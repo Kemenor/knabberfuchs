@@ -57,6 +57,8 @@ Thumbs.db
 *.zip
 *.bak
 scratch/
+.emu_*.png
+.scratch*
 
 # Claude Code local settings
 .claude/settings.local.json
