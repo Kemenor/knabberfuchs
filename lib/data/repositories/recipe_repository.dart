@@ -59,6 +59,31 @@ class RecipeRepository {
     );
   }
 
+  Future<void> update({
+    required int id,
+    required String name,
+    required double servings,
+    required List<RecipeShareItem> items,
+  }) {
+    return db.updateRecipe(
+      id,
+      RecipesCompanion(name: Value(name), servings: Value(servings)),
+      [
+        for (var idx = 0; idx < items.length; idx++)
+          RecipeItemsCompanion.insert(
+            recipeId: 0, // set inside updateRecipe
+            sName: items[idx].name,
+            grams: items[idx].grams,
+            sKcal100: items[idx].kcal100,
+            sProtein100: Value(items[idx].protein100),
+            sCarb100: Value(items[idx].carb100),
+            sFat100: Value(items[idx].fat100),
+            sortIndex: Value(idx),
+          ),
+      ],
+    );
+  }
+
   Future<int> importShare(RecipeShare share) =>
       create(name: share.name, servings: share.servings, items: share.items);
 

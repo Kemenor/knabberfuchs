@@ -9,6 +9,7 @@ import '../../domain/meal_times.dart';
 import '../../domain/nutrition.dart';
 import '../../domain/recipe_share.dart';
 import '../../providers.dart';
+import 'recipe_edit_screen.dart';
 import 'recipe_share_screen.dart';
 
 class RecipeDetailScreen extends ConsumerStatefulWidget {
@@ -20,6 +21,7 @@ class RecipeDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
+  late Recipe _recipe = widget.recipe;
   RecipeShare? _share;
 
   @override
@@ -30,14 +32,25 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
 
   Future<void> _load() async {
     final repo = ref.read(recipeRepositoryProvider);
-    final items = await repo.items(widget.recipe.id);
+    final fresh = await ref.read(dbProvider).recipeById(_recipe.id) ?? _recipe;
+    final items = await repo.items(_recipe.id);
     if (mounted) {
-      setState(() => _share = repo.toShare(widget.recipe, items));
+      setState(() {
+        _recipe = fresh;
+        _share = repo.toShare(fresh, items);
+      });
     }
   }
 
+  Future<void> _edit() async {
+    final changed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => RecipeEditScreen(recipe: _recipe)),
+    );
+    if (changed == true) await _load();
+  }
+
   Future<void> _delete() async {
-    await ref.read(recipeRepositoryProvider).delete(widget.recipe.id);
+    await ref.read(recipeRepositoryProvider).delete(_recipe.id);
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -47,8 +60,14 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.recipe.name),
+        title: Text(_recipe.name),
         actions: [
+          if (share != null)
+            IconButton(
+              tooltip: 'Edit',
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: _edit,
+            ),
           if (share != null)
             IconButton(
               tooltip: 'Share',

@@ -219,6 +219,9 @@ class AppDatabase extends _$AppDatabase {
   Stream<List<Recipe>> watchRecipes() =>
       (select(recipes)..orderBy([(r) => OrderingTerm.asc(r.name)])).watch();
 
+  Future<Recipe?> recipeById(int id) =>
+      (select(recipes)..where((r) => r.id.equals(id))).getSingleOrNull();
+
   Future<List<RecipeItem>> itemsForRecipe(int recipeId) =>
       (select(recipeItems)
             ..where((i) => i.recipeId.equals(recipeId))
@@ -233,6 +236,18 @@ class AppDatabase extends _$AppDatabase {
         await into(recipeItems).insert(item.copyWith(recipeId: Value(id)));
       }
       return id;
+    });
+  }
+
+  /// Update a recipe's fields and replace its items.
+  Future<void> updateRecipe(
+      int id, RecipesCompanion recipe, List<RecipeItemsCompanion> items) async {
+    await transaction(() async {
+      await (update(recipes)..where((r) => r.id.equals(id))).write(recipe);
+      await (delete(recipeItems)..where((i) => i.recipeId.equals(id))).go();
+      for (final item in items) {
+        await into(recipeItems).insert(item.copyWith(recipeId: Value(id)));
+      }
     });
   }
 

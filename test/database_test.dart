@@ -141,6 +141,31 @@ void main() {
     expect((await db.mappedFoodForOcr('creme fraiche'))?.id, id2);
   });
 
+  test('updateRecipe replaces fields and items', () async {
+    final id = await db.createRecipe(
+      RecipesCompanion.insert(name: 'A'),
+      [
+        RecipeItemsCompanion.insert(
+            recipeId: 0, sName: 'Oats', grams: 50, sKcal100: 389),
+      ],
+    );
+    await db.updateRecipe(
+      id,
+      RecipesCompanion(name: const Value('B'), servings: const Value(3)),
+      [
+        RecipeItemsCompanion.insert(
+            recipeId: 0, sName: 'Rice', grams: 100, sKcal100: 130),
+        RecipeItemsCompanion.insert(
+            recipeId: 0, sName: 'Beans', grams: 80, sKcal100: 90),
+      ],
+    );
+    final r = await db.recipeById(id);
+    expect(r!.name, 'B');
+    expect(r.servings, 3);
+    final items = await db.itemsForRecipe(id);
+    expect(items.map((i) => i.sName), ['Rice', 'Beans']);
+  });
+
   test('settings round-trip', () async {
     await db.setSetting('unit', 'kcal');
     expect(await db.getSetting('unit'), 'kcal');

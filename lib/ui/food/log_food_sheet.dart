@@ -56,7 +56,14 @@ Future<bool?> showLogFoodSheet(
 /// recipe ingredients so they match the add-food flow.
 Future<double?> showAmountSheet(
   BuildContext context, {
-  required Food food,
+  required String name,
+  String? brand,
+  required double kcal100,
+  double? protein100,
+  double? carb100,
+  double? fat100,
+  double? servingG,
+  String? servingLabel,
   double? initialGrams,
   String submitLabel = 'Add',
 }) async {
@@ -68,15 +75,15 @@ Future<double?> showAmountSheet(
     builder: (_) => _LogSheet(
       title: 'Amount',
       submitLabel: submitLabel,
-      name: food.name,
-      brand: food.brand,
-      kcal100: food.kcal100,
-      protein100: food.protein100,
-      carb100: food.carb100,
-      fat100: food.fat100,
-      servingG: food.servingG,
-      servingLabel: food.servingLabel,
-      initialGrams: initialGrams ?? food.servingG ?? 100,
+      name: name,
+      brand: brand,
+      kcal100: kcal100,
+      protein100: protein100,
+      carb100: carb100,
+      fat100: fat100,
+      servingG: servingG,
+      servingLabel: servingLabel,
+      initialGrams: initialGrams ?? servingG ?? 100,
       initialMeal: MealType.snack,
       askMeal: false,
       onSubmit: (g, _) async => result = g,
@@ -188,14 +195,18 @@ class _LogSheetState extends State<_LogSheet> {
     final grams = _grams;
     final kcal = widget.kcal100 * grams / 100;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(widget.name,
+    // SafeArea keeps the buttons clear of the system nav bar (3-button mode);
+    // viewInsets handles the keyboard. Together they cover both at once.
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(widget.name,
               style: theme.textTheme.titleLarge,
               maxLines: 2,
               overflow: TextOverflow.ellipsis),
@@ -317,6 +328,7 @@ class _LogSheetState extends State<_LogSheet> {
             ],
           ),
         ],
+        ),
       ),
     );
   }
