@@ -1,0 +1,40 @@
+name: Build offline OFF packs
+
+# Builds per-country OFF packs from the OFF parquet and publishes them (+ a
+# manifest) to the public Hugging Face dataset. Weekly + manual.
+on:
+  schedule:
+    - cron: "0 4 * * 0" # Sundays 04:00 UTC
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install DuckDB CLI
+        run: |
+          curl -fsSL https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-amd64.zip -o /tmp/duckdb.zip
+          unzip -o /tmp/duckdb.zip -d /tmp
+          sudo mv /tmp/duckdb /usr/local/bin/
+          duckdb --version
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install huggingface_hub
+        run: pip install --quiet huggingface_hub
+
+      - name: Verify Python sqlite has FTS5
+        run: python -c "import sqlite3; sqlite3.connect(':memory:').execute('CREATE VIRTUAL TABLE t USING fts5(x)'); print('fts5 ok')"
+
+      - name: Build region packs
+        run: bash pipeline/build_all.sh
+
+      - name: Publish to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python pipeline/publish.py
