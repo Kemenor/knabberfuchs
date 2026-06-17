@@ -17,6 +17,7 @@ class SettingsScreen extends ConsumerWidget {
     final targetsAsync = ref.watch(targetsProvider);
     final defaultMin = ref.watch(defaultMinProvider).asData?.value;
     final defaultMax = ref.watch(defaultMaxProvider).asData?.value;
+    final trackByMeal = ref.watch(groupByMealProvider).asData?.value ?? true;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -63,6 +64,16 @@ class SettingsScreen extends ConsumerWidget {
                   onMax: (v) =>
                       db.setTarget(wd, TargetsCompanion(kcalMax: Value(v))),
                 ),
+              const Divider(),
+              const _SectionHeader('Logging'),
+              SwitchListTile(
+                title: const Text('Track by meal'),
+                subtitle: const Text(
+                    'Off: log straight to the day without picking a meal'),
+                value: trackByMeal,
+                onChanged: (v) =>
+                    db.setSetting('groupByMeal', v ? 'true' : 'false'),
+              ),
               const Divider(),
               const _SectionHeader('Integrations'),
               const ListTile(

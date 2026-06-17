@@ -7,6 +7,10 @@ import '../../data/db/database.dart';
 import '../../domain/enums.dart';
 import '../../providers.dart';
 
+/// Whether the meal picker should be shown (track-by-meal mode).
+bool _askMeal(WidgetRef ref) =>
+    ref.read(groupByMealProvider).asData?.value ?? true;
+
 /// Sheet to log a catalog [food] into [day]/[meal].
 Future<bool?> showLogFoodSheet(
   BuildContext context,
@@ -32,6 +36,7 @@ Future<bool?> showLogFoodSheet(
       servingLabel: food.servingLabel,
       initialGrams: food.servingG ?? 100,
       initialMeal: meal,
+      askMeal: _askMeal(ref),
       onSubmit: (g, m) => ref
           .read(diaryRepositoryProvider)
           .logFood(food: food, grams: g, meal: m, day: day),
@@ -58,6 +63,7 @@ void showEditEntrySheet(BuildContext context, WidgetRef ref, Entry entry) {
       servingLabel: null,
       initialGrams: entry.grams,
       initialMeal: entry.mealType,
+      askMeal: _askMeal(ref),
       onSubmit: (g, m) =>
           ref.read(diaryRepositoryProvider).editEntry(entry, grams: g, meal: m),
       onDelete: () => ref.read(diaryRepositoryProvider).deleteEntry(entry.id),
@@ -78,6 +84,7 @@ class _LogSheet extends StatefulWidget {
   final String? servingLabel;
   final double initialGrams;
   final MealType initialMeal;
+  final bool askMeal;
   final Future<void> Function(double grams, MealType meal) onSubmit;
   final Future<void> Function()? onDelete;
 
@@ -94,6 +101,7 @@ class _LogSheet extends StatefulWidget {
     required this.servingLabel,
     required this.initialGrams,
     required this.initialMeal,
+    required this.askMeal,
     required this.onSubmit,
     this.onDelete,
   });
@@ -189,20 +197,22 @@ class _LogSheetState extends State<_LogSheet> {
                 ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text('Meal', style: theme.textTheme.labelLarge),
-          const SizedBox(height: 4),
-          Wrap(
-            spacing: 8,
-            children: [
-              for (final m in MealType.values)
-                ChoiceChip(
-                  label: Text(m.label),
-                  selected: _meal == m,
-                  onSelected: (_) => setState(() => _meal = m),
-                ),
-            ],
-          ),
+          if (widget.askMeal) ...[
+            const SizedBox(height: 16),
+            Text('Meal', style: theme.textTheme.labelLarge),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 8,
+              children: [
+                for (final m in MealType.values)
+                  ChoiceChip(
+                    label: Text(m.label),
+                    selected: _meal == m,
+                    onSelected: (_) => setState(() => _meal = m),
+                  ),
+              ],
+            ),
+          ],
           const SizedBox(height: 20),
           Row(
             children: [
