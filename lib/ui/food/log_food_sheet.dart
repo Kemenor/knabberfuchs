@@ -20,6 +20,9 @@ Future<bool?> showLogFoodSheet(
   required String day,
   required MealType meal,
 }) {
+  // Read once, now — never inside the builder, which re-runs on sheet rebuilds
+  // when the caller's ref may already be disposed (e.g. after delete).
+  final askMeal = _askMeal(ref);
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -37,7 +40,7 @@ Future<bool?> showLogFoodSheet(
       servingLabel: food.servingLabel,
       initialGrams: food.servingG ?? 100,
       initialMeal: meal,
-      askMeal: _askMeal(ref),
+      askMeal: askMeal,
       onSubmit: (g, m) => ref
           .read(diaryRepositoryProvider)
           .logFood(food: food, grams: g, meal: m, day: day),
@@ -47,6 +50,7 @@ Future<bool?> showLogFoodSheet(
 
 /// Sheet to edit an existing diary [entry] (grams + meal, or delete).
 void showEditEntrySheet(BuildContext context, WidgetRef ref, Entry entry) {
+  final askMeal = _askMeal(ref);
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -64,7 +68,7 @@ void showEditEntrySheet(BuildContext context, WidgetRef ref, Entry entry) {
       servingLabel: null,
       initialGrams: entry.grams,
       initialMeal: entry.mealType,
-      askMeal: _askMeal(ref),
+      askMeal: askMeal,
       onSubmit: (g, m) =>
           ref.read(diaryRepositoryProvider).editEntry(entry, grams: g, meal: m),
       onDelete: () => ref.read(diaryRepositoryProvider).deleteEntry(entry.id),

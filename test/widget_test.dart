@@ -29,6 +29,8 @@ void main() {
 
     expect(find.text('Today'), findsOneWidget);
     expect(find.text('Add food'), findsOneWidget);
-    expect(find.text('Nothing logged yet.'), findsOneWidget);
+    // Meal mode (overridden true): empty day shows the four meal sections.
+    expect(find.text('Breakfast'), findsOneWidget);
+    expect(find.text('Snacks'), findsOneWidget);
   });
 }
