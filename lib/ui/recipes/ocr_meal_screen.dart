@@ -37,9 +37,25 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   final _name = TextEditingController(text: 'Meal from photo');
 
   @override
+  void initState() {
+    super.initState();
+    _autoMatch();
+  }
+
+  @override
   void dispose() {
     _name.dispose();
     super.dispose();
+  }
+
+  /// Pre-match ingredients whose name was matched to a food before.
+  Future<void> _autoMatch() async {
+    final db = ref.read(dbProvider);
+    for (var i = 0; i < _items.length; i++) {
+      final food =
+          await db.mappedFoodForOcr(normalizeOcrName(_items[i].parsed.name));
+      if (food != null && mounted) setState(() => _items[i].matched = food);
+    }
   }
 
   double? _grams(_Item it) {
@@ -71,7 +87,31 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       MaterialPageRoute(
           builder: (_) => FoodPickerScreen(title: _items[i].parsed.name)),
     );
-    if (food != null && mounted) setState(() => _items[i].matched = food);
+    if (food == null || !mounted) return;
+    // Persist + remember the mapping so this name auto-matches next time.
+    final persisted = await ref.read(foodRepositoryProvider).ensurePersisted(food);
+    await ref
+        .read(dbProvider)
+        .setOcrMapping(normalizeOcrName(_items[i].parsed.name), persisted.id);
+    if (mounted) setState(() => _items[i].matched = persisted);
+  }
+
+  Future<void> _addIngredient() async {
+    final food = await Navigator.of(context).push<Food>(
+      MaterialPageRoute(
+          builder: (_) => const FoodPickerScreen(title: 'Add ingredient')),
+    );
+    if (food == null || !mounted) return;
+    final persisted = await ref.read(foodRepositoryProvider).ensurePersisted(food);
+    if (!mounted) return;
+    setState(() {
+      _items.add(_Item(OcrIngredient(
+        name: persisted.name,
+        amount: persisted.servingG ?? 100,
+        unit: AmountUnit.grams,
+        rawUnit: 'g',
+      ))..matched = persisted);
+    });
   }
 
   Future<void> _editGrams(int i) async {
@@ -172,7 +212,16 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final matched = _ready.length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Review meal')),
+      appBar: AppBar(
+        title: const Text('Review meal'),
+        actions: [
+          IconButton(
+            tooltip: 'Add ingredient',
+            icon: const Icon(Icons.add),
+            onPressed: _addIngredient,
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(

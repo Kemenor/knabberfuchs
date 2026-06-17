@@ -1,6 +1,6 @@
 import 'package:calorie_tracker/data/db/database.dart';
 import 'package:calorie_tracker/domain/enums.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -125,6 +125,20 @@ void main() {
     ));
     await db.deleteEntryGroup(gid);
     expect(await db.watchDay('2026-06-17').first, isEmpty);
+  });
+
+  test('OCR mapping round-trips and resolves to a food', () async {
+    final id = await db.upsertFood(FoodsCompanion.insert(
+        source: FoodSource.custom, name: 'Crème Fraîche 30%', kcal100: 300));
+    await db.setOcrMapping('creme fraiche', id);
+    expect((await db.mappedFoodForOcr('creme fraiche'))?.id, id);
+    expect(await db.mappedFoodForOcr('unknown'), isNull);
+
+    // re-mapping overwrites
+    final id2 = await db.upsertFood(FoodsCompanion.insert(
+        source: FoodSource.custom, name: 'Light Crème Fraîche', kcal100: 160));
+    await db.setOcrMapping('creme fraiche', id2);
+    expect((await db.mappedFoodForOcr('creme fraiche'))?.id, id2);
   });
 
   test('settings round-trip', () async {

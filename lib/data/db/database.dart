@@ -10,7 +10,7 @@ part 'database.g.dart';
 @DriftDatabase(
   tables: [
     Foods, Entries, EntryGroups, Targets, Recipes, RecipeItems, Settings,
-    InstalledPacks,
+    InstalledPacks, OcrMappings,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -48,6 +48,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 4) {
             // Installed offline region packs.
             await m.createTable(installedPacks);
+          }
+          if (from < 5) {
+            // Remembered OCR ingredient-name -> food matches.
+            await m.createTable(ocrMappings);
           }
         },
         beforeOpen: (details) async {
@@ -249,6 +253,20 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteInstalledPack(String code) =>
       (delete(installedPacks)..where((p) => p.code.equals(code))).go();
+
+  // ---------------- OCR name -> food mappings ----------------
+
+  Future<Food?> mappedFoodForOcr(String normalizedName) async {
+    final m = await (select(ocrMappings)
+          ..where((x) => x.normalizedName.equals(normalizedName)))
+        .getSingleOrNull();
+    if (m == null) return null;
+    return foodById(m.foodId);
+  }
+
+  Future<void> setOcrMapping(String normalizedName, int foodId) =>
+      into(ocrMappings).insertOnConflictUpdate(OcrMappingsCompanion.insert(
+          normalizedName: normalizedName, foodId: foodId));
 
   // ---------------- Settings ----------------
 

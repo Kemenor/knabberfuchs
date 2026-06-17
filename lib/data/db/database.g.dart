@@ -4349,6 +4349,279 @@ class InstalledPacksCompanion extends UpdateCompanion<InstalledPack> {
   }
 }
 
+class $OcrMappingsTable extends OcrMappings
+    with TableInfo<$OcrMappingsTable, OcrMapping> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OcrMappingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _normalizedNameMeta = const VerificationMeta(
+    'normalizedName',
+  );
+  @override
+  late final GeneratedColumn<String> normalizedName = GeneratedColumn<String>(
+    'normalized_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _foodIdMeta = const VerificationMeta('foodId');
+  @override
+  late final GeneratedColumn<int> foodId = GeneratedColumn<int>(
+    'food_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES foods (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [normalizedName, foodId, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ocr_mappings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OcrMapping> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('normalized_name')) {
+      context.handle(
+        _normalizedNameMeta,
+        normalizedName.isAcceptableOrUnknown(
+          data['normalized_name']!,
+          _normalizedNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedNameMeta);
+    }
+    if (data.containsKey('food_id')) {
+      context.handle(
+        _foodIdMeta,
+        foodId.isAcceptableOrUnknown(data['food_id']!, _foodIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_foodIdMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {normalizedName};
+  @override
+  OcrMapping map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OcrMapping(
+      normalizedName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}normalized_name'],
+      )!,
+      foodId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}food_id'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $OcrMappingsTable createAlias(String alias) {
+    return $OcrMappingsTable(attachedDatabase, alias);
+  }
+}
+
+class OcrMapping extends DataClass implements Insertable<OcrMapping> {
+  final String normalizedName;
+  final int foodId;
+  final DateTime updatedAt;
+  const OcrMapping({
+    required this.normalizedName,
+    required this.foodId,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['normalized_name'] = Variable<String>(normalizedName);
+    map['food_id'] = Variable<int>(foodId);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  OcrMappingsCompanion toCompanion(bool nullToAbsent) {
+    return OcrMappingsCompanion(
+      normalizedName: Value(normalizedName),
+      foodId: Value(foodId),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory OcrMapping.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OcrMapping(
+      normalizedName: serializer.fromJson<String>(json['normalizedName']),
+      foodId: serializer.fromJson<int>(json['foodId']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'normalizedName': serializer.toJson<String>(normalizedName),
+      'foodId': serializer.toJson<int>(foodId),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  OcrMapping copyWith({
+    String? normalizedName,
+    int? foodId,
+    DateTime? updatedAt,
+  }) => OcrMapping(
+    normalizedName: normalizedName ?? this.normalizedName,
+    foodId: foodId ?? this.foodId,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  OcrMapping copyWithCompanion(OcrMappingsCompanion data) {
+    return OcrMapping(
+      normalizedName: data.normalizedName.present
+          ? data.normalizedName.value
+          : this.normalizedName,
+      foodId: data.foodId.present ? data.foodId.value : this.foodId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OcrMapping(')
+          ..write('normalizedName: $normalizedName, ')
+          ..write('foodId: $foodId, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(normalizedName, foodId, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OcrMapping &&
+          other.normalizedName == this.normalizedName &&
+          other.foodId == this.foodId &&
+          other.updatedAt == this.updatedAt);
+}
+
+class OcrMappingsCompanion extends UpdateCompanion<OcrMapping> {
+  final Value<String> normalizedName;
+  final Value<int> foodId;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const OcrMappingsCompanion({
+    this.normalizedName = const Value.absent(),
+    this.foodId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OcrMappingsCompanion.insert({
+    required String normalizedName,
+    required int foodId,
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : normalizedName = Value(normalizedName),
+       foodId = Value(foodId);
+  static Insertable<OcrMapping> custom({
+    Expression<String>? normalizedName,
+    Expression<int>? foodId,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (normalizedName != null) 'normalized_name': normalizedName,
+      if (foodId != null) 'food_id': foodId,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OcrMappingsCompanion copyWith({
+    Value<String>? normalizedName,
+    Value<int>? foodId,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return OcrMappingsCompanion(
+      normalizedName: normalizedName ?? this.normalizedName,
+      foodId: foodId ?? this.foodId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (normalizedName.present) {
+      map['normalized_name'] = Variable<String>(normalizedName.value);
+    }
+    if (foodId.present) {
+      map['food_id'] = Variable<int>(foodId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OcrMappingsCompanion(')
+          ..write('normalizedName: $normalizedName, ')
+          ..write('foodId: $foodId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4360,6 +4633,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RecipeItemsTable recipeItems = $RecipeItemsTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
   late final $InstalledPacksTable installedPacks = $InstalledPacksTable(this);
+  late final $OcrMappingsTable ocrMappings = $OcrMappingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4373,6 +4647,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     recipeItems,
     settings,
     installedPacks,
+    ocrMappings,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -4396,6 +4671,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('recipe_items', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'foods',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('ocr_mappings', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -4469,6 +4751,24 @@ final class $$FoodsTableReferences
     ).filter((f) => f.foodId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_entriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$OcrMappingsTable, List<OcrMapping>>
+  _ocrMappingsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.ocrMappings,
+    aliasName: 'foods__id__ocr_mappings__food_id',
+  );
+
+  $$OcrMappingsTableProcessedTableManager get ocrMappingsRefs {
+    final manager = $$OcrMappingsTableTableManager(
+      $_db,
+      $_db.ocrMappings,
+    ).filter((f) => f.foodId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_ocrMappingsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4610,6 +4910,31 @@ class $$FoodsTableFilterComposer extends Composer<_$AppDatabase, $FoodsTable> {
           }) => $$EntriesTableFilterComposer(
             $db: $db,
             $table: $db.entries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ocrMappingsRefs(
+    Expression<bool> Function($$OcrMappingsTableFilterComposer f) f,
+  ) {
+    final $$OcrMappingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ocrMappings,
+      getReferencedColumn: (t) => t.foodId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OcrMappingsTableFilterComposer(
+            $db: $db,
+            $table: $db.ocrMappings,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4853,6 +5178,31 @@ class $$FoodsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> ocrMappingsRefs<T extends Object>(
+    Expression<T> Function($$OcrMappingsTableAnnotationComposer a) f,
+  ) {
+    final $$OcrMappingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ocrMappings,
+      getReferencedColumn: (t) => t.foodId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OcrMappingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ocrMappings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$FoodsTableTableManager
@@ -4868,7 +5218,7 @@ class $$FoodsTableTableManager
           $$FoodsTableUpdateCompanionBuilder,
           (Food, $$FoodsTableReferences),
           Food,
-          PrefetchHooks Function({bool entriesRefs})
+          PrefetchHooks Function({bool entriesRefs, bool ocrMappingsRefs})
         > {
   $$FoodsTableTableManager(_$AppDatabase db, $FoodsTable table)
     : super(
@@ -4983,29 +5333,55 @@ class $$FoodsTableTableManager
                     (e.readTable(table), $$FoodsTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({entriesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (entriesRefs) db.entries],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (entriesRefs)
-                    await $_getPrefetchedData<Food, $FoodsTable, Entry>(
-                      currentTable: table,
-                      referencedTable: $$FoodsTableReferences._entriesRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult: (p0) =>
-                          $$FoodsTableReferences(db, table, p0).entriesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.foodId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({entriesRefs = false, ocrMappingsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (entriesRefs) db.entries,
+                    if (ocrMappingsRefs) db.ocrMappings,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (entriesRefs)
+                        await $_getPrefetchedData<Food, $FoodsTable, Entry>(
+                          currentTable: table,
+                          referencedTable: $$FoodsTableReferences
+                              ._entriesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FoodsTableReferences(db, table, p0).entriesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.foodId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (ocrMappingsRefs)
+                        await $_getPrefetchedData<
+                          Food,
+                          $FoodsTable,
+                          OcrMapping
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FoodsTableReferences
+                              ._ocrMappingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FoodsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ocrMappingsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.foodId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -5022,7 +5398,7 @@ typedef $$FoodsTableProcessedTableManager =
       $$FoodsTableUpdateCompanionBuilder,
       (Food, $$FoodsTableReferences),
       Food,
-      PrefetchHooks Function({bool entriesRefs})
+      PrefetchHooks Function({bool entriesRefs, bool ocrMappingsRefs})
     >;
 typedef $$EntryGroupsTableCreateCompanionBuilder =
     EntryGroupsCompanion Function({
@@ -7160,6 +7536,287 @@ typedef $$InstalledPacksTableProcessedTableManager =
       InstalledPack,
       PrefetchHooks Function()
     >;
+typedef $$OcrMappingsTableCreateCompanionBuilder =
+    OcrMappingsCompanion Function({
+      required String normalizedName,
+      required int foodId,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$OcrMappingsTableUpdateCompanionBuilder =
+    OcrMappingsCompanion Function({
+      Value<String> normalizedName,
+      Value<int> foodId,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$OcrMappingsTableReferences
+    extends BaseReferences<_$AppDatabase, $OcrMappingsTable, OcrMapping> {
+  $$OcrMappingsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $FoodsTable _foodIdTable(_$AppDatabase db) =>
+      db.foods.createAlias('ocr_mappings__food_id__foods__id');
+
+  $$FoodsTableProcessedTableManager get foodId {
+    final $_column = $_itemColumn<int>('food_id')!;
+
+    final manager = $$FoodsTableTableManager(
+      $_db,
+      $_db.foods,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_foodIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$OcrMappingsTableFilterComposer
+    extends Composer<_$AppDatabase, $OcrMappingsTable> {
+  $$OcrMappingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$FoodsTableFilterComposer get foodId {
+    final $$FoodsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.foodId,
+      referencedTable: $db.foods,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FoodsTableFilterComposer(
+            $db: $db,
+            $table: $db.foods,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OcrMappingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $OcrMappingsTable> {
+  $$OcrMappingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$FoodsTableOrderingComposer get foodId {
+    final $$FoodsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.foodId,
+      referencedTable: $db.foods,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FoodsTableOrderingComposer(
+            $db: $db,
+            $table: $db.foods,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OcrMappingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OcrMappingsTable> {
+  $$OcrMappingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$FoodsTableAnnotationComposer get foodId {
+    final $$FoodsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.foodId,
+      referencedTable: $db.foods,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FoodsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.foods,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OcrMappingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OcrMappingsTable,
+          OcrMapping,
+          $$OcrMappingsTableFilterComposer,
+          $$OcrMappingsTableOrderingComposer,
+          $$OcrMappingsTableAnnotationComposer,
+          $$OcrMappingsTableCreateCompanionBuilder,
+          $$OcrMappingsTableUpdateCompanionBuilder,
+          (OcrMapping, $$OcrMappingsTableReferences),
+          OcrMapping,
+          PrefetchHooks Function({bool foodId})
+        > {
+  $$OcrMappingsTableTableManager(_$AppDatabase db, $OcrMappingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OcrMappingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OcrMappingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OcrMappingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> normalizedName = const Value.absent(),
+                Value<int> foodId = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OcrMappingsCompanion(
+                normalizedName: normalizedName,
+                foodId: foodId,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String normalizedName,
+                required int foodId,
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OcrMappingsCompanion.insert(
+                normalizedName: normalizedName,
+                foodId: foodId,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$OcrMappingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({foodId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (foodId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.foodId,
+                                referencedTable: $$OcrMappingsTableReferences
+                                    ._foodIdTable(db),
+                                referencedColumn: $$OcrMappingsTableReferences
+                                    ._foodIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$OcrMappingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OcrMappingsTable,
+      OcrMapping,
+      $$OcrMappingsTableFilterComposer,
+      $$OcrMappingsTableOrderingComposer,
+      $$OcrMappingsTableAnnotationComposer,
+      $$OcrMappingsTableCreateCompanionBuilder,
+      $$OcrMappingsTableUpdateCompanionBuilder,
+      (OcrMapping, $$OcrMappingsTableReferences),
+      OcrMapping,
+      PrefetchHooks Function({bool foodId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7180,4 +7837,6 @@ class $AppDatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$InstalledPacksTableTableManager get installedPacks =>
       $$InstalledPacksTableTableManager(_db, _db.installedPacks);
+  $$OcrMappingsTableTableManager get ocrMappings =>
+      $$OcrMappingsTableTableManager(_db, _db.ocrMappings);
 }

@@ -141,6 +141,18 @@ class InstalledPacks extends Table {
   Set<Column> get primaryKey => {code};
 }
 
+/// Remembers which food an OCR'd ingredient name was matched to, so the same
+/// name auto-matches next time. Keyed by the normalized name.
+class OcrMappings extends Table {
+  TextColumn get normalizedName => text()();
+  IntColumn get foodId =>
+      integer().references(Foods, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {normalizedName};
+}
+
 /// Simple key/value store for app preferences.
 class Settings extends Table {
   TextColumn get key => text()();

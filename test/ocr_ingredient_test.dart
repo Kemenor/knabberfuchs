@@ -61,4 +61,10 @@ void main() {
     expect(r.single.name, 'Omega 3 Fish Oil');
     expect(r.single.amount, 200);
   });
+
+  test('normalizeOcrName folds accents and punctuation', () {
+    expect(normalizeOcrName('Crème Fraîche'), 'creme fraiche');
+    expect(normalizeOcrName('creme fraiche'), 'creme fraiche');
+    expect(normalizeOcrName('  Olive   Oil! '), 'olive oil');
+  });
 }
