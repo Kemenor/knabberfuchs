@@ -7,6 +7,7 @@ import '../../providers.dart';
 import '../scan/scan_screen.dart';
 import 'food_search_list.dart';
 import 'manual_food_screen.dart';
+import 'offline_reminder.dart';
 
 /// Search / scan / create a single food and pop it. Used to match an OCR
 /// ingredient or add a recipe ingredient.
@@ -25,10 +26,12 @@ class FoodPickerScreen extends ConsumerWidget {
     ));
     if (barcode == null || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
-    final food = await ref.read(foodRepositoryProvider).lookupBarcode(barcode);
+    final hit = await ref.read(foodRepositoryProvider).lookupBarcode(barcode);
     if (!context.mounted) return;
-    if (food != null) {
-      Navigator.of(context).pop(food);
+    if (hit.food != null) {
+      final reminder = offlinePackReminder(context, ref, hit.source);
+      Navigator.of(context).pop(hit.food);
+      reminder?.call(); // shows on the screen we return to
     } else {
       messenger.showSnackBar(
           SnackBar(content: Text('No product found for $barcode')));

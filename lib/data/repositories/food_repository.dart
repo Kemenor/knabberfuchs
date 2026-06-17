@@ -5,6 +5,15 @@ import '../db/database.dart';
 import '../offline/region_pack_store.dart';
 import '../sources/off_api.dart';
 
+/// How a scanned barcode was resolved (for the offline-pack nudge).
+enum BarcodeSource { cache, pack, online, none }
+
+class BarcodeHit {
+  final Food? food;
+  final BarcodeSource source;
+  const BarcodeHit(this.food, this.source);
+}
+
 /// Food lookup across the layered sources:
 /// local catalog (custom / USDA / scan-cache) + offline region packs -> OFF live.
 class FoodRepository {
@@ -80,15 +89,17 @@ class FoodRepository {
 
   /// Resolve a scanned barcode: cache first, then OFF. Caches a hit.
   /// Returns null if the product is unknown everywhere.
-  Future<Food?> lookupBarcode(String barcode) async {
+  Future<BarcodeHit> lookupBarcode(String barcode) async {
     final cached = await db.foodByExternal(FoodSource.openFoodFacts, barcode);
-    if (cached != null) return cached;
+    if (cached != null) return BarcodeHit(cached, BarcodeSource.cache);
     final fromPack = packs.lookupBarcode(barcode);
-    if (fromPack != null) return ensurePersisted(fromPack);
+    if (fromPack != null) {
+      return BarcodeHit(await ensurePersisted(fromPack), BarcodeSource.pack);
+    }
     final remote = await off.productByBarcode(barcode);
-    if (remote == null) return null;
+    if (remote == null) return const BarcodeHit(null, BarcodeSource.none);
     final id = await db.upsertFood(remote);
-    return db.foodById(id);
+    return BarcodeHit(await db.foodById(id), BarcodeSource.online);
   }
 
   Future<Food> createCustomFood({

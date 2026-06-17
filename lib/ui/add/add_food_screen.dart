@@ -5,6 +5,7 @@ import '../../data/db/database.dart';
 import '../../domain/enums.dart';
 import '../../providers.dart';
 import '../food/food_search_list.dart';
+import '../food/offline_reminder.dart';
 import '../food/log_food_sheet.dart';
 import '../food/manual_food_screen.dart';
 import '../scan/scan_screen.dart';
@@ -39,10 +40,12 @@ class AddFoodScreen extends ConsumerWidget {
     );
     if (barcode == null || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
-    final food = await ref.read(foodRepositoryProvider).lookupBarcode(barcode);
+    final hit = await ref.read(foodRepositoryProvider).lookupBarcode(barcode);
     if (!context.mounted) return;
-    if (food != null) {
-      await _pick(context, ref, food);
+    if (hit.food != null) {
+      final reminder = offlinePackReminder(context, ref, hit.source);
+      await _pick(context, ref, hit.food!);
+      reminder?.call(); // after the log sheet closes, so it isn't hidden
     } else {
       messenger.showSnackBar(
           SnackBar(content: Text('No product found for $barcode')));
