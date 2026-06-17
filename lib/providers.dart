@@ -7,6 +7,7 @@ import 'data/repositories/diary_repository.dart';
 import 'data/repositories/food_repository.dart';
 import 'data/repositories/recipe_repository.dart';
 import 'data/backup_service.dart';
+import 'data/ocr/ocr_service.dart';
 import 'data/offline/offline_pack_service.dart';
 import 'data/offline/region_pack_store.dart';
 import 'data/sources/off_api.dart';
@@ -68,6 +69,12 @@ final recipesProvider = StreamProvider<List<Recipe>>(
 final backupServiceProvider = Provider<BackupService>(
   (ref) => BackupService(ref.watch(dbProvider)),
 );
+
+final ocrServiceProvider = Provider<OcrService>((ref) {
+  final s = OcrService();
+  ref.onDispose(s.dispose);
+  return s;
+});
 
 /// One-time startup work: import the bundled USDA produce dataset on first run
 /// and open any installed offline region packs.

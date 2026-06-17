@@ -50,10 +50,12 @@ class DiaryRepository {
     required double grams,
     required MealType meal,
     required String day,
+    int? groupId,
   }) async {
     await db.addEntry(EntriesCompanion.insert(
       day: day,
       mealType: meal,
+      groupId: Value(groupId),
       grams: grams,
       sName: name,
       sKcal100: kcal100,
