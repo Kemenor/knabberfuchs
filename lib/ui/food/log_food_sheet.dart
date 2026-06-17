@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/format.dart';
 import '../../data/db/database.dart';
 import '../../domain/enums.dart';
+import '../../domain/units.dart';
 import '../../providers.dart';
 
 /// Whether the meal picker should be shown (track-by-meal mode).
@@ -111,27 +112,33 @@ class _LogSheet extends StatefulWidget {
 }
 
 class _LogSheetState extends State<_LogSheet> {
-  late final TextEditingController _grams =
+  late final TextEditingController _amountCtrl =
       TextEditingController(text: gramsStr(widget.initialGrams));
   late MealType _meal = widget.initialMeal;
+  AmountUnit _unit = AmountUnit.grams;
 
-  double get _g => double.tryParse(_grams.text.replaceAll(',', '.')) ?? 0;
+  double get _amount =>
+      double.tryParse(_amountCtrl.text.replaceAll(',', '.')) ?? 0;
+  double get _grams => _unit.toGrams(_amount);
 
   @override
   void dispose() {
-    _grams.dispose();
+    _amountCtrl.dispose();
     super.dispose();
   }
 
   void _setGrams(double g) {
-    _grams.text = gramsStr(g);
-    setState(() {});
+    setState(() {
+      _unit = AmountUnit.grams;
+      _amountCtrl.text = gramsStr(g);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final kcal = widget.kcal100 * _g / 100;
+    final grams = _grams;
+    final kcal = widget.kcal100 * grams / 100;
     final chips = <double>{50, 100, 150, 200, if (widget.servingG != null) widget.servingG!}
         .toList()
       ..sort();
@@ -157,17 +164,17 @@ class _LogSheetState extends State<_LogSheet> {
             children: [
               Expanded(
                 child: TextField(
-                  controller: _grams,
+                  controller: _amountCtrl,
                   autofocus: true,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                   ],
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Amount',
-                    suffixText: 'g',
-                    border: OutlineInputBorder(),
+                    suffixText: _unit.label,
+                    border: const OutlineInputBorder(),
                   ),
                   onChanged: (_) => setState(() {}),
                 ),
@@ -184,6 +191,25 @@ class _LogSheetState extends State<_LogSheet> {
               ),
             ],
           ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            children: [
+              for (final u in AmountUnit.values)
+                ChoiceChip(
+                  label: Text(u.label),
+                  selected: _unit == u,
+                  onSelected: (_) => setState(() => _unit = u),
+                  visualDensity: VisualDensity.compact,
+                ),
+            ],
+          ),
+          if (_unit.isVolume)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text('≈ ${gramsStr(grams)} g (assumes ~1 g/ml)',
+                  style: theme.textTheme.bodySmall),
+            ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -229,10 +255,10 @@ class _LogSheetState extends State<_LogSheet> {
                 ),
               const Spacer(),
               FilledButton(
-                onPressed: _g <= 0
+                onPressed: _grams <= 0
                     ? null
                     : () async {
-                        await widget.onSubmit(_g, _meal);
+                        await widget.onSubmit(_grams, _meal);
                         if (context.mounted) Navigator.of(context).pop(true);
                       },
                 child: Text(widget.submitLabel),
