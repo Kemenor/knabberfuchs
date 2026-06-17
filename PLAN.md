@@ -9,8 +9,8 @@ recipe sharing, ZIP backup/restore.
 | Area | Decision |
 |---|---|
 | Framework | **Flutter** (official OpenFoodFacts Dart pkg, `mobile_scanner`, `health`, `drift`) |
-| Food data | **OpenFoodFacts** (barcode) + **USDA FoodData Central** (produce/generic search) + **manual custom foods** |
-| Offline | **Live API + local cache** now; optional opt-in **regional offline packs** in Settings later |
+| Food data | **OpenFoodFacts** live API (barcode, no key) + **bundled USDA public-domain produce DB** (Foundation + SR Legacy, no key) + **manual custom foods** |
+| Offline | OFF results cached locally; **USDA produce bundled = offline from day one**; optional opt-in OFF **regional packs** later. No runtime API keys (avoids key-leak/deactivation — see note) |
 | Day model | Entries grouped by **meal** (Breakfast/Lunch/Dinner/Snacks) **with a flat-list toggle** |
 | Targets | **Per-weekday** optional calorie target (training days can be higher) + default; counter is per-day |
 | Recipes | Create from a meal or selected products; reusable |
@@ -23,12 +23,23 @@ recipe sharing, ZIP backup/restore.
 - **Offline-first.** Everything reads/writes the local SQLite DB. Network is only for
   *resolving new foods* (barcode scan / text search), and results are cached locally.
 - **Repository with layered sources** for food lookup:
-  `local cache → OpenFoodFacts → USDA FDC → (manual entry prompt)`.
+  `local cache (incl. bundled USDA produce) → OpenFoodFacts live → (manual entry prompt)`.
+- **No runtime API keys.** OFF is keyless. USDA is shipped as a *bundled* dataset (built at
+  dev-time from public-domain data), so we never embed a USDA key in the app — nothing to
+  leak or have deactivated. An optional user-supplied USDA key (stored on-device) can enable
+  live branded search later, but is never required.
 - **History is immutable to food edits.** Each logged entry stores a *snapshot* of the
   food's nutrition + grams, so re-caching or editing a food never rewrites past days.
 - Stack: `drift` (SQLite + migrations), `riverpod` (state), `mobile_scanner` (barcode),
-  `openfoodfacts` (OFF), `http` (USDA), `health` (Health Connect), `archive`/`share_plus`
+  `openfoodfacts` (OFF), `health` (Health Connect), `archive`/`share_plus`
   (ZIP backup + share sheet), `qr_flutter` + `mobile_scanner` (QR encode/decode).
+  `http` only if/when optional live-USDA is added.
+
+### Build-time data pipeline (USDA produce bundle)
+A dev-time script (DuckDB or Dart) downloads USDA FoodData Central **Foundation Foods +
+SR Legacy** (~10k whole foods, public domain — excludes the huge Branded Foods set, which
+OFF already covers), keeps the columns we need, and emits a compact SQLite asset bundled in
+the app. Refreshed manually on USDA dataset updates. No runtime key, fully offline, ~few MB.
 
 ### Data model (draft)
 
@@ -50,8 +61,8 @@ quick-pick chips (e.g. "1 serving = 30 g") that just fill the grams field.
 API limits force search to be **local-first, network-on-pause** — never per-keystroke:
 
 - OFF product read (barcode): **15 req/min/IP** · OFF search: **10 req/min/IP**
-  (OFF explicitly: *don't use for search-as-you-type*) · USDA FDC: **~1000 req/hr**
-  with a free key (DEMO_KEY only 30/hr).
+  (OFF explicitly: *don't use for search-as-you-type*). **USDA is not hit at runtime** (bundled),
+  so it has no rate limit to manage; limits below apply only to OFF.
 
 Strategy:
 1. **Search-as-you-type hits the local cache only** (instant, zero network). The
@@ -60,7 +71,7 @@ Strategy:
    pauses (debounce ≥ 600 ms) *and* local results are thin, or when they tap
    "Search online". Results are merged into the cache.
 3. **Client-side token-bucket rate limiter per source** wraps every API call: OFF-search
-   bucket (10/min), OFF-product bucket (15/min), USDA bucket. Requests queue when the
+   bucket (10/min), OFF-product bucket (15/min). Requests queue when the
    bucket is empty; UI shows "searching…/rate-limited, retrying in Ns" instead of erroring.
 4. **Aggressive caching:** every fetched product and search hit is stored in `foods`
    with `updated_at`; barcodes cache effectively forever (background refresh only if
@@ -70,10 +81,12 @@ Strategy:
 
 ## Roadmap (phased)
 
-- **Phase 0 — Scaffold:** Flutter project, drift schema + migrations, settings, theming.
-- **Phase 1 — Usable MVP:** barcode scan + text search (OFF/USDA) + manual food;
-  log grams into a day; day view (meal grouping + flat toggle) with running total;
-  per-weekday target with remaining/over readout; custom foods; local cache.
+- **Phase 0 — Scaffold:** ✅ Flutter project created (Android + Linux desktop), toolchain in
+  a distrobox, debug APK builds. Next within Phase 0: drift schema + migrations, settings, theming.
+- **Phase 1 — Usable MVP:** build the USDA produce bundle (pipeline above); barcode scan +
+  text search (local cache + bundled USDA + OFF live) + manual food; log grams into a day;
+  day view (meal grouping + flat toggle) with running total; per-weekday target with
+  remaining/over readout; custom foods; local cache.
 - **Phase 2 — Recipes & sharing:** build recipe from meal/products; QR share
   (macros, self-contained) + file share fallback; import via QR scan / file.
 - **Phase 3 — Health Connect:** opt-in write-only push of energy/macros/micros.
@@ -83,8 +96,9 @@ Strategy:
   from Settings, with live API fallback for misses.
 
 ## Prerequisites / open dev details
-- Flutter SDK not yet installed on this machine — needed before Phase 0.
-- USDA FoodData Central needs a **free API key** (sign up at fdc.nal.usda.gov; DEMO_KEY
-  is rate-limited).
+- ✅ Toolchain ready: Flutter 3.44.2 / Dart 3.12.2 / JDK 21 / Android SDK 35+36 in the
+  `flutter` distrobox; debug APK builds.
+- No runtime API keys needed (OFF keyless; USDA bundled). Optional user-supplied USDA key
+  is a future power-user setting only.
 - Default locale → device locale (German for CH); OFF returns multilingual names.
 - App name/branding: TBD (placeholder until you pick one).
