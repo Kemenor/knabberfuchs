@@ -82,7 +82,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const AboutListTile(
                 icon: Icon(Icons.info_outline),
-                applicationName: 'Calorie Tracker',
+                applicationName: 'Knabberfuchs',
                 applicationVersion: '0.1.0',
                 aboutBoxChildren: [
                   Text('Ad-free, no subscriptions. Data from Open Food Facts '

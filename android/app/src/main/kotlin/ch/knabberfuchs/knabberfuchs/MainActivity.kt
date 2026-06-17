@@ -1,4 +1,4 @@
-package ch.knabberfuchs.calorie_tracker
+package ch.knabberfuchs.knabberfuchs
 
 import io.flutter.embedding.android.FlutterActivity
 
