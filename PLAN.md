@@ -4,6 +4,14 @@ An ad-free, no-subscription, no-popup calorie tracker. Android-first (Flutter, s
 iOS stays possible). Local-first data, optional Health Connect sync, serverless
 recipe sharing, ZIP backup/restore.
 
+## Status (2026-06-17)
+
+Phases **0, 1, 2, 4 done**; **6 core done**. Working app: 47 tests pass, debug APK
+builds. **Not yet run on a real device/emulator** — verified via `flutter analyze`,
+unit/widget tests, and `flutter build apk`. Remaining: **Phase 3 (Health Connect)**
+needs device verification; **Phase 5 (offline packs)** optional/later. UI polish and a
+first on-device smoke test are the natural next steps.
+
 ## Decisions (from planning)
 
 | Area | Decision |
@@ -88,21 +96,27 @@ Strategy:
   bundled USDA + debounced OFF live) + manual food; log grams into a day; day view
   (meal grouping + flat toggle) with running total; per-weekday target with
   remaining/over readout; custom foods; local cache. 34 tests, debug APK builds.
-- **Phase 2 — Recipes & sharing:** build recipe from meal/products; QR share
-  (macros, self-contained) + file share fallback; import via QR scan / file.
-- **Phase 3 — Health Connect:** opt-in write-only push of energy/macros/micros.
-- **Phase 4 — Backup:** ZIP export (SQLite + JSON + CSV) and import with migration.
+- **Phase 2 — Recipes & sharing:** ✅ DONE. Recipe editor (search/add ingredients,
+  servings); detail with whole + per-serving nutrition; QR share (self-contained
+  CTR1 payload) + share_plus text; import via QR scan.
+- **Phase 3 — Health Connect:** ⏳ NOT STARTED (needs a physical device + the Health
+  Connect app to verify, so deferred — can't validate headlessly). Plan: `health`
+  pkg (already a dep) write-only push of energy/macros on log, opt-in Settings toggle,
+  Health Connect permission declarations + privacy-policy intent in the manifest.
+- **Phase 4 — Backup:** ✅ DONE. ZIP = backup.json (lossless logical restore) +
+  entries.csv (portable) + manifest (schema version). Export shares the zip;
+  import picks a zip (file_selector), confirms, and restores transactionally.
+  (JSON restore is lossless for user data; cached OFF/USDA re-seed/re-fetch.)
 - **Phase 5 — Offline packs (optional):** DuckDB preprocessing of the OFF Parquet
   (5.74 GB worldwide) into a compact regional SQLite pack (~30–300 MB), downloadable
   from Settings, with live API fallback for misses. **Hosting:** static file on
   **GitHub Releases** (free, ≤2 GB/file) or Hugging Face; a free GitHub Actions job
   rebuilds packs periodically and re-uploads them. Packs carry a manifest
   (version + date + checksum) so the app can offer "update available". No server.
-- **Phase 6 — Batch cooking / portioning:** build a recipe (or ad-hoc meal) with all
-  ingredients, then split the total into N portions and assign portions across days —
-  e.g. cook once, log one portion today and another for tomorrow. Builds on the Phase 2
-  recipe model: logging a portion = a snapshot entry scaled to the portion fraction of
-  the recipe total, repeatable on any chosen day.
+- **Phase 6 — Batch cooking / portioning:** ✅ CORE DONE via the recipe "Log portion to
+  a day" sheet (pick day + portion count, log repeatedly across days). Builds on the
+  Phase 2 recipe model: a portion = a density-scaled snapshot entry. Possible polish
+  later: a one-shot "split into N, assign each to a day" wizard.
 
 ## Prerequisites / open dev details
 - ✅ Toolchain ready: Flutter 3.44.2 / Dart 3.12.2 / JDK 21 / Android SDK 35+36 in the
