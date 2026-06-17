@@ -132,15 +132,13 @@ Strategy:
 - ✅ **Search quality** — synonyms (bell pepper→peppers sweet, rocket→arugula…),
   token-AND matching, simpler/raw entries ranked first. Fixed bell pepper / cherry
   tomato / potato-variety findings. (Done.)
-- **Calorie target → min + max** (both optional): support a *minimum* too (some people
-  struggle to eat enough). Day readout becomes under-min / in-range / over-max. Needs a
-  targets-table migration (kcalMin/kcalMax replacing single kcal) + summary + UI changes.
-- **Track-by-meal vs track-by-day switch** (Settings): in by-day mode the add flow should
-  *not* require choosing a meal — log straight to the day; day view is the flat list.
-  Unify with the existing meal/flat display toggle into one "tracking mode" setting.
-- **Units** (g / ml / tsp / tbsp / piece / clove): recipes & OCR lists use non-gram
-  units; add unit entry + conversion to grams (density/serving-weight tables) so users
-  don't convert in their heads. Prerequisite for richer Phase 7 parsing.
+- ✅ **Calorie target → min + max** (both optional): under-min / in-range / over-max
+  readout. Targets-table migrated to kcalMin/kcalMax (schema v2, verified on-device).
+- ✅ **Track-by-meal vs track-by-day switch** (Settings > Logging): by-day mode skips the
+  meal picker on add; unified with the meal/flat display toggle.
+- ✅ **Units** (g / ml / tsp / tbsp / cup): log sheet unit selector, volume→grams at
+  ~1 g/ml with a "≈" hint. Entries stay grams. *Still TODO:* per-food density &
+  piece/clove weights for accuracy; units in the recipe-ingredient dialog (for Phase 7).
 
 ## Prerequisites / open dev details
 - ✅ Toolchain ready: Flutter 3.44.2 / Dart 3.12.2 / JDK 21 / Android SDK 35+36 in the
