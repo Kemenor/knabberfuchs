@@ -116,13 +116,12 @@ Strategy:
   a day" sheet (pick day + portion count, log repeatedly across days). Builds on the
   Phase 2 recipe model: a portion = a density-scaled snapshot entry. Possible polish
   later: a one-shot "split into N, assign each to a day" wizard.
-- **Phase 7 — Track a meal by photo (OCR):** snap one or two screenshots of a recipe's
-  ingredient list (e.g. from the Sidekick app), run on-device OCR
-  (`google_mlkit_text_recognition`, free/offline — sibling of the barcode ML Kit we
-  already use), parse each line into name + quantity + unit, match each to a food
-  (reusing the search layer + synonyms), let the user confirm/adjust, then build a
-  recipe or log the meal directly. Depends on unit handling (below). All on-device, no
-  server.
+- **Phase 7 — Track a meal by photo (OCR):** ✅ DONE (emulator-verified with a real
+  Sidekick screenshot). Recipes → "From photo(s)" → pick 1+ images → on-device ML Kit OCR
+  → parse name+amount+unit → Review screen of placeholders → swipe/tap to match each to a
+  food (search/scan/custom), keeping the parsed unit → Save as recipe or Log to a day.
+  Possible polish: occasional missed line on dense screenshots; per-ingredient grams for
+  count units without a serving; batch-match suggestions.
 
 - **Phase 8 — Auto-meal grouping (track-by-day mode):** ✅ DONE (schema v3, verified on
   emulator + device DB). In by-day mode, consecutive
