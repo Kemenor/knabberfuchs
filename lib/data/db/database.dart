@@ -25,14 +25,25 @@ class AppDatabase extends _$AppDatabase {
             await into(targets).insert(TargetsCompanion.insert(weekday: Value(wd)));
           }
         },
+        beforeOpen: (details) async {
+          // Enforce FK constraints (recipe_items cascade, entries.food set-null).
+          await customStatement('PRAGMA foreign_keys = ON');
+        },
       );
 
   // ---------------- Foods ----------------
 
   /// Insert or update a catalog food by its (source, externalId) identity.
-  /// Returns the row id.
-  Future<int> upsertFood(FoodsCompanion food) async {
-    return into(foods).insertOnConflictUpdate(food);
+  /// Custom foods (null externalId) never conflict, so each is a fresh row.
+  /// Returns the row id (existing row's id on update).
+  Future<int> upsertFood(FoodsCompanion food) {
+    return into(foods).insert(
+      food,
+      onConflict: DoUpdate(
+        (_) => food,
+        target: [foods.source, foods.externalId],
+      ),
+    );
   }
 
   Future<Food?> foodById(int id) =>
