@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -159,19 +160,19 @@ Future<void> _toggleHealthSync(
   if (!value) {
     await db.setSetting('healthSync', 'false');
     await health.refreshEnabled(db);
-    messenger.showSnackBar(
+    messenger.showAutoSnackBar(
         const SnackBar(content: Text('Health Connect sync turned off.')));
     return;
   }
 
   if (!await health.isAvailable()) {
-    messenger.showSnackBar(const SnackBar(
+    messenger.showAutoSnackBar(const SnackBar(
         content: Text('Health Connect is not available on this device.')));
     return;
   }
   final granted = await health.requestPermissions();
   if (!granted) {
-    messenger.showSnackBar(const SnackBar(
+    messenger.showAutoSnackBar(const SnackBar(
         content: Text('Health Connect permission was not granted.')));
     return;
   }
@@ -180,7 +181,7 @@ Future<void> _toggleHealthSync(
   // Sync the selected day immediately so the user sees data right away.
   final day = ref.read(selectedDayProvider);
   await health.syncDay(day, await db.watchDay(day).first);
-  messenger.showSnackBar(const SnackBar(
+  messenger.showAutoSnackBar(const SnackBar(
       content: Text('Health Connect sync on — today pushed.')));
 }
 
@@ -189,7 +190,7 @@ Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
   try {
     await ref.read(backupServiceProvider).shareBackup();
   } catch (e) {
-    messenger.showSnackBar(SnackBar(content: Text('Export failed: $e')));
+    messenger.showAutoSnackBar(SnackBar(content: Text('Export failed: $e')));
   }
 }
 
@@ -223,9 +224,9 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
 
   try {
     await ref.read(backupServiceProvider).restoreFromZip(file.path);
-    messenger.showSnackBar(const SnackBar(content: Text('Backup restored.')));
+    messenger.showAutoSnackBar(const SnackBar(content: Text('Backup restored.')));
   } catch (e) {
-    messenger.showSnackBar(SnackBar(content: Text('Import failed: $e')));
+    messenger.showAutoSnackBar(SnackBar(content: Text('Import failed: $e')));
   }
 }
 

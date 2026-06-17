@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/date_x.dart';
@@ -62,7 +63,7 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
           days: _days,
         );
     if (mounted) Navigator.of(context).pop();
-    messenger.showSnackBar(
+    messenger.showAutoSnackBar(
         SnackBar(content: Text('Split into $_n days')));
   }
 

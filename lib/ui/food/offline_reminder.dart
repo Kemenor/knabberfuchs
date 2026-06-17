@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/snackbar.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../providers.dart';
 import '../settings/offline_regions_screen.dart';
@@ -26,7 +27,7 @@ VoidCallback? offlinePackReminder(
   return () {
     if (_remindedThisSession) return;
     _remindedThisSession = true;
-    messenger.showSnackBar(SnackBar(
+    messenger.showAutoSnackBar(SnackBar(
       duration: const Duration(seconds: 6),
       content: const Text(
           'Looked up online — download your region for faster, offline scans.'),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -113,11 +114,11 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     final servings = double.tryParse(_servings.text.replaceAll(',', '.')) ?? 1;
     if (name.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Give the recipe a name.')));
+          .showAutoSnackBar(const SnackBar(content: Text('Give the recipe a name.')));
       return;
     }
     if (_items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAutoSnackBar(
           const SnackBar(content: Text('Add at least one ingredient.')));
       return;
     }

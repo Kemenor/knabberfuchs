@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -145,7 +146,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final ready = _ready;
     final messenger = ScaffoldMessenger.of(context);
     if (ready.isEmpty) {
-      messenger.showSnackBar(
+      messenger.showAutoSnackBar(
           const SnackBar(content: Text('Match at least one ingredient first.')));
       return;
     }
@@ -165,14 +166,14 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
           ],
         );
     if (mounted) Navigator.of(context).pop();
-    messenger.showSnackBar(const SnackBar(content: Text('Saved to recipes')));
+    messenger.showAutoSnackBar(const SnackBar(content: Text('Saved to recipes')));
   }
 
   Future<void> _logToDay() async {
     final ready = _ready;
     final messenger = ScaffoldMessenger.of(context);
     if (ready.isEmpty) {
-      messenger.showSnackBar(
+      messenger.showAutoSnackBar(
           const SnackBar(content: Text('Match at least one ingredient first.')));
       return;
     }
@@ -204,7 +205,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       );
     }
     if (mounted) Navigator.of(context).pop();
-    messenger.showSnackBar(SnackBar(content: Text('Logged to ${DayKey.label(day)}')));
+    messenger.showAutoSnackBar(SnackBar(content: Text('Logged to ${DayKey.label(day)}')));
   }
 
   @override

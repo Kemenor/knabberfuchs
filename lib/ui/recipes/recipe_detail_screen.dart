@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/date_x.dart';
@@ -288,6 +289,6 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
           groupId: groupId,
         );
     if (mounted) Navigator.of(context).pop();
-    messenger.showSnackBar(SnackBar(content: Text('Logged to $label')));
+    messenger.showAutoSnackBar(SnackBar(content: Text('Logged to $label')));
   }
 }

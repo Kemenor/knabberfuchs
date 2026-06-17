@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/date_x.dart';
@@ -452,7 +453,7 @@ class _GroupSection extends ConsumerWidget {
               ),
           ],
         );
-    messenger.showSnackBar(
+    messenger.showAutoSnackBar(
         SnackBar(content: Text('Saved "${group.name}" to recipes')));
   }
 

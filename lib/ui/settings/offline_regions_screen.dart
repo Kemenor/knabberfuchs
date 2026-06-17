@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/database.dart';
@@ -26,9 +27,9 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
           onProgress: (p) {
         if (mounted) setState(() => _progress[r.code] = p);
       });
-      messenger.showSnackBar(SnackBar(content: Text('${r.name} downloaded')));
+      messenger.showAutoSnackBar(SnackBar(content: Text('${r.name} downloaded')));
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Download failed: $e')));
+      messenger.showAutoSnackBar(SnackBar(content: Text('Download failed: $e')));
     } finally {
       if (mounted) setState(() => _progress.remove(r.code));
     }
@@ -38,7 +39,7 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
     await ref.read(offlinePackServiceProvider).remove(code);
     if (mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('$name removed')));
+          .showAutoSnackBar(SnackBar(content: Text('$name removed')));
     }
   }
 

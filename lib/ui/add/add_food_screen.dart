@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/database.dart';
@@ -47,7 +48,7 @@ class AddFoodScreen extends ConsumerWidget {
       await _pick(context, ref, hit.food!);
       reminder?.call(); // after the log sheet closes, so it isn't hidden
     } else {
-      messenger.showSnackBar(
+      messenger.showAutoSnackBar(
           SnackBar(content: Text('No product found for $barcode')));
     }
   }

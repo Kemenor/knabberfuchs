@@ -1,5 +1,6 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -32,12 +33,12 @@ class RecipesScreen extends ConsumerWidget {
       if (text == null) return;
       final share = RecipeCodec.decode(text);
       if (share == null) {
-        messenger.showSnackBar(
+        messenger.showAutoSnackBar(
             const SnackBar(content: Text('That QR code is not a recipe.')));
         return;
       }
       await ref.read(recipeRepositoryProvider).importShare(share);
-      messenger.showSnackBar(
+      messenger.showAutoSnackBar(
           SnackBar(content: Text('Imported "${share.name}"')));
     }
 
@@ -64,7 +65,7 @@ class RecipesScreen extends ConsumerWidget {
       navigator.pop(); // close the loading dialog
 
       if (all.isEmpty) {
-        messenger.showSnackBar(const SnackBar(
+        messenger.showAutoSnackBar(const SnackBar(
             content: Text('No ingredients found in those images.')));
         return;
       }

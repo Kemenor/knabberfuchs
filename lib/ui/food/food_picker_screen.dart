@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -33,7 +34,7 @@ class FoodPickerScreen extends ConsumerWidget {
       Navigator.of(context).pop(hit.food);
       reminder?.call(); // shows on the screen we return to
     } else {
-      messenger.showSnackBar(
+      messenger.showAutoSnackBar(
           SnackBar(content: Text('No product found for $barcode')));
     }
   }
