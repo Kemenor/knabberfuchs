@@ -337,20 +337,26 @@ class _GroupSection extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 12, 4, 0),
           child: Row(
             children: [
-              Flexible(
+              Expanded(
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => _rename(context, ref),
-                  child: Text(group.name,
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(group.name,
+                            style: theme.textTheme.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      const SizedBox(width: 8),
+                      Text('${kcalStr(group.subtotal.kcal)} kcal',
+                          style: theme.textTheme.bodySmall),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Text('${kcalStr(group.subtotal.kcal)} kcal',
-                  style: theme.textTheme.bodySmall),
-              const Spacer(),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, size: 20),
                 onSelected: (v) {
