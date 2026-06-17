@@ -14,6 +14,7 @@ import 'data/offline/region_pack_store.dart';
 import 'data/sources/off_api.dart';
 import 'data/sources/usda_seed.dart';
 import 'domain/day_summary.dart';
+import 'domain/meal_times.dart';
 import 'domain/offline_manifest.dart';
 
 // ---------------- Infrastructure ----------------
@@ -225,6 +226,11 @@ final targetsProvider = StreamProvider<List<Target>>(
 
 /// Meal layout: true = fixed Breakfast/Lunch/Dinner/Snacks sections,
 /// false = automatic per-add meal groups (track-by-day). Defaults to false.
+/// User-configured meal windows for auto-labeling track-by-day entries.
+final mealTimesProvider = StreamProvider<MealTimes>((ref) =>
+    ref.watch(dbProvider).watchAllSettings().map((rows) =>
+        MealTimes.fromSettings({for (final s in rows) s.key: s.value})));
+
 final groupByMealProvider = StreamProvider<bool>((ref) {
   return ref
       .watch(dbProvider)

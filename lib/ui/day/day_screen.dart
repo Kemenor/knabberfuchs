@@ -5,6 +5,7 @@ import '../../core/date_x.dart';
 import '../../core/format.dart';
 import '../../domain/day_summary.dart';
 import '../../domain/enums.dart';
+import '../../domain/meal_times.dart';
 import '../../domain/nutrition.dart';
 import '../../domain/recipe_share.dart';
 import '../../providers.dart';
@@ -115,11 +116,13 @@ void addFoodToMeal(BuildContext context, String day, MealType meal) {
 /// Push the add-food flow for track-by-day mode; the target group (active or a
 /// new time-named one) is resolved at log time so empty groups never linger.
 void addFoodByDay(BuildContext context, WidgetRef ref, String day) {
+  final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
+      .inferNow();
   Navigator.of(context).push(
     MaterialPageRoute(
       builder: (_) => AddFoodScreen(
         day: day,
-        meal: MealType.snack,
+        meal: meal,
         resolveGroup: () =>
             ref.read(activeGroupProvider.notifier).ensureGroup(day),
       ),

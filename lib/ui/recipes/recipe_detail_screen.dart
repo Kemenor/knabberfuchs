@@ -5,6 +5,7 @@ import '../../core/date_x.dart';
 import '../../core/format.dart';
 import '../../data/db/database.dart';
 import '../../domain/enums.dart';
+import '../../domain/meal_times.dart';
 import '../../domain/nutrition.dart';
 import '../../domain/recipe_share.dart';
 import '../../providers.dart';
@@ -256,10 +257,14 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
     final groupId = fixedMeals
         ? null
         : await ref.read(dbProvider).createEntryGroup(_day, widget.share.name);
+    final meal = fixedMeals
+        ? _meal
+        : (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
+            .inferNow();
     await ref.read(recipeRepositoryProvider).logPortionGrams(
           share: widget.share,
           grams: grams,
-          meal: fixedMeals ? _meal : MealType.snack,
+          meal: meal,
           day: _day,
           groupId: groupId,
         );

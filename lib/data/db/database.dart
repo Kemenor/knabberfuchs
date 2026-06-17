@@ -272,6 +272,8 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<Setting>> allSettings() => select(settings).get();
 
+  Stream<List<Setting>> watchAllSettings() => select(settings).watch();
+
   Future<String?> getSetting(String key) async {
     final row = await (select(settings)..where((s) => s.key.equals(key)))
         .getSingleOrNull();

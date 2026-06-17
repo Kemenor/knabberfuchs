@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/date_x.dart';
 import '../../data/db/database.dart';
+import '../../domain/enums.dart';
+import '../../domain/meal_times.dart';
 import '../../providers.dart';
 import 'offline_regions_screen.dart';
 
@@ -78,6 +80,23 @@ class SettingsScreen extends ConsumerWidget {
                 onChanged: (v) =>
                     db.setSetting('groupByMeal', v ? 'true' : 'false'),
               ),
+              if (!fixedMeals) ...[
+                const ListTile(
+                  leading: Icon(Icons.schedule),
+                  title: Text('Meal times'),
+                  subtitle: Text(
+                      'Auto-labels each entry by the time you log it. '
+                      'Anything outside these windows counts as a snack.'),
+                  isThreeLine: true,
+                ),
+                for (final m in const [
+                  MealType.breakfast,
+                  MealType.lunch,
+                  MealType.dinner
+                ])
+                  _MealTimeRow(meal: m),
+                const SizedBox(height: 8),
+              ],
               const Divider(),
               const _SectionHeader('Food data'),
               ListTile(
@@ -251,6 +270,50 @@ class _OpenFoodFactsThanks extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+String _fmtMins(int m) =>
+    '${(m ~/ 60).toString().padLeft(2, '0')}:${(m % 60).toString().padLeft(2, '0')}';
+
+/// A meal's [start]–[end] window with two tappable time buttons.
+class _MealTimeRow extends ConsumerWidget {
+  final MealType meal;
+  const _MealTimeRow({required this.meal});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(mealTimesProvider).asData?.value ?? MealTimes.defaults;
+    final db = ref.read(dbProvider);
+    final start = t.startOf(meal);
+    final end = t.endOf(meal);
+
+    Future<void> pick(bool isStart) async {
+      final cur = isStart ? start : end;
+      final picked = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay(hour: cur ~/ 60, minute: cur % 60),
+      );
+      if (picked == null) return;
+      final mins = picked.hour * 60 + picked.minute;
+      await db.setSetting(
+          isStart ? MealTimes.startKey(meal) : MealTimes.endKey(meal), '$mins');
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Row(
+        children: [
+          Expanded(child: Text(meal.label)),
+          OutlinedButton(
+              onPressed: () => pick(true), child: Text(_fmtMins(start))),
+          const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8), child: Text('–')),
+          OutlinedButton(
+              onPressed: () => pick(false), child: Text(_fmtMins(end))),
+        ],
+      ),
     );
   }
 }

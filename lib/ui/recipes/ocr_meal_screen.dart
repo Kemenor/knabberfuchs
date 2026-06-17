@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/date_x.dart';
 import '../../core/format.dart';
 import '../../data/db/database.dart';
-import '../../domain/enums.dart';
+import '../../domain/meal_times.dart';
 import '../../domain/nutrition.dart';
 import '../../domain/ocr_ingredient.dart';
 import '../../domain/recipe_share.dart';
@@ -188,6 +188,8 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final diary = ref.read(diaryRepositoryProvider);
     final gid = await db.createEntryGroup(
         day, _name.text.trim().isEmpty ? 'Meal from photo' : _name.text.trim());
+    final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
+        .inferNow();
     for (final it in ready) {
       await diary.logSnapshot(
         name: it.matched!.name,
@@ -196,7 +198,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
         carb100: it.matched!.carb100,
         fat100: it.matched!.fat100,
         grams: _grams(it)!,
-        meal: MealType.snack,
+        meal: meal,
         day: day,
         groupId: gid,
       );
