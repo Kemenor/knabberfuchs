@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Open Food Facts lookups -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Barcode scanning -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+
     <application
-        android:label="calorie_tracker"
+        android:label="Calorie Tracker"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
