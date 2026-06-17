@@ -48,6 +48,15 @@ class _DayScreenState extends ConsumerState<DayScreen>
     final summaryAsync = ref.watch(daySummaryProvider);
     final groupByMeal = ref.watch(groupByMealProvider).asData?.value ?? false;
 
+    // Push this day's nutrition to Health Connect whenever its entries change
+    // (no-op unless the user enabled sync in Settings).
+    ref.listen(selectedDayEntriesProvider, (_, next) {
+      final entries = next.asData?.value;
+      if (entries != null) {
+        ref.read(healthServiceProvider).maybeSyncDay(day, entries);
+      }
+    });
+
     void shiftDay(int by) => ref.read(selectedDayProvider.notifier).shift(by);
 
     return Scaffold(

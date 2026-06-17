@@ -90,11 +90,14 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const Divider(),
               const _SectionHeader('Integrations'),
-              const ListTile(
-                leading: Icon(Icons.favorite_border),
-                title: Text('Health Connect sync'),
-                subtitle: Text('Coming soon'),
-                enabled: false,
+              SwitchListTile(
+                secondary: const Icon(Icons.favorite_border),
+                title: const Text('Sync to Health Connect'),
+                subtitle: const Text(
+                    'Write logged calories & macros to Health Connect'),
+                value: ref.watch(healthSyncEnabledProvider).asData?.value ??
+                    false,
+                onChanged: (v) => _toggleHealthSync(context, ref, v),
               ),
               ListTile(
                 leading: const Icon(Icons.upload_outlined),
@@ -126,6 +129,40 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> _toggleHealthSync(
+    BuildContext context, WidgetRef ref, bool value) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final db = ref.read(dbProvider);
+  final health = ref.read(healthServiceProvider);
+
+  if (!value) {
+    await db.setSetting('healthSync', 'false');
+    await health.refreshEnabled(db);
+    messenger.showSnackBar(
+        const SnackBar(content: Text('Health Connect sync turned off.')));
+    return;
+  }
+
+  if (!await health.isAvailable()) {
+    messenger.showSnackBar(const SnackBar(
+        content: Text('Health Connect is not available on this device.')));
+    return;
+  }
+  final granted = await health.requestPermissions();
+  if (!granted) {
+    messenger.showSnackBar(const SnackBar(
+        content: Text('Health Connect permission was not granted.')));
+    return;
+  }
+  await db.setSetting('healthSync', 'true');
+  await health.refreshEnabled(db);
+  // Sync the selected day immediately so the user sees data right away.
+  final day = ref.read(selectedDayProvider);
+  await health.syncDay(day, await db.watchDay(day).first);
+  messenger.showSnackBar(const SnackBar(
+      content: Text('Health Connect sync on — today pushed.')));
 }
 
 Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {

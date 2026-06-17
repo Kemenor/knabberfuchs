@@ -7,6 +7,7 @@ import 'data/repositories/diary_repository.dart';
 import 'data/repositories/food_repository.dart';
 import 'data/repositories/recipe_repository.dart';
 import 'data/backup_service.dart';
+import 'data/health/health_service.dart';
 import 'data/ocr/ocr_service.dart';
 import 'data/offline/offline_pack_service.dart';
 import 'data/offline/region_pack_store.dart';
@@ -76,11 +77,23 @@ final ocrServiceProvider = Provider<OcrService>((ref) {
   return s;
 });
 
+final healthServiceProvider = Provider<HealthService>((ref) => HealthService());
+
+final healthSyncEnabledProvider = StreamProvider<bool>((ref) =>
+    ref.watch(dbProvider).watchSetting('healthSync').map((v) => v == 'true'));
+
+/// Raw entries for the selected day (used to drive Health Connect auto-sync).
+final selectedDayEntriesProvider = StreamProvider<List<Entry>>((ref) {
+  final db = ref.watch(dbProvider);
+  return db.watchDay(ref.watch(selectedDayProvider));
+});
+
 /// One-time startup work: import the bundled USDA produce dataset on first run
 /// and open any installed offline region packs.
 final appStartupProvider = FutureProvider<void>((ref) async {
   await seedUsdaIfNeeded(ref.watch(dbProvider));
   await ref.read(offlinePackServiceProvider).syncStore();
+  await ref.read(healthServiceProvider).refreshEnabled(ref.read(dbProvider));
 });
 
 // ---------------- Track-by-day groups ----------------
