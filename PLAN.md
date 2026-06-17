@@ -127,7 +127,8 @@ Strategy:
   recipe or log the meal directly. Depends on unit handling (below). All on-device, no
   server.
 
-- **Phase 8 — Auto-meal grouping (track-by-day mode):** in by-day mode, consecutive
+- **Phase 8 — Auto-meal grouping (track-by-day mode):** ✅ DONE (schema v3, verified on
+  emulator + device DB). In by-day mode, consecutive
   adds form an ad-hoc **meal group** (header + ingredients), *not* auto-saved to the
   cookbook. Adding the first item creates the group and enters **edit mode**; while
   active, the group's header button is a **✓** (finish) and the bottom-right FAB adds
