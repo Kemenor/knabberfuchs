@@ -190,14 +190,16 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
       grams: grams,
     );
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Log a portion', style: theme.textTheme.titleLarge),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Log a portion', style: theme.textTheme.titleLarge),
           const SizedBox(height: 12),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -253,6 +255,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

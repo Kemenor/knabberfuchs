@@ -72,14 +72,16 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
     final theme = Theme.of(context);
     final perPortionKcal = widget.group.subtotal.kcal / _n;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Split "${widget.group.name}"',
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Split "${widget.group.name}"',
               style: theme.textTheme.titleLarge,
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
@@ -129,6 +131,7 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
             ),
           ),
         ],
+        ),
       ),
     );
   }
