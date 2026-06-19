@@ -270,6 +270,12 @@ re-download already works at these sizes. Instead, fix update-detection to be co
 - ✅ **Units** (g / ml / tsp / tbsp / cup): log sheet unit selector, volume→grams at
   ~1 g/ml with a "≈" hint. Entries stay grams. *Still TODO:* per-food density &
   piece/clove weights for accuracy; units in the recipe-ingredient dialog (for Phase 7).
+- 💡 **Region-aware offline nudge (idea):** when a scanned barcode resolves via the OFF
+  *online* API, the result's `countries_tags` tell us which country the product is sold
+  in. The "Regions" nudge could deep-link straight to that country (open the Offline
+  regions screen with the search **pre-filtered** to it), so the user downloads the right
+  pack in one tap. Needs: off_api to also return countries_tags, map tag→region code, and
+  an optional initial-query param on OfflineRegionsScreen. Small-to-medium plumbing.
 
 ## Prerequisites / open dev details
 - ✅ Toolchain ready: Flutter 3.44.2 / Dart 3.12.2 / JDK 21 / Android SDK 35+36 in the
