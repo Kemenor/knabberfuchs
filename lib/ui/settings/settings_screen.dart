@@ -23,6 +23,8 @@ class SettingsScreen extends ConsumerWidget {
     final defaultMin = ref.watch(defaultMinProvider).asData?.value;
     final defaultMax = ref.watch(defaultMaxProvider).asData?.value;
     final fixedMeals = ref.watch(groupByMealProvider).asData?.value ?? false;
+    final healthSync =
+        ref.watch(healthSyncEnabledProvider).asData?.value ?? false;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -119,10 +121,29 @@ class SettingsScreen extends ConsumerWidget {
                 title: const Text('Sync to Health Connect'),
                 subtitle: const Text(
                     'Write logged calories & macros to Health Connect'),
-                value: ref.watch(healthSyncEnabledProvider).asData?.value ??
-                    false,
+                value: healthSync,
                 onChanged: (v) => _toggleHealthSync(context, ref, v),
               ),
+              if (healthSync)
+                ExpansionTile(
+                  leading: const Icon(Icons.schedule),
+                  title: const Text('Meal times'),
+                  subtitle: const Text(
+                      'When each meal is timestamped in Health Connect'),
+                  childrenPadding: const EdgeInsets.only(bottom: 8),
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      child: Text(
+                          'Entries are written to Health Connect at the start '
+                          'of their meal window, so calories land at a sensible '
+                          'time of day.'),
+                    ),
+                    _MealTimeRow(meal: MealType.breakfast),
+                    _MealTimeRow(meal: MealType.lunch),
+                    _MealTimeRow(meal: MealType.dinner),
+                  ],
+                ),
               const Divider(),
               const _SectionHeader('Data & backup'),
               ListTile(
