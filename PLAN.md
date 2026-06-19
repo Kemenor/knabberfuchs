@@ -147,10 +147,11 @@ Strategy:
   **OCR the label**: photograph the nutrition table (Nährwerttabelle) and the
   ingredients list, run on-device ML Kit OCR (reuse the Phase 7 pipeline), and parse the
   rows into our nutrition fields. Saving stores it as a **contributed custom food keyed
-  by the barcode**, so a re-scan finds it immediately — fully offline, no submission
-  required. Then an opt-in **"Submit to Open Food Facts"** posts the product (and
-  optionally photos) to OFF's write API **directly from the device** (keyless/serverless
-  principle intact), giving back to the database the whole app is built on. Sub-parts:
+  by the barcode**, so a re-scan finds it immediately — fully offline, no account needed.
+  **Near-term scope (decided 2026-06-19): local add + OCR only; for contributing back, we
+  just deep-link out to the Open Food Facts app/website** rather than building API
+  submission. This dodges the OAuth/OIDC-client-registration blocker (see 9c), keeps the
+  app keyless, and OFF handles its own auth + submission in its own app. Sub-parts:
   - **9a — Add product locally.** Barcode-miss → "Add product" form (name, brand,
     quantity/serving, per-100 g energy + macros). Save keyed by barcode so it's instantly
     loggable and persists for future scans. Likely a new `FoodSource.userContributed`
@@ -163,28 +164,27 @@ Strategy:
     two-column "per 100 g / per serving" layouts. Also OCR the ingredients **text** for
     the OFF ingredients field. User reviews/edits before saving (OCR is a head start,
     not gospel). Reuse ML Kit + the row-by-vertical-position reconstruction from Phase 7.
-  - **9c — Submit to OFF (account required).** OFF requires authentication for all
-    writes — **anonymous product adds are NOT allowed** (verified against the OFF API
-    docs). The account gates **only this step**; 9a/9b work with no account. **Auth via
-    OAuth, not a custom password screen:** use OFF's Keycloak/OIDC with the
-    **Authorization Code + PKCE** flow — a *public* client (no client secret shipped, so
-    keyless intact) that opens the system browser; OFF/Keycloak handles the credentials
-    (passkeys/social/password), and the app only ever holds the returned tokens (in
-    `flutter_secure_storage`). Libraries: `flutter_appauth` / `openid_client`. **OFF
-    pre-configures no clients** — register a **public native OIDC client for Knabberfuchs**
-    (redirect e.g. `ch.knabberfuchs.app://oauth`) with the OFF team first, and confirm
-    they support public/PKCE clients (their docs lean toward backend confidential
-    clients). Legacy `user_id`+`password` write API stays as a transitional fallback only
-    if PKCE isn't available for native apps yet. Then POST to the write API
-    (`/cgi/product_jqm2.pl` or `/api/v3/product/{barcode}`) + `/cgi/product_image_upload.pl`
-    for photos, with a proper `User-Agent` (`Knabberfuchs/<ver>`). Send only
-    user-provided fields; queue offline + submit on reconnect; track per-product
-    submission status. **Test against staging** (`world.openfoodfacts.net`) first.
-    Contributions are ODbL.
-  - **Deps / notes:** image capture (camera/image_picker), OAuth (`flutter_appauth`),
-    `flutter_secure_storage`, existing ML Kit OCR + http. One-time: register the app's
-    OIDC client + an app account / API-usage form with OFF. Optional small schema bump
-    for the contributed-food flag + submission state.
+  - **9c — Contribute via the OFF app/site (NEAR-TERM, no API/auth on our side).** A
+    "Add to Open Food Facts" button just **opens OFF for that barcode** with
+    `url_launcher` (already a dep) — e.g. the add/edit page
+    `https://world.openfoodfacts.org/cgi/product.pl?type=add&code=<barcode>` (confirm exact
+    URL at build time). Android **App Links** route it to the installed OFF app, else the
+    browser; OFF handles its own login + submission. No account, no OAuth, no write API,
+    no client registration — the app stays keyless and we ship the contribution path now.
+    Optionally pass along what the user entered, if OFF's add URL supports prefill params.
+  - **9d — In-app API submission (LATER / optional, deferred).** Push directly from the
+    device via OFF's write API (`/api/v3/product/{barcode}` + `/cgi/product_image_upload.pl`
+    for photos, `User-Agent: Knabberfuchs/<ver>`). **Blocked on auth:** OFF requires an
+    account for writes (no anonymous adds) and is on Keycloak/OIDC; the right native flow
+    is **Authorization Code + PKCE** (public client, system browser, no secret shipped, no
+    custom password screen — tokens in `flutter_secure_storage` via `flutter_appauth`). But
+    **OFF pre-registers no clients**, so this needs a one-time request to register a public
+    native OIDC client for Knabberfuchs (`ch.knabberfuchs.app://oauth`) and confirmation
+    they support public/PKCE clients. Until then, 9c (link-out) is the contribution path.
+    Test against staging (`world.openfoodfacts.net`). Contributions are ODbL.
+  - **Deps / notes:** image capture (camera/image_picker) + existing ML Kit OCR + http +
+    url_launcher. Optional small schema bump for the contributed-food flag. (9d adds
+    `flutter_appauth` + `flutter_secure_storage` + the OFF OIDC-client registration.)
 
 - **Phase 10 — All regions + searchable Offline regions screen:** ✅ DONE (2026-06-19).
   **106 countries** (≥1000 products each) now live on the HF dataset; the picker has a
