@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/format.dart';
 import '../../core/snackbar.dart';
 import '../../data/db/database.dart';
 import '../../providers.dart';
+import 'crop_screen.dart';
 
 /// Add a product for a barcode that's not in Open Food Facts (or anywhere).
 /// Saves it locally (keyed by barcode, so a re-scan finds it) and offers to
@@ -66,14 +70,23 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         ]),
       ),
     );
-    if (source == null) return;
+    if (source == null || !mounted) return;
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     final img = await ImagePicker().pickImage(source: source);
     if (img == null || !mounted) return;
 
+    // Crop to just the nutrition table for much better OCR.
+    final bytes = await img.readAsBytes();
+    final cropped = await navigator.push<Uint8List>(
+        MaterialPageRoute(builder: (_) => CropScreen(image: bytes)));
+    if (cropped == null || !mounted) return;
+    final path = '${(await getTemporaryDirectory()).path}/label_ocr.jpg';
+    await File(path).writeAsBytes(cropped, flush: true);
+
     setState(() => _ocrBusy = true);
-    final messenger = ScaffoldMessenger.of(context);
     try {
-      final n = await ref.read(ocrServiceProvider).nutritionFromImage(img.path);
+      final n = await ref.read(ocrServiceProvider).nutritionFromImage(path);
       void set(TextEditingController c, double? v) {
         if (v != null) c.text = gramsStr(v);
       }
