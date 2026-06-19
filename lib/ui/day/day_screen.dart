@@ -537,15 +537,23 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
   Future<void> _save() async {
     final name = _nameCtrl.text.trim();
     final newDay = DayKey.of(_when);
-    await ref.read(dbProvider).editEntryGroup(
+    final db = ref.read(dbProvider);
+    final health = ref.read(healthServiceProvider);
+    await db.editEntryGroup(
           id: widget.group.id,
           name: name.isEmpty ? _autoName : name,
           day: newDay,
           time: _when,
           mealType: _meal,
         );
-    // If the meal moved off the visible day, follow it there.
+    // Re-sync Health Connect for both the source and destination day. The
+    // day-screen listener only covers the selected day, so a cross-day move
+    // would otherwise leave the meal double-counted on the old day. Each call
+    // deletes that day's range and rewrites it; both are no-ops if sync is off.
+    await health.maybeSyncDay(widget.day, await db.watchDay(widget.day).first);
     if (newDay != widget.day) {
+      await health.maybeSyncDay(newDay, await db.watchDay(newDay).first);
+      // Follow the meal to its new day.
       ref.read(selectedDayProvider.notifier).set(newDay);
     }
     if (mounted) Navigator.of(context).pop();
