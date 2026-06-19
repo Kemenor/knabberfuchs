@@ -26,5 +26,45 @@
   "languageEnglish": "English",
   "languageGerman": "Deutsch",
   "languageFrench": "Français",
-  "languageItalian": "Italiano"
+  "languageItalian": "Italiano",
+
+  "dayPreviousDay": "Previous day",
+  "dayNextDay": "Next day",
+  "dayAddFood": "Add food",
+  "dayMealFromList": "Meal from an ingredient list",
+  "dayEmptyHint": "Tap + to start a meal.\nEverything you add flows into it until you tap ✓ (or 15 min pass).",
+  "@dayEmptyHint": { "description": "Empty-state hint on the Day screen" },
+
+  "unitKcal": "kcal",
+  "macroProtein": "Protein",
+  "macroCarbs": "Carbs",
+  "macroFat": "Fat",
+
+  "targetOver": "{kcal} over",
+  "@targetOver": { "placeholders": { "kcal": { "type": "String" } } },
+  "targetToGo": "{kcal} to go",
+  "@targetToGo": { "placeholders": { "kcal": { "type": "String" } } },
+  "targetLeft": "{kcal} left",
+  "@targetLeft": { "placeholders": { "kcal": { "type": "String" } } },
+  "targetMinReached": "minimum reached",
+  "targetRangeBoth": "Target {min}–{max} kcal",
+  "@targetRangeBoth": { "placeholders": { "min": { "type": "String" }, "max": { "type": "String" } } },
+  "targetRangeMax": "Target {max} kcal",
+  "@targetRangeMax": { "placeholders": { "max": { "type": "String" } } },
+  "targetRangeMin": "Minimum {min} kcal",
+  "@targetRangeMin": { "placeholders": { "min": { "type": "String" } } },
+
+  "mealMenuEdit": "Edit meal",
+  "mealMenuSplit": "Split across days",
+  "mealMenuSaveRecipe": "Save as recipe",
+  "mealMenuDelete": "Delete meal",
+  "mealFinish": "Finish meal",
+  "mealAddTo": "Add to this meal",
+  "mealSavedToRecipes": "Saved \"{name}\" to recipes",
+  "@mealSavedToRecipes": { "placeholders": { "name": { "type": "String" } } },
+
+  "editMealTitle": "Edit meal",
+  "editMealName": "Name",
+  "editMealType": "Meal type",
+  "editMealWhen": "When"
 }

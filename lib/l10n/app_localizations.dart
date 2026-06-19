@@ -197,6 +197,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Italiano'**
   String get languageItalian;
+
+  /// No description provided for @dayPreviousDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous day'**
+  String get dayPreviousDay;
+
+  /// No description provided for @dayNextDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Next day'**
+  String get dayNextDay;
+
+  /// No description provided for @dayAddFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Add food'**
+  String get dayAddFood;
+
+  /// No description provided for @dayMealFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal from an ingredient list'**
+  String get dayMealFromList;
+
+  /// Empty-state hint on the Day screen
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to start a meal.\nEverything you add flows into it until you tap ✓ (or 15 min pass).'**
+  String get dayEmptyHint;
+
+  /// No description provided for @unitKcal.
+  ///
+  /// In en, this message translates to:
+  /// **'kcal'**
+  String get unitKcal;
+
+  /// No description provided for @macroProtein.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein'**
+  String get macroProtein;
+
+  /// No description provided for @macroCarbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Carbs'**
+  String get macroCarbs;
+
+  /// No description provided for @macroFat.
+  ///
+  /// In en, this message translates to:
+  /// **'Fat'**
+  String get macroFat;
+
+  /// No description provided for @targetOver.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} over'**
+  String targetOver(String kcal);
+
+  /// No description provided for @targetToGo.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} to go'**
+  String targetToGo(String kcal);
+
+  /// No description provided for @targetLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} left'**
+  String targetLeft(String kcal);
+
+  /// No description provided for @targetMinReached.
+  ///
+  /// In en, this message translates to:
+  /// **'minimum reached'**
+  String get targetMinReached;
+
+  /// No description provided for @targetRangeBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Target {min}–{max} kcal'**
+  String targetRangeBoth(String min, String max);
+
+  /// No description provided for @targetRangeMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Target {max} kcal'**
+  String targetRangeMax(String max);
+
+  /// No description provided for @targetRangeMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum {min} kcal'**
+  String targetRangeMin(String min);
+
+  /// No description provided for @mealMenuEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit meal'**
+  String get mealMenuEdit;
+
+  /// No description provided for @mealMenuSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Split across days'**
+  String get mealMenuSplit;
+
+  /// No description provided for @mealMenuSaveRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as recipe'**
+  String get mealMenuSaveRecipe;
+
+  /// No description provided for @mealMenuDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete meal'**
+  String get mealMenuDelete;
+
+  /// No description provided for @mealFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish meal'**
+  String get mealFinish;
+
+  /// No description provided for @mealAddTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to this meal'**
+  String get mealAddTo;
+
+  /// No description provided for @mealSavedToRecipes.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved \"{name}\" to recipes'**
+  String mealSavedToRecipes(String name);
+
+  /// No description provided for @editMealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit meal'**
+  String get editMealTitle;
+
+  /// No description provided for @editMealName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get editMealName;
+
+  /// No description provided for @editMealType.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal type'**
+  String get editMealType;
+
+  /// No description provided for @editMealWhen.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get editMealWhen;
 }
 
 class _AppLocalizationsDelegate

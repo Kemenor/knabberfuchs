@@ -9,6 +9,7 @@ import '../../domain/enums.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/nutrition.dart';
 import '../../domain/recipe_share.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../add/add_food_screen.dart';
 import '../food/log_food_sheet.dart';
@@ -47,6 +48,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
   Widget build(BuildContext context) {
     final day = ref.watch(selectedDayProvider);
     final summaryAsync = ref.watch(daySummaryProvider);
+    final l10n = AppLocalizations.of(context);
 
     // Push this day's nutrition to Health Connect whenever its entries change
     // (no-op unless the user enabled sync in Settings).
@@ -73,13 +75,13 @@ class _DayScreenState extends ConsumerState<DayScreen>
           ),
         ),
         leading: IconButton(
-          tooltip: 'Previous day',
+          tooltip: l10n.dayPreviousDay,
           icon: const Icon(Icons.chevron_left),
           onPressed: () => shiftDay(-1),
         ),
         actions: [
           IconButton(
-            tooltip: 'Next day',
+            tooltip: l10n.dayNextDay,
             icon: const Icon(Icons.chevron_right),
             onPressed: () => shiftDay(1),
           ),
@@ -95,7 +97,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
         children: [
           FloatingActionButton.small(
             heroTag: 'dayFromList',
-            tooltip: 'Meal from an ingredient list',
+            tooltip: l10n.dayMealFromList,
             onPressed: () => startOcrMealFlow(context, ref),
             child: const Icon(Icons.document_scanner_outlined),
           ),
@@ -104,7 +106,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
             heroTag: 'dayAddFood',
             onPressed: () => addFoodByDay(context, ref, day),
             icon: const Icon(Icons.add),
-            label: const Text('Add food'),
+            label: Text(l10n.dayAddFood),
           ),
         ],
       ),
@@ -153,12 +155,11 @@ class _DayBody extends ConsumerWidget {
     final groups = ref.watch(dayGroupViewsProvider);
     final ungrouped = ref.watch(ungroupedDayEntriesProvider);
     if (groups.isEmpty && ungrouped.isEmpty) {
-      children.add(const Padding(
-        padding: EdgeInsets.all(48),
+      children.add(Padding(
+        padding: const EdgeInsets.all(48),
         child: Center(
           child: Text(
-            'Tap + to start a meal.\nEverything you add flows into it '
-            'until you tap ✓ (or 15 min pass).',
+            AppLocalizations.of(context).dayEmptyHint,
             textAlign: TextAlign.center,
           ),
         ),
@@ -177,11 +178,13 @@ class _DayBody extends ConsumerWidget {
   }
 }
 
-String _rangeLabel(DaySummary s) {
+String _rangeLabel(AppLocalizations l10n, DaySummary s) {
   final mn = s.kcalMin, mx = s.kcalMax;
-  if (mn != null && mx != null) return 'Target ${kcalStr(mn)}–${kcalStr(mx)} kcal';
-  if (mx != null) return 'Target ${kcalStr(mx)} kcal';
-  if (mn != null) return 'Minimum ${kcalStr(mn)} kcal';
+  if (mn != null && mx != null) {
+    return l10n.targetRangeBoth(kcalStr(mn), kcalStr(mx));
+  }
+  if (mx != null) return l10n.targetRangeMax(kcalStr(mx));
+  if (mn != null) return l10n.targetRangeMin(kcalStr(mn));
   return '';
 }
 
@@ -192,6 +195,7 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final total = summary.total;
     final status = summary.status;
     final color = switch (status) {
@@ -201,11 +205,11 @@ class _SummaryCard extends StatelessWidget {
       TargetStatus.none => theme.colorScheme.onSurfaceVariant,
     };
     final statusText = switch (status) {
-      TargetStatus.over => '${kcalStr(-summary.remainingToMax!)} over',
-      TargetStatus.under => '${kcalStr(summary.shortOfMin!)} to go',
+      TargetStatus.over => l10n.targetOver(kcalStr(-summary.remainingToMax!)),
+      TargetStatus.under => l10n.targetToGo(kcalStr(summary.shortOfMin!)),
       TargetStatus.inRange => summary.kcalMax != null
-          ? '${kcalStr(summary.remainingToMax!)} left'
-          : 'minimum reached',
+          ? l10n.targetLeft(kcalStr(summary.remainingToMax!))
+          : l10n.targetMinReached,
       TargetStatus.none => '',
     };
 
@@ -224,7 +228,7 @@ class _SummaryCard extends StatelessWidget {
                     style: theme.textTheme.displaySmall
                         ?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(width: 4),
-                Text('kcal', style: theme.textTheme.titleMedium),
+                Text(l10n.unitKcal, style: theme.textTheme.titleMedium),
                 const Spacer(),
                 if (summary.hasTarget)
                   Text(
@@ -251,7 +255,8 @@ class _SummaryCard extends StatelessWidget {
             ],
             if (summary.hasTarget) ...[
               const SizedBox(height: 4),
-              Text(_rangeLabel(summary), style: theme.textTheme.bodySmall),
+              Text(_rangeLabel(l10n, summary),
+                  style: theme.textTheme.bodySmall),
             ],
             const SizedBox(height: 12),
             _MacroRow(total: total),
@@ -268,12 +273,13 @@ class _MacroRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _macro(context, 'Protein', total.protein),
-        _macro(context, 'Carbs', total.carb),
-        _macro(context, 'Fat', total.fat),
+        _macro(context, l10n.macroProtein, total.protein),
+        _macro(context, l10n.macroCarbs, total.carb),
+        _macro(context, l10n.macroFat, total.fat),
       ],
     );
   }
@@ -301,6 +307,7 @@ class _GroupSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final isActive = ref.watch(activeGroupProvider) == group.id;
 
     Future<void> reopenAndAdd() async {
@@ -349,26 +356,27 @@ class _GroupSection extends ConsumerWidget {
                       _delete(ref);
                   }
                 },
-                itemBuilder: (_) => const [
+                itemBuilder: (_) => [
+                  PopupMenuItem(value: 'edit', child: Text(l10n.mealMenuEdit)),
                   PopupMenuItem(
-                      value: 'edit', child: Text('Edit meal')),
+                      value: 'split', child: Text(l10n.mealMenuSplit)),
                   PopupMenuItem(
-                      value: 'split', child: Text('Split across days')),
-                  PopupMenuItem(value: 'recipe', child: Text('Save as recipe')),
-                  PopupMenuItem(value: 'delete', child: Text('Delete meal')),
+                      value: 'recipe', child: Text(l10n.mealMenuSaveRecipe)),
+                  PopupMenuItem(
+                      value: 'delete', child: Text(l10n.mealMenuDelete)),
                 ],
               ),
               if (isActive)
                 IconButton(
                   visualDensity: VisualDensity.compact,
-                  tooltip: 'Finish meal',
+                  tooltip: l10n.mealFinish,
                   icon: Icon(Icons.check, size: 22, color: theme.colorScheme.primary),
                   onPressed: () => ref.read(activeGroupProvider.notifier).end(),
                 )
               else
                 IconButton(
                   visualDensity: VisualDensity.compact,
-                  tooltip: 'Add to this meal',
+                  tooltip: l10n.mealAddTo,
                   icon: const Icon(Icons.add, size: 22),
                   onPressed: reopenAndAdd,
                 ),
@@ -392,6 +400,7 @@ class _GroupSection extends ConsumerWidget {
 
   Future<void> _saveAsRecipe(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     await ref.read(recipeRepositoryProvider).create(
           name: group.name,
           servings: 1,
@@ -408,7 +417,7 @@ class _GroupSection extends ConsumerWidget {
           ],
         );
     messenger.showAutoSnackBar(
-        SnackBar(content: Text('Saved "${group.name}" to recipes')));
+        SnackBar(content: Text(l10n.mealSavedToRecipes(group.name))));
   }
 
   Future<void> _delete(WidgetRef ref) async {
@@ -510,6 +519,7 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return SafeArea(
       top: false,
       child: Padding(
@@ -519,19 +529,19 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Edit meal', style: theme.textTheme.titleLarge),
+            Text(l10n.editMealTitle, style: theme.textTheme.titleLarge),
             const SizedBox(height: 16),
             TextField(
               controller: _nameCtrl,
               autofocus: false,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.editMealName,
+                border: const OutlineInputBorder(),
               ),
               onChanged: (_) => _nameDirty = true,
             ),
             const SizedBox(height: 16),
-            Text('Meal type', style: theme.textTheme.labelLarge),
+            Text(l10n.editMealType, style: theme.textTheme.labelLarge),
             const SizedBox(height: 4),
             Wrap(
               spacing: 8,
@@ -545,7 +555,7 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
               ],
             ),
             const SizedBox(height: 16),
-            Text('When', style: theme.textTheme.labelLarge),
+            Text(l10n.editMealWhen, style: theme.textTheme.labelLarge),
             const SizedBox(height: 4),
             Row(
               children: [
@@ -568,7 +578,7 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
             Row(
               children: [
                 const Spacer(),
-                FilledButton(onPressed: _save, child: const Text('Save')),
+                FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
               ],
             ),
           ],
