@@ -38,19 +38,24 @@ void main() {
     expect(back.total.kcal, closeTo(1400, 0.001));
   });
 
-  test('logPortionGrams logs a correctly-scaled snapshot to a day', () async {
-    // One of 4 servings = 200 g of 800 g total -> 1/4 of 1400 = 350 kcal.
+  test('logPortionGrams logs each ingredient scaled by the portion', () async {
+    // One of 4 servings = 200 g of 800 g total -> 1/4 of each ingredient.
     final grams = repo.portionGramsForServings(share);
     expect(grams, 200);
 
     await repo.logPortionGrams(
         share: share, grams: grams, meal: MealType.dinner, day: '2026-06-17');
     final entries = await db.watchDay('2026-06-17').first;
-    expect(entries.length, 1);
-    final e = entries.first;
-    expect(e.sName, 'Chili');
-    // kcal for this entry = sKcal100 * grams/100
-    expect(e.sKcal100 * e.grams / 100, closeTo(350, 0.001));
+    expect(entries.length, 2); // one entry per ingredient, not a single dish
+    expect(entries.map((e) => e.sName), containsAll(['Beans', 'Beef']));
+    // each 400 g ingredient scaled by 0.25 -> 100 g
+    for (final e in entries) {
+      expect(e.grams, closeTo(100, 0.001));
+    }
+    // total still 1/4 of 1400 = 350 kcal
+    final totalKcal =
+        entries.fold<double>(0, (s, e) => s + e.sKcal100 * e.grams / 100);
+    expect(totalKcal, closeTo(350, 0.001));
   });
 
   test('portions across two days split the batch', () async {
@@ -58,8 +63,9 @@ void main() {
         share: share, grams: 200, meal: MealType.dinner, day: '2026-06-17');
     await repo.logPortionGrams(
         share: share, grams: 200, meal: MealType.lunch, day: '2026-06-18');
-    expect((await db.watchDay('2026-06-17').first).length, 1);
-    expect((await db.watchDay('2026-06-18').first).length, 1);
+    // two ingredients -> two entries per portion
+    expect((await db.watchDay('2026-06-17').first).length, 2);
+    expect((await db.watchDay('2026-06-18').first).length, 2);
   });
 
   test('importShare persists a shared recipe', () async {

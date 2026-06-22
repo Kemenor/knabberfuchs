@@ -89,7 +89,9 @@ class RecipeRepository {
 
   Future<void> delete(int id) => db.deleteRecipe(id);
 
-  /// Log a portion of [share] (by weight in grams) into a day/meal.
+  /// Log a portion of [share] (by weight in grams) into a day/meal: each
+  /// ingredient is logged as its own entry, scaled by the portion's fraction of
+  /// the whole recipe, into [groupId] (the meal group, named after the recipe).
   Future<void> logPortionGrams({
     required RecipeShare share,
     required double grams,
@@ -97,22 +99,24 @@ class RecipeRepository {
     required String day,
     int? groupId,
   }) async {
-    final total = share.total;
     final totalG = share.totalGrams;
     if (totalG <= 0 || grams <= 0) return;
-    // Per-100g of the (homogeneous) cooked dish.
-    double per100(double absolute) => absolute / totalG * 100;
-    await diary.logSnapshot(
-      name: share.name,
-      kcal100: per100(total.kcal),
-      protein100: per100(total.protein),
-      carb100: per100(total.carb),
-      fat100: per100(total.fat),
-      grams: grams,
-      meal: meal,
-      day: day,
-      groupId: groupId,
-    );
+    final factor = grams / totalG; // fraction of the whole recipe in this portion
+    for (final item in share.items) {
+      final g = item.grams * factor;
+      if (g <= 0) continue;
+      await diary.logSnapshot(
+        name: item.name,
+        kcal100: item.kcal100,
+        protein100: item.protein100,
+        carb100: item.carb100,
+        fat100: item.fat100,
+        grams: g,
+        meal: meal,
+        day: day,
+        groupId: groupId,
+      );
+    }
   }
 
   /// Convenience: grams for one of [servings] equal portions.
