@@ -15,6 +15,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../add/add_food_screen.dart';
 import '../food/log_food_sheet.dart';
+import '../food/quick_add_sheet.dart';
 import '../food/recognize_food_flow.dart';
 import '../recipes/ocr_meal_screen.dart';
 import 'split_meal_sheet.dart';
@@ -100,9 +101,9 @@ class _DayScreenState extends ConsumerState<DayScreen>
         children: [
           FloatingActionButton.small(
             heroTag: 'dayCapture',
-            tooltip: l10n.dayCaptureTooltip,
+            tooltip: l10n.quickAdd,
             onPressed: () => _showCaptureMenu(context, ref, day),
-            child: const Icon(Icons.add_a_photo_outlined),
+            child: const Icon(Icons.bolt),
           ),
           const SizedBox(width: 12),
           FloatingActionButton.extended(
@@ -126,6 +127,15 @@ class _DayScreenState extends ConsumerState<DayScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              leading: const Icon(Icons.bolt),
+              title: Text(l10n.quickAdd),
+              subtitle: Text(l10n.quickAddSubtitle),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                quickAddByDay(context, ref, day);
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.center_focus_weak),
               title: Text(l10n.captureScanAi),
@@ -187,6 +197,18 @@ Future<void> recognizeFoodByDay(
   final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
       .inferNow();
   await startRecognizeFoodFlow(context, ref,
+      day: day,
+      meal: meal,
+      resolveGroup: () =>
+          ref.read(activeGroupProvider.notifier).ensureGroup(day));
+}
+
+/// Free add (name + calories) that logs into [day]'s active (or new) group.
+Future<void> quickAddByDay(
+    BuildContext context, WidgetRef ref, String day) async {
+  final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
+      .inferNow();
+  await showQuickAddSheet(context, ref,
       day: day,
       meal: meal,
       resolveGroup: () =>
