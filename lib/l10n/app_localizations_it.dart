@@ -445,6 +445,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Fotografa un piatto — indoviniamo piatto e calorie';
 
   @override
+  String get foodFormTitle => 'Nuovo alimento';
+
+  @override
+  String get barcodeField => 'Codice a barre (facoltativo)';
+
+  @override
   String get scanBarcode => 'Scansiona codice a barre';
 
   @override

@@ -858,6 +858,18 @@ abstract class AppLocalizations {
   /// **'Photograph a dish — we\'ll guess it and the calories'**
   String get captureScanAiSub;
 
+  /// No description provided for @foodFormTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New food'**
+  String get foodFormTitle;
+
+  /// No description provided for @barcodeField.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode (optional)'**
+  String get barcodeField;
+
   /// No description provided for @scanBarcode.
   ///
   /// In en, this message translates to:

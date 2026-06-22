@@ -150,6 +150,8 @@
   "dayCaptureTooltip": "Ajouter depuis une photo",
   "captureScanAi": "Scanner un repas avec l'IA",
   "captureScanAiSub": "Photographiez un plat — on devine le plat et les calories",
+  "foodFormTitle": "Nouvel aliment",
+  "barcodeField": "Code-barres (facultatif)",
   "scanBarcode": "Scanner un code-barres",
   "selectFood": "Sélectionner un aliment",
 

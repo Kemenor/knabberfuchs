@@ -177,6 +177,8 @@
   "dayCaptureTooltip": "Add from a photo",
   "captureScanAi": "Scan a meal with AI",
   "captureScanAiSub": "Photograph a dish — we'll guess it and the calories",
+  "foodFormTitle": "New food",
+  "barcodeField": "Barcode (optional)",
   "scanBarcode": "Scan barcode",
   "selectFood": "Select food",
 

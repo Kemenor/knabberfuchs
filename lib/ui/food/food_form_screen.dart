@@ -13,12 +13,13 @@ import '../../data/db/database.dart';
 import '../../data/ocr/image_preprocess.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import '../scan/scan_screen.dart';
 import 'crop_screen.dart';
 
-/// Create a saved food: full nutrition form with an optional label scanner.
-/// One screen for both "create custom food" (no barcode) and "add a product
-/// for a not-found barcode" — with a barcode it's re-scannable and offers an
-/// Open Food Facts contribution link. Pops the created [Food].
+/// Create a saved food: one full nutrition form for everything. The barcode is
+/// just an optional field (type it, or tap the icon to scan one) — with a value
+/// the food is re-scannable and offers an Open Food Facts contribution link.
+/// Pass [barcode] to pre-fill it (e.g. from a not-found scan). Pops the [Food].
 class FoodFormScreen extends ConsumerStatefulWidget {
   final String? barcode;
   const FoodFormScreen({super.key, this.barcode});
@@ -28,6 +29,7 @@ class FoodFormScreen extends ConsumerStatefulWidget {
 }
 
 class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
+  late final _barcode = TextEditingController(text: widget.barcode ?? '');
   final _name = TextEditingController();
   final _brand = TextEditingController();
   final _serving = TextEditingController();
@@ -41,12 +43,19 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   final _salt = TextEditingController();
   bool _ocrBusy = false;
 
-  bool get _hasBarcode => widget.barcode != null;
+  bool get _hasBarcode => _barcode.text.trim().isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    // Rebuild so the "Add to Open Food Facts" section follows the field.
+    _barcode.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
     for (final c in [
-      _name, _brand, _serving, _kcal, _protein, _carb, _fat,
+      _barcode, _name, _brand, _serving, _kcal, _protein, _carb, _fat,
       _fiber, _sugar, _satfat, _salt,
     ]) {
       c.dispose();
@@ -56,6 +65,15 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
 
   double? _val(TextEditingController c) =>
       double.tryParse(c.text.replaceAll(',', '.'));
+
+  Future<void> _scanBarcode() async {
+    final code = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const ScanScreen()),
+    );
+    if (code != null && code.trim().isNotEmpty && mounted) {
+      _barcode.text = code.trim();
+    }
+  }
 
   Future<void> _scanLabel() async {
     final l10n = AppLocalizations.of(context);
@@ -124,8 +142,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
           SnackBar(content: Text(l10n.addNameEnergyRequired)));
       return;
     }
+    final barcode = _barcode.text.trim();
     final food = await ref.read(foodRepositoryProvider).createFood(
-          barcode: widget.barcode,
+          barcode: barcode.isEmpty ? null : barcode,
           name: name,
           brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
           kcal100: kcal,
@@ -145,8 +164,8 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     // Open OFF for this barcode — App Links route to the OFF app if installed,
     // otherwise the browser. OFF handles its own login + submission.
     await launchUrl(
-      Uri.parse(
-          'https://world.openfoodfacts.org/cgi/product.pl?type=add&code=${widget.barcode}'),
+      Uri.parse('https://world.openfoodfacts.org/cgi/product.pl'
+          '?type=add&code=${_barcode.text.trim()}'),
       mode: LaunchMode.externalApplication,
     );
   }
@@ -157,17 +176,26 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(_hasBarcode ? l10n.addProductTitle : l10n.manualTitle),
+        title: Text(l10n.foodFormTitle),
         actions: [TextButton(onPressed: _save, child: Text(l10n.actionSave))],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (_hasBarcode) ...[
-            Text(l10n.addBarcodeLabel(widget.barcode!),
-                style: theme.textTheme.bodySmall),
-            const SizedBox(height: 12),
-          ],
+          TextField(
+            controller: _barcode,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: l10n.barcodeField,
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                tooltip: l10n.scanBarcode,
+                icon: const Icon(Icons.qr_code_scanner),
+                onPressed: _scanBarcode,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.sentences,

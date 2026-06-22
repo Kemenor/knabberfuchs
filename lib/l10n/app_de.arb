@@ -150,6 +150,8 @@
   "dayCaptureTooltip": "Per Foto hinzufügen",
   "captureScanAi": "Mahlzeit mit KI scannen",
   "captureScanAiSub": "Fotografiere ein Gericht — wir schätzen es und die Kalorien",
+  "foodFormTitle": "Neues Lebensmittel",
+  "barcodeField": "Barcode (optional)",
   "scanBarcode": "Barcode scannen",
   "selectFood": "Lebensmittel auswählen",
 

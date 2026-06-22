@@ -441,6 +441,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Photograph a dish — we\'ll guess it and the calories';
 
   @override
+  String get foodFormTitle => 'New food';
+
+  @override
+  String get barcodeField => 'Barcode (optional)';
+
+  @override
   String get scanBarcode => 'Scan barcode';
 
   @override
