@@ -7,6 +7,7 @@ import '../../core/format.dart';
 import '../../data/db/database.dart';
 import '../../domain/nutrition.dart';
 import '../../domain/recipe_share.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../food/food_picker_screen.dart';
 import '../food/log_food_sheet.dart';
@@ -57,7 +58,8 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     // + the amount sheet (unit selector, quick-picks, serving).
     final food = await Navigator.of(context).push<Food>(
       MaterialPageRoute(
-          builder: (_) => const FoodPickerScreen(title: 'Add ingredient')),
+          builder: (_) =>
+              FoodPickerScreen(title: AppLocalizations.of(context).addIngredient)),
     );
     if (food == null || !mounted) return;
     final grams = await showAmountSheet(
@@ -112,14 +114,15 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   Future<void> _save() async {
     final name = _name.text.trim();
     final servings = double.tryParse(_servings.text.replaceAll(',', '.')) ?? 1;
+    final l10n = AppLocalizations.of(context);
     if (name.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showAutoSnackBar(const SnackBar(content: Text('Give the recipe a name.')));
+          .showAutoSnackBar(SnackBar(content: Text(l10n.recipeNeedName)));
       return;
     }
     if (_items.isEmpty) {
       ScaffoldMessenger.of(context).showAutoSnackBar(
-          const SnackBar(content: Text('Add at least one ingredient.')));
+          SnackBar(content: Text(l10n.recipeNeedIngredient)));
       return;
     }
     final repo = ref.read(recipeRepositoryProvider);
@@ -138,10 +141,11 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   @override
   Widget build(BuildContext context) {
     final total = _total;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.recipe == null ? 'New recipe' : 'Edit recipe'),
-        actions: [TextButton(onPressed: _save, child: const Text('Save'))],
+        title: Text(widget.recipe == null ? l10n.recipeNew : l10n.recipeEdit),
+        actions: [TextButton(onPressed: _save, child: Text(l10n.actionSave))],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -149,25 +153,27 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-                labelText: 'Recipe name', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+                labelText: l10n.recipeName,
+                border: const OutlineInputBorder()),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _servings,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
-            decoration: const InputDecoration(
-              labelText: 'Servings (portions this makes)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.recipeServingsField,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              Text('Ingredients', style: Theme.of(context).textTheme.titleMedium),
+              Text(l10n.ingredients,
+                  style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
-              Text('${kcalStr(total.kcal)} kcal total',
+              Text(l10n.kcalTotal(kcalStr(total.kcal)),
                   style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
@@ -178,8 +184,8 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
               contentPadding: EdgeInsets.zero,
               title: Text(_items[i].name,
                   maxLines: 1, overflow: TextOverflow.ellipsis),
-              subtitle: Text('${gramsStr(_items[i].grams)} g · '
-                  '${kcalStr(_items[i].nutrition.kcal)} kcal'),
+              subtitle: Text(l10n.gramsKcal(gramsStr(_items[i].grams),
+                  kcalStr(_items[i].nutrition.kcal))),
               onTap: () => _editIngredient(i),
               trailing: IconButton(
                 icon: const Icon(Icons.close, size: 20),
@@ -190,7 +196,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
           OutlinedButton.icon(
             onPressed: _addIngredient,
             icon: const Icon(Icons.add),
-            label: const Text('Add ingredient'),
+            label: Text(l10n.addIngredient),
           ),
         ],
       ),

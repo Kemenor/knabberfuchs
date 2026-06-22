@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/date_x.dart';
 import '../../core/format.dart';
 import '../../domain/day_summary.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 
 /// Sheet to split a meal group into equal portions across several days.
@@ -58,18 +59,20 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
 
   Future<void> _split() async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     await ref.read(diaryRepositoryProvider).splitGroupAcrossDays(
           groupId: widget.group.id,
           days: _days,
         );
     if (mounted) Navigator.of(context).pop();
     messenger.showAutoSnackBar(
-        SnackBar(content: Text('Split into $_n days')));
+        SnackBar(content: Text(l10n.splitInto('$_n'))));
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final perPortionKcal = widget.group.subtotal.kcal / _n;
 
     return SafeArea(
@@ -81,20 +84,19 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Split "${widget.group.name}"',
+            Text(l10n.splitTitle(widget.group.name),
               style: theme.textTheme.titleLarge,
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
           const SizedBox(height: 4),
           Text(
-            'Divide this meal into equal portions, one per day. '
-            'The original is replaced.',
+            l10n.splitDescription,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              Text('Portions', style: theme.textTheme.labelLarge),
+              Text(l10n.recipePortions, style: theme.textTheme.labelLarge),
               const Spacer(),
               IconButton.filledTonal(
                 onPressed: _n > 2 ? () => _setCount(_n - 1) : null,
@@ -110,7 +112,7 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
               ),
             ],
           ),
-          Text('${kcalStr(perPortionKcal)} kcal each',
+          Text(l10n.splitKcalEach(kcalStr(perPortionKcal)),
               style: theme.textTheme.bodySmall),
           const SizedBox(height: 8),
           for (var i = 0; i < _days.length; i++)
@@ -127,7 +129,7 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _split,
-              child: Text('Split into $_n days'),
+              child: Text(l10n.splitInto('$_n')),
             ),
           ),
         ],

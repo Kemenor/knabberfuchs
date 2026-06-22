@@ -192,7 +192,9 @@ Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = AppLocalizations.of(context);
   try {
-    await ref.read(backupServiceProvider).shareBackup();
+    await ref
+        .read(backupServiceProvider)
+        .shareBackup(subject: l10n.backupShareSubject);
   } catch (e) {
     messenger
         .showAutoSnackBar(SnackBar(content: Text(l10n.backupExportFailed('$e'))));

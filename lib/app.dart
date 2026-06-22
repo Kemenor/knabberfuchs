@@ -47,16 +47,16 @@ class _Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.restaurant_menu, size: 56),
-            SizedBox(height: 16),
-            Text('Preparing food database…'),
-            SizedBox(height: 16),
-            CircularProgressIndicator(),
+            const Icon(Icons.restaurant_menu, size: 56),
+            const SizedBox(height: 16),
+            Text(AppLocalizations.of(context).splashPreparing),
+            const SizedBox(height: 16),
+            const CircularProgressIndicator(),
           ],
         ),
       ),

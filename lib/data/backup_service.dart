@@ -40,11 +40,11 @@ class BackupService {
     return file;
   }
 
-  Future<void> shareBackup() async {
+  Future<void> shareBackup({String? subject}) async {
     final file = await buildZip();
     await SharePlus.instance.share(ShareParams(
       files: [XFile(file.path)],
-      subject: 'Calorie Tracker backup',
+      subject: subject ?? 'Knabberfuchs backup',
     ));
   }
 

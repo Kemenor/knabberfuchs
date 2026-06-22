@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// Lets the user drag a rectangle to keep only the nutrition table before OCR.
 /// Pops the cropped image bytes (or null if cancelled).
 class CropScreen extends StatefulWidget {
@@ -19,10 +21,11 @@ class _CropScreenState extends State<CropScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Crop to the table'),
+        title: Text(l10n.cropTitle),
         actions: [
           if (_busy)
             const Padding(
@@ -40,7 +43,7 @@ class _CropScreenState extends State<CropScreen> {
                 setState(() => _busy = true);
                 _controller.crop();
               },
-              child: const Text('Done'),
+              child: Text(l10n.cropDone),
             ),
         ],
       ),

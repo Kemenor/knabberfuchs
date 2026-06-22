@@ -225,12 +225,15 @@ Strategy:
     driven by `localeProvider` (persisted `appLocale` setting; null/'system' = device locale).
     Settings → Language section (RadioGroup: System default + EN/DE/FR/IT). Emulator-verified:
     switching to Deutsch flips nav + Material's own strings; System default reverts.
-  - **11b — Extract strings (the bulk). 🔄 IN PROGRESS.** ✅ Done: **Day screen**, **Recipes
-    screen + create menu** (English keys; DE/FR/IT fall back until 11c). Remaining: settings
-    (most rows), log/add-food sheet, add-product, OCR review, offline regions, health, backup,
-    split-meal, manual-food, scan. Also deferred: meal-type words (Breakfast/…) + relative
-    date title (Today/Yesterday) — they double as persisted auto-name tokens, so tied to the
-    naming question. Handle parameters/plurals (`{n} products`, `{kcal} kcal`).
+  - **11b — Extract strings (the bulk). ✅ DONE.** All UI screens now pull from `app_en.arb`
+    (~230 keys, English; DE/FR/IT fall back until 11c): Day, Recipes + create menu, Settings
+    (incl. language picker, health snackbars, backup dialogs, OFF thanks), log/add-food sheet,
+    food search + picker, add-product, manual-food, OCR review, recipe edit/detail/share,
+    offline regions, scan, crop, split-meal, offline reminder, splash. Parameters/plurals
+    handled (`{products}k products`, `{kcal} kcal`, `{n} days`, etc.). Verified: analyze clean,
+    80 tests pass, builds + runs on emulator. Still deferred to the naming question: meal-type
+    words (Breakfast/…) + relative date title (Today/Yesterday) — they double as persisted
+    auto-name tokens.
   - **11c — Translate.** Fill `app_de.arb` / `app_fr.arb` / `app_it.arb`. Review by a
     native/fluent speaker (the user is Swiss — DE/FR at least) since machine translations
     of UI microcopy are often stilted.

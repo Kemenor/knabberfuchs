@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/snackbar.dart';
 import '../../data/repositories/food_repository.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../settings/offline_regions_screen.dart';
 
@@ -24,15 +25,15 @@ VoidCallback? offlinePackReminder(
 
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context, rootNavigator: true);
+  final l10n = AppLocalizations.of(context);
   return () {
     if (_remindedThisSession) return;
     _remindedThisSession = true;
     messenger.showAutoSnackBar(SnackBar(
       duration: const Duration(seconds: 6),
-      content: const Text(
-          'Looked up online — download your region for faster, offline scans.'),
+      content: Text(l10n.offlineReminderText),
       action: SnackBarAction(
-        label: 'Regions',
+        label: l10n.offlineReminderAction,
         onPressed: () => navigator.push(MaterialPageRoute(
             builder: (_) => const OfflineRegionsScreen())),
       ),

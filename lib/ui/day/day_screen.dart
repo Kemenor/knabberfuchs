@@ -89,7 +89,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
       ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(l10n.genericError('$e'))),
         data: (summary) => _DayBody(summary: summary),
       ),
       floatingActionButton: Row(

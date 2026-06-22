@@ -23,9 +23,9 @@ class RecipesScreen extends ConsumerWidget {
       final messenger = ScaffoldMessenger.of(context);
       final text = await Navigator.of(context).push<String>(
         MaterialPageRoute(
-          builder: (_) => const ScanScreen(
-            formats: [BarcodeFormat.qrCode],
-            title: 'Scan recipe QR',
+          builder: (_) => ScanScreen(
+            formats: const [BarcodeFormat.qrCode],
+            title: l10n.scanRecipeQr,
             allowManual: false,
           ),
         ),
@@ -90,7 +90,7 @@ class RecipesScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.recipesTitle)),
       body: recipesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(l10n.genericError('$e'))),
         data: (recipes) {
           if (recipes.isEmpty) {
             return Center(

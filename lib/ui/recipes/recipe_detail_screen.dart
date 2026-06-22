@@ -8,6 +8,7 @@ import '../../data/db/database.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/nutrition.dart';
 import '../../domain/recipe_share.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import 'recipe_edit_screen.dart';
 import 'recipe_share_screen.dart';
@@ -58,26 +59,27 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
   Widget build(BuildContext context) {
     final share = _share;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(_recipe.name),
         actions: [
           if (share != null)
             IconButton(
-              tooltip: 'Edit',
+              tooltip: l10n.actionEdit,
               icon: const Icon(Icons.edit_outlined),
               onPressed: _edit,
             ),
           if (share != null)
             IconButton(
-              tooltip: 'Share',
+              tooltip: l10n.actionShare,
               icon: const Icon(Icons.ios_share),
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => RecipeShareScreen(share: share),
               )),
             ),
           IconButton(
-            tooltip: 'Delete',
+            tooltip: l10n.actionDelete,
             icon: const Icon(Icons.delete_outline),
             onPressed: _delete,
           ),
@@ -91,15 +93,15 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                 _NutritionCard(share: share),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                  child: Text('Ingredients',
+                  child: Text(l10n.ingredients,
                       style: theme.textTheme.titleMedium),
                 ),
                 for (final i in share.items)
                   ListTile(
                     dense: true,
                     title: Text(i.name),
-                    subtitle: Text('${gramsStr(i.grams)} g'),
-                    trailing: Text('${kcalStr(i.nutrition.kcal)} kcal'),
+                    subtitle: Text(l10n.gramsValue(gramsStr(i.grams))),
+                    trailing: Text(l10n.kcalValue(kcalStr(i.nutrition.kcal))),
                   ),
               ],
             ),
@@ -108,7 +110,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
           : FloatingActionButton.extended(
               onPressed: () => _showLogPortion(context, share),
               icon: const Icon(Icons.event_available),
-              label: const Text('Log portion to a day'),
+              label: Text(l10n.recipeLogPortion),
             ),
     );
   }
@@ -130,6 +132,7 @@ class _NutritionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final total = share.total;
     final per = share.perServing;
     return Card(
@@ -139,17 +142,17 @@ class _NutritionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Whole recipe', style: theme.textTheme.labelMedium),
+            Text(l10n.recipeWhole, style: theme.textTheme.labelMedium),
             Text(
-              '${kcalStr(total.kcal)} kcal · ${gramsStr(share.totalGrams)} g',
+              l10n.kcalDotGrams(kcalStr(total.kcal), gramsStr(share.totalGrams)),
               style: theme.textTheme.titleLarge,
             ),
             const Divider(height: 20),
-            Text('Per serving (${share.servings.toStringAsFixed(0)})',
+            Text(l10n.recipePerServing(share.servings.toStringAsFixed(0)),
                 style: theme.textTheme.labelMedium),
             Text(
-              '${kcalStr(per.kcal)} kcal · '
-              'P ${macroStr(per.protein)}  C ${macroStr(per.carb)}  F ${macroStr(per.fat)}',
+              l10n.macroPcf(kcalStr(per.kcal), macroStr(per.protein),
+                  macroStr(per.carb), macroStr(per.fat)),
               style: theme.textTheme.titleMedium,
             ),
           ],
@@ -179,6 +182,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final grams = _oneServingGrams * _portions;
     final nutrition = Nutrition.fromPer100g(
       kcal100: widget.share.totalGrams == 0
@@ -196,7 +200,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Log a portion', style: theme.textTheme.titleLarge),
+            Text(l10n.recipeLogPortionTitle, style: theme.textTheme.titleLarge),
           const SizedBox(height: 12),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -206,7 +210,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
             onTap: _pickDay,
           ),
           const SizedBox(height: 4),
-          Text('Portions', style: theme.textTheme.labelLarge),
+          Text(l10n.recipePortions, style: theme.textTheme.labelLarge),
           Row(
             children: [
               IconButton.filledTonal(
@@ -234,7 +238,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
             width: double.infinity,
             child: FilledButton(
               onPressed: grams <= 0 ? null : _log,
-              child: Text('Log to ${DayKey.label(_day)}'),
+              child: Text(l10n.recipeLogToDay(DayKey.label(_day))),
             ),
           ),
         ],
@@ -257,6 +261,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
   Future<void> _log() async {
     final grams = _oneServingGrams * _portions;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     final label = DayKey.label(_day);
     // Log the portion as its own meal group named after the recipe.
     final groupId =
@@ -271,6 +276,6 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
           groupId: groupId,
         );
     if (mounted) Navigator.of(context).pop();
-    messenger.showAutoSnackBar(SnackBar(content: Text('Logged to $label')));
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.loggedTo(label))));
   }
 }

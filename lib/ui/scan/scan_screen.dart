@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// Barcode/QR scanner. Pops the scanned (or manually entered) string.
 ///
 /// Uses mobile_scanner's recommended explicit lifecycle (start/stop tied to
@@ -14,7 +16,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 /// camera errors or isn't available (e.g. desktop).
 class ScanScreen extends StatefulWidget {
   final List<BarcodeFormat> formats;
-  final String title;
+  final String? title;
   final bool allowManual;
 
   const ScanScreen({
@@ -25,7 +27,7 @@ class ScanScreen extends StatefulWidget {
       BarcodeFormat.upcA,
       BarcodeFormat.upcE,
     ],
-    this.title = 'Scan barcode',
+    this.title,
     this.allowManual = true,
   });
 
@@ -97,24 +99,26 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _enterManually() async {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
     final code = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Enter barcode'),
+        title: Text(l10n.scanEnterBarcode),
         content: TextField(
           controller: controller,
           autofocus: true,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: const InputDecoration(hintText: 'e.g. 3017620422003'),
+          decoration: InputDecoration(hintText: l10n.scanExampleHint),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.actionCancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('Look up'),
+            child: Text(l10n.scanLookUp),
           ),
         ],
       ),
@@ -126,13 +130,14 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title ?? l10n.scanBarcode),
         actions: [
           if (widget.allowManual)
             IconButton(
-              tooltip: 'Enter manually',
+              tooltip: l10n.scanEnterManually,
               icon: const Icon(Icons.keyboard),
               onPressed: _enterManually,
             ),
@@ -154,7 +159,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
               ],
             )
           : _CameraError(
-              message: 'Camera scanning is only available on a device.',
+              message: l10n.scanCameraOnlyDevice,
               onManual: widget.allowManual ? _enterManually : null,
             ),
     );
@@ -168,6 +173,7 @@ class _CameraError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -177,7 +183,7 @@ class _CameraError extends StatelessWidget {
             const Icon(Icons.photo_camera_back_outlined, size: 48),
             const SizedBox(height: 12),
             Text(
-              "Couldn't start the camera.",
+              l10n.scanCameraFailed,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 6),
@@ -189,7 +195,7 @@ class _CameraError extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onManual,
                 icon: const Icon(Icons.keyboard),
-                label: const Text('Enter barcode manually'),
+                label: Text(l10n.scanEnterManuallyButton),
               ),
             ],
           ],

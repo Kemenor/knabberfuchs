@@ -3,6 +3,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../domain/recipe_share.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Shows a scannable QR for the recipe plus a text/file share fallback.
 /// Fully serverless — the QR/payload is self-contained (calories + macros).
@@ -14,9 +15,10 @@ class RecipeShareScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final payload = RecipeCodec.encode(share);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Share "${share.name}"')),
+      appBar: AppBar(title: Text(l10n.shareTitle(share.name))),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -40,14 +42,16 @@ class RecipeShareScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text(share.name, style: theme.textTheme.titleMedium),
               Text(
-                '${share.items.length} ingredients · '
-                '${share.servings.toStringAsFixed(0)} servings · '
-                '${payload.length} bytes',
+                l10n.shareMeta(
+                  '${share.items.length}',
+                  share.servings.toStringAsFixed(0),
+                  '${payload.length}',
+                ),
                 style: theme.textTheme.bodySmall,
               ),
               const SizedBox(height: 8),
               Text(
-                'Scan this in another phone’s "Import from QR".',
+                l10n.shareScanHint,
                 style: theme.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -56,11 +60,11 @@ class RecipeShareScreen extends StatelessWidget {
                 onPressed: () => SharePlus.instance.share(
                   ShareParams(
                     text: payload,
-                    subject: 'Recipe: ${share.name}',
+                    subject: l10n.shareSubject(share.name),
                   ),
                 ),
                 icon: const Icon(Icons.share),
-                label: const Text('Share as text'),
+                label: Text(l10n.shareAsText),
               ),
             ],
           ),

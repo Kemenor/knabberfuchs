@@ -11,6 +11,7 @@ import '../../core/format.dart';
 import '../../core/snackbar.dart';
 import '../../data/db/database.dart';
 import '../../data/ocr/image_preprocess.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import 'crop_screen.dart';
 
@@ -54,18 +55,19 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       double.tryParse(c.text.replaceAll(',', '.'));
 
   Future<void> _scanLabel() async {
+    final l10n = AppLocalizations.of(context);
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       builder: (_) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ListTile(
             leading: const Icon(Icons.photo_camera),
-            title: const Text('Take a photo of the nutrition table'),
+            title: Text(l10n.addPhotoOfTable),
             onTap: () => Navigator.pop(context, ImageSource.camera),
           ),
           ListTile(
             leading: const Icon(Icons.photo_library),
-            title: const Text('Choose from gallery'),
+            title: Text(l10n.addChooseGallery),
             onTap: () => Navigator.pop(context, ImageSource.gallery),
           ),
         ]),
@@ -102,9 +104,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       set(_satfat, n.satFat100);
       set(_salt, n.saltG100);
       messenger.showAutoSnackBar(SnackBar(
-          content: Text(n.hasAny
-              ? 'Filled from the label — please check the values.'
-              : "Couldn't read the table. Enter the values manually.")));
+          content: Text(
+              n.hasAny ? l10n.addFilledFromLabel : l10n.addCouldntRead)));
     } finally {
       if (mounted) setState(() => _ocrBusy = false);
     }
@@ -112,11 +113,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   Future<void> _save() async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     final name = _name.text.trim();
     final kcal = _val(_kcal);
     if (name.isEmpty || kcal == null) {
-      messenger.showAutoSnackBar(const SnackBar(
-          content: Text('A name and energy (kcal/100 g) are required.')));
+      messenger.showAutoSnackBar(
+          SnackBar(content: Text(l10n.addNameEnergyRequired)));
       return;
     }
     final food = await ref.read(foodRepositoryProvider).createContributedFood(
@@ -149,35 +151,39 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add product'),
-        actions: [TextButton(onPressed: _save, child: const Text('Save'))],
+        title: Text(l10n.addProductTitle),
+        actions: [TextButton(onPressed: _save, child: Text(l10n.actionSave))],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('Barcode ${widget.barcode}', style: theme.textTheme.bodySmall),
+          Text(l10n.addBarcodeLabel(widget.barcode),
+              style: theme.textTheme.bodySmall),
           const SizedBox(height: 12),
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-                labelText: 'Product name', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+                labelText: l10n.addProductName,
+                border: const OutlineInputBorder()),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _brand,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
-                labelText: 'Brand (optional)', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+                labelText: l10n.manualBrandOptional,
+                border: const OutlineInputBorder()),
           ),
           const SizedBox(height: 12),
-          _numField(_serving, 'Serving size', 'g'),
+          _numField(_serving, l10n.addServingSize, 'g'),
           const SizedBox(height: 16),
           Row(
             children: [
-              Text('Nutrition per 100 g', style: theme.textTheme.titleSmall),
+              Text(l10n.addNutritionPer100, style: theme.textTheme.titleSmall),
               const Spacer(),
               _ocrBusy
                   ? const SizedBox(
@@ -186,37 +192,36 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   : OutlinedButton.icon(
                       onPressed: _scanLabel,
                       icon: const Icon(Icons.document_scanner_outlined, size: 18),
-                      label: const Text('Scan label'),
+                      label: Text(l10n.addScanLabel),
                     ),
             ],
           ),
           const SizedBox(height: 12),
-          _numField(_kcal, 'Energy', 'kcal'),
+          _numField(_kcal, l10n.addEnergy, 'kcal'),
           const SizedBox(height: 12),
-          _numField(_protein, 'Protein', 'g'),
+          _numField(_protein, l10n.addProtein, 'g'),
           const SizedBox(height: 12),
-          _numField(_carb, 'Carbohydrate', 'g'),
+          _numField(_carb, l10n.addCarbohydrate, 'g'),
           const SizedBox(height: 12),
-          _numField(_fat, 'Fat', 'g'),
+          _numField(_fat, l10n.addFat, 'g'),
           const SizedBox(height: 12),
-          _numField(_sugar, 'of which sugars', 'g'),
+          _numField(_sugar, l10n.addSugars, 'g'),
           const SizedBox(height: 12),
-          _numField(_satfat, 'of which saturates', 'g'),
+          _numField(_satfat, l10n.addSaturates, 'g'),
           const SizedBox(height: 12),
-          _numField(_fiber, 'Fibre', 'g'),
+          _numField(_fiber, l10n.addFibre, 'g'),
           const SizedBox(height: 12),
-          _numField(_salt, 'Salt', 'g'),
+          _numField(_salt, l10n.addSalt, 'g'),
           const SizedBox(height: 24),
           OutlinedButton.icon(
             onPressed: _contributeToOff,
             icon: const Icon(Icons.volunteer_activism_outlined),
-            label: const Text('Add to Open Food Facts'),
+            label: Text(l10n.addToOff),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 6),
             child: Text(
-              'Opens Open Food Facts so everyone benefits. Your local entry is '
-              'saved either way.',
+              l10n.addToOffNote,
               style: theme.textTheme.bodySmall,
             ),
           ),

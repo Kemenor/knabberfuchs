@@ -383,4 +383,388 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectFood => 'Select food';
+
+  @override
+  String get addIngredient => 'Add ingredient';
+
+  @override
+  String get ingredients => 'Ingredients';
+
+  @override
+  String get actionEdit => 'Edit';
+
+  @override
+  String get actionShare => 'Share';
+
+  @override
+  String get actionSet => 'Set';
+
+  @override
+  String kcalValue(String kcal) {
+    return '$kcal kcal';
+  }
+
+  @override
+  String gramsValue(String grams) {
+    return '$grams g';
+  }
+
+  @override
+  String gramsKcal(String grams, String kcal) {
+    return '$grams g · $kcal kcal';
+  }
+
+  @override
+  String kcalTotal(String kcal) {
+    return '$kcal kcal total';
+  }
+
+  @override
+  String loggedTo(String day) {
+    return 'Logged to $day';
+  }
+
+  @override
+  String get recipeEdit => 'Edit recipe';
+
+  @override
+  String get recipeNeedName => 'Give the recipe a name.';
+
+  @override
+  String get recipeNeedIngredient => 'Add at least one ingredient.';
+
+  @override
+  String get recipeName => 'Recipe name';
+
+  @override
+  String get recipeServingsField => 'Servings (portions this makes)';
+
+  @override
+  String get recipeLogPortion => 'Log portion to a day';
+
+  @override
+  String get recipeWhole => 'Whole recipe';
+
+  @override
+  String recipePerServing(String count) {
+    return 'Per serving ($count)';
+  }
+
+  @override
+  String get recipeLogPortionTitle => 'Log a portion';
+
+  @override
+  String get recipePortions => 'Portions';
+
+  @override
+  String recipeLogToDay(String day) {
+    return 'Log to $day';
+  }
+
+  @override
+  String shareTitle(String name) {
+    return 'Share \"$name\"';
+  }
+
+  @override
+  String get shareScanHint =>
+      'Scan this in another phone’s \"Import from QR\".';
+
+  @override
+  String get shareAsText => 'Share as text';
+
+  @override
+  String shareMeta(String ingredients, String servings, String bytes) {
+    return '$ingredients ingredients · $servings servings · $bytes bytes';
+  }
+
+  @override
+  String shareSubject(String name) {
+    return 'Recipe: $name';
+  }
+
+  @override
+  String get ocrNoIngredients => 'No ingredients found in those images.';
+
+  @override
+  String get ocrDefaultMealName => 'Meal from photo';
+
+  @override
+  String get ocrNeedMatch => 'Match at least one ingredient first.';
+
+  @override
+  String get ocrSavedToRecipes => 'Saved to recipes';
+
+  @override
+  String get ocrReviewTitle => 'Review meal';
+
+  @override
+  String get ocrSaveAsRecipe => 'Save as recipe';
+
+  @override
+  String get ocrLogToDay => 'Log to day';
+
+  @override
+  String get ocrMealName => 'Meal name';
+
+  @override
+  String ocrMatched(String matched, String total) {
+    return '$matched / $total matched';
+  }
+
+  @override
+  String get ocrSwipeHint => 'Swipe → to pick a food, ← to remove.';
+
+  @override
+  String ocrFromSource(String amount, String name) {
+    return '$amount · from \"$name\"';
+  }
+
+  @override
+  String ocrPickHintSub(String amount) {
+    return '$amount · swipe → to pick a food';
+  }
+
+  @override
+  String kcalGrams(String kcal, String grams) {
+    return '$kcal kcal\n$grams g';
+  }
+
+  @override
+  String get ocrSetGrams => 'set g';
+
+  @override
+  String kcalDotGrams(String kcal, String grams) {
+    return '$kcal kcal · $grams g';
+  }
+
+  @override
+  String macroPcf(String kcal, String protein, String carb, String fat) {
+    return '$kcal kcal · P $protein  C $carb  F $fat';
+  }
+
+  @override
+  String get manualTitle => 'Custom food';
+
+  @override
+  String get manualNameRequired => 'Name *';
+
+  @override
+  String get manualBrandOptional => 'Brand (optional)';
+
+  @override
+  String get manualPer100 => 'Per 100 g';
+
+  @override
+  String get manualCalories => 'Calories (kcal) *';
+
+  @override
+  String get manualProtein => 'Protein (g)';
+
+  @override
+  String get manualCarbs => 'Carbs (g)';
+
+  @override
+  String get manualFat => 'Fat (g)';
+
+  @override
+  String get manualServing => 'Serving size (g, optional)';
+
+  @override
+  String get manualSaveFood => 'Save food';
+
+  @override
+  String get manualRequired => 'Required';
+
+  @override
+  String get manualInvalidNumber => 'Invalid number';
+
+  @override
+  String get addProductTitle => 'Add product';
+
+  @override
+  String get addPhotoOfTable => 'Take a photo of the nutrition table';
+
+  @override
+  String get addChooseGallery => 'Choose from gallery';
+
+  @override
+  String get addNameEnergyRequired =>
+      'A name and energy (kcal/100 g) are required.';
+
+  @override
+  String addBarcodeLabel(String code) {
+    return 'Barcode $code';
+  }
+
+  @override
+  String get addProductName => 'Product name';
+
+  @override
+  String get addServingSize => 'Serving size';
+
+  @override
+  String get addNutritionPer100 => 'Nutrition per 100 g';
+
+  @override
+  String get addScanLabel => 'Scan label';
+
+  @override
+  String get addEnergy => 'Energy';
+
+  @override
+  String get addProtein => 'Protein';
+
+  @override
+  String get addCarbohydrate => 'Carbohydrate';
+
+  @override
+  String get addFat => 'Fat';
+
+  @override
+  String get addSugars => 'of which sugars';
+
+  @override
+  String get addSaturates => 'of which saturates';
+
+  @override
+  String get addFibre => 'Fibre';
+
+  @override
+  String get addSalt => 'Salt';
+
+  @override
+  String get addToOff => 'Add to Open Food Facts';
+
+  @override
+  String get addToOffNote =>
+      'Opens Open Food Facts so everyone benefits. Your local entry is saved either way.';
+
+  @override
+  String get addFilledFromLabel =>
+      'Filled from the label — please check the values.';
+
+  @override
+  String get addCouldntRead =>
+      'Couldn\'t read the table. Enter the values manually.';
+
+  @override
+  String get backupShareSubject => 'Knabberfuchs backup';
+
+  @override
+  String get scanRecipeQr => 'Scan recipe QR';
+
+  @override
+  String get splashPreparing => 'Preparing food database…';
+
+  @override
+  String get scanEnterBarcode => 'Enter barcode';
+
+  @override
+  String get scanExampleHint => 'e.g. 3017620422003';
+
+  @override
+  String get scanLookUp => 'Look up';
+
+  @override
+  String get scanEnterManually => 'Enter manually';
+
+  @override
+  String get scanCameraOnlyDevice =>
+      'Camera scanning is only available on a device.';
+
+  @override
+  String get scanCameraFailed => 'Couldn\'t start the camera.';
+
+  @override
+  String get scanEnterManuallyButton => 'Enter barcode manually';
+
+  @override
+  String splitTitle(String name) {
+    return 'Split \"$name\"';
+  }
+
+  @override
+  String get splitDescription =>
+      'Divide this meal into equal portions, one per day. The original is replaced.';
+
+  @override
+  String splitKcalEach(String kcal) {
+    return '$kcal kcal each';
+  }
+
+  @override
+  String splitInto(String n) {
+    return 'Split into $n days';
+  }
+
+  @override
+  String get cropTitle => 'Crop to the table';
+
+  @override
+  String get cropDone => 'Done';
+
+  @override
+  String get offlineReminderText =>
+      'Looked up online — download your region for faster, offline scans.';
+
+  @override
+  String get offlineReminderAction => 'Regions';
+
+  @override
+  String regionDownloaded(String name) {
+    return '$name downloaded';
+  }
+
+  @override
+  String regionDownloadFailed(String error) {
+    return 'Download failed: $error';
+  }
+
+  @override
+  String regionRemoved(String name) {
+    return '$name removed';
+  }
+
+  @override
+  String get regionLoadError => 'Could not load the region list.';
+
+  @override
+  String get actionRetry => 'Retry';
+
+  @override
+  String get regionIntro =>
+      'Download a country to search its packaged products offline. You can download several.';
+
+  @override
+  String get regionSearchHint => 'Search countries';
+
+  @override
+  String regionNoMatch(String query) {
+    return 'No countries match \"$query\".';
+  }
+
+  @override
+  String get regionTooltipDownload => 'Download';
+
+  @override
+  String get regionTooltipRemove => 'Remove';
+
+  @override
+  String get regionUpdate => 'Update';
+
+  @override
+  String regionSubtitle(String products, String size) {
+    return '${products}k products · $size download';
+  }
+
+  @override
+  String regionSubtitleInstalled(String base) {
+    return '$base · installed';
+  }
+
+  @override
+  String regionSubtitleUpdatable(String base) {
+    return '$base · update available';
+  }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/database.dart';
 import '../../domain/offline_manifest.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 
 String _mb(int bytes) => '${(bytes / 1024 / 1024).toStringAsFixed(1)} MB';
@@ -29,31 +30,36 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
 
   Future<void> _download(OfflineManifest m, RegionInfo r) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     setState(() => _progress[r.code] = 0);
     try {
       await ref.read(offlinePackServiceProvider).install(m, r,
           onProgress: (p) {
         if (mounted) setState(() => _progress[r.code] = p);
       });
-      messenger.showAutoSnackBar(SnackBar(content: Text('${r.name} downloaded')));
+      messenger
+          .showAutoSnackBar(SnackBar(content: Text(l10n.regionDownloaded(r.name))));
     } catch (e) {
-      messenger.showAutoSnackBar(SnackBar(content: Text('Download failed: $e')));
+      messenger.showAutoSnackBar(
+          SnackBar(content: Text(l10n.regionDownloadFailed('$e'))));
     } finally {
       if (mounted) setState(() => _progress.remove(r.code));
     }
   }
 
   Future<void> _remove(String code, String name) async {
+    final l10n = AppLocalizations.of(context);
     await ref.read(offlinePackServiceProvider).remove(code);
     if (mounted) {
       ScaffoldMessenger.of(context)
-          .showAutoSnackBar(SnackBar(content: Text('$name removed')));
+          .showAutoSnackBar(SnackBar(content: Text(l10n.regionRemoved(name))));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final manifestAsync = ref.watch(offlineManifestProvider);
     final installed = {
       for (final p in ref.watch(installedPacksProvider).asData?.value ?? const [])
@@ -61,19 +67,18 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
     };
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Offline regions')),
+      appBar: AppBar(title: Text(l10n.settingsOfflineRegions)),
       body: manifestAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              const Text('Could not load the region list.',
-                  textAlign: TextAlign.center),
+              Text(l10n.regionLoadError, textAlign: TextAlign.center),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: () => ref.invalidate(offlineManifestProvider),
-                child: const Text('Retry'),
+                child: Text(l10n.actionRetry),
               ),
             ]),
           ),
@@ -93,12 +98,9 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
 
           return Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-                child: Text(
-                  'Download a country to search its packaged products offline. '
-                  'You can download several.',
-                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: Text(l10n.regionIntro),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
@@ -108,7 +110,7 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
                   decoration: InputDecoration(
                     isDense: true,
                     prefixIcon: const Icon(Icons.search),
-                    hintText: 'Search countries',
+                    hintText: l10n.regionSearchHint,
                     border: const OutlineInputBorder(),
                     suffixIcon: _query.isEmpty
                         ? null
@@ -125,7 +127,7 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
               Expanded(
                 child: regions.isEmpty
                     ? Center(
-                        child: Text('No countries match "$_query".',
+                        child: Text(l10n.regionNoMatch(_query),
                             style: theme.textTheme.bodyMedium))
                     : ListView(
                         children: [
@@ -172,10 +174,14 @@ class _RegionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final isInstalled = installed != null;
     final updatable = isInstalled && installed!.version != region.version;
-    final subtitle =
-        '${(region.products / 1000).toStringAsFixed(region.products >= 1000 ? 0 : 1)}k products · ${_mb(region.size)} download';
+    final subtitle = l10n.regionSubtitle(
+      (region.products / 1000)
+          .toStringAsFixed(region.products >= 1000 ? 0 : 1),
+      _mb(region.size),
+    );
 
     Widget trailing;
     if (progress != null) {
@@ -189,7 +195,7 @@ class _RegionTile extends StatelessWidget {
       );
     } else if (!isInstalled) {
       trailing = IconButton(
-        tooltip: 'Download',
+        tooltip: l10n.regionTooltipDownload,
         icon: const Icon(Icons.download),
         onPressed: onDownload,
       );
@@ -198,11 +204,11 @@ class _RegionTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (updatable)
-            TextButton(onPressed: onDownload, child: const Text('Update'))
+            TextButton(onPressed: onDownload, child: Text(l10n.regionUpdate))
           else
             Icon(Icons.check_circle, color: theme.colorScheme.primary),
           IconButton(
-            tooltip: 'Remove',
+            tooltip: l10n.regionTooltipRemove,
             icon: const Icon(Icons.delete_outline),
             onPressed: onRemove,
           ),
@@ -214,9 +220,9 @@ class _RegionTile extends StatelessWidget {
       title: Text(region.name),
       subtitle: Text(
         isInstalled && !updatable
-            ? '$subtitle · installed'
+            ? l10n.regionSubtitleInstalled(subtitle)
             : updatable
-                ? '$subtitle · update available'
+                ? l10n.regionSubtitleUpdatable(subtitle)
                 : subtitle,
       ),
       trailing: trailing,

@@ -12,6 +12,7 @@ import '../../domain/nutrition.dart';
 import '../../domain/ocr_ingredient.dart';
 import '../../domain/recipe_share.dart';
 import '../../domain/units.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../food/food_picker_screen.dart';
 
@@ -20,6 +21,7 @@ import '../food/food_picker_screen.dart';
 Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
+  final l10n = AppLocalizations.of(context);
   final files = await openFiles(acceptedTypeGroups: const [
     XTypeGroup(label: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp']),
   ]);
@@ -40,8 +42,8 @@ Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
   navigator.pop(); // close the loading dialog
 
   if (all.isEmpty) {
-    messenger.showAutoSnackBar(const SnackBar(
-        content: Text('No ingredients found in those images.')));
+    messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.ocrNoIngredients)));
     return;
   }
   navigator
@@ -69,12 +71,22 @@ class OcrMealScreen extends ConsumerStatefulWidget {
 class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   late final List<_Item> _items =
       widget.ingredients.map(_Item.new).toList();
-  final _name = TextEditingController(text: 'Meal from photo');
+  final _name = TextEditingController();
+  bool _nameInit = false;
 
   @override
   void initState() {
     super.initState();
     _autoMatch();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_nameInit) {
+      _nameInit = true;
+      _name.text = AppLocalizations.of(context).ocrDefaultMealName;
+    }
   }
 
   @override
@@ -134,7 +146,8 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   Future<void> _addIngredient() async {
     final food = await Navigator.of(context).push<Food>(
       MaterialPageRoute(
-          builder: (_) => const FoodPickerScreen(title: 'Add ingredient')),
+          builder: (_) =>
+              FoodPickerScreen(title: AppLocalizations.of(context).addIngredient)),
     );
     if (food == null || !mounted) return;
     final persisted = await ref.read(foodRepositoryProvider).ensurePersisted(food);
@@ -150,6 +163,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   }
 
   Future<void> _editGrams(int i) async {
+    final l10n = AppLocalizations.of(context);
     final c = TextEditingController(
         text: _grams(_items[i])?.let(gramsStr) ?? '');
     final g = await showDialog<double>(
@@ -164,11 +178,13 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
           decoration: const InputDecoration(suffixText: 'g'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.actionCancel)),
           FilledButton(
             onPressed: () =>
                 Navigator.pop(ctx, double.tryParse(c.text.replaceAll(',', '.'))),
-            child: const Text('Set'),
+            child: Text(l10n.actionSet),
           ),
         ],
       ),
@@ -179,13 +195,16 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   Future<void> _saveRecipe() async {
     final ready = _ready;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     if (ready.isEmpty) {
       messenger.showAutoSnackBar(
-          const SnackBar(content: Text('Match at least one ingredient first.')));
+          SnackBar(content: Text(l10n.ocrNeedMatch)));
       return;
     }
     await ref.read(recipeRepositoryProvider).create(
-          name: _name.text.trim().isEmpty ? 'Meal from photo' : _name.text.trim(),
+          name: _name.text.trim().isEmpty
+              ? l10n.ocrDefaultMealName
+              : _name.text.trim(),
           servings: 1,
           items: [
             for (final it in ready)
@@ -200,15 +219,16 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
           ],
         );
     if (mounted) Navigator.of(context).pop();
-    messenger.showAutoSnackBar(const SnackBar(content: Text('Saved to recipes')));
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.ocrSavedToRecipes)));
   }
 
   Future<void> _logToDay() async {
     final ready = _ready;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     if (ready.isEmpty) {
       messenger.showAutoSnackBar(
-          const SnackBar(content: Text('Match at least one ingredient first.')));
+          SnackBar(content: Text(l10n.ocrNeedMatch)));
       return;
     }
     final picked = await showDatePicker(
@@ -221,8 +241,8 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final day = DayKey.of(picked);
     final db = ref.read(dbProvider);
     final diary = ref.read(diaryRepositoryProvider);
-    final gid = await db.createEntryGroup(
-        day, _name.text.trim().isEmpty ? 'Meal from photo' : _name.text.trim());
+    final gid = await db.createEntryGroup(day,
+        _name.text.trim().isEmpty ? l10n.ocrDefaultMealName : _name.text.trim());
     final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
         .inferNow();
     for (final it in ready) {
@@ -239,21 +259,23 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       );
     }
     if (mounted) Navigator.of(context).pop();
-    messenger.showAutoSnackBar(SnackBar(content: Text('Logged to ${DayKey.label(day)}')));
+    messenger
+        .showAutoSnackBar(SnackBar(content: Text(l10n.loggedTo(DayKey.label(day)))));
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final total = Nutrition.sum(_items.map(_nutrition).whereType<Nutrition>());
     final matched = _ready.length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Review meal')),
+      appBar: AppBar(title: Text(l10n.ocrReviewTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _addIngredient,
         icon: const Icon(Icons.add),
-        label: const Text('Add ingredient'),
+        label: Text(l10n.addIngredient),
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
@@ -263,14 +285,14 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: _saveRecipe,
-                  child: const Text('Save as recipe'),
+                  child: Text(l10n.ocrSaveAsRecipe),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: FilledButton(
                   onPressed: _logToDay,
-                  child: const Text('Log to day'),
+                  child: Text(l10n.ocrLogToDay),
                 ),
               ),
             ],
@@ -283,26 +305,27 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: TextField(
               controller: _name,
-              decoration: const InputDecoration(
-                  labelText: 'Meal name', border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                  labelText: l10n.ocrMealName,
+                  border: const OutlineInputBorder()),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Text('$matched / ${_items.length} matched',
+                Text(l10n.ocrMatched('$matched', '${_items.length}'),
                     style: theme.textTheme.bodySmall),
                 const Spacer(),
-                Text('${kcalStr(total.kcal)} kcal',
+                Text(l10n.kcalValue(kcalStr(total.kcal)),
                     style: theme.textTheme.titleMedium),
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 4, 16, 4),
-            child: Text('Swipe → to pick a food, ← to remove.',
-                style: TextStyle(fontStyle: FontStyle.italic)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+            child: Text(l10n.ocrSwipeHint,
+                style: const TextStyle(fontStyle: FontStyle.italic)),
           ),
           const Divider(height: 1),
           Expanded(
@@ -319,6 +342,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
 
   Widget _row(BuildContext context, int i) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final it = _items[i];
     final n = _nutrition(it);
     final amountLabel = it.parsed.unit != null
@@ -357,18 +381,19 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
         ),
         title: Text(it.matched?.name ?? it.parsed.name),
         subtitle: Text(it.matched != null && it.matched!.name != it.parsed.name
-            ? '$amountLabel · from "${it.parsed.name}"'
+            ? l10n.ocrFromSource(amountLabel, it.parsed.name)
             : it.matched == null
-                ? '$amountLabel · swipe → to pick a food'
+                ? l10n.ocrPickHintSub(amountLabel)
                 : amountLabel),
         trailing: it.matched == null
             ? null
             : (n != null
-                ? Text('${kcalStr(n.kcal)} kcal\n${gramsStr(g!)} g',
+                ? Text(l10n.kcalGrams(kcalStr(n.kcal), gramsStr(g!)),
                     textAlign: TextAlign.right,
                     style: theme.textTheme.bodySmall)
                 : TextButton(
-                    onPressed: () => _editGrams(i), child: const Text('set g'))),
+                    onPressed: () => _editGrams(i),
+                    child: Text(l10n.ocrSetGrams))),
         onTap: () => it.matched == null ? _match(i) : _editGrams(i),
       ),
     );
