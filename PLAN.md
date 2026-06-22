@@ -4,6 +4,21 @@ An ad-free, no-subscription, no-popup calorie tracker. Android-first (Flutter, s
 iOS stays possible). Local-first data, optional Health Connect sync, serverless
 recipe sharing, ZIP backup/restore.
 
+## Open reminders / TODO (updated 2026-06-22)
+
+- ⏳ **Italian food data** (Phase 12): the Swiss FCDB Italian export wasn't on the Wayback
+  Machine and `naehrwertdaten.ch` was down on 2026-06-22. When it's reachable again, fetch
+  `it.xlsx` into `tool/swiss_fcdb/` (see that README for the URL), re-run `build.py`, bump
+  `swissDatasetVersion` in `lib/data/sources/swiss_seed.dart`. ID join slots Italian names in
+  with **zero code change**. Until then `nameIt` is null → Italian UI shows English food names.
+- 📝 **Translation review** (Phase 11c): DE/FR/IT UI strings are a machine-translation first
+  pass. Kemenor (Swiss, DE/FR) to review microcopy; **IT entirely unreviewed**. Disclosed in-app
+  under the language picker.
+- 🔢 **Locale-aware number display** (Phase 11d, nice-to-have): show/parse "1,5" per locale.
+- 🍽️ **Per-food density / piece weights** (units follow-up): volume→grams still assumes ~1 g/ml;
+  no per-piece weights yet.
+- 💤 **Phase 5b offline-pack deltas**: PARKED INDEFINITELY (packs are tiny; full re-download is fine).
+
 ## Status (2026-06-17)
 
 Phases **0, 1, 2, 4 done**; **6 core done**. 52 tests pass, debug + release APK build.
