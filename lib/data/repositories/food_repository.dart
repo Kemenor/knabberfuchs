@@ -47,6 +47,30 @@ class FoodRepository {
     return merged.take(50).toList();
   }
 
+  /// Rough kcal estimate for a recognized dish [label]: the best local-catalog
+  /// match's kcal/100 g scaled to one portion (its serving size, or a 300 g
+  /// plate default). Null if nothing matches. Always shown to the user as an
+  /// editable estimate, never logged blindly.
+  Future<int?> estimateKcalForLabel(String label) async {
+    // The model's labels are specific ("Neapolitan pizza"); the catalog AND-
+    // matches all tokens, so try the full label first, then fall back to the
+    // head noun (usually the last word: "pizza", "rice") for a looser match.
+    final queries = <String>[label];
+    final words = label.split(RegExp(r'[\s\-,]+')).where((w) => w.isNotEmpty);
+    if (words.length > 1) queries.add(words.last);
+    Food? hit;
+    for (final q in queries) {
+      final hits = await searchLocal(q);
+      if (hits.isNotEmpty) {
+        hit = hits.first;
+        break;
+      }
+    }
+    if (hit == null) return null;
+    final grams = hit.servingG ?? 300;
+    return (hit.kcal100 * grams / 100).round();
+  }
+
   /// Persist a food if it's a synthetic search/pack hit (id 0), returning the
   /// stored row. A no-op for foods already in the catalog.
   Future<Food> ensurePersisted(Food food) async {

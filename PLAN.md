@@ -314,13 +314,16 @@ Strategy:
   `image_picker` / `crop_screen` infra from the OCR label scanner.
   - **Core tension:** the app is **keyless + serverless + offline-first**. A cloud multimodal
     model would be most accurate but needs a key/server → violates that. So:
-  - **13a — On-device classifier (recommended default).** Bundle a TFLite food-classification
-    model (Food-101  class set, ~5–20 MB) → top-K dish guesses → map the label to a kcal
-    estimate for a default portion (a small curated dish→kcal table, and/or match the label
-    against the Swiss FCDB / OFF catalog we already ship) → prefill Free add. Fully offline,
-    keyless. Accuracy is moderate (≈80% top-5 on Food-101) and portion is a guess → **never
-    auto-log; always show the guess as editable in the Free add sheet.** Show the top few
-    candidates as chips so the user picks the right one.
+  - **13a — On-device classifier. ✅ DONE (2026-06-22).** Bundles **Google AIY food_V1**
+    (`assets/foodmodel/food_V1.tflite`, Apache-2.0, ~20 MB, 2024 dish classes, 192×192 uint8)
+    via `tflite_flutter`. `food_classifier.dart` → top-K guesses (skip `__background__`);
+    `recognize_food_flow.dart`: camera/gallery → classify → "Looks like…" candidate sheet (with
+    confidence %) → `FoodRepository.estimateKcalForLabel` (catalog match, head-noun fallback,
+    300 g plate default) → prefills the **Free add** sheet (name + kcal), always editable, never
+    auto-logged. Entry point = a "recognize" icon in the Add-food app bar. Verified on emulator:
+    pizza photo → "Neapolitan pizza" 98% → Free add prefilled "Neapolitan pizza", 585 kcal.
+    Model provenance/license in `tool/foodmodel/README.md`; credited in Settings → About.
+    Gradle needed `kotlin.jvm.target.validation.mode=warning` (tflite_flutter target mismatch).
   - **13b — Optional cloud/LLM path (power-user, opt-in, own key).** A multimodal LLM
     ("what's in this photo + estimate kcal") gives far better accuracy + portion sizing, but
     requires a user-supplied API key (same pattern as the deferred optional-USDA-key idea) so

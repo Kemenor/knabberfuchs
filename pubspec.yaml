@@ -57,6 +57,7 @@ dependencies:
   image_picker: ^1.2.2
   crop_your_image: ^2.0.0
   image: ^4.9.1
+  tflite_flutter: ^0.12.1
 
 dev_dependencies:
   flutter_test:
@@ -99,6 +100,10 @@ flutter:
     # Bundled Swiss Food Composition Database (FSVO/BLV), multilingual whole
     # foods. Built by tool/swiss_fcdb/build.py; imported on first launch.
     - assets/swiss_foods.csv.gz
+    # On-device food image classifier: Google AIY food_V1 (Apache-2.0, 2024
+    # dish classes) + its English labels. Powers photo → dish guess → Free add.
+    - assets/foodmodel/food_V1.tflite
+    - assets/foodmodel/food_labels.txt
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

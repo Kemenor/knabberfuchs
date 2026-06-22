@@ -11,6 +11,7 @@ import '../food/offline_reminder.dart';
 import '../food/log_food_sheet.dart';
 import '../food/manual_food_screen.dart';
 import '../food/quick_add_sheet.dart';
+import '../food/recognize_food_flow.dart';
 import '../scan/scan_screen.dart';
 
 /// Search + add a food to [day]/[meal].
@@ -69,6 +70,12 @@ class AddFoodScreen extends ConsumerWidget {
     if (added == true && context.mounted) Navigator.of(context).pop();
   }
 
+  Future<void> _recognize(BuildContext context, WidgetRef ref) async {
+    final added = await startRecognizeFoodFlow(context, ref,
+        day: day, meal: meal, resolveGroup: resolveGroup);
+    if (added && context.mounted) Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -76,6 +83,11 @@ class AddFoodScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.dayAddFood),
         actions: [
+          IconButton(
+            tooltip: l10n.recognizeTooltip,
+            icon: const Icon(Icons.center_focus_weak),
+            onPressed: () => _recognize(context, ref),
+          ),
           IconButton(
             tooltip: l10n.scanBarcode,
             icon: const Icon(Icons.qr_code_scanner),

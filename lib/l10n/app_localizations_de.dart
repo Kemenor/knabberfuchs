@@ -292,7 +292,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsAboutBody =>
-      'Werbefrei, keine Abos. Daten von Open Food Facts und der Schweizer Nährwertdatenbank (Bundesamt für Lebensmittelsicherheit und Veterinärwesen, BLV).';
+      'Werbefrei, keine Abos. Daten von Open Food Facts und der Schweizer Nährwertdatenbank (Bundesamt für Lebensmittelsicherheit und Veterinärwesen, BLV). Die Foto-Erkennung nutzt Googles AIY-Lebensmittelmodell (Apache 2.0).';
 
   @override
   String get offThanksTitle => 'Dank an Open Food Facts';
@@ -417,6 +417,21 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get quickAddMacros => 'Makros hinzufügen (optional)';
+
+  @override
+  String get recognizeTooltip => 'Per Foto erkennen';
+
+  @override
+  String get recognizeTakePhoto => 'Foto aufnehmen';
+
+  @override
+  String get recognizeLooksLike => 'Sieht aus wie…';
+
+  @override
+  String get recognizeNoneManual => 'Nichts davon – manuell eingeben';
+
+  @override
+  String get recognizeNoGuess => 'Essen nicht erkannt. Füge es manuell hinzu.';
 
   @override
   String get scanBarcode => 'Barcode scannen';

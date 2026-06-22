@@ -1,0 +1,6 @@
+# Scratch copies + test images. The shipped model lives in assets/foodmodel/.
+*.tflite
+*.jpg
+*.png
+labels_en.txt
+food_labels.txt

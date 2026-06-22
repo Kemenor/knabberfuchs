@@ -290,7 +290,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAboutBody =>
-      'Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO).';
+      'Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO). Food photo recognition uses Google\'s AIY food model (Apache 2.0).';
 
   @override
   String get offThanksTitle => 'Thanks to Open Food Facts';
@@ -413,6 +413,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickAddMacros => 'Add macros (optional)';
+
+  @override
+  String get recognizeTooltip => 'Recognize from photo';
+
+  @override
+  String get recognizeTakePhoto => 'Take a photo';
+
+  @override
+  String get recognizeLooksLike => 'Looks like…';
+
+  @override
+  String get recognizeNoneManual => 'None of these — enter manually';
+
+  @override
+  String get recognizeNoGuess =>
+      'Couldn\'t recognize the food. Add it manually.';
 
   @override
   String get scanBarcode => 'Scan barcode';

@@ -18,6 +18,7 @@ Future<bool?> showQuickAddSheet(
   required MealType meal,
   Future<int?> Function()? resolveGroup,
   String? initialName,
+  int? initialKcal,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -28,6 +29,7 @@ Future<bool?> showQuickAddSheet(
       meal: meal,
       resolveGroup: resolveGroup,
       initialName: initialName,
+      initialKcal: initialKcal,
     ),
   );
 }
@@ -37,11 +39,13 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
   final MealType meal;
   final Future<int?> Function()? resolveGroup;
   final String? initialName;
+  final int? initialKcal;
   const _QuickAddSheet({
     required this.day,
     required this.meal,
     required this.resolveGroup,
     required this.initialName,
+    required this.initialKcal,
   });
 
   @override
@@ -50,7 +54,8 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
 
 class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
   late final _name = TextEditingController(text: widget.initialName ?? '');
-  final _kcal = TextEditingController();
+  late final _kcal =
+      TextEditingController(text: widget.initialKcal?.toString() ?? '');
   final _protein = TextEditingController();
   final _carb = TextEditingController();
   final _fat = TextEditingController();

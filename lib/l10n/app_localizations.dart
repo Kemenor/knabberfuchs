@@ -603,7 +603,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAboutBody.
   ///
   /// In en, this message translates to:
-  /// **'Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO).'**
+  /// **'Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO). Food photo recognition uses Google\'s AIY food model (Apache 2.0).'**
   String get settingsAboutBody;
 
   /// No description provided for @offThanksTitle.
@@ -809,6 +809,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add macros (optional)'**
   String get quickAddMacros;
+
+  /// No description provided for @recognizeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognize from photo'**
+  String get recognizeTooltip;
+
+  /// No description provided for @recognizeTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get recognizeTakePhoto;
+
+  /// No description provided for @recognizeLooksLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Looks like…'**
+  String get recognizeLooksLike;
+
+  /// No description provided for @recognizeNoneManual.
+  ///
+  /// In en, this message translates to:
+  /// **'None of these — enter manually'**
+  String get recognizeNoneManual;
+
+  /// No description provided for @recognizeNoGuess.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t recognize the food. Add it manually.'**
+  String get recognizeNoGuess;
 
   /// No description provided for @scanBarcode.
   ///

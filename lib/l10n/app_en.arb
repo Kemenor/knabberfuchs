@@ -120,7 +120,7 @@
   "settingsImportSub": "Restore from a .zip (replaces all data)",
 
   "settingsAbout": "About",
-  "settingsAboutBody": "Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO).",
+  "settingsAboutBody": "Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO). Food photo recognition uses Google's AIY food model (Apache 2.0).",
   "offThanksTitle": "Thanks to Open Food Facts",
   "offThanksBody": "Knabberfuchs is built on Open Food Facts — a free, open, crowdsourced food database kept alive by volunteers around the world. Without their work, this app simply would not exist.\n\nIf Knabberfuchs is useful to you, please consider supporting them.",
   "offDonate": "Donate to Open Food Facts",
@@ -169,6 +169,11 @@
   "quickAddName": "Name",
   "quickAddCalories": "Calories",
   "quickAddMacros": "Add macros (optional)",
+  "recognizeTooltip": "Recognize from photo",
+  "recognizeTakePhoto": "Take a photo",
+  "recognizeLooksLike": "Looks like…",
+  "recognizeNoneManual": "None of these — enter manually",
+  "recognizeNoGuess": "Couldn't recognize the food. Add it manually.",
   "scanBarcode": "Scan barcode",
   "selectFood": "Select food",
 

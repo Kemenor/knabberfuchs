@@ -292,7 +292,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsAboutBody =>
-      'Sans publicité, sans abonnement. Données d\'Open Food Facts et de la Base de données suisse des valeurs nutritives (Office fédéral de la sécurité alimentaire et des affaires vétérinaires, OSAV).';
+      'Sans publicité, sans abonnement. Données d\'Open Food Facts et de la Base de données suisse des valeurs nutritives (Office fédéral de la sécurité alimentaire et des affaires vétérinaires, OSAV). La reconnaissance photo utilise le modèle alimentaire AIY de Google (Apache 2.0).';
 
   @override
   String get offThanksTitle => 'Merci à Open Food Facts';
@@ -417,6 +417,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get quickAddMacros => 'Ajouter les macros (facultatif)';
+
+  @override
+  String get recognizeTooltip => 'Reconnaître par photo';
+
+  @override
+  String get recognizeTakePhoto => 'Prendre une photo';
+
+  @override
+  String get recognizeLooksLike => 'On dirait…';
+
+  @override
+  String get recognizeNoneManual => 'Aucun de ceux-ci – saisir manuellement';
+
+  @override
+  String get recognizeNoGuess =>
+      'Aliment non reconnu. Ajoutez-le manuellement.';
 
   @override
   String get scanBarcode => 'Scanner un code-barres';

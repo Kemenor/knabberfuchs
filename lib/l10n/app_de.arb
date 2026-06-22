@@ -101,7 +101,7 @@
   "settingsImportSub": "Aus einer .zip wiederherstellen (ersetzt alle Daten)",
 
   "settingsAbout": "Über",
-  "settingsAboutBody": "Werbefrei, keine Abos. Daten von Open Food Facts und der Schweizer Nährwertdatenbank (Bundesamt für Lebensmittelsicherheit und Veterinärwesen, BLV).",
+  "settingsAboutBody": "Werbefrei, keine Abos. Daten von Open Food Facts und der Schweizer Nährwertdatenbank (Bundesamt für Lebensmittelsicherheit und Veterinärwesen, BLV). Die Foto-Erkennung nutzt Googles AIY-Lebensmittelmodell (Apache 2.0).",
   "offThanksTitle": "Dank an Open Food Facts",
   "offThanksBody": "Knabberfuchs basiert auf Open Food Facts — einer kostenlosen, offenen, gemeinschaftlich gepflegten Lebensmitteldatenbank, die von Freiwilligen auf der ganzen Welt am Leben gehalten wird. Ohne ihre Arbeit würde es diese App schlicht nicht geben.\n\nWenn dir Knabberfuchs nützlich ist, denk bitte darüber nach, sie zu unterstützen.",
   "offDonate": "An Open Food Facts spenden",
@@ -142,6 +142,11 @@
   "quickAddName": "Name",
   "quickAddCalories": "Kalorien",
   "quickAddMacros": "Makros hinzufügen (optional)",
+  "recognizeTooltip": "Per Foto erkennen",
+  "recognizeTakePhoto": "Foto aufnehmen",
+  "recognizeLooksLike": "Sieht aus wie…",
+  "recognizeNoneManual": "Nichts davon – manuell eingeben",
+  "recognizeNoGuess": "Essen nicht erkannt. Füge es manuell hinzu.",
   "scanBarcode": "Barcode scannen",
   "selectFood": "Lebensmittel auswählen",
 
