@@ -5,11 +5,10 @@ import '../../data/db/database.dart';
 import '../../domain/enums.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
-import '../food/add_product_screen.dart';
+import '../food/food_form_screen.dart';
 import '../food/food_search_list.dart';
 import '../food/offline_reminder.dart';
 import '../food/log_food_sheet.dart';
-import '../food/manual_food_screen.dart';
 import '../food/quick_add_sheet.dart';
 import '../scan/scan_screen.dart';
 
@@ -51,14 +50,14 @@ class AddFoodScreen extends ConsumerWidget {
     } else {
       // Not found anywhere — let the user add it (and optionally send to OFF).
       final created = await Navigator.of(context).push<Food>(MaterialPageRoute(
-          builder: (_) => AddProductScreen(barcode: barcode)));
+          builder: (_) => FoodFormScreen(barcode: barcode)));
       if (created != null && context.mounted) await _pick(context, ref, created);
     }
   }
 
   Future<void> _createCustom(BuildContext context, WidgetRef ref) async {
     final food = await Navigator.of(context).push<Food>(
-      MaterialPageRoute(builder: (_) => const ManualFoodScreen()),
+      MaterialPageRoute(builder: (_) => const FoodFormScreen()),
     );
     if (food != null && context.mounted) await _pick(context, ref, food);
   }

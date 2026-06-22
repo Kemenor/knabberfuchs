@@ -12,7 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 Future<void> _seed(AppDatabase db) async {
   final repo = FoodRepository(db, OffApi(), RegionPackStore());
-  final apple = await repo.createCustomFood(name: 'Apple', kcal100: 52);
+  final apple = await repo.createFood(name: 'Apple', kcal100: 52);
   await db.addEntry(EntriesCompanion.insert(
     day: '2026-06-17',
     mealType: MealType.breakfast,

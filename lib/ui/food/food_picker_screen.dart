@@ -6,9 +6,8 @@ import '../../data/db/database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../scan/scan_screen.dart';
-import 'add_product_screen.dart';
+import 'food_form_screen.dart';
 import 'food_search_list.dart';
-import 'manual_food_screen.dart';
 import 'offline_reminder.dart';
 
 /// Search / scan / create a single food and pop it. Used to match an OCR
@@ -35,14 +34,14 @@ class FoodPickerScreen extends ConsumerWidget {
       reminder?.call(); // shows on the screen we return to
     } else {
       final created = await Navigator.of(context).push<Food>(MaterialPageRoute(
-          builder: (_) => AddProductScreen(barcode: barcode)));
+          builder: (_) => FoodFormScreen(barcode: barcode)));
       if (created != null && context.mounted) Navigator.of(context).pop(created);
     }
   }
 
   Future<void> _createCustom(BuildContext context) async {
     final food = await Navigator.of(context).push<Food>(
-      MaterialPageRoute(builder: (_) => const ManualFoodScreen()),
+      MaterialPageRoute(builder: (_) => const FoodFormScreen()),
     );
     if (food != null && context.mounted) Navigator.of(context).pop(food);
   }

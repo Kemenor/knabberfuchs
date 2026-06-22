@@ -47,12 +47,12 @@ void main() {
 
   test('tokenized search matches USDA formal names via synonyms', () async {
     await db.upsertFood(FoodsCompanion.insert(
-        source: FoodSource.usda,
+        source: FoodSource.custom,
         externalId: const Value('p1'),
         name: 'Peppers, sweet, green, raw',
         kcal100: 20));
     await db.upsertFood(FoodsCompanion.insert(
-        source: FoodSource.usda,
+        source: FoodSource.custom,
         externalId: const Value('c1'),
         name: 'Candies, milk chocolate',
         kcal100: 535));
@@ -63,12 +63,12 @@ void main() {
 
   test('ranks simpler/shorter names first', () async {
     await db.upsertFood(FoodsCompanion.insert(
-        source: FoodSource.usda,
+        source: FoodSource.custom,
         externalId: const Value('a'),
         name: 'Potatoes, au gratin, dry mix, prepared with water and milk',
         kcal100: 93));
     await db.upsertFood(FoodsCompanion.insert(
-        source: FoodSource.usda,
+        source: FoodSource.custom,
         externalId: const Value('b'),
         name: 'Potatoes, raw',
         kcal100: 77));

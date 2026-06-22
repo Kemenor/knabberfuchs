@@ -190,9 +190,7 @@ class _FoodTile extends StatelessWidget {
       if (food.brand != null && food.brand!.isNotEmpty) food.brand!,
       switch (food.source) {
         FoodSource.openFoodFacts => l10n.sourceOff,
-        FoodSource.usda => l10n.sourceUsda,
         FoodSource.custom => l10n.sourceCustom,
-        FoodSource.userContributed => l10n.sourceContributed,
         FoodSource.swissFcdb => l10n.sourceSwiss,
       },
     ];

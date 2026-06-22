@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -68,6 +68,15 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(foods, foods.nameFr);
             await m.addColumn(foods, foods.nameIt);
             await m.addColumn(foods, foods.searchText);
+          }
+          if (from < 8) {
+            // FoodSource dropped the now-dead `usda` and `userContributed`
+            // values, so stored indices shift: old {off:0, usda:1, custom:2,
+            // userContributed:3, swissFcdb:4} -> new {off:0, custom:1,
+            // swissFcdb:2}. Renumber in order so no row moves twice.
+            await customStatement(
+                'UPDATE foods SET source = 1 WHERE source IN (2, 3)');
+            await customStatement('UPDATE foods SET source = 2 WHERE source = 4');
           }
         },
         beforeOpen: (details) async {

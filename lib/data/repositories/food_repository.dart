@@ -119,7 +119,7 @@ class FoodRepository {
   Future<BarcodeHit> lookupBarcode(String barcode) async {
     final cached = await db.foodByExternal(FoodSource.openFoodFacts, barcode);
     if (cached != null) return BarcodeHit(cached, BarcodeSource.cache);
-    final mine = await db.foodByExternal(FoodSource.userContributed, barcode);
+    final mine = await db.foodByExternal(FoodSource.custom, barcode);
     if (mine != null) return BarcodeHit(mine, BarcodeSource.cache);
     final fromPack = packs.lookupBarcode(barcode);
     if (fromPack != null) {
@@ -131,34 +131,12 @@ class FoodRepository {
     return BarcodeHit(await db.foodById(id), BarcodeSource.online);
   }
 
-  Future<Food> createCustomFood({
-    required String name,
-    String? brand,
-    required double kcal100,
-    double? protein100,
-    double? carb100,
-    double? fat100,
-    double? servingG,
-    String? servingLabel,
-  }) async {
-    final id = await db.upsertFood(FoodsCompanion.insert(
-      source: FoodSource.custom,
-      name: name,
-      brand: Value(brand),
-      kcal100: kcal100,
-      protein100: Value(protein100),
-      carb100: Value(carb100),
-      fat100: Value(fat100),
-      servingG: Value(servingG),
-      servingLabel: Value(servingLabel),
-    ));
-    return (await db.foodById(id))!;
-  }
-
-  /// Create (or update) a product the user added for a missing barcode. Keyed
-  /// by barcode under [FoodSource.userContributed] so a re-scan finds it.
-  Future<Food> createContributedFood({
-    required String barcode,
+  /// Create (or update) a user food. With a [barcode] it's keyed by that
+  /// barcode (so a re-scan finds it) and re-adding the same barcode updates the
+  /// row; without one, every save is a distinct custom food. Both are
+  /// [FoodSource.custom].
+  Future<Food> createFood({
+    String? barcode,
     required String name,
     String? brand,
     required double kcal100,
@@ -173,7 +151,7 @@ class FoodRepository {
     String? servingLabel,
   }) async {
     final id = await db.upsertFood(FoodsCompanion.insert(
-      source: FoodSource.userContributed,
+      source: FoodSource.custom,
       externalId: Value(barcode),
       barcode: Value(barcode),
       name: name,

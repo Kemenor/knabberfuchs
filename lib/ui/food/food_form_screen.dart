@@ -15,18 +15,19 @@ import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import 'crop_screen.dart';
 
-/// Add a product for a barcode that's not in Open Food Facts (or anywhere).
-/// Saves it locally (keyed by barcode, so a re-scan finds it) and offers to
-/// contribute it to OFF by opening their app/site. Pops the created [Food].
-class AddProductScreen extends ConsumerStatefulWidget {
-  final String barcode;
-  const AddProductScreen({super.key, required this.barcode});
+/// Create a saved food: full nutrition form with an optional label scanner.
+/// One screen for both "create custom food" (no barcode) and "add a product
+/// for a not-found barcode" — with a barcode it's re-scannable and offers an
+/// Open Food Facts contribution link. Pops the created [Food].
+class FoodFormScreen extends ConsumerStatefulWidget {
+  final String? barcode;
+  const FoodFormScreen({super.key, this.barcode});
 
   @override
-  ConsumerState<AddProductScreen> createState() => _AddProductScreenState();
+  ConsumerState<FoodFormScreen> createState() => _FoodFormScreenState();
 }
 
-class _AddProductScreenState extends ConsumerState<AddProductScreen> {
+class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   final _name = TextEditingController();
   final _brand = TextEditingController();
   final _serving = TextEditingController();
@@ -39,6 +40,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final _satfat = TextEditingController();
   final _salt = TextEditingController();
   bool _ocrBusy = false;
+
+  bool get _hasBarcode => widget.barcode != null;
 
   @override
   void dispose() {
@@ -121,7 +124,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           SnackBar(content: Text(l10n.addNameEnergyRequired)));
       return;
     }
-    final food = await ref.read(foodRepositoryProvider).createContributedFood(
+    final food = await ref.read(foodRepositoryProvider).createFood(
           barcode: widget.barcode,
           name: name,
           brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
@@ -154,15 +157,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.addProductTitle),
+        title: Text(_hasBarcode ? l10n.addProductTitle : l10n.manualTitle),
         actions: [TextButton(onPressed: _save, child: Text(l10n.actionSave))],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text(l10n.addBarcodeLabel(widget.barcode),
-              style: theme.textTheme.bodySmall),
-          const SizedBox(height: 12),
+          if (_hasBarcode) ...[
+            Text(l10n.addBarcodeLabel(widget.barcode!),
+                style: theme.textTheme.bodySmall),
+            const SizedBox(height: 12),
+          ],
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.sentences,
@@ -212,19 +217,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           _numField(_fiber, l10n.addFibre, 'g'),
           const SizedBox(height: 12),
           _numField(_salt, l10n.addSalt, 'g'),
-          const SizedBox(height: 24),
-          OutlinedButton.icon(
-            onPressed: _contributeToOff,
-            icon: const Icon(Icons.volunteer_activism_outlined),
-            label: Text(l10n.addToOff),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              l10n.addToOffNote,
-              style: theme.textTheme.bodySmall,
+          if (_hasBarcode) ...[
+            const SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: _contributeToOff,
+              icon: const Icon(Icons.volunteer_activism_outlined),
+              label: Text(l10n.addToOff),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(l10n.addToOffNote, style: theme.textTheme.bodySmall),
+            ),
+          ],
         ],
       ),
     );

@@ -1,21 +1,18 @@
-/// Where a food record came from.
+/// Where a food record came from. Stored as the enum index (drift intEnum), so
+/// the order is load-bearing — a DB migration renumbers existing rows whenever
+/// it changes (see schema v8).
 enum FoodSource {
   /// Fetched from the Open Food Facts live API (packaged / barcoded products).
   openFoodFacts,
 
-  /// From the bundled USDA public-domain dataset (whole foods / produce).
-  usda,
-
-  /// Entered by the user.
+  /// Entered by the user. Covers both barcodeless custom foods and products the
+  /// user added for a missing barcode (those just also carry a [barcode], which
+  /// is what makes them re-scannable). Merged from the old `custom` +
+  /// `userContributed` since there's no direct OFF upload to distinguish them.
   custom,
 
-  /// A product the user added for a missing barcode (may be contributed to OFF).
-  /// Appended last so the stored enum indices of the others never shift.
-  userContributed,
-
   /// From the bundled Swiss Food Composition Database (FSVO/BLV) — curated,
-  /// multilingual whole foods. Replaces the USDA generic layer. Appended last
-  /// to keep existing stored enum indices stable.
+  /// multilingual whole foods.
   swissFcdb,
 }
 

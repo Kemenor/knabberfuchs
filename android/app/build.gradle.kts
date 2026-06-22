@@ -29,10 +29,13 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
+            // Keep R8 off: it strips the reflection-heavy CameraX/ML Kit classes
+            // mobile_scanner needs at runtime ("Couldn't start the camera" in
+            // release only). The APK is dominated by bundled ML models, so the
+            // code-shrink savings are negligible. Re-enable with full keep rules
+            // (mobile_scanner, CameraX, ML Kit, drift, …) if going to the Store.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

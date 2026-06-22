@@ -114,12 +114,11 @@ Future<int> seedSwissIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
     final csv = utf8.decode(gzip.decode(data.buffer.asUint8List()));
     final companions = parseSwissCsv(csv);
     await db.transaction(() async {
-      // Replace prior Swiss rows and retire the legacy USDA generic layer.
-      // The entries FK is set-null on delete, so logged history is unaffected.
+      // Replace any previously-seeded Swiss rows. The entries FK is set-null on
+      // delete, so logged history is unaffected. (The old USDA layer is already
+      // gone — removed by the v8 migration / earlier reseeds.)
       await (db.delete(db.foods)
-            ..where((f) =>
-                f.source.equalsValue(FoodSource.swissFcdb) |
-                f.source.equalsValue(FoodSource.usda)))
+            ..where((f) => f.source.equalsValue(FoodSource.swissFcdb)))
           .go();
       await db.batch((batch) {
         batch.insertAll(db.foods, companions, mode: InsertMode.insertOrIgnore);
