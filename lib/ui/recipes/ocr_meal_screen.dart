@@ -1,7 +1,7 @@
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../core/date_label.dart';
 import '../../core/date_x.dart';
@@ -16,16 +16,21 @@ import '../../domain/units.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../food/food_picker_screen.dart';
+import '../food/image_source_sheet.dart';
 
-/// Pick image(s) of an ingredient list, OCR them, and open the review screen.
-/// Shared by the day-screen "more" menu and the recipes screen.
+/// Photograph or pick image(s) of an ingredient list, OCR them, and open the
+/// review screen. Shared by the day-screen capture menu and the recipes screen.
 Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
   final l10n = AppLocalizations.of(context);
-  final files = await openFiles(acceptedTypeGroups: const [
-    XTypeGroup(label: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp']),
-  ]);
+  final source = await pickImageSource(context);
+  if (source == null || !context.mounted) return;
+  final picker = ImagePicker();
+  // Camera takes one shot; gallery allows several (a list can span pages).
+  final files = source == ImageSource.camera
+      ? [await picker.pickImage(source: ImageSource.camera)].nonNulls.toList()
+      : await picker.pickMultiImage();
   if (files.isEmpty || !context.mounted) return;
 
   showDialog(

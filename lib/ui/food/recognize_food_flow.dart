@@ -9,6 +9,7 @@ import '../../data/ml/food_classifier.dart';
 import '../../domain/enums.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import 'image_source_sheet.dart';
 import 'quick_add_sheet.dart';
 
 /// Photo → on-device dish guess → Free add. Pick a photo, classify it with the
@@ -23,23 +24,7 @@ Future<bool> startRecognizeFoodFlow(
   Future<int?> Function()? resolveGroup,
 }) async {
   final l10n = AppLocalizations.of(context);
-  final source = await showModalBottomSheet<ImageSource>(
-    context: context,
-    builder: (_) => SafeArea(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        ListTile(
-          leading: const Icon(Icons.photo_camera),
-          title: Text(l10n.recognizeTakePhoto),
-          onTap: () => Navigator.pop(context, ImageSource.camera),
-        ),
-        ListTile(
-          leading: const Icon(Icons.photo_library),
-          title: Text(l10n.addChooseGallery),
-          onTap: () => Navigator.pop(context, ImageSource.gallery),
-        ),
-      ]),
-    ),
-  );
+  final source = await pickImageSource(context);
   if (source == null || !context.mounted) return false;
 
   final messenger = ScaffoldMessenger.of(context);

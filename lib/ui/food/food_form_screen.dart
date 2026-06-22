@@ -15,6 +15,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../scan/scan_screen.dart';
 import 'crop_screen.dart';
+import 'image_source_sheet.dart';
 
 /// Create a saved food: one full nutrition form for everything. The barcode is
 /// just an optional field (type it, or tap the icon to scan one) — with a value
@@ -77,23 +78,7 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
 
   Future<void> _scanLabel() async {
     final l10n = AppLocalizations.of(context);
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (_) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ListTile(
-            leading: const Icon(Icons.photo_camera),
-            title: Text(l10n.addPhotoOfTable),
-            onTap: () => Navigator.pop(context, ImageSource.camera),
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo_library),
-            title: Text(l10n.addChooseGallery),
-            onTap: () => Navigator.pop(context, ImageSource.gallery),
-          ),
-        ]),
-      ),
-    );
+    final source = await pickImageSource(context, cameraLabel: l10n.addPhotoOfTable);
     if (source == null || !mounted) return;
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
