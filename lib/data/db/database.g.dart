@@ -83,6 +83,44 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _nameDeMeta = const VerificationMeta('nameDe');
+  @override
+  late final GeneratedColumn<String> nameDe = GeneratedColumn<String>(
+    'name_de',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameFrMeta = const VerificationMeta('nameFr');
+  @override
+  late final GeneratedColumn<String> nameFr = GeneratedColumn<String>(
+    'name_fr',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameItMeta = const VerificationMeta('nameIt');
+  @override
+  late final GeneratedColumn<String> nameIt = GeneratedColumn<String>(
+    'name_it',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _searchTextMeta = const VerificationMeta(
+    'searchText',
+  );
+  @override
+  late final GeneratedColumn<String> searchText = GeneratedColumn<String>(
+    'search_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _servingGMeta = const VerificationMeta(
     'servingG',
   );
@@ -272,6 +310,10 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
     name,
     brand,
     locale,
+    nameDe,
+    nameFr,
+    nameIt,
+    searchText,
     servingG,
     servingLabel,
     kcal100,
@@ -334,6 +376,30 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
       context.handle(
         _localeMeta,
         locale.isAcceptableOrUnknown(data['locale']!, _localeMeta),
+      );
+    }
+    if (data.containsKey('name_de')) {
+      context.handle(
+        _nameDeMeta,
+        nameDe.isAcceptableOrUnknown(data['name_de']!, _nameDeMeta),
+      );
+    }
+    if (data.containsKey('name_fr')) {
+      context.handle(
+        _nameFrMeta,
+        nameFr.isAcceptableOrUnknown(data['name_fr']!, _nameFrMeta),
+      );
+    }
+    if (data.containsKey('name_it')) {
+      context.handle(
+        _nameItMeta,
+        nameIt.isAcceptableOrUnknown(data['name_it']!, _nameItMeta),
+      );
+    }
+    if (data.containsKey('search_text')) {
+      context.handle(
+        _searchTextMeta,
+        searchText.isAcceptableOrUnknown(data['search_text']!, _searchTextMeta),
       );
     }
     if (data.containsKey('serving_g')) {
@@ -486,6 +552,22 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
         DriftSqlType.string,
         data['${effectivePrefix}locale'],
       ),
+      nameDe: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_de'],
+      ),
+      nameFr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_fr'],
+      ),
+      nameIt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_it'],
+      ),
+      searchText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}search_text'],
+      ),
       servingG: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}serving_g'],
@@ -573,6 +655,16 @@ class Food extends DataClass implements Insertable<Food> {
   final String? brand;
   final String? locale;
 
+  /// Localized display names (multilingual sources like the Swiss FCDB). [name]
+  /// is the canonical/fallback (English); these override it per UI locale.
+  final String? nameDe;
+  final String? nameFr;
+  final String? nameIt;
+
+  /// Lower-cased haystack of every language's name + synonyms, so search finds
+  /// a food regardless of the UI language. Null for single-language rows.
+  final String? searchText;
+
   /// Optional serving size for the "1 serving = N g" quick-pick chips.
   final double? servingG;
   final String? servingLabel;
@@ -602,6 +694,10 @@ class Food extends DataClass implements Insertable<Food> {
     required this.name,
     this.brand,
     this.locale,
+    this.nameDe,
+    this.nameFr,
+    this.nameIt,
+    this.searchText,
     this.servingG,
     this.servingLabel,
     required this.kcal100,
@@ -638,6 +734,18 @@ class Food extends DataClass implements Insertable<Food> {
     }
     if (!nullToAbsent || locale != null) {
       map['locale'] = Variable<String>(locale);
+    }
+    if (!nullToAbsent || nameDe != null) {
+      map['name_de'] = Variable<String>(nameDe);
+    }
+    if (!nullToAbsent || nameFr != null) {
+      map['name_fr'] = Variable<String>(nameFr);
+    }
+    if (!nullToAbsent || nameIt != null) {
+      map['name_it'] = Variable<String>(nameIt);
+    }
+    if (!nullToAbsent || searchText != null) {
+      map['search_text'] = Variable<String>(searchText);
     }
     if (!nullToAbsent || servingG != null) {
       map['serving_g'] = Variable<double>(servingG);
@@ -699,6 +807,18 @@ class Food extends DataClass implements Insertable<Food> {
       locale: locale == null && nullToAbsent
           ? const Value.absent()
           : Value(locale),
+      nameDe: nameDe == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nameDe),
+      nameFr: nameFr == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nameFr),
+      nameIt: nameIt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nameIt),
+      searchText: searchText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(searchText),
       servingG: servingG == null && nullToAbsent
           ? const Value.absent()
           : Value(servingG),
@@ -757,6 +877,10 @@ class Food extends DataClass implements Insertable<Food> {
       name: serializer.fromJson<String>(json['name']),
       brand: serializer.fromJson<String?>(json['brand']),
       locale: serializer.fromJson<String?>(json['locale']),
+      nameDe: serializer.fromJson<String?>(json['nameDe']),
+      nameFr: serializer.fromJson<String?>(json['nameFr']),
+      nameIt: serializer.fromJson<String?>(json['nameIt']),
+      searchText: serializer.fromJson<String?>(json['searchText']),
       servingG: serializer.fromJson<double?>(json['servingG']),
       servingLabel: serializer.fromJson<String?>(json['servingLabel']),
       kcal100: serializer.fromJson<double>(json['kcal100']),
@@ -788,6 +912,10 @@ class Food extends DataClass implements Insertable<Food> {
       'name': serializer.toJson<String>(name),
       'brand': serializer.toJson<String?>(brand),
       'locale': serializer.toJson<String?>(locale),
+      'nameDe': serializer.toJson<String?>(nameDe),
+      'nameFr': serializer.toJson<String?>(nameFr),
+      'nameIt': serializer.toJson<String?>(nameIt),
+      'searchText': serializer.toJson<String?>(searchText),
       'servingG': serializer.toJson<double?>(servingG),
       'servingLabel': serializer.toJson<String?>(servingLabel),
       'kcal100': serializer.toJson<double>(kcal100),
@@ -815,6 +943,10 @@ class Food extends DataClass implements Insertable<Food> {
     String? name,
     Value<String?> brand = const Value.absent(),
     Value<String?> locale = const Value.absent(),
+    Value<String?> nameDe = const Value.absent(),
+    Value<String?> nameFr = const Value.absent(),
+    Value<String?> nameIt = const Value.absent(),
+    Value<String?> searchText = const Value.absent(),
     Value<double?> servingG = const Value.absent(),
     Value<String?> servingLabel = const Value.absent(),
     double? kcal100,
@@ -839,6 +971,10 @@ class Food extends DataClass implements Insertable<Food> {
     name: name ?? this.name,
     brand: brand.present ? brand.value : this.brand,
     locale: locale.present ? locale.value : this.locale,
+    nameDe: nameDe.present ? nameDe.value : this.nameDe,
+    nameFr: nameFr.present ? nameFr.value : this.nameFr,
+    nameIt: nameIt.present ? nameIt.value : this.nameIt,
+    searchText: searchText.present ? searchText.value : this.searchText,
     servingG: servingG.present ? servingG.value : this.servingG,
     servingLabel: servingLabel.present ? servingLabel.value : this.servingLabel,
     kcal100: kcal100 ?? this.kcal100,
@@ -867,6 +1003,12 @@ class Food extends DataClass implements Insertable<Food> {
       name: data.name.present ? data.name.value : this.name,
       brand: data.brand.present ? data.brand.value : this.brand,
       locale: data.locale.present ? data.locale.value : this.locale,
+      nameDe: data.nameDe.present ? data.nameDe.value : this.nameDe,
+      nameFr: data.nameFr.present ? data.nameFr.value : this.nameFr,
+      nameIt: data.nameIt.present ? data.nameIt.value : this.nameIt,
+      searchText: data.searchText.present
+          ? data.searchText.value
+          : this.searchText,
       servingG: data.servingG.present ? data.servingG.value : this.servingG,
       servingLabel: data.servingLabel.present
           ? data.servingLabel.value
@@ -910,6 +1052,10 @@ class Food extends DataClass implements Insertable<Food> {
           ..write('name: $name, ')
           ..write('brand: $brand, ')
           ..write('locale: $locale, ')
+          ..write('nameDe: $nameDe, ')
+          ..write('nameFr: $nameFr, ')
+          ..write('nameIt: $nameIt, ')
+          ..write('searchText: $searchText, ')
           ..write('servingG: $servingG, ')
           ..write('servingLabel: $servingLabel, ')
           ..write('kcal100: $kcal100, ')
@@ -939,6 +1085,10 @@ class Food extends DataClass implements Insertable<Food> {
     name,
     brand,
     locale,
+    nameDe,
+    nameFr,
+    nameIt,
+    searchText,
     servingG,
     servingLabel,
     kcal100,
@@ -967,6 +1117,10 @@ class Food extends DataClass implements Insertable<Food> {
           other.name == this.name &&
           other.brand == this.brand &&
           other.locale == this.locale &&
+          other.nameDe == this.nameDe &&
+          other.nameFr == this.nameFr &&
+          other.nameIt == this.nameIt &&
+          other.searchText == this.searchText &&
           other.servingG == this.servingG &&
           other.servingLabel == this.servingLabel &&
           other.kcal100 == this.kcal100 &&
@@ -993,6 +1147,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
   final Value<String> name;
   final Value<String?> brand;
   final Value<String?> locale;
+  final Value<String?> nameDe;
+  final Value<String?> nameFr;
+  final Value<String?> nameIt;
+  final Value<String?> searchText;
   final Value<double?> servingG;
   final Value<String?> servingLabel;
   final Value<double> kcal100;
@@ -1017,6 +1175,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     this.name = const Value.absent(),
     this.brand = const Value.absent(),
     this.locale = const Value.absent(),
+    this.nameDe = const Value.absent(),
+    this.nameFr = const Value.absent(),
+    this.nameIt = const Value.absent(),
+    this.searchText = const Value.absent(),
     this.servingG = const Value.absent(),
     this.servingLabel = const Value.absent(),
     this.kcal100 = const Value.absent(),
@@ -1042,6 +1204,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     required String name,
     this.brand = const Value.absent(),
     this.locale = const Value.absent(),
+    this.nameDe = const Value.absent(),
+    this.nameFr = const Value.absent(),
+    this.nameIt = const Value.absent(),
+    this.searchText = const Value.absent(),
     this.servingG = const Value.absent(),
     this.servingLabel = const Value.absent(),
     required double kcal100,
@@ -1069,6 +1235,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     Expression<String>? name,
     Expression<String>? brand,
     Expression<String>? locale,
+    Expression<String>? nameDe,
+    Expression<String>? nameFr,
+    Expression<String>? nameIt,
+    Expression<String>? searchText,
     Expression<double>? servingG,
     Expression<String>? servingLabel,
     Expression<double>? kcal100,
@@ -1094,6 +1264,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
       if (name != null) 'name': name,
       if (brand != null) 'brand': brand,
       if (locale != null) 'locale': locale,
+      if (nameDe != null) 'name_de': nameDe,
+      if (nameFr != null) 'name_fr': nameFr,
+      if (nameIt != null) 'name_it': nameIt,
+      if (searchText != null) 'search_text': searchText,
       if (servingG != null) 'serving_g': servingG,
       if (servingLabel != null) 'serving_label': servingLabel,
       if (kcal100 != null) 'kcal100': kcal100,
@@ -1121,6 +1295,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     Value<String>? name,
     Value<String?>? brand,
     Value<String?>? locale,
+    Value<String?>? nameDe,
+    Value<String?>? nameFr,
+    Value<String?>? nameIt,
+    Value<String?>? searchText,
     Value<double?>? servingG,
     Value<String?>? servingLabel,
     Value<double>? kcal100,
@@ -1146,6 +1324,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
       name: name ?? this.name,
       brand: brand ?? this.brand,
       locale: locale ?? this.locale,
+      nameDe: nameDe ?? this.nameDe,
+      nameFr: nameFr ?? this.nameFr,
+      nameIt: nameIt ?? this.nameIt,
+      searchText: searchText ?? this.searchText,
       servingG: servingG ?? this.servingG,
       servingLabel: servingLabel ?? this.servingLabel,
       kcal100: kcal100 ?? this.kcal100,
@@ -1190,6 +1372,18 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     }
     if (locale.present) {
       map['locale'] = Variable<String>(locale.value);
+    }
+    if (nameDe.present) {
+      map['name_de'] = Variable<String>(nameDe.value);
+    }
+    if (nameFr.present) {
+      map['name_fr'] = Variable<String>(nameFr.value);
+    }
+    if (nameIt.present) {
+      map['name_it'] = Variable<String>(nameIt.value);
+    }
+    if (searchText.present) {
+      map['search_text'] = Variable<String>(searchText.value);
     }
     if (servingG.present) {
       map['serving_g'] = Variable<double>(servingG.value);
@@ -1252,6 +1446,10 @@ class FoodsCompanion extends UpdateCompanion<Food> {
           ..write('name: $name, ')
           ..write('brand: $brand, ')
           ..write('locale: $locale, ')
+          ..write('nameDe: $nameDe, ')
+          ..write('nameFr: $nameFr, ')
+          ..write('nameIt: $nameIt, ')
+          ..write('searchText: $searchText, ')
           ..write('servingG: $servingG, ')
           ..write('servingLabel: $servingLabel, ')
           ..write('kcal100: $kcal100, ')
@@ -4747,6 +4945,10 @@ typedef $$FoodsTableCreateCompanionBuilder =
       required String name,
       Value<String?> brand,
       Value<String?> locale,
+      Value<String?> nameDe,
+      Value<String?> nameFr,
+      Value<String?> nameIt,
+      Value<String?> searchText,
       Value<double?> servingG,
       Value<String?> servingLabel,
       required double kcal100,
@@ -4773,6 +4975,10 @@ typedef $$FoodsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String?> brand,
       Value<String?> locale,
+      Value<String?> nameDe,
+      Value<String?> nameFr,
+      Value<String?> nameIt,
+      Value<String?> searchText,
       Value<double?> servingG,
       Value<String?> servingLabel,
       Value<double> kcal100,
@@ -4874,6 +5080,26 @@ class $$FoodsTableFilterComposer extends Composer<_$AppDatabase, $FoodsTable> {
 
   ColumnFilters<String> get locale => $composableBuilder(
     column: $table.locale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameDe => $composableBuilder(
+    column: $table.nameDe,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameFr => $composableBuilder(
+    column: $table.nameFr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameIt => $composableBuilder(
+    column: $table.nameIt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get searchText => $composableBuilder(
+    column: $table.searchText,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5052,6 +5278,26 @@ class $$FoodsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get nameDe => $composableBuilder(
+    column: $table.nameDe,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameFr => $composableBuilder(
+    column: $table.nameFr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameIt => $composableBuilder(
+    column: $table.nameIt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get searchText => $composableBuilder(
+    column: $table.searchText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get servingG => $composableBuilder(
     column: $table.servingG,
     builder: (column) => ColumnOrderings(column),
@@ -5164,6 +5410,20 @@ class $$FoodsTableAnnotationComposer
 
   GeneratedColumn<String> get locale =>
       $composableBuilder(column: $table.locale, builder: (column) => column);
+
+  GeneratedColumn<String> get nameDe =>
+      $composableBuilder(column: $table.nameDe, builder: (column) => column);
+
+  GeneratedColumn<String> get nameFr =>
+      $composableBuilder(column: $table.nameFr, builder: (column) => column);
+
+  GeneratedColumn<String> get nameIt =>
+      $composableBuilder(column: $table.nameIt, builder: (column) => column);
+
+  GeneratedColumn<String> get searchText => $composableBuilder(
+    column: $table.searchText,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<double> get servingG =>
       $composableBuilder(column: $table.servingG, builder: (column) => column);
@@ -5313,6 +5573,10 @@ class $$FoodsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String?> brand = const Value.absent(),
                 Value<String?> locale = const Value.absent(),
+                Value<String?> nameDe = const Value.absent(),
+                Value<String?> nameFr = const Value.absent(),
+                Value<String?> nameIt = const Value.absent(),
+                Value<String?> searchText = const Value.absent(),
                 Value<double?> servingG = const Value.absent(),
                 Value<String?> servingLabel = const Value.absent(),
                 Value<double> kcal100 = const Value.absent(),
@@ -5337,6 +5601,10 @@ class $$FoodsTableTableManager
                 name: name,
                 brand: brand,
                 locale: locale,
+                nameDe: nameDe,
+                nameFr: nameFr,
+                nameIt: nameIt,
+                searchText: searchText,
                 servingG: servingG,
                 servingLabel: servingLabel,
                 kcal100: kcal100,
@@ -5363,6 +5631,10 @@ class $$FoodsTableTableManager
                 required String name,
                 Value<String?> brand = const Value.absent(),
                 Value<String?> locale = const Value.absent(),
+                Value<String?> nameDe = const Value.absent(),
+                Value<String?> nameFr = const Value.absent(),
+                Value<String?> nameIt = const Value.absent(),
+                Value<String?> searchText = const Value.absent(),
                 Value<double?> servingG = const Value.absent(),
                 Value<String?> servingLabel = const Value.absent(),
                 required double kcal100,
@@ -5387,6 +5659,10 @@ class $$FoodsTableTableManager
                 name: name,
                 brand: brand,
                 locale: locale,
+                nameDe: nameDe,
+                nameFr: nameFr,
+                nameIt: nameIt,
+                searchText: searchText,
                 servingG: servingG,
                 servingLabel: servingLabel,
                 kcal100: kcal100,

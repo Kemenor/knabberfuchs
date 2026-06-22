@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -60,6 +60,14 @@ class AppDatabase extends _$AppDatabase {
             await customStatement(
                 'UPDATE foods SET last_used_at = updated_at '
                 'WHERE usage_count > 0');
+          }
+          if (from < 7) {
+            // Multilingual catalog (Swiss FCDB replaces the English-only USDA
+            // generic layer). Add localized name + cross-language search columns.
+            await m.addColumn(foods, foods.nameDe);
+            await m.addColumn(foods, foods.nameFr);
+            await m.addColumn(foods, foods.nameIt);
+            await m.addColumn(foods, foods.searchText);
           }
         },
         beforeOpen: (details) async {
@@ -106,7 +114,10 @@ class AppDatabase extends _$AppDatabase {
             Expression<bool> expr = const Constant(true);
             for (final t in tokens) {
               final like = '%${t.replaceAll('%', '').replaceAll('_', '')}%';
-              expr = expr & (f.name.like(like) | f.brand.like(like));
+              expr = expr &
+                  (f.name.like(like) |
+                      f.brand.like(like) |
+                      f.searchText.like(like));
             }
             return expr;
           })

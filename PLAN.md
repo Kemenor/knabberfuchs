@@ -247,22 +247,30 @@ Strategy:
     change. The OCR nutrition-label parser already handles DE/FR/IT/EN *input* keys —
     separate from UI i18n but the same languages.
 
-- **Phase 12 — Data localization:** 📋 PLANNED. Localize the *food data*, not just the UI
-  (Phase 11). Key asymmetry: **OFF data is already mostly localized** (the pack pipeline
-  extracts each product's native "main" name), so the real work is the **English-only USDA
-  bundle** (~5,600 generic whole foods — there is no DE/FR/IT USDA).
-  - **12a — Translate USDA at build time.** In `tool/build_usda_bundle.dart`, machine-
-    translate the names (DeepL/Google) and bundle `name_de` / `name_fr` / `name_it`
-    columns into `assets/usda_foods.csv.gz`. One-time build cost; **no runtime API key**.
-    Hand-review the **top ~200 common foods** (machine translations of USDA's formal
-    taxonomic names are stilted); leave the long tail machine-translated.
-  - **12b — Locale-aware food display + search.** Show the name column for the current
-    locale (fallback to English); make local search match localized queries (e.g. "Banane"
-    → "Bananen, roh"). Localize the produce **synonyms** (`search_query.dart`) too, or
-    accept weaker synonym matching in non-English.
-  - **12c — OFF region-language preference (refinement, optional).** The pack name is
-    currently `coalesce(main, en, de, fr, it)`. Could prefer the *region's* language per
-    pack (de-first for the DE pack, etc.) for the few products whose `main` isn't local.
+- **Phase 12 — Data localization:** ✅ DONE (DE/FR/EN; IT pending one file). **Pivoted from
+  the original "machine-translate USDA" plan to swapping the generic-foods source entirely.**
+  Instead of translating English USDA names, we replaced the USDA layer with the **Swiss Food
+  Composition Database (FSVO/BLV, naehrwertdaten.ch)** — an official, curated table that ships
+  names + synonyms natively in **DE/FR/IT/EN** (the app's exact locales). No machine
+  translation, no synonym maintenance.
+  - **Source/license:** free incl. commercial use, "subject to acknowledgment of the source"
+    (the FSVO literally names a *nutrition diary app* as an allowed use). Credited in
+    Settings → About. Build tool + provenance: `tool/swiss_fcdb/` (Python + openpyxl; raw
+    xlsx pulled via the Internet Archive since the live host is geo-blocked/down).
+  - **What shipped:** `assets/swiss_foods.csv.gz` (1109 generic foods, EN/DE/FR + `search_text`
+    = all-language names+synonyms). `Foods` gained `nameDe/nameFr/nameIt/searchText` (schema
+    v6→v7). New `FoodSource.swissFcdb` (USDA enum kept for legacy/backup compat). `swiss_seed.dart`
+    seeds on first launch and **purges the old USDA rows** (diary entries keep snapshots).
+    `searchFoodsLocal` matches `search_text` → cross-language search (verified: "apfel"→12,
+    "poulet"→13). Display via `Food.localizedName()` at the search tile, log snapshot, and
+    recipe-ingredient flow; falls back to English. Verified on emulator end-to-end in German.
+  - **IT pending:** the Italian xlsx isn't on the Wayback Machine and the live site is down;
+    `nameIt` is null → falls back to English. Drop `it.xlsx` into `tool/swiss_fcdb/`, re-run
+    `build.py`, bump `swissDatasetVersion` — the ID join slots Italian in with zero code change.
+  - **Dropped from the old plan:** the `food_terms_i18n.dart` query-synonym dictionary (a
+    workaround for English-only USDA) — unnecessary now that the data is natively multilingual.
+  - **12c — OFF region-language preference (refinement, optional, still open).** The pack name
+    is `coalesce(main, en, de, fr, it)`. Could prefer the *region's* language per pack.
     Mostly already handled — low priority.
   - **Notes:** depends on Phase 11 (locale selection). Build-time only — no keys shipped,
     no runtime cost, asset grows modestly. Scope is small because OFF (the big dataset) is

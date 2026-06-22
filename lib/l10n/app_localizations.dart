@@ -585,7 +585,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAboutBody.
   ///
   /// In en, this message translates to:
-  /// **'Ad-free, no subscriptions. Data from Open Food Facts and USDA FoodData Central.'**
+  /// **'Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO).'**
   String get settingsAboutBody;
 
   /// No description provided for @offThanksTitle.
@@ -743,6 +743,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom'**
   String get sourceCustom;
+
+  /// No description provided for @sourceSwiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Swiss DB'**
+  String get sourceSwiss;
 
   /// No description provided for @sourceContributed.
   ///

@@ -283,7 +283,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsAboutBody =>
-      'Senza pubblicità, senza abbonamenti. Dati da Open Food Facts e USDA FoodData Central.';
+      'Senza pubblicità, senza abbonamenti. Dati da Open Food Facts e dalla Banca dati svizzera dei valori nutritivi (Ufficio federale della sicurezza alimentare e di veterinaria, USAV).';
 
   @override
   String get offThanksTitle => 'Grazie a Open Food Facts';
@@ -382,6 +382,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sourceCustom => 'Personalizzato';
+
+  @override
+  String get sourceSwiss => 'Banca dati CH';
 
   @override
   String get sourceContributed => 'Aggiunto da te';

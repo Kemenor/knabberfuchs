@@ -22,6 +22,7 @@ class DiaryRepository {
     required MealType meal,
     required String day,
     int? groupId,
+    String? displayName,
   }) async {
     await db.addEntry(EntriesCompanion.insert(
       day: day,
@@ -29,7 +30,7 @@ class DiaryRepository {
       groupId: Value(groupId),
       grams: grams,
       foodId: Value(food.id),
-      sName: food.name,
+      sName: displayName ?? food.name,
       sKcal100: food.kcal100,
       sProtein100: Value(food.protein100),
       sCarb100: Value(food.carb100),

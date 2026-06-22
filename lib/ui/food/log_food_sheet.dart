@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/format.dart';
 import '../../data/db/database.dart';
 import '../../domain/enums.dart';
+import '../../domain/food_name.dart';
 import '../../domain/units.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
@@ -19,6 +20,7 @@ Future<bool?> showLogFoodSheet(
   required MealType meal,
   Future<int?> Function()? resolveGroup,
 }) {
+  final displayName = food.localizedNameOf(context);
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -26,7 +28,7 @@ Future<bool?> showLogFoodSheet(
     builder: (_) => _LogSheet(
       title: AppLocalizations.of(context).dayAddFood,
       submitLabel: AppLocalizations.of(context).actionAdd,
-      name: food.name,
+      name: displayName,
       brand: food.brand,
       kcal100: food.kcal100,
       protein100: food.protein100,
@@ -39,7 +41,12 @@ Future<bool?> showLogFoodSheet(
       onSubmit: (g, m) async {
         final groupId = resolveGroup == null ? null : await resolveGroup();
         await ref.read(diaryRepositoryProvider).logFood(
-            food: food, grams: g, meal: m, day: day, groupId: groupId);
+            food: food,
+            grams: g,
+            meal: m,
+            day: day,
+            groupId: groupId,
+            displayName: displayName);
       },
     ),
   );

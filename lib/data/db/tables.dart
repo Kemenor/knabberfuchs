@@ -16,6 +16,16 @@ class Foods extends Table {
   TextColumn get brand => text().nullable()();
   TextColumn get locale => text().nullable()();
 
+  /// Localized display names (multilingual sources like the Swiss FCDB). [name]
+  /// is the canonical/fallback (English); these override it per UI locale.
+  TextColumn get nameDe => text().nullable()();
+  TextColumn get nameFr => text().nullable()();
+  TextColumn get nameIt => text().nullable()();
+
+  /// Lower-cased haystack of every language's name + synonyms, so search finds
+  /// a food regardless of the UI language. Null for single-language rows.
+  TextColumn get searchText => text().nullable()();
+
   /// Optional serving size for the "1 serving = N g" quick-pick chips.
   RealColumn get servingG => real().nullable()();
   TextColumn get servingLabel => text().nullable()();

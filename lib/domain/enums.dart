@@ -12,6 +12,11 @@ enum FoodSource {
   /// A product the user added for a missing barcode (may be contributed to OFF).
   /// Appended last so the stored enum indices of the others never shift.
   userContributed,
+
+  /// From the bundled Swiss Food Composition Database (FSVO/BLV) — curated,
+  /// multilingual whole foods. Replaces the USDA generic layer. Appended last
+  /// to keep existing stored enum indices stable.
+  swissFcdb,
 }
 
 /// Meal a diary entry belongs to. Order matters: it's the display order.

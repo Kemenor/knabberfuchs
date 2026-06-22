@@ -13,7 +13,7 @@ import 'data/ocr/ocr_service.dart';
 import 'data/offline/offline_pack_service.dart';
 import 'data/offline/region_pack_store.dart';
 import 'data/sources/off_api.dart';
-import 'data/sources/usda_seed.dart';
+import 'data/sources/swiss_seed.dart';
 import 'domain/day_summary.dart';
 import 'domain/enums.dart';
 import 'domain/meal_times.dart';
@@ -94,7 +94,7 @@ final selectedDayEntriesProvider = StreamProvider<List<Entry>>((ref) {
 /// One-time startup work: import the bundled USDA produce dataset on first run
 /// and open any installed offline region packs.
 final appStartupProvider = FutureProvider<void>((ref) async {
-  await seedUsdaIfNeeded(ref.watch(dbProvider));
+  await seedSwissIfNeeded(ref.watch(dbProvider));
   await ref.read(offlinePackServiceProvider).syncStore();
   await ref.read(healthServiceProvider).refreshEnabled(ref.read(dbProvider));
 });

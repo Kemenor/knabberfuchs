@@ -7,11 +7,12 @@ import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 import '../../domain/enums.dart';
 import '../db/database.dart';
 
-const _assetPath = 'assets/usda_foods.csv.gz';
-const _versionKey = 'usdaDatasetVersion';
+const _assetPath = 'assets/swiss_foods.csv.gz';
+const _versionKey = 'swissDatasetVersion';
 
-/// Bump whenever assets/usda_foods.csv.gz changes so existing installs re-import.
-const usdaDatasetVersion = '2';
+/// Bump whenever assets/swiss_foods.csv.gz changes so existing installs
+/// re-import (e.g. when the Italian names land).
+const swissDatasetVersion = '1';
 
 /// Minimal RFC-4180-ish CSV parser: handles quoted fields containing commas,
 /// newlines, and doubled quotes. Good enough for our controlled asset.
@@ -62,58 +63,69 @@ List<List<String>> parseCsv(String input) {
   return rows;
 }
 
-/// Parse the bundled USDA CSV into catalog rows.
-/// Columns: fdc_id,name,kcal100,protein100,carb100,fat100,fiber100,sugar100,sodium_mg100
-List<FoodsCompanion> parseUsdaCsv(String csv) {
+/// Parse the bundled Swiss FCDB CSV into catalog rows.
+/// Columns: id,name_en,name_de,name_fr,name_it,kcal100,protein100,carb100,
+///          fat100,fiber100,sugar100,satfat100,sodium_mg100,search_text
+List<FoodsCompanion> parseSwissCsv(String csv) {
   final rows = parseCsv(csv);
   final out = <FoodsCompanion>[];
+  String? s(String v) => v.trim().isEmpty ? null : v.trim();
+  double? n(String v) => v.trim().isEmpty ? null : double.tryParse(v.trim());
   for (var i = 1; i < rows.length; i++) {
     // skip header
     final r = rows[i];
-    if (r.length < 9) continue;
-    final kcal = double.tryParse(r[2]);
+    if (r.length < 14) continue;
+    final kcal = double.tryParse(r[5]);
     if (kcal == null) continue;
     final name = r[1].trim();
     if (name.isEmpty) continue;
-    double? n(String s) => s.trim().isEmpty ? null : double.tryParse(s);
     out.add(FoodsCompanion.insert(
-      source: FoodSource.usda,
+      source: FoodSource.swissFcdb,
       externalId: Value(r[0]),
       name: name,
+      nameDe: Value(s(r[2])),
+      nameFr: Value(s(r[3])),
+      nameIt: Value(s(r[4])),
+      searchText: Value(s(r[13])),
       kcal100: kcal,
-      protein100: Value(n(r[3])),
-      carb100: Value(n(r[4])),
-      fat100: Value(n(r[5])),
-      fiber100: Value(n(r[6])),
-      sugar100: Value(n(r[7])),
-      sodiumMg100: Value(n(r[8])),
+      protein100: Value(n(r[6])),
+      carb100: Value(n(r[7])),
+      fat100: Value(n(r[8])),
+      fiber100: Value(n(r[9])),
+      sugar100: Value(n(r[10])),
+      satFat100: Value(n(r[11])),
+      sodiumMg100: Value(n(r[12])),
     ));
   }
   return out;
 }
 
-/// Import the bundled USDA produce dataset into the local catalog. Runs on
-/// first launch and again whenever [usdaDatasetVersion] changes (so cleaned/
-/// updated bundles replace the old rows). Idempotent within a version.
-/// Returns the number of rows imported (0 if up to date or asset missing).
-Future<int> seedUsdaIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
-  if (await db.getSetting(_versionKey) == usdaDatasetVersion) return 0;
+/// Import the bundled Swiss Food Composition Database (FSVO/BLV) into the local
+/// catalog. Runs on first launch and again whenever [swissDatasetVersion]
+/// changes. Replaces the old English-only USDA generic layer (deletes both
+/// previously-seeded Swiss and USDA rows; diary entries keep their snapshots,
+/// so logged history is unaffected). Idempotent within a version. Returns the
+/// number of rows imported (0 if up to date or asset missing).
+Future<int> seedSwissIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
+  if (await db.getSetting(_versionKey) == swissDatasetVersion) return 0;
   final b = bundle ?? rootBundle;
   try {
     final data = await b.load(_assetPath);
     final csv = utf8.decode(gzip.decode(data.buffer.asUint8List()));
-    final companions = parseUsdaCsv(csv);
+    final companions = parseSwissCsv(csv);
     await db.transaction(() async {
-      // Replace any previously-seeded USDA rows (entries keep their snapshots;
-      // the FK is set-null on delete).
+      // Replace prior Swiss rows and retire the legacy USDA generic layer.
+      // The entries FK is set-null on delete, so logged history is unaffected.
       await (db.delete(db.foods)
-            ..where((f) => f.source.equalsValue(FoodSource.usda)))
+            ..where((f) =>
+                f.source.equalsValue(FoodSource.swissFcdb) |
+                f.source.equalsValue(FoodSource.usda)))
           .go();
       await db.batch((batch) {
         batch.insertAll(db.foods, companions, mode: InsertMode.insertOrIgnore);
       });
     });
-    await db.setSetting(_versionKey, usdaDatasetVersion);
+    await db.setSetting(_versionKey, swissDatasetVersion);
     return companions.length;
   } catch (_) {
     // No asset bundled (e.g. dev build before the pipeline ran) — skip quietly.

@@ -117,7 +117,7 @@
   "settingsImportSub": "Restore from a .zip (replaces all data)",
 
   "settingsAbout": "About",
-  "settingsAboutBody": "Ad-free, no subscriptions. Data from Open Food Facts and USDA FoodData Central.",
+  "settingsAboutBody": "Ad-free, no subscriptions. Data from Open Food Facts and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO).",
   "offThanksTitle": "Thanks to Open Food Facts",
   "offThanksBody": "Knabberfuchs is built on Open Food Facts — a free, open, crowdsourced food database kept alive by volunteers around the world. Without their work, this app simply would not exist.\n\nIf Knabberfuchs is useful to you, please consider supporting them.",
   "offDonate": "Donate to Open Food Facts",
@@ -156,6 +156,7 @@
   "sourceOff": "Open Food Facts",
   "sourceUsda": "USDA",
   "sourceCustom": "Custom",
+  "sourceSwiss": "Swiss DB",
   "sourceContributed": "Added by you",
 
   "scanBarcode": "Scan barcode",

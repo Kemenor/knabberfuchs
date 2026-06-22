@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/format.dart';
 import '../../data/db/database.dart';
 import '../../domain/nutrition.dart';
+import '../../domain/food_name.dart';
 import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
@@ -62,9 +63,10 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
               FoodPickerScreen(title: AppLocalizations.of(context).addIngredient)),
     );
     if (food == null || !mounted) return;
+    final foodName = food.localizedNameOf(context);
     final grams = await showAmountSheet(
       context,
-      name: food.name,
+      name: foodName,
       brand: food.brand,
       kcal100: food.kcal100,
       protein100: food.protein100,
@@ -76,7 +78,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     if (grams == null || !mounted) return;
     setState(() {
       _items.add(RecipeShareItem(
-        name: food.name,
+        name: foodName,
         grams: grams,
         kcal100: food.kcal100,
         protein100: food.protein100,

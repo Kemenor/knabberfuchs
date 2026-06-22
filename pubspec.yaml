@@ -96,9 +96,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    # Bundled USDA public-domain produce dataset (built by tool/build_usda_bundle.dart),
-    # imported into the local catalog on first launch.
-    - assets/usda_foods.csv.gz
+    # Bundled Swiss Food Composition Database (FSVO/BLV), multilingual whole
+    # foods. Built by tool/swiss_fcdb/build.py; imported on first launch.
+    - assets/swiss_foods.csv.gz
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

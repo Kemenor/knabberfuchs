@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/format.dart';
 import '../../data/db/database.dart';
 import '../../domain/enums.dart';
+import '../../domain/food_name.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 
@@ -172,10 +173,12 @@ class _FoodTile extends StatelessWidget {
         FoodSource.usda => l10n.sourceUsda,
         FoodSource.custom => l10n.sourceCustom,
         FoodSource.userContributed => l10n.sourceContributed,
+        FoodSource.swissFcdb => l10n.sourceSwiss,
       },
     ];
     return ListTile(
-      title: Text(food.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(food.localizedNameOf(context),
+          maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(parts.join(' · ')),
       trailing: Text(l10n.kcalPer100Short(kcalStr(food.kcal100)),
           textAlign: TextAlign.right,
