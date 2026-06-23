@@ -393,17 +393,22 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   final _ctrl = TextEditingController();
   bool _obscure = true;
   bool _loaded = false;
+  bool _onDeviceOnly = false;
 
   @override
   void initState() {
     super.initState();
-    ref.read(dbProvider).getSetting(geminiKeySetting).then((v) {
+    final db = ref.read(dbProvider);
+    db.getSetting(geminiKeySetting).then((v) {
       if (mounted) {
         setState(() {
           _ctrl.text = v ?? '';
           _loaded = true;
         });
       }
+    });
+    db.getSetting(aiOnDeviceOnlySetting).then((v) {
+      if (mounted) setState(() => _onDeviceOnly = v == 'true');
     });
   }
 
@@ -443,8 +448,11 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
                 onPressed: () => setState(() => _obscure = !_obscure),
               ),
             ),
-            onChanged: (v) => ref.read(dbProvider).setSetting(
-                geminiKeySetting, v.trim().isEmpty ? null : v.trim()),
+            onChanged: (v) {
+              setState(() {}); // toggle visibility follows the key field
+              ref.read(dbProvider).setSetting(
+                  geminiKeySetting, v.trim().isEmpty ? null : v.trim());
+            },
           ),
           Align(
             alignment: Alignment.centerLeft,
@@ -456,6 +464,24 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               label: Text(l10n.aiKeyGet),
             ),
           ),
+          // Engine choice only matters once a key exists; until then every scan
+          // is on-device anyway.
+          if (_loaded && _ctrl.text.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.aiOnDeviceOnlyTitle),
+                subtitle: Text(l10n.aiOnDeviceOnlySubtitle),
+                value: _onDeviceOnly,
+                onChanged: (v) {
+                  setState(() => _onDeviceOnly = v);
+                  ref
+                      .read(dbProvider)
+                      .setSetting(aiOnDeviceOnlySetting, v ? 'true' : null);
+                },
+              ),
+            ),
         ],
       ),
     );

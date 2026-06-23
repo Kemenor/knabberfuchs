@@ -469,6 +469,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aiKeyGet => 'Obtenir une clé API';
 
   @override
+  String get aiOnDeviceOnlyTitle => 'Toujours reconnaître sur l\'appareil';
+
+  @override
+  String get aiOnDeviceOnlySubtitle =>
+      'Ne jamais envoyer de photos à Gemini — utiliser le modèle sur l\'appareil pour chaque scan.';
+
+  @override
+  String get recognizeByGemini => 'Estimé par Gemini';
+
+  @override
+  String get recognizeByOnDevice => 'Estimé sur l\'appareil';
+
+  @override
   String get geminiFailed =>
       'Gemini injoignable — reconnaissance sur l\'appareil utilisée.';
 

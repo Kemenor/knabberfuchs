@@ -900,6 +900,30 @@ abstract class AppLocalizations {
   /// **'Get an API key'**
   String get aiKeyGet;
 
+  /// No description provided for @aiOnDeviceOnlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Always recognise on-device'**
+  String get aiOnDeviceOnlyTitle;
+
+  /// No description provided for @aiOnDeviceOnlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Never upload photos to Gemini — use the on-device model for every scan.'**
+  String get aiOnDeviceOnlySubtitle;
+
+  /// No description provided for @recognizeByGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated by Gemini'**
+  String get recognizeByGemini;
+
+  /// No description provided for @recognizeByOnDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated on-device'**
+  String get recognizeByOnDevice;
+
   /// No description provided for @geminiFailed.
   ///
   /// In en, this message translates to:

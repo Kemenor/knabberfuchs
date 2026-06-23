@@ -1,0 +1,1 @@
+Die Fotoerkennung zeigt jetzt an, ob eine Schätzung von Gemini oder vom Modell auf dem Gerät stammt. Mit hinterlegtem Gemini-Schlüssel kannst du per Einstellung jeden Scan auf dem Gerät behalten.

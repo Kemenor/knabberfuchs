@@ -23,6 +23,7 @@ Future<bool?> showQuickAddSheet(
   double? initialProtein,
   double? initialCarb,
   double? initialFat,
+  String? sourceLabel,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -37,6 +38,7 @@ Future<bool?> showQuickAddSheet(
       initialProtein: initialProtein,
       initialCarb: initialCarb,
       initialFat: initialFat,
+      sourceLabel: sourceLabel,
     ),
   );
 }
@@ -50,6 +52,7 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
   final double? initialProtein;
   final double? initialCarb;
   final double? initialFat;
+  final String? sourceLabel;
   const _QuickAddSheet({
     required this.day,
     required this.meal,
@@ -59,6 +62,7 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
     required this.initialProtein,
     required this.initialCarb,
     required this.initialFat,
+    required this.sourceLabel,
   });
 
   @override
@@ -130,6 +134,19 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.quickAdd, style: Theme.of(context).textTheme.titleLarge),
+            if (widget.sourceLabel != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.auto_awesome,
+                      size: 14, color: Theme.of(context).colorScheme.outline),
+                  const SizedBox(width: 6),
+                  Text(widget.sourceLabel!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.outline)),
+                ],
+              ),
+            ],
             const SizedBox(height: 12),
             TextField(
               controller: _name,

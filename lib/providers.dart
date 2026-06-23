@@ -93,6 +93,11 @@ final foodClassifierProvider = Provider<FoodClassifier>((ref) {
 
 const geminiKeySetting = 'geminiApiKey';
 
+/// When 'true', photo recognition always uses the on-device model and never
+/// uploads to Gemini, even if a key is configured. Only surfaced in settings
+/// once a key exists. Default (null/false) = use Gemini, fall back on-device.
+const aiOnDeviceOnlySetting = 'aiOnDeviceOnly';
+
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final s = GeminiService();
   ref.onDispose(s.dispose);

@@ -1,0 +1,1 @@
+Il riconoscimento foto ora mostra se una stima proviene da Gemini o dal modello sul dispositivo. Con una chiave Gemini, una nuova impostazione consente di mantenere ogni scansione sul dispositivo.

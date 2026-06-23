@@ -1,0 +1,1 @@
+La reconnaissance photo indique désormais si une estimation vient de Gemini ou du modèle sur l'appareil. Avec une clé Gemini, un nouveau réglage permet de garder chaque scan sur l'appareil.

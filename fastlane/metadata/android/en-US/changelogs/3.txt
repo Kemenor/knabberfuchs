@@ -1,0 +1,1 @@
+Photo recognition now shows whether an estimate came from Gemini or the on-device model. If you've added a Gemini key, a new setting lets you keep every scan on-device.

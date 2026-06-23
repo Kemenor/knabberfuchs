@@ -41,7 +41,9 @@ Future<bool> startRecognizeFoodFlow(
   // richer estimate — dish + grams + macros. Falls back to on-device on any
   // failure so the feature still works offline / when the key is bad.
   final geminiKey = await ref.read(dbProvider).getSetting(geminiKeySetting);
-  if (geminiKey != null && geminiKey.trim().isNotEmpty) {
+  final onDeviceOnly =
+      await ref.read(dbProvider).getSetting(aiOnDeviceOnlySetting) == 'true';
+  if (geminiKey != null && geminiKey.trim().isNotEmpty && !onDeviceOnly) {
     if (!context.mounted) return false;
     final attempt = ValueNotifier<int>(1);
     showDialog(
@@ -69,7 +71,8 @@ Future<bool> startRecognizeFoodFlow(
               initialKcal: r.kcal.round(),
               initialProtein: r.protein,
               initialCarb: r.carb,
-              initialFat: r.fat) ==
+              initialFat: r.fat,
+              sourceLabel: l10n.recognizeByGemini) ==
           true;
     }
     messenger.showAutoSnackBar(SnackBar(content: Text(l10n.geminiFailed)));
@@ -115,7 +118,8 @@ Future<bool> startRecognizeFoodFlow(
       meal: meal,
       resolveGroup: resolveGroup,
       initialName: name,
-      initialKcal: kcal);
+      initialKcal: kcal,
+      sourceLabel: name != null ? l10n.recognizeByOnDevice : null);
   return added == true;
 }
 
