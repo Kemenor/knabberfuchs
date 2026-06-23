@@ -1,0 +1,1 @@
+Fixed AI meal scan: switched to a reliable Gemini model (the previous one was overloaded and always fell back to on-device).

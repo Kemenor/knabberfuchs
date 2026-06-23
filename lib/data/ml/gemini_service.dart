@@ -28,10 +28,11 @@ class GeminiFoodResult {
 /// Strictly opt-in: the on-device classifier stays the keyless default, and the
 /// photo only leaves the device when the user has configured a key.
 class GeminiService {
-  // Latest free-tier Flash model (better at vision than 2.5). If Google
-  // retires/renames it, the recognise flow falls back to the on-device
-  // classifier — bump this string to follow the current model.
-  static const _model = 'gemini-3.5-flash';
+  // gemini-2.5-flash: GA, free-tier, strong vision, and reliably available —
+  // gemini-3.5-flash was persistently returning HTTP 503 (overloaded), failing
+  // every scan. If Google retires/renames this, the recognise flow falls back
+  // to the on-device classifier; bump the string to follow the current model.
+  static const _model = 'gemini-2.5-flash';
   static const _base =
       'https://generativelanguage.googleapis.com/v1beta/models';
 

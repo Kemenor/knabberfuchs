@@ -1,0 +1,1 @@
+KI-Mahlzeitenscan behoben: auf ein zuverlässiges Gemini-Modell umgestellt (das vorherige war überlastet und ist immer auf die Erkennung auf dem Gerät zurückgefallen).

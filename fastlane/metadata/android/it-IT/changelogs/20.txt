@@ -1,0 +1,1 @@
+Scansione pasto IA corretta: passaggio a un modello Gemini affidabile (il precedente era sovraccarico e ripiegava sempre sul dispositivo).

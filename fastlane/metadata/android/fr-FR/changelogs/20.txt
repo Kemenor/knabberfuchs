@@ -1,0 +1,1 @@
+Scan de repas IA corrigé : passage à un modèle Gemini fiable (le précédent était surchargé et basculait toujours sur l'appareil).
