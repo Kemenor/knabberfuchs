@@ -21,7 +21,7 @@ snap a photo of your meal, or just type a name and the calories. Your data stays
   meal to log.
 - 📅 **Day by day** — meals group automatically as you add; running total and macros.
 - 🎯 **Per-weekday targets** — a minimum, a maximum, or both (training days can differ).
-- 📖 **Recipes** — build once, log a portion to any day (broken back into its real ingredients),
+- 📖 **Recipes** — build once, log a portion to any day (added as its individual ingredients),
   share by **QR or image**, import by **QR or text**.
 - 🌍 **Offline, worldwide** — download any of 106 country databases and search with no connection.
 - 🗣️ **Multilingual** — English, German, French, Italian.
