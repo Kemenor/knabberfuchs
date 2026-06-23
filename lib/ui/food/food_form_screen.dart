@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/format.dart';
 import '../../core/snackbar.dart';
@@ -42,6 +43,15 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   final _satfat = TextEditingController();
   final _salt = TextEditingController();
   bool _ocrBusy = false;
+
+  bool get _hasBarcode => _barcode.text.trim().isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    // Rebuild so the "share to Open Food Facts" hint follows the barcode field.
+    _barcode.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
@@ -210,6 +220,46 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
           _numField(_fiber, l10n.addFibre, 'g'),
           const SizedBox(height: 12),
           _numField(_salt, l10n.addSalt, 'g'),
+          if (_hasBarcode) ...[
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () => launchUrl(
+                Uri.parse(
+                    'https://world.openfoodfacts.org/how-to-add-a-product'),
+                mode: LaunchMode.externalApplication,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.volunteer_activism_outlined,
+                        size: 16, color: theme.colorScheme.outline),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: theme.colorScheme.outline),
+                          children: [
+                            TextSpan(text: '${l10n.shareToOff} '),
+                            TextSpan(
+                              text: l10n.shareToOffLink,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

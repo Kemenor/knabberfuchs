@@ -256,8 +256,8 @@
   "addSaturates": "dont acides gras saturés",
   "addFibre": "Fibres",
   "addSalt": "Sel",
-  "addToOff": "Ajouter à Open Food Facts",
-  "addToOffNote": "Ouvre Open Food Facts pour que tout le monde en profite. Votre entrée locale est enregistrée dans tous les cas.",
+  "shareToOff": "Envie de partager ce produit avec tout le monde ? Ajoutez-le à Open Food Facts.",
+  "shareToOffLink": "Comment ajouter un produit",
   "addFilledFromLabel": "Rempli à partir de l'étiquette — veuillez vérifier les valeurs.",
   "addCouldntRead": "Impossible de lire le tableau. Saisissez les valeurs manuellement.",
 

@@ -301,8 +301,8 @@
   "addSaturates": "of which saturates",
   "addFibre": "Fibre",
   "addSalt": "Salt",
-  "addToOff": "Add to Open Food Facts",
-  "addToOffNote": "Opens Open Food Facts so everyone benefits. Your local entry is saved either way.",
+  "shareToOff": "Want to share this product with everyone? Contribute it to Open Food Facts.",
+  "shareToOffLink": "How to add a product",
   "addFilledFromLabel": "Filled from the label — please check the values.",
   "addCouldntRead": "Couldn't read the table. Enter the values manually.",
 

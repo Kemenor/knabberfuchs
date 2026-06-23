@@ -775,11 +775,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get addSalt => 'Sale';
 
   @override
-  String get addToOff => 'Aggiungi a Open Food Facts';
+  String get shareToOff =>
+      'Vuoi condividere questo prodotto con tutti? Aggiungilo a Open Food Facts.';
 
   @override
-  String get addToOffNote =>
-      'Apre Open Food Facts a beneficio di tutti. La tua voce locale viene comunque salvata.';
+  String get shareToOffLink => 'Come aggiungere un prodotto';
 
   @override
   String get addFilledFromLabel =>

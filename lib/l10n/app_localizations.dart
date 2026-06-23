@@ -1428,17 +1428,17 @@ abstract class AppLocalizations {
   /// **'Salt'**
   String get addSalt;
 
-  /// No description provided for @addToOff.
+  /// No description provided for @shareToOff.
   ///
   /// In en, this message translates to:
-  /// **'Add to Open Food Facts'**
-  String get addToOff;
+  /// **'Want to share this product with everyone? Contribute it to Open Food Facts.'**
+  String get shareToOff;
 
-  /// No description provided for @addToOffNote.
+  /// No description provided for @shareToOffLink.
   ///
   /// In en, this message translates to:
-  /// **'Opens Open Food Facts so everyone benefits. Your local entry is saved either way.'**
-  String get addToOffNote;
+  /// **'How to add a product'**
+  String get shareToOffLink;
 
   /// No description provided for @addFilledFromLabel.
   ///
