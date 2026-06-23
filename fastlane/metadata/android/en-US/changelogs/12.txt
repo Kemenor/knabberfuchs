@@ -1,0 +1,1 @@
+Consistent layout: the main action now sits as a bottom-right button everywhere — New food has a Save button, and the barcode scanner moved to the bottom-right when picking a food.

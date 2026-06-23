@@ -1,0 +1,1 @@
+Disposition cohérente : l'action principale est désormais un bouton en bas à droite partout — « Nouvel aliment » a un bouton Enregistrer, et le scanner de code-barres est passé en bas à droite lors du choix d'un aliment.

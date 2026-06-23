@@ -1,0 +1,1 @@
+Einheitliches Layout: Die Hauptaktion sitzt jetzt überall als Button unten rechts — „Neues Lebensmittel" hat einen Speichern-Button, und der Barcode-Scanner ist beim Auswählen eines Lebensmittels nach unten rechts gewandert.

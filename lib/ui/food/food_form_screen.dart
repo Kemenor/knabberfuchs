@@ -150,12 +150,15 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.foodFormTitle),
-        actions: [TextButton(onPressed: _save, child: Text(l10n.actionSave))],
+      appBar: AppBar(title: Text(l10n.foodFormTitle)),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'foodSaveFab',
+        onPressed: _save,
+        icon: const Icon(Icons.check),
+        label: Text(l10n.actionSave),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
         children: [
           TextField(
             controller: _barcode,

@@ -54,15 +54,12 @@ class FoodPickerScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title ?? l10n.selectFood),
-        actions: [
-          IconButton(
-            tooltip: l10n.scanBarcode,
-            icon: const Icon(Icons.qr_code_scanner),
-            onPressed: () => _scan(context, ref),
-          ),
-        ],
+      appBar: AppBar(title: Text(title ?? l10n.selectFood)),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'pickerScanFab',
+        tooltip: l10n.scanBarcode,
+        onPressed: () => _scan(context, ref),
+        child: const Icon(Icons.qr_code_scanner),
       ),
       body: FoodSearchList(
         initialQuery: initialQuery,

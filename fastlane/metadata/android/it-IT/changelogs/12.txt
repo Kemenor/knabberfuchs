@@ -1,0 +1,1 @@
+Layout coerente: l'azione principale è ora un pulsante in basso a destra ovunque — "Nuovo alimento" ha un pulsante Salva e lo scanner di codici a barre è passato in basso a destra quando scegli un alimento.
