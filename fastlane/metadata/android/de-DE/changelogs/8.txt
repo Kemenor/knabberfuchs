@@ -1,0 +1,1 @@
+Flüssigkeiten (Milch, Öl, Saft…) öffnen jetzt standardmässig in Millilitern. Lebensmittel mit einer Open-Food-Facts-Portionsgrösse zeigen ebenfalls einen „1 Portion"-Chip.

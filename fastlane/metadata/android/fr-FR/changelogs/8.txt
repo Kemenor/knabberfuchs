@@ -1,0 +1,1 @@
+Les liquides (lait, huile, jus…) s'ouvrent désormais en millilitres par défaut. Les aliments avec une taille de portion Open Food Facts affichent aussi une puce « 1 portion ».

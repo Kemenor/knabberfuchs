@@ -1,9 +1,10 @@
 import '../l10n/app_localizations.dart';
 
-/// Localized word for a curated natural-portion unit key (see tool/portions/).
-/// Unknown keys (e.g. a free-text serving label from a custom food) pass
-/// through unchanged so they still display sensibly.
-String portionUnitLabel(AppLocalizations l10n, String key) {
+/// Localized word for a curated natural-portion unit key (see tool/portions/),
+/// or null if [key] isn't one of our known units — e.g. an Open Food Facts
+/// `serving_size` string like "30 g", which the caller should render as a
+/// plain "1 serving" instead.
+String? portionUnitLabel(AppLocalizations l10n, String key) {
   switch (key) {
     case 'piece':
       return l10n.portionUnitPiece;
@@ -20,6 +21,6 @@ String portionUnitLabel(AppLocalizations l10n, String key) {
     case 'cob':
       return l10n.portionUnitCob;
     default:
-      return key;
+      return null;
   }
 }

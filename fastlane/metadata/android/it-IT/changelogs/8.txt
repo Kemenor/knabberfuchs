@@ -1,0 +1,1 @@
+I liquidi (latte, olio, succo…) si aprono ora in millilitri per impostazione predefinita. Gli alimenti con una porzione di Open Food Facts mostrano anche un chip "1 porzione".

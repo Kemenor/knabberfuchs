@@ -1,0 +1,1 @@
+Liquids (milk, oil, juice…) now open in millilitres by default. Foods with an Open Food Facts serving size also show a quick "1 serving" chip.
