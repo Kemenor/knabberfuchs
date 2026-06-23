@@ -122,6 +122,10 @@
   "settingsImportSub": "Restore from a .zip (replaces all data)",
 
   "settingsAbout": "About",
+  "settingsContactDev": "Contact the developer",
+  "settingsContactDevSub": "Email feedback or a bug report (adds app & device info)",
+  "settingsContactDevNoApp": "No email app found. Write to {email}",
+  "@settingsContactDevNoApp": { "placeholders": { "email": { "type": "String" } } },
   "settingsAboutBody": "Ad-free, no subscriptions. Food data from Open Food Facts (© Open Food Facts contributors, ODbL) and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO). Portion sizes informed by USDA FoodData Central (public domain). On-device photo recognition uses Google's AIY food_V1 model (Apache 2.0). Tap “View licenses” for open-source components.",
   "offThanksTitle": "Thanks to Open Food Facts",
   "offThanksBody": "Knabberfuchs is built on Open Food Facts — a free, open, crowdsourced food database kept alive by volunteers around the world. Without their work, this app simply would not exist.\n\nIf Knabberfuchs is useful to you, please consider supporting them.",

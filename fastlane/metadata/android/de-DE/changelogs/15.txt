@@ -1,0 +1,1 @@
+Neu: Einstellungen → Entwickler kontaktieren öffnet eine E-Mail für Feedback oder Fehlerberichte, vorausgefüllt mit App- & Geräteinfos.

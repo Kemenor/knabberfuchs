@@ -296,6 +296,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsAbout => 'Über';
 
   @override
+  String get settingsContactDev => 'Entwickler kontaktieren';
+
+  @override
+  String get settingsContactDevSub =>
+      'Feedback oder Fehlerbericht per E-Mail (mit App- & Geräteinfos)';
+
+  @override
+  String settingsContactDevNoApp(String email) {
+    return 'Keine E-Mail-App gefunden. Schreib an $email';
+  }
+
+  @override
   String get settingsAboutBody =>
       'Werbefrei, keine Abos. Lebensmitteldaten von Open Food Facts (© Open Food Facts contributors, ODbL) und der Schweizer Nährwertdatenbank (Bundesamt für Lebensmittelsicherheit und Veterinärwesen, BLV). Portionsgrössen basierend auf USDA FoodData Central (gemeinfrei). Die Foto-Erkennung auf dem Gerät nutzt Googles AIY-food_V1-Modell (Apache 2.0). Tippe auf „Lizenzen anzeigen“ für die Open-Source-Komponenten.';
 

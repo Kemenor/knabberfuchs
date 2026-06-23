@@ -1,0 +1,1 @@
+Novità: Impostazioni → Contatta lo sviluppatore apre un'e-mail per feedback o segnalazioni, precompilata con info app e dispositivo.

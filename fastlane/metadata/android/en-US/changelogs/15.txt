@@ -1,0 +1,1 @@
+New: Settings → Contact the developer opens an email to send feedback or a bug report, pre-filled with app & device info.

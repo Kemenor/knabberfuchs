@@ -102,6 +102,9 @@
   "settingsImportSub": "Aus einer .zip wiederherstellen (ersetzt alle Daten)",
 
   "settingsAbout": "Über",
+  "settingsContactDev": "Entwickler kontaktieren",
+  "settingsContactDevSub": "Feedback oder Fehlerbericht per E-Mail (mit App- & Geräteinfos)",
+  "settingsContactDevNoApp": "Keine E-Mail-App gefunden. Schreib an {email}",
   "settingsAboutBody": "Werbefrei, keine Abos. Lebensmitteldaten von Open Food Facts (© Open Food Facts contributors, ODbL) und der Schweizer Nährwertdatenbank (Bundesamt für Lebensmittelsicherheit und Veterinärwesen, BLV). Portionsgrössen basierend auf USDA FoodData Central (gemeinfrei). Die Foto-Erkennung auf dem Gerät nutzt Googles AIY-food_V1-Modell (Apache 2.0). Tippe auf „Lizenzen anzeigen“ für die Open-Source-Komponenten.",
   "offThanksTitle": "Dank an Open Food Facts",
   "offThanksBody": "Knabberfuchs basiert auf Open Food Facts — einer kostenlosen, offenen, gemeinschaftlich gepflegten Lebensmitteldatenbank, die von Freiwilligen auf der ganzen Welt am Leben gehalten wird. Ohne ihre Arbeit würde es diese App schlicht nicht geben.\n\nWenn dir Knabberfuchs nützlich ist, denk bitte darüber nach, sie zu unterstützen.",

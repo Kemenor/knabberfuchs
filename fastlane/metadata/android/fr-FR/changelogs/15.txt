@@ -1,0 +1,1 @@
+Nouveau : Paramètres → Contacter le développeur ouvre un e-mail pour un retour ou un bug, prérempli avec les infos app & appareil.

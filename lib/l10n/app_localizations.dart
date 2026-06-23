@@ -606,6 +606,24 @@ abstract class AppLocalizations {
   /// **'About'**
   String get settingsAbout;
 
+  /// No description provided for @settingsContactDev.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact the developer'**
+  String get settingsContactDev;
+
+  /// No description provided for @settingsContactDevSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Email feedback or a bug report (adds app & device info)'**
+  String get settingsContactDevSub;
+
+  /// No description provided for @settingsContactDevNoApp.
+  ///
+  /// In en, this message translates to:
+  /// **'No email app found. Write to {email}'**
+  String settingsContactDevNoApp(String email);
+
   /// No description provided for @settingsAboutBody.
   ///
   /// In en, this message translates to:

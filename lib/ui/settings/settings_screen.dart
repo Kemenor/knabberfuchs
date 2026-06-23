@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/date_x.dart';
+import '../../core/support_email.dart';
 import '../../data/db/database.dart';
 import '../../domain/enums.dart';
 import '../../domain/meal_times.dart';
@@ -140,6 +141,20 @@ class SettingsScreen extends ConsumerWidget {
               const Divider(),
               _SectionHeader(l10n.settingsAbout),
               const _AboutTile(),
+              ListTile(
+                leading: const Icon(Icons.mail_outline),
+                title: Text(l10n.settingsContactDev),
+                subtitle: Text(l10n.settingsContactDevSub),
+                onTap: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  final locale = Localizations.localeOf(context).toString();
+                  final ok = await contactDeveloper(locale: locale);
+                  if (!ok) {
+                    messenger.showAutoSnackBar(SnackBar(
+                        content: Text(l10n.settingsContactDevNoApp(supportEmail))));
+                  }
+                },
+              ),
             ],
           );
         },
