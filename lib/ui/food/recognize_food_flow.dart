@@ -40,27 +40,27 @@ Future<bool> startRecognizeFoodFlow(
   // Cloud path: if the user configured a (free-tier) Gemini key, use it for a
   // richer estimate — dish + grams + macros. Falls back to on-device on any
   // failure so the feature still works offline / when the key is bad.
-  final geminiKey = await ref.read(dbProvider).getSetting(geminiKeySetting);
-  final onDeviceOnly =
-      await ref.read(dbProvider).getSetting(aiOnDeviceOnlySetting) == 'true';
+  final db = ref.read(dbProvider);
+  final geminiKey = await db.getSetting(geminiKeySetting);
+  final onDeviceOnly = await db.getSetting(aiOnDeviceOnlySetting) == 'true';
   if (geminiKey != null && geminiKey.trim().isNotEmpty && !onDeviceOnly) {
     if (!context.mounted) return false;
-    final attempt = ValueNotifier<int>(1);
+    final preferredModel = await db.getSetting(geminiModelSetting);
+    if (!context.mounted) return false;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => _GeminiLoadingDialog(attempt: attempt),
+      builder: (_) => const _GeminiLoadingDialog(),
     );
     GeminiFoodResult? r;
     try {
       r = await ref.read(geminiServiceProvider).recognizeFood(
             bytes,
             geminiKey.trim(),
-            onAttempt: (n) => attempt.value = n,
+            preferredModel: preferredModel,
           );
     } catch (_) {}
     if (context.mounted) navigator.pop();
-    attempt.dispose();
     if (!context.mounted) return false;
     if (r != null) {
       return await showQuickAddSheet(context, ref,
@@ -125,11 +125,10 @@ Future<bool> startRecognizeFoodFlow(
 }
 
 /// Loading dialog shown while polling Gemini. Cycles through reassuring status
-/// lines so a slow request doesn't look frozen, and shows a live retry counter
-/// (driven by [attempt]) when the request is retried after a transient error.
+/// lines so a slow request doesn't look frozen, and after ~13 s adds a "Gemini
+/// is busy" note. The model fallback (preferred → 2.5) is transparent.
 class _GeminiLoadingDialog extends StatefulWidget {
-  final ValueListenable<int> attempt;
-  const _GeminiLoadingDialog({required this.attempt});
+  const _GeminiLoadingDialog();
 
   @override
   State<_GeminiLoadingDialog> createState() => _GeminiLoadingDialogState();
@@ -183,28 +182,17 @@ class _GeminiLoadingDialogState extends State<_GeminiLoadingDialog> {
                 style: theme.textTheme.bodyLarge,
               ),
             ),
-            ValueListenableBuilder<int>(
-              valueListenable: widget.attempt,
-              builder: (context, n, _) {
-                // Escalating reassurance: silent → "busy, taking longer"
-                // (~13 s in) → "retrying (attempt N)" once it actually retries.
-                final sub = n > 1
-                    ? l10n.geminiRetrying(n)
-                    : (_step >= 6 ? l10n.geminiSlow : null);
-                if (sub == null) return const SizedBox.shrink();
-                return Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    sub,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                        color: n > 1
-                            ? theme.colorScheme.error
-                            : theme.colorScheme.outline),
-                  ),
-                );
-              },
-            ),
+            // After ~13 s, reassure that it's just slow/busy (not frozen).
+            if (_step >= 6)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  l10n.geminiSlow,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.outline),
+                ),
+              ),
           ],
         ),
       ),

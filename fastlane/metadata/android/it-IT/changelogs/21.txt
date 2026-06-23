@@ -1,0 +1,1 @@
+Scansione IA: scegli il tuo modello Gemini preferito nelle impostazioni (2.5 Flash affidabile; 3.5 Flash più preciso ma spesso occupato). Ripiega automaticamente su 2.5 Flash e poi sul dispositivo; timeout ora 30s.

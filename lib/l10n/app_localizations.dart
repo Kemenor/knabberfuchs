@@ -1008,6 +1008,30 @@ abstract class AppLocalizations {
   /// **'Get an API key'**
   String get aiKeyGet;
 
+  /// No description provided for @aiModelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AI model'**
+  String get aiModelLabel;
+
+  /// No description provided for @aiModelReliable.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini 2.5 Flash — reliable'**
+  String get aiModelReliable;
+
+  /// No description provided for @aiModelAccurate.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini 3.5 Flash — sharper, often busy'**
+  String get aiModelAccurate;
+
+  /// No description provided for @aiModelNote.
+  ///
+  /// In en, this message translates to:
+  /// **'If your choice is busy it falls back to 2.5 Flash, then on-device.'**
+  String get aiModelNote;
+
   /// No description provided for @aiOnDeviceOnlyTitle.
   ///
   /// In en, this message translates to:

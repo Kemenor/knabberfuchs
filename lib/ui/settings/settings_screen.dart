@@ -427,6 +427,7 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   bool _obscure = true;
   bool _loaded = false;
   bool _onDeviceOnly = false;
+  String _model = 'gemini-2.5-flash';
 
   @override
   void initState() {
@@ -442,6 +443,9 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
     });
     db.getSetting(aiOnDeviceOnlySetting).then((v) {
       if (mounted) setState(() => _onDeviceOnly = v == 'true');
+    });
+    db.getSetting(geminiModelSetting).then((v) {
+      if (mounted && v != null) setState(() => _model = v);
     });
   }
 
@@ -499,7 +503,7 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
           ),
           // Engine choice only matters once a key exists; until then every scan
           // is on-device anyway.
-          if (_loaded && _ctrl.text.trim().isNotEmpty)
+          if (_loaded && _ctrl.text.trim().isNotEmpty) ...[
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: SwitchListTile(
@@ -515,6 +519,38 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
                 },
               ),
             ),
+            if (!_onDeviceOnly) ...[
+              const SizedBox(height: 4),
+              DropdownButtonFormField<String>(
+                initialValue: _model,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: l10n.aiModelLabel,
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                ),
+                items: [
+                  DropdownMenuItem(
+                      value: 'gemini-2.5-flash',
+                      child: Text(l10n.aiModelReliable)),
+                  DropdownMenuItem(
+                      value: 'gemini-3.5-flash',
+                      child: Text(l10n.aiModelAccurate)),
+                ],
+                onChanged: (v) {
+                  if (v == null) return;
+                  setState(() => _model = v);
+                  ref.read(dbProvider).setSetting(geminiModelSetting, v);
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(l10n.aiModelNote,
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: theme.colorScheme.outline)),
+              ),
+            ],
+          ],
         ],
       ),
     );

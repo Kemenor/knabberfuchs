@@ -1,0 +1,1 @@
+AI scan: pick your preferred Gemini model in Settings (2.5 Flash is reliable; 3.5 Flash is sharper but often busy). It auto-falls back to 2.5 Flash, then on-device, and the timeout is now 30s.

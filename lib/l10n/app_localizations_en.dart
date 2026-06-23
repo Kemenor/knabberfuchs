@@ -530,6 +530,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiKeyGet => 'Get an API key';
 
   @override
+  String get aiModelLabel => 'AI model';
+
+  @override
+  String get aiModelReliable => 'Gemini 2.5 Flash — reliable';
+
+  @override
+  String get aiModelAccurate => 'Gemini 3.5 Flash — sharper, often busy';
+
+  @override
+  String get aiModelNote =>
+      'If your choice is busy it falls back to 2.5 Flash, then on-device.';
+
+  @override
   String get aiOnDeviceOnlyTitle => 'Always recognise on-device';
 
   @override

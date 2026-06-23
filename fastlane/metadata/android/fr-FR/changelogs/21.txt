@@ -1,0 +1,1 @@
+Scan IA : choisissez votre modèle Gemini préféré dans les réglages (2.5 Flash fiable ; 3.5 Flash plus précis mais souvent occupé). Bascule auto vers 2.5 Flash puis l'appareil ; délai désormais 30s.

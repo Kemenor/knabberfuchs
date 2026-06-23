@@ -1,0 +1,1 @@
+KI-Scan: Wähle dein bevorzugtes Gemini-Modell in den Einstellungen (2.5 Flash zuverlässig; 3.5 Flash schärfer, aber oft ausgelastet). Es greift automatisch auf 2.5 Flash und dann aufs Gerät zurück; Timeout jetzt 30s.

@@ -105,6 +105,10 @@ const geminiKeySetting = 'geminiApiKey';
 /// once a key exists. Default (null/false) = use Gemini, fall back on-device.
 const aiOnDeviceOnlySetting = 'aiOnDeviceOnly';
 
+/// Preferred Gemini model to try first (the service always falls back to
+/// gemini-2.5-flash on a 503/timeout). Null = use the reliable default.
+const geminiModelSetting = 'geminiModel';
+
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final s = GeminiService();
   ref.onDispose(s.dispose);

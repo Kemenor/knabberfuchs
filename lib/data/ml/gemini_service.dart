@@ -28,11 +28,11 @@ class GeminiFoodResult {
 /// Strictly opt-in: the on-device classifier stays the keyless default, and the
 /// photo only leaves the device when the user has configured a key.
 class GeminiService {
-  // gemini-2.5-flash: GA, free-tier, strong vision, and reliably available —
-  // gemini-3.5-flash was persistently returning HTTP 503 (overloaded), failing
-  // every scan. If Google retires/renames this, the recognise flow falls back
-  // to the on-device classifier; bump the string to follow the current model.
-  static const _model = 'gemini-2.5-flash';
+  /// Always tried last (after the user's preferred model) because it's GA,
+  /// free-tier, strong at vision, and reliably available. The newer flash
+  /// models (e.g. gemini-3.5-flash) can be more accurate but get overloaded
+  /// (HTTP 503), so they're only the *preferred* first try, not the fallback.
+  static const fallbackModel = 'gemini-2.5-flash';
   static const _base =
       'https://generativelanguage.googleapis.com/v1beta/models';
 
@@ -50,15 +50,16 @@ class GeminiService {
   final http.Client? _injected;
   GeminiService({http.Client? client}) : _injected = client;
 
-  /// [onAttempt] fires at the start of each network attempt with its 1-based
-  /// number, so the UI can surface a live retry counter.
+  /// Tries [preferredModel] first, then [fallbackModel] (skipped if the same)
+  /// on a 503/timeout/transient failure, before the caller falls back to the
+  /// on-device classifier. Each model gets one 30 s try with a fresh client.
   Future<GeminiFoodResult?> recognizeFood(
     Uint8List bytes,
     String apiKey, {
-    void Function(int attempt)? onAttempt,
+    String? preferredModel,
   }) async {
     final b64 = base64Encode(_downscaleJpeg(bytes));
-    final uri = Uri.parse('$_base/$_model:generateContent?key=$apiKey');
+    final models = <String>{preferredModel ?? fallbackModel, fallbackModel};
     final body = jsonEncode({
       'contents': [
         {
@@ -88,36 +89,30 @@ class GeminiService {
         },
       },
     });
-    // Up to two attempts, each with its own client. Retry once on a transient
-    // overload (503) or timeout; any other failure falls straight through to
-    // the on-device classifier.
-    for (var attempt = 1; attempt <= 2; attempt++) {
-      onAttempt?.call(attempt);
+    // Try each model in turn (preferred → fallback), one 30 s attempt each with
+    // a fresh client. On any failure (503/timeout/error/non-200) move to the
+    // next model; exhausting them returns null → the on-device classifier.
+    for (final model in models) {
+      final uri = Uri.parse('$_base/$model:generateContent?key=$apiKey');
       final client = _injected ?? http.Client();
       try {
         final resp = await client
             .post(uri,
                 headers: {'Content-Type': 'application/json'}, body: body)
-            .timeout(const Duration(seconds: 60));
-        if (resp.statusCode == 503 && attempt == 1) {
-          debugPrint('[gemini] 503 overloaded, retrying');
+            .timeout(const Duration(seconds: 30));
+        if (resp.statusCode != 200) {
+          debugPrint('[gemini] $model HTTP ${resp.statusCode} — next model');
           continue;
         }
-        if (resp.statusCode != 200) {
-          debugPrint('[gemini] HTTP ${resp.statusCode}: '
-              '${resp.body.length > 300 ? resp.body.substring(0, 300) : resp.body}');
-          return null;
-        }
         final r = parseGeminiResponse(resp.body);
-        debugPrint('[gemini] ok=${r != null} name=${r?.name}');
+        debugPrint('[gemini] $model ok=${r != null} name=${r?.name}');
         return r;
       } on TimeoutException {
-        debugPrint('[gemini] timeout (attempt $attempt)');
-        if (attempt == 1) continue;
-        return null;
+        debugPrint('[gemini] $model timeout — next model');
+        continue;
       } catch (e) {
-        debugPrint('[gemini] error: $e');
-        return null;
+        debugPrint('[gemini] $model error: $e — next model');
+        continue;
       } finally {
         if (_injected == null) client.close();
       }
