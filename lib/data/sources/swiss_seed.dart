@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show gzip;
 
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 
 import '../../domain/enums.dart';
@@ -111,7 +112,13 @@ Future<int> seedSwissIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
   final b = bundle ?? rootBundle;
   try {
     final data = await b.load(_assetPath);
-    final csv = utf8.decode(gzip.decode(data.buffer.asUint8List()));
+    // IMPORTANT: honour the ByteData's offset/length. In release builds the
+    // asset can be a view into a larger shared buffer, so a bare
+    // `buffer.asUint8List()` hands gzip trailing bytes → "trailing data" throw →
+    // the catch below silently skips seeding (no Swiss foods on device).
+    final bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    final csv = utf8.decode(gzip.decode(bytes));
     final companions = parseSwissCsv(csv);
     await db.transaction(() async {
       // Replace any previously-seeded Swiss rows. The entries FK is set-null on
@@ -125,9 +132,12 @@ Future<int> seedSwissIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
       });
     });
     await db.setSetting(_versionKey, swissDatasetVersion);
+    debugPrint('[swiss] seeded ${companions.length} foods');
     return companions.length;
-  } catch (_) {
-    // No asset bundled (e.g. dev build before the pipeline ran) — skip quietly.
+  } catch (e) {
+    // Asset missing (dev build before the pipeline ran) or decode failure —
+    // log so a silent seed failure can't hide again, then skip.
+    debugPrint('[swiss] seed failed: $e');
     return 0;
   }
 }
