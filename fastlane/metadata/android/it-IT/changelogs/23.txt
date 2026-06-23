@@ -1,0 +1,1 @@
+Modificando il peso in un'aggiunta rapida ora si ricalcolano calorie e macro — inserisci la tua porzione reale in grammi e i valori si adeguano.

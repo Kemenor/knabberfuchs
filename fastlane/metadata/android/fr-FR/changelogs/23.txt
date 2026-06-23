@@ -1,0 +1,1 @@
+Modifier le poids lors d'un ajout rapide recalcule désormais les calories et les macros — indiquez votre portion réelle en grammes et les chiffres suivent.

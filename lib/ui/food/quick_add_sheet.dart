@@ -82,18 +82,31 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
   late final _carb = TextEditingController(text: _g(widget.initialCarb));
   late final _fat = TextEditingController(text: _g(widget.initialFat));
   late final _weight = TextEditingController(text: _g(widget.initialWeight));
+  final _weightFocus = FocusNode();
   late bool _showMacros = widget.initialProtein != null ||
       widget.initialCarb != null ||
       widget.initialFat != null;
+
+  /// The weight the current kcal/macro totals correspond to. Editing the weight
+  /// scales the totals by (new / last) — so the fields track the real portion —
+  /// then this updates. Editing kcal/macros directly leaves it (it just redefines
+  /// the per-gram density at that weight). Null until a weight is first set.
+  double? _lastWeight;
 
   static String _g(double? v) => v == null ? '' : gramsStr(v);
 
   @override
   void initState() {
     super.initState();
+    _lastWeight = widget.initialWeight;
     for (final c in [_name, _kcal, _protein, _carb, _fat, _weight]) {
       c.addListener(() => setState(() {}));
     }
+    // Scale on commit (focus leaves the field), not per keystroke — otherwise a
+    // half-typed "6" on the way to "600" would briefly collapse the totals.
+    _weightFocus.addListener(() {
+      if (!_weightFocus.hasFocus) setState(_applyWeightScale);
+    });
   }
 
   @override
@@ -101,7 +114,36 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
     for (final c in [_name, _kcal, _protein, _carb, _fat, _weight]) {
       c.dispose();
     }
+    _weightFocus.dispose();
     super.dispose();
+  }
+
+  /// Rescale the kcal + macro totals to a newly-entered weight, keeping the
+  /// per-gram values fixed. No-op if there's no prior weight to scale from, the
+  /// new weight is invalid/zero, or it's unchanged.
+  void _applyWeightScale() {
+    final w = _num(_weight);
+    final base = _lastWeight;
+    if (w == null || w <= 0) return;
+    if (base == null || base <= 0) {
+      _lastWeight = w; // first real weight — adopt it as the basis, no scaling
+      return;
+    }
+    if ((w - base).abs() < 0.01) return;
+    final ratio = w / base;
+    _scaleField(_kcal, ratio, decimals: false);
+    _scaleField(_protein, ratio);
+    _scaleField(_carb, ratio);
+    _scaleField(_fat, ratio);
+    _lastWeight = w;
+  }
+
+  void _scaleField(TextEditingController c, double ratio,
+      {bool decimals = true}) {
+    final v = _num(c);
+    if (v == null) return;
+    final scaled = v * ratio;
+    c.text = decimals ? gramsStr(scaled) : scaled.round().toString();
   }
 
   double? _num(TextEditingController c) =>
@@ -110,6 +152,9 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
   bool get _valid => _name.text.trim().isNotEmpty && (_num(_kcal) ?? 0) > 0;
 
   Future<void> _add() async {
+    // Tapping "Add" doesn't blur the weight field, so commit any pending rescale
+    // first (idempotent if the focus listener already ran).
+    _applyWeightScale();
     final groupId =
         widget.resolveGroup == null ? null : await widget.resolveGroup!();
     // The fields hold portion totals. With a weight, store the real grams and a
@@ -200,6 +245,7 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
                   flex: 2,
                   child: TextField(
                     controller: _weight,
+                    focusNode: _weightFocus,
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [

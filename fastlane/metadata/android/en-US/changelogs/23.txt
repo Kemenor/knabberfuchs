@@ -1,0 +1,1 @@
+Adjusting the weight on a quick add now rescales the calories and macros with it — set your real portion in grams and the numbers follow.
