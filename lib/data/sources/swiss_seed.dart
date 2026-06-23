@@ -12,9 +12,9 @@ const _assetPath = 'assets/swiss_foods.csv.gz';
 const _versionKey = 'swissDatasetVersion';
 
 /// Bump whenever assets/swiss_foods.csv.gz changes so existing installs
-/// re-import. v4: liquid densities + more natural portions. v3: added
-/// natural-portion weights. v2: 2025/07 generation with full Italian names.
-const swissDatasetVersion = '4';
+/// re-import. v5: ~290 foods with portions/densities (curate+verify pass).
+/// v4: liquid densities + more portions. v3: portions. v2: Italian names.
+const swissDatasetVersion = '5';
 
 /// Minimal RFC-4180-ish CSV parser: handles quoted fields containing commas,
 /// newlines, and doubled quotes. Good enough for our controlled asset.
