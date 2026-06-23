@@ -1,0 +1,1 @@
+Quick add now takes a weight (and Gemini estimates the portion); logging a recipe portion jumps to that day; scale a whole meal from its ⋮ menu; Contact the developer in Settings; a 'Gemini is busy' note on slow scans; and automatic backup of your data to Google Drive.

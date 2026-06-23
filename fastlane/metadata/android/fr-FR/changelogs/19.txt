@@ -1,0 +1,1 @@
+L'ajout rapide prend un poids (Gemini estime la portion) ; enregistrer une portion de recette ouvre ce jour ; mettre tout un repas à l'échelle via son menu ⋮ ; Contacter le développeur dans les réglages ; mention « Gemini est occupé » sur les scans lents ; sauvegarde automatique de vos données sur Google Drive.

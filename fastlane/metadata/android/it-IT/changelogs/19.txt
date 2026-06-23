@@ -1,0 +1,1 @@
+L'aggiunta rapida accetta un peso (Gemini stima la porzione); registrare una porzione di ricetta apre quel giorno; ridimensiona un intero pasto dal menu ⋮; Contatta lo sviluppatore nelle impostazioni; nota "Gemini è occupato" sulle scansioni lente; backup automatico dei dati su Google Drive.
