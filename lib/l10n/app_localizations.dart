@@ -330,6 +330,24 @@ abstract class AppLocalizations {
   /// **'Split across days'**
   String get mealMenuSplit;
 
+  /// No description provided for @mealMenuScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Scale meal'**
+  String get mealMenuScale;
+
+  /// No description provided for @scaleMealApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Scale to {pct}%'**
+  String scaleMealApply(String pct);
+
+  /// No description provided for @scaleMealDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal scaled to {pct}%'**
+  String scaleMealDone(String pct);
+
   /// No description provided for @mealMenuSaveRecipe.
   ///
   /// In en, this message translates to:

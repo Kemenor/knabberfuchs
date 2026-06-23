@@ -72,7 +72,7 @@ recipe sharing, ZIP backup/restore.
   list" → add-food* flow the barcode-scan action should sit as a lower-right FAB, matching the
   rest of the app (add food / new recipe / scan all use a bottom-right FAB). Keeps the primary
   action in the same place everywhere so it doesn't feel off.
-- 📐 **Scale a meal** (meal ⋮ menu, from the day overview): add an action to the meal's overflow
+- 📐 **Scale a meal** — ✅ DONE 2026-06-23 (v1.0.16+17): meal ⋮ → Scale meal: slider + preset chips (25/50/75/150/200%) with a live kcal preview; multiplies every entry's grams. Original note: add an action to the meal's overflow
   menu to **scale the whole meal by a factor** — multiply every entry's grams (and so kcal/macros)
   by a chosen ratio. Primary use is *down*scaling: you logged a full meal/recipe portion but only
   ate part of it (e.g. ate 60% → scale to 0.6). Sits alongside the existing Edit / Split-across-

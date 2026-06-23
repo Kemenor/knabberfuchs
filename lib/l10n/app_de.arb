@@ -46,6 +46,9 @@
 
   "mealMenuEdit": "Mahlzeit bearbeiten",
   "mealMenuSplit": "Auf mehrere Tage aufteilen",
+  "mealMenuScale": "Mahlzeit skalieren",
+  "scaleMealApply": "Auf {pct}% skalieren",
+  "scaleMealDone": "Mahlzeit auf {pct}% skaliert",
   "mealMenuSaveRecipe": "Als Rezept speichern",
   "mealMenuDelete": "Mahlzeit löschen",
   "mealFinish": "Mahlzeit abschließen",

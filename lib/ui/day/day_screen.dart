@@ -18,6 +18,7 @@ import '../food/log_food_sheet.dart';
 import '../food/quick_add_sheet.dart';
 import '../food/recognize_food_flow.dart';
 import '../recipes/ocr_meal_screen.dart';
+import 'scale_meal_sheet.dart';
 import 'split_meal_sheet.dart';
 
 class DayScreen extends ConsumerStatefulWidget {
@@ -419,6 +420,8 @@ class _GroupSection extends ConsumerWidget {
                   switch (v) {
                     case 'edit':
                       _editMeal(context, ref);
+                    case 'scale':
+                      showScaleMealSheet(context, group);
                     case 'split':
                       showSplitMealSheet(context, group);
                     case 'recipe':
@@ -429,6 +432,8 @@ class _GroupSection extends ConsumerWidget {
                 },
                 itemBuilder: (_) => [
                   PopupMenuItem(value: 'edit', child: Text(l10n.mealMenuEdit)),
+                  PopupMenuItem(
+                      value: 'scale', child: Text(l10n.mealMenuScale)),
                   PopupMenuItem(
                       value: 'split', child: Text(l10n.mealMenuSplit)),
                   PopupMenuItem(

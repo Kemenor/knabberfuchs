@@ -61,6 +61,11 @@
 
   "mealMenuEdit": "Edit meal",
   "mealMenuSplit": "Split across days",
+  "mealMenuScale": "Scale meal",
+  "scaleMealApply": "Scale to {pct}%",
+  "@scaleMealApply": { "placeholders": { "pct": { "type": "String" } } },
+  "scaleMealDone": "Meal scaled to {pct}%",
+  "@scaleMealDone": { "placeholders": { "pct": { "type": "String" } } },
   "mealMenuSaveRecipe": "Save as recipe",
   "mealMenuDelete": "Delete meal",
   "mealFinish": "Finish meal",

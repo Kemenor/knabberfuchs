@@ -46,6 +46,9 @@
 
   "mealMenuEdit": "Modifica pasto",
   "mealMenuSplit": "Distribuisci su più giorni",
+  "mealMenuScale": "Ridimensiona pasto",
+  "scaleMealApply": "Ridimensiona al {pct}%",
+  "scaleMealDone": "Pasto ridimensionato al {pct}%",
   "mealMenuSaveRecipe": "Salva come ricetta",
   "mealMenuDelete": "Elimina pasto",
   "mealFinish": "Termina pasto",

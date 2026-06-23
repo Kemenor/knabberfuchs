@@ -137,6 +137,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get mealMenuSplit => 'Distribuisci su più giorni';
 
   @override
+  String get mealMenuScale => 'Ridimensiona pasto';
+
+  @override
+  String scaleMealApply(String pct) {
+    return 'Ridimensiona al $pct%';
+  }
+
+  @override
+  String scaleMealDone(String pct) {
+    return 'Pasto ridimensionato al $pct%';
+  }
+
+  @override
   String get mealMenuSaveRecipe => 'Salva come ricetta';
 
   @override

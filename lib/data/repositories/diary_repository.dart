@@ -73,6 +73,19 @@ class DiaryRepository {
 
   Future<void> deleteEntry(int id) => db.deleteEntry(id);
 
+  /// Scale every entry in a meal group by [factor] (e.g. 0.6 = you ate 60%).
+  /// Each entry's grams — and so its kcal/macros — is multiplied; the per-100 g
+  /// snapshot is unchanged. A factor of 1 is a no-op.
+  Future<void> scaleGroup({required int groupId, required double factor}) async {
+    if (factor <= 0 || factor == 1) return;
+    final items = await db.entriesForGroup(groupId);
+    await db.transaction(() async {
+      for (final e in items) {
+        await db.updateEntry(e.copyWith(grams: e.grams * factor));
+      }
+    });
+  }
+
   /// Split a meal group into equal portions across [days]: each day gets a new
   /// group (same name) with every ingredient scaled to 1/N of its grams. The
   /// original group is replaced.

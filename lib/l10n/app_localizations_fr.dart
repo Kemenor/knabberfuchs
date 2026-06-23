@@ -137,6 +137,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mealMenuSplit => 'Répartir sur plusieurs jours';
 
   @override
+  String get mealMenuScale => 'Mettre le repas à l\'échelle';
+
+  @override
+  String scaleMealApply(String pct) {
+    return 'Mettre à $pct%';
+  }
+
+  @override
+  String scaleMealDone(String pct) {
+    return 'Repas mis à $pct%';
+  }
+
+  @override
   String get mealMenuSaveRecipe => 'Enregistrer comme recette';
 
   @override

@@ -46,6 +46,9 @@
 
   "mealMenuEdit": "Modifier le repas",
   "mealMenuSplit": "Répartir sur plusieurs jours",
+  "mealMenuScale": "Mettre le repas à l'échelle",
+  "scaleMealApply": "Mettre à {pct}%",
+  "scaleMealDone": "Repas mis à {pct}%",
   "mealMenuSaveRecipe": "Enregistrer comme recette",
   "mealMenuDelete": "Supprimer le repas",
   "mealFinish": "Terminer le repas",
