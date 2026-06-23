@@ -291,6 +291,18 @@ class SelectedDayNotifier extends Notifier<String> {
 final selectedDayProvider =
     NotifierProvider<SelectedDayNotifier, String>(SelectedDayNotifier.new);
 
+/// HomeShell bottom-nav tab index (0 = Day, 1 = Recipes, 2 = Settings). A
+/// provider so flows like "log a recipe portion to a day" can jump to the Day
+/// tab on the day they just logged to.
+class HomeTabNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+  void set(int index) => state = index;
+}
+
+final homeTabProvider =
+    NotifierProvider<HomeTabNotifier, int>(HomeTabNotifier.new);
+
 final daySummaryProvider = StreamProvider<DaySummary>((ref) {
   final db = ref.watch(dbProvider);
   final day = ref.watch(selectedDayProvider);

@@ -1,33 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/app_localizations.dart';
+import '../providers.dart';
 import 'day/day_screen.dart';
 import 'recipes/recipes_screen.dart';
 import 'settings/settings_screen.dart';
 
 /// Root navigation: a bottom bar switching between the three top-level
 /// destinations. Tabs keep their state (IndexedStack) so switching never
-/// resets scroll position or an in-progress search.
-class HomeShell extends StatefulWidget {
+/// resets scroll position or an in-progress search. The index lives in
+/// [homeTabProvider] so other flows can switch tabs programmatically.
+class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
-
-  @override
-  State<HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<HomeShell> {
-  int _index = 0;
 
   static const _pages = [DayScreen(), RecipesScreen(), SettingsScreen()];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final index = ref.watch(homeTabProvider);
     return Scaffold(
-      body: IndexedStack(index: _index, children: _pages),
+      body: IndexedStack(index: index, children: _pages),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        selectedIndex: index,
+        onDestinationSelected: (i) => ref.read(homeTabProvider.notifier).set(i),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.today_outlined),
