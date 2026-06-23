@@ -241,6 +241,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsTargetDefault => 'Standard';
 
   @override
+  String get settingsTargetMin => 'Min.';
+
+  @override
+  String get settingsTargetMax => 'Max.';
+
+  @override
   String get settingsCustomizePerDay => 'Pro Tag anpassen';
 
   @override

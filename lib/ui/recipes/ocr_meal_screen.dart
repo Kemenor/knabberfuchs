@@ -315,6 +315,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: TextField(
               controller: _name,
+              textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
                   labelText: l10n.ocrMealName,
                   border: const OutlineInputBorder()),

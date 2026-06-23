@@ -102,6 +102,10 @@
   "settingsTargets": "Calorie targets",
   "settingsTargetsHelp": "Set a minimum, a maximum, or both. A minimum helps if you need to make sure you eat enough. Leave blank to use the default.",
   "settingsTargetDefault": "Default",
+  "settingsTargetMin": "min",
+  "@settingsTargetMin": { "description": "Hint in the minimum-calories target field" },
+  "settingsTargetMax": "max",
+  "@settingsTargetMax": { "description": "Hint in the maximum-calories target field" },
   "settingsCustomizePerDay": "Customize per day",
   "settingsCustomizePerDaySub": "Training days and weekends can differ",
 

@@ -164,6 +164,13 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
 - **Dialog action order is fixed: `TextButton`(Cancel) → `FilledButton`(confirm).**
   Live: `recipes_screen.dart:179-191`, `settings_screen.dart:223-237`.
 
+- **Persistent dual-action bar:** a screen with *two* co-equal commit actions may
+  use a `bottomNavigationBar` of two `Expanded` buttons — secondary
+  `OutlinedButton` + primary `FilledButton` (`FilledButton` on the right) — and may
+  still carry an `add`-style FAB above it. Live: `ocr_meal_screen.dart:290-311`
+  (Save-as-recipe / Log-to-day). Use this only when both actions are primary; a
+  single primary action stays a FAB (§2).
+
 ---
 
 ## 6. Forms & inputs
@@ -273,7 +280,8 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
 
 - **Loading:** inline `Center(child: CircularProgressIndicator())` for
   `AsyncValue.loading`; a full `showDialog(barrierDismissible: false)` overlay for
-  blocking async (AI calls) (`recognize_food_flow.dart:86`).
+  blocking async (AI calls) (`recognize_food_flow.dart:84` on-device, `:50`
+  Gemini).
 - **Error:** `AsyncValue.error` branches render
   `Center(child: Text(l10n.genericError('$e')))`.
 - **Confirmation:** `AlertDialog` with Cancel(`TextButton`) → confirm(`FilledButton`).
@@ -292,9 +300,11 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   Import), `settings*`, `meal*`, `quickAdd*`, `recipe*`, `scan*`, `ai*`.
 - Parameterized strings use ICU placeholders (`genericError('$e')`,
   `kcalPer100(...)`).
-- Allowed literal exceptions: the brand name `'Knabberfuchs'`, the `'g'` unit
-  suffix, and formatting glyphs (`'%'`, `'→'`). Numbers format locale-aware via
-  `lib/core/format.dart` driven by `localeProvider`.
+- Allowed literal exceptions: the brand name `'Knabberfuchs'`, the
+  locale-invariant unit suffixes `'g'` / `'kcal'` / `'MB'`, and formatting glyphs
+  (`'%'`, `'→'`, `'–'`). (`l10n.unitKcal` also exists and is equally fine for the
+  `kcal` suffix.) Numbers format locale-aware via `lib/core/format.dart` driven by
+  `localeProvider`.
 - **Adding a string:** add the key + `@key` block to `app_en.arb`, mirror into
   `de/fr/it`, rebuild. (IT is machine-translated/unreviewed — see `PLAN.md`.)
 

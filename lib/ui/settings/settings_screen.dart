@@ -597,6 +597,7 @@ class _TargetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
@@ -607,7 +608,7 @@ class _TargetRow extends StatelessWidget {
             child: _TargetField(
               key: ValueKey('$keyPrefix-min'),
               initial: initialMin,
-              hint: hintMin ?? 'min',
+              hint: hintMin ?? l10n.settingsTargetMin,
               onChanged: onMin,
             ),
           ),
@@ -620,7 +621,7 @@ class _TargetRow extends StatelessWidget {
             child: _TargetField(
               key: ValueKey('$keyPrefix-max'),
               initial: initialMax,
-              hint: hintMax ?? 'max',
+              hint: hintMax ?? l10n.settingsTargetMax,
               onChanged: onMax,
             ),
           ),

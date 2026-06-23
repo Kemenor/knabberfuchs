@@ -98,7 +98,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       carb100: item.carb100,
       fat100: item.fat100,
       initialGrams: item.grams,
-      submitLabel: 'Save',
+      submitLabel: AppLocalizations.of(context).actionSave,
     );
     if (grams == null || !mounted) return;
     setState(() {
@@ -195,6 +195,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                   kcalStr(_items[i].nutrition.kcal))),
               onTap: () => _editIngredient(i),
               trailing: IconButton(
+                visualDensity: VisualDensity.compact,
                 icon: const Icon(Icons.close, size: 20),
                 onPressed: () => setState(() => _items.removeAt(i)),
               ),

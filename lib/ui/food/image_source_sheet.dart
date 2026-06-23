@@ -12,6 +12,7 @@ Future<ImageSource?> pickImageSource(BuildContext context,
   final l10n = AppLocalizations.of(context);
   return showModalBottomSheet<ImageSource>(
     context: context,
+    showDragHandle: true,
     builder: (_) => SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,

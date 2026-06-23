@@ -241,6 +241,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTargetDefault => 'Default';
 
   @override
+  String get settingsTargetMin => 'min';
+
+  @override
+  String get settingsTargetMax => 'max';
+
+  @override
   String get settingsCustomizePerDay => 'Customize per day';
 
   @override

@@ -48,10 +48,12 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
   }
 
   Future<void> _remove(String code, String name) async {
+    // Capture messenger + l10n before the await (the convention), not after.
     final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     await ref.read(offlinePackServiceProvider).remove(code);
     if (mounted) {
-      ScaffoldMessenger.of(context)
+      messenger
           .showAutoSnackBar(SnackBar(content: Text(l10n.regionRemoved(name))));
     }
   }

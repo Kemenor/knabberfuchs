@@ -504,6 +504,18 @@ abstract class AppLocalizations {
   /// **'Default'**
   String get settingsTargetDefault;
 
+  /// Hint in the minimum-calories target field
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get settingsTargetMin;
+
+  /// Hint in the maximum-calories target field
+  ///
+  /// In en, this message translates to:
+  /// **'max'**
+  String get settingsTargetMax;
+
   /// No description provided for @settingsCustomizePerDay.
   ///
   /// In en, this message translates to:

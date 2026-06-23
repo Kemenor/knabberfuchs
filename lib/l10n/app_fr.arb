@@ -80,6 +80,8 @@
   "settingsTargets": "Objectifs caloriques",
   "settingsTargetsHelp": "Définissez un minimum, un maximum ou les deux. Un minimum aide si vous devez vous assurer de manger assez. Laissez vide pour utiliser la valeur par défaut.",
   "settingsTargetDefault": "Par défaut",
+  "settingsTargetMin": "min",
+  "settingsTargetMax": "max",
   "settingsCustomizePerDay": "Personnaliser par jour",
   "settingsCustomizePerDaySub": "Les jours d'entraînement et les week-ends peuvent différer",
 
