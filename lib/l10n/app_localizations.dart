@@ -732,11 +732,23 @@ abstract class AppLocalizations {
   /// **'piece'**
   String get portionUnitPiece;
 
+  /// No description provided for @portionUnitSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'small'**
+  String get portionUnitSmall;
+
   /// No description provided for @portionUnitMedium.
   ///
   /// In en, this message translates to:
   /// **'medium'**
   String get portionUnitMedium;
+
+  /// No description provided for @portionUnitLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'large'**
+  String get portionUnitLarge;
 
   /// No description provided for @portionUnitSlice.
   ///

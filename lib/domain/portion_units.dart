@@ -8,8 +8,12 @@ String? portionUnitLabel(AppLocalizations l10n, String key) {
   switch (key) {
     case 'piece':
       return l10n.portionUnitPiece;
+    case 'small':
+      return l10n.portionUnitSmall;
     case 'medium':
       return l10n.portionUnitMedium;
+    case 'large':
+      return l10n.portionUnitLarge;
     case 'slice':
       return l10n.portionUnitSlice;
     case 'clove':

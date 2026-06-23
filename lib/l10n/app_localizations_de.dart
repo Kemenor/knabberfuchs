@@ -379,7 +379,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get portionUnitPiece => 'Stück';
 
   @override
+  String get portionUnitSmall => 'klein';
+
+  @override
   String get portionUnitMedium => 'mittelgross';
+
+  @override
+  String get portionUnitLarge => 'gross';
 
   @override
   String get portionUnitSlice => 'Scheibe';
