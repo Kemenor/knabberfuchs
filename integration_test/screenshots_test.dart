@@ -91,6 +91,33 @@ void main() {
       }
     }
     container.read(selectedDayProvider.notifier).set(day);
+
+    // A couple of recipes so the Recipes screens have content.
+    await db.createRecipe(
+      RecipesCompanion.insert(name: 'Chicken rice bowl', servings: const Value(2)),
+      [
+        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Chicken breast, grilled',
+            grams: 300.0, sKcal100: 165.0, sProtein100: const Value(31.0),
+            sCarb100: const Value(0.0), sFat100: const Value(3.6)),
+        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Basmati rice, cooked',
+            grams: 300.0, sKcal100: 130.0, sProtein100: const Value(2.7),
+            sCarb100: const Value(28.0), sFat100: const Value(0.3)),
+        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Broccoli, steamed',
+            grams: 150.0, sKcal100: 34.0, sProtein100: const Value(2.8),
+            sCarb100: const Value(7.0), sFat100: const Value(0.4)),
+      ],
+    );
+    await db.createRecipe(
+      RecipesCompanion.insert(name: 'Overnight oats', servings: const Value(1)),
+      [
+        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Rolled oats', grams: 50.0,
+            sKcal100: 389.0, sProtein100: const Value(17.0),
+            sCarb100: const Value(66.0), sFat100: const Value(7.0)),
+        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Milk, semi-skimmed',
+            grams: 200.0, sKcal100: 47.0, sProtein100: const Value(3.4),
+            sCarb100: const Value(5.0), sFat100: const Value(1.5)),
+      ],
+    );
     await settle(tester);
 
     if (Platform.isAndroid) {
@@ -102,42 +129,115 @@ void main() {
       await binding.takeScreenshot(name);
     }
 
+    void tab(int i) => container.read(homeTabProvider.notifier).set(i);
+
+    // Tap a widget by its (English) label; returns false if not found so each
+    // shot degrades gracefully instead of crashing the whole run.
+    Future<bool> tapText(String text) async {
+      final f = find.text(text);
+      if (f.evaluate().isEmpty) return false;
+      await tester.ensureVisible(f.first);
+      await settle(tester);
+      await tester.tap(f.first);
+      await settle(tester);
+      return true;
+    }
+
+    Future<void> tapFab(String heroTag) async {
+      final fab = find.byWidgetPredicate(
+          (w) => w is FloatingActionButton && w.heroTag == heroTag);
+      if (fab.evaluate().isNotEmpty) {
+        await tester.tap(fab.first);
+        await settle(tester);
+      }
+    }
+
+    // Settings is a long scroller — bring a row into view before tapping it
+    // (off-screen rows in the lazy list aren't built, so find.text misses them).
+    Future<bool> tapRow(String text) async {
+      try {
+        await tester.scrollUntilVisible(find.text(text), 250,
+            scrollable: find.byType(Scrollable).first, maxScrolls: 40);
+      } catch (_) {}
+      return tapText(text);
+    }
+
+    // The marketing set (matches the Android Play listing), minus "recognise"
+    // (a live AI result) which can't be reproduced deterministically in a test.
+
     // 1. Day hero (meal-grouped)
-    container.read(homeTabProvider.notifier).set(0);
+    tab(0);
     await shot('01_day');
 
-    // 2. Settings
-    container.read(homeTabProvider.notifier).set(2);
-    await shot('02_settings');
-
-    // 3. Capture menu (Quick add / AI scan / OCR) over the Day tab
-    container.read(homeTabProvider.notifier).set(0);
-    await settle(tester);
+    // 2. Quick add (capture menu → Quick add)
     try {
-      final bolt = find.byWidgetPredicate(
-          (w) => w is FloatingActionButton && w.heroTag == 'dayCapture');
-      if (bolt.evaluate().isNotEmpty) {
-        await tester.tap(bolt.first);
-        await shot('03_capture');
-        await tester.tapAt(const Offset(20, 20)); // dismiss the sheet
+      tab(0);
+      await tapFab('dayCapture');
+      if (await tapText('Quick add')) await shot('02_quicklog');
+      await tester.tapAt(const Offset(20, 20)); // dismiss any open sheet
+      await settle(tester);
+    } catch (_) {}
+
+    // 3. Add food with live search results from the food database
+    try {
+      tab(0);
+      await tapFab('dayAddFood');
+      final search = find.byType(TextField);
+      if (search.evaluate().isNotEmpty) {
+        await tester.enterText(search.first, 'Chicken');
+        await settle(tester);
+      }
+      await shot('03_search');
+      await tester.pageBack();
+      await settle(tester);
+    } catch (_) {}
+
+    // 4. Recipes list
+    try {
+      tab(1);
+      await shot('04_recipes');
+    } catch (_) {}
+
+    // 5. A recipe, broken into its ingredients
+    try {
+      tab(1);
+      if (await tapText('Chicken rice bowl')) {
+        await shot('05_recipe');
+        await tester.pageBack();
         await settle(tester);
       }
     } catch (_) {}
 
-    // 4. Add food with live search results from the food database
+    // 6. Offline regions (Settings → Offline regions)
     try {
-      final add = find.byWidgetPredicate(
-          (w) => w is FloatingActionButton && w.heroTag == 'dayAddFood');
-      if (add.evaluate().isNotEmpty) {
-        await tester.tap(add.first);
+      tab(2);
+      if (await tapRow('Offline regions')) {
+        await shot('06_regions');
+        await tester.pageBack();
         await settle(tester);
-        final search = find.byType(TextField);
-        if (search.evaluate().isNotEmpty) {
-          await tester.enterText(search.first, 'Chicken');
-          await settle(tester);
-        }
-        await shot('04_search');
       }
+    } catch (_) {}
+
+    // 7. Language — the collapsible "App language" tile at the TOP of Settings.
+    // Scroll back up to it (we may be scrolled down from the regions step),
+    // then tap to expand the picker.
+    try {
+      tab(2);
+      await settle(tester);
+      for (var i = 0; i < 40; i++) {
+        if (find.text('App language').evaluate().isNotEmpty) break;
+        await tester.drag(find.byType(Scrollable).first, const Offset(0, 300));
+        await tester.pump(const Duration(milliseconds: 80));
+      }
+      if (await tapText('App language')) {
+        await shot('07_language');
+      }
+    } catch (_) {}
+
+    // 8. Settings overview (bonus — not in the marketing set)
+    try {
+      tab(2);
+      await shot('08_settings');
     } catch (_) {}
   });
 }
