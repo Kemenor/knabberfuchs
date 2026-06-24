@@ -80,6 +80,20 @@ platform :ios do
     )
   end
 
+  desc "Replace the App Store screenshots with the repo set (overwrites all — fixes dupes)"
+  lane :screenshots do
+    upload_to_app_store(
+      api_key: asc_key,
+      screenshots_path: "fastlane/screenshots",
+      skip_binary_upload: true,
+      skip_metadata: true,
+      overwrite_screenshots: true,
+      submit_for_review: false,
+      force: true,
+      run_precheck_before_submit: false,
+    )
+  end
+
   desc "Validate the App Store metadata locally — no upload"
   lane :validate do
     upload_to_app_store(
