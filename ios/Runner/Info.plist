@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Calorie Tracker</string>
+	<string>Knabberfuchs</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -66,5 +66,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Knabberfuchs uses the camera to scan product barcodes and nutrition labels so you can log food quickly.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Knabberfuchs reads data from Apple Health to keep your nutrition and energy tracking in sync.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Knabberfuchs saves the calories and nutrition you log to Apple Health.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
