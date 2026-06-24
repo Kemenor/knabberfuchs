@@ -67,6 +67,13 @@ claude.session
 # Play Store service-account key — NEVER commit
 fastlane/play-store-key.json
 fastlane/*.json
+# App Store Connect API key + iOS signing material — NEVER commit
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+*.provisionprofile
+ios/fastlane/report.xml
 # fastlane run artifacts
 fastlane/report.xml
 fastlane/Preview.html
