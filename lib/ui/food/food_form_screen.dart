@@ -44,6 +44,14 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   final _salt = TextEditingController();
   bool _ocrBusy = false;
 
+  /// Whether this food is measured by volume (ml) rather than weight (g). When
+  /// true the serving and "per 100" basis read in ml and we store a 1 g/ml
+  /// density so the log sheet offers ml. Per-100 values map 1:1 to the per-100g
+  /// storage basis at 1 g/ml; an editable density is a future enhancement.
+  bool _isLiquid = false;
+
+  String get _baseUnit => _isLiquid ? 'ml' : 'g';
+
   bool get _hasBarcode => _barcode.text.trim().isNotEmpty;
 
   @override
@@ -167,6 +175,10 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
             satFat100: _val(_satfat),
             saltG100: _val(_salt),
             servingG: _val(_serving),
+            // At 1 g/ml the entered per-100ml / serving-ml values equal the
+            // per-100g / grams storage basis, so we store them as-is and just
+            // record the density so the log sheet measures this food in ml.
+            densityGPerMl: _isLiquid ? 1.0 : null,
           );
       if (mounted) Navigator.of(context).pop(food);
     } catch (e) {
@@ -224,11 +236,31 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          _numField(_serving, l10n.addServingSize, 'g'),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _numField(_serving, l10n.addServingSize, _baseUnit),
+              ),
+              const SizedBox(width: 12),
+              SegmentedButton<bool>(
+                segments: const [
+                  ButtonSegment(value: false, label: Text('g')),
+                  ButtonSegment(value: true, label: Text('ml')),
+                ],
+                selected: {_isLiquid},
+                onSelectionChanged: (s) => setState(() => _isLiquid = s.first),
+                showSelectedIcon: false,
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
           Row(
             children: [
-              Text(l10n.addNutritionPer100, style: theme.textTheme.titleSmall),
+              Text(
+                _isLiquid ? l10n.addNutritionPer100Ml : l10n.addNutritionPer100,
+                style: theme.textTheme.titleSmall,
+              ),
               const Spacer(),
               _ocrBusy
                   ? const SizedBox(
@@ -247,19 +279,22 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
             ],
           ),
           const SizedBox(height: 12),
+          // Order follows the Swiss/EU 1169-2011 mandatory label sequence:
+          // energy, fat, of which saturates, carbohydrate, of which sugars,
+          // (fibre — voluntary), protein, salt.
           _numField(_kcal, l10n.addEnergy, 'kcal'),
-          const SizedBox(height: 12),
-          _numField(_protein, l10n.addProtein, 'g'),
-          const SizedBox(height: 12),
-          _numField(_carb, l10n.addCarbohydrate, 'g'),
           const SizedBox(height: 12),
           _numField(_fat, l10n.addFat, 'g'),
           const SizedBox(height: 12),
-          _numField(_sugar, l10n.addSugars, 'g'),
-          const SizedBox(height: 12),
           _numField(_satfat, l10n.addSaturates, 'g'),
           const SizedBox(height: 12),
+          _numField(_carb, l10n.addCarbohydrate, 'g'),
+          const SizedBox(height: 12),
+          _numField(_sugar, l10n.addSugars, 'g'),
+          const SizedBox(height: 12),
           _numField(_fiber, l10n.addFibre, 'g'),
+          const SizedBox(height: 12),
+          _numField(_protein, l10n.addProtein, 'g'),
           const SizedBox(height: 12),
           _numField(_salt, l10n.addSalt, 'g'),
           if (_hasBarcode) ...[

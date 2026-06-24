@@ -259,6 +259,24 @@ final activeGroupProvider = NotifierProvider<ActiveGroupNotifier, int?>(
   ActiveGroupNotifier.new,
 );
 
+/// Session-only set of meal-group ids the user has collapsed in the day
+/// overview. Not persisted — resets on app restart / day change.
+class CollapsedGroupsNotifier extends Notifier<Set<int>> {
+  @override
+  Set<int> build() => const {};
+
+  void toggle(int groupId) {
+    final next = {...state};
+    if (!next.remove(groupId)) next.add(groupId);
+    state = next;
+  }
+}
+
+final collapsedGroupsProvider =
+    NotifierProvider<CollapsedGroupsNotifier, Set<int>>(
+      CollapsedGroupsNotifier.new,
+    );
+
 // ---------------- Settings ----------------
 
 final defaultMinProvider = StreamProvider<double?>((ref) {

@@ -70,6 +70,8 @@
   "mealMenuDelete": "Delete meal",
   "mealFinish": "Finish meal",
   "mealAddTo": "Add to this meal",
+  "mealCollapse": "Collapse meal",
+  "mealExpand": "Expand meal",
   "mealSavedToRecipes": "Saved \"{name}\" to recipes",
   "@mealSavedToRecipes": { "placeholders": { "name": { "type": "String" } } },
 
@@ -328,6 +330,7 @@
   "addProductName": "Product name",
   "addServingSize": "Serving size",
   "addNutritionPer100": "Nutrition per 100 g",
+  "addNutritionPer100Ml": "Nutrition per 100 ml",
   "addScanLabel": "Scan label",
   "addEnergy": "Energy",
   "addProtein": "Protein",

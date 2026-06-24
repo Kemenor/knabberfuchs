@@ -151,6 +151,7 @@ class FoodRepository {
     double? saltG100,
     double? servingG,
     String? servingLabel,
+    double? densityGPerMl,
   }) async {
     final id = await db.upsertFood(
       FoodsCompanion.insert(
@@ -169,6 +170,7 @@ class FoodRepository {
         saltG100: Value(saltG100),
         servingG: Value(servingG),
         servingLabel: Value(servingLabel),
+        densityGPerMl: Value(densityGPerMl),
       ),
     );
     return (await db.foodById(id))!;

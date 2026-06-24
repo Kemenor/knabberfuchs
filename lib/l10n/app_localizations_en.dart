@@ -162,6 +162,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealAddTo => 'Add to this meal';
 
   @override
+  String get mealCollapse => 'Collapse meal';
+
+  @override
+  String get mealExpand => 'Expand meal';
+
+  @override
   String mealSavedToRecipes(String name) {
     return 'Saved \"$name\" to recipes';
   }
@@ -836,6 +842,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addNutritionPer100 => 'Nutrition per 100 g';
+
+  @override
+  String get addNutritionPer100Ml => 'Nutrition per 100 ml';
 
   @override
   String get addScanLabel => 'Scan label';

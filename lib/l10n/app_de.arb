@@ -53,6 +53,8 @@
   "mealMenuDelete": "Mahlzeit löschen",
   "mealFinish": "Mahlzeit abschließen",
   "mealAddTo": "Zu dieser Mahlzeit hinzufügen",
+  "mealCollapse": "Mahlzeit einklappen",
+  "mealExpand": "Mahlzeit ausklappen",
   "mealSavedToRecipes": "\"{name}\" in Rezepten gespeichert",
 
   "editMealTitle": "Mahlzeit bearbeiten",
@@ -275,6 +277,7 @@
   "addProductName": "Produktname",
   "addServingSize": "Portionsgröße",
   "addNutritionPer100": "Nährwerte pro 100 g",
+  "addNutritionPer100Ml": "Nährwerte pro 100 ml",
   "addScanLabel": "Etikett scannen",
   "addEnergy": "Energie",
   "addProtein": "Protein",

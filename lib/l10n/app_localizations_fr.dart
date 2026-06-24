@@ -162,6 +162,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mealAddTo => 'Ajouter à ce repas';
 
   @override
+  String get mealCollapse => 'Réduire le repas';
+
+  @override
+  String get mealExpand => 'Développer le repas';
+
+  @override
   String mealSavedToRecipes(String name) {
     return '\"$name\" enregistré dans les recettes';
   }
@@ -842,6 +848,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get addNutritionPer100 => 'Valeurs nutritionnelles pour 100 g';
+
+  @override
+  String get addNutritionPer100Ml => 'Valeurs nutritionnelles pour 100 ml';
 
   @override
   String get addScanLabel => 'Scanner l\'étiquette';

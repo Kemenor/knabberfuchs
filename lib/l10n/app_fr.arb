@@ -53,6 +53,8 @@
   "mealMenuDelete": "Supprimer le repas",
   "mealFinish": "Terminer le repas",
   "mealAddTo": "Ajouter à ce repas",
+  "mealCollapse": "Réduire le repas",
+  "mealExpand": "Développer le repas",
   "mealSavedToRecipes": "\"{name}\" enregistré dans les recettes",
 
   "editMealTitle": "Modifier le repas",
@@ -275,6 +277,7 @@
   "addProductName": "Nom du produit",
   "addServingSize": "Taille de portion",
   "addNutritionPer100": "Valeurs nutritionnelles pour 100 g",
+  "addNutritionPer100Ml": "Valeurs nutritionnelles pour 100 ml",
   "addScanLabel": "Scanner l'étiquette",
   "addEnergy": "Énergie",
   "addProtein": "Protéines",

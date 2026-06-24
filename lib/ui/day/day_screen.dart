@@ -404,6 +404,7 @@ class _GroupSection extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final isActive = ref.watch(activeGroupProvider) == group.id;
+    final isCollapsed = ref.watch(collapsedGroupsProvider).contains(group.id);
 
     Future<void> reopenAndAdd() async {
       await ref.read(activeGroupProvider.notifier).reopen(group.id);
@@ -414,9 +415,19 @@ class _GroupSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 4, 0),
+          padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
           child: Row(
             children: [
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                tooltip: isCollapsed ? l10n.mealExpand : l10n.mealCollapse,
+                icon: Icon(
+                  isCollapsed ? Icons.expand_more : Icons.expand_less,
+                  size: 22,
+                ),
+                onPressed: () =>
+                    ref.read(collapsedGroupsProvider.notifier).toggle(group.id),
+              ),
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -499,7 +510,8 @@ class _GroupSection extends ConsumerWidget {
             ],
           ),
         ),
-        for (final e in group.items) _EntryTile(view: e, day: day),
+        if (!isCollapsed)
+          for (final e in group.items) _EntryTile(view: e, day: day),
         const Divider(height: 1, indent: 16, endIndent: 16),
       ],
     );

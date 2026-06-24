@@ -162,6 +162,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get mealAddTo => 'Zu dieser Mahlzeit hinzufügen';
 
   @override
+  String get mealCollapse => 'Mahlzeit einklappen';
+
+  @override
+  String get mealExpand => 'Mahlzeit ausklappen';
+
+  @override
   String mealSavedToRecipes(String name) {
     return '\"$name\" in Rezepten gespeichert';
   }
@@ -841,6 +847,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addNutritionPer100 => 'Nährwerte pro 100 g';
+
+  @override
+  String get addNutritionPer100Ml => 'Nährwerte pro 100 ml';
 
   @override
   String get addScanLabel => 'Etikett scannen';

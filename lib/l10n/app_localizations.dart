@@ -372,6 +372,18 @@ abstract class AppLocalizations {
   /// **'Add to this meal'**
   String get mealAddTo;
 
+  /// No description provided for @mealCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse meal'**
+  String get mealCollapse;
+
+  /// No description provided for @mealExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand meal'**
+  String get mealExpand;
+
   /// No description provided for @mealSavedToRecipes.
   ///
   /// In en, this message translates to:
@@ -1541,6 +1553,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nutrition per 100 g'**
   String get addNutritionPer100;
+
+  /// No description provided for @addNutritionPer100Ml.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition per 100 ml'**
+  String get addNutritionPer100Ml;
 
   /// No description provided for @addScanLabel.
   ///

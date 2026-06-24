@@ -53,6 +53,8 @@
   "mealMenuDelete": "Elimina pasto",
   "mealFinish": "Termina pasto",
   "mealAddTo": "Aggiungi a questo pasto",
+  "mealCollapse": "Comprimi pasto",
+  "mealExpand": "Espandi pasto",
   "mealSavedToRecipes": "\"{name}\" salvato nelle ricette",
 
   "editMealTitle": "Modifica pasto",
@@ -275,6 +277,7 @@
   "addProductName": "Nome del prodotto",
   "addServingSize": "Dimensione porzione",
   "addNutritionPer100": "Valori nutrizionali per 100 g",
+  "addNutritionPer100Ml": "Valori nutrizionali per 100 ml",
   "addScanLabel": "Scansiona etichetta",
   "addEnergy": "Energia",
   "addProtein": "Proteine",
