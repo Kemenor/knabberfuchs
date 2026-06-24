@@ -1,0 +1,26 @@
+Knabberfuchs è un conta calorie che ti rispetta: niente pubblicità, niente abbonamenti, niente pop-up, nessun account. Solo uno strumento veloce e onesto per registrare ciò che mangi – e i tuoi dati restano sul telefono.
+
+Nato perché tutti i tracker più diffusi assillano con i paywall. Questo no – e non lo farà mai.
+
+COSA PUOI FARE
+• Scansiona i codici a barre – valori nutrizionali immediati da Open Food Facts. Non è nel database? Aggiungilo tu stesso scansionando l'etichetta: sarà salvato per la prossima volta.
+• Cerca veloce, offline – Open Food Facts più la curata Banca dati svizzera dei valori nutritivi, insieme ai tuoi alimenti personali.
+• Aggiunta rapida – conosci già il numero? Registra «Lasagne · 816 kcal» con pochi tocchi.
+• Fotografa un pasto – il riconoscimento con IA stima il piatto e la porzione. Per impostazione predefinita funziona sul dispositivo (nessun account, nessun cloud). In opzione, aggiungi la tua chiave Google Gemini per risultati più precisi con i macro completi.
+• Un pasto da una foto – fotografa un elenco di ingredienti stampato; il riconoscimento del testo sul dispositivo lo trasforma in un pasto.
+• Ricette – crea una ricetta una volta, poi registra una porzione in qualsiasi giorno; viene scomposta nei suoi veri ingredienti. Condividi con QR code o immagine, importa con QR o testo.
+• Giorno per giorno – i pasti si raggruppano automaticamente, con totale e macro in tempo reale.
+• Obiettivi per giorno della settimana – un minimo, un massimo o entrambi. I giorni di allenamento possono essere diversi.
+• Offline, in tutto il mondo – scarica uno dei 106 database nazionali e cerca senza connessione.
+• Apple Salute – sincronizzazione facoltativa, in sola scrittura, di calorie e macro.
+• Backup e ripristino – esporta tutto in uno ZIP (JSON + CSV) e ripristinalo quando vuoi. Niente cloud, nessun vincolo.
+
+MULTILINGUA
+Disponibile in inglese, tedesco, francese e italiano.
+
+PRIVACY FIN DALLA PROGETTAZIONE
+Nessun account, nessuna analisi, nessuna pubblicità, nessun tracker. Non gestiamo alcun server e non vediamo mai i tuoi dati. L'unica cosa che lascia il telefono è una foto del pasto Gemini facoltativa – e solo se configuri la tua chiave. Tutto il resto rimane sul dispositivo.
+
+Dati alimentari: Open Food Facts (ODbL) e la Banca dati svizzera dei valori nutritivi (USAV). Il riconoscimento dei pasti sul dispositivo usa il modello alimentare Google AIY, integrato ed eseguito localmente.
+
+Realizzato in Svizzera. 🦊

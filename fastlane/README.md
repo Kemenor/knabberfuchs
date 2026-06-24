@@ -80,3 +80,78 @@ publish.
   desired.
 - `supply` does **not** handle the content-rating questionnaire, target-audience,
   category/tags, or most of the Data Safety form — those stay in the Console.
+
+---
+
+# App Store (iOS)
+
+The iOS twin of the above, via [`deliver`](https://docs.fastlane.tools/actions/deliver/)
+(metadata) and [`pilot`](https://docs.fastlane.tools/actions/pilot/) (TestFlight).
+Auth is the **App Store Connect API key** (team key `knabberfuchs-ci`, role App
+Manager) instead of a Play service account. Nothing is submitted for review —
+you press **Submit** in App Store Connect.
+
+## Layout
+
+```
+fastlane/
+  Fastfile                      ios lanes: validate / listing / beta
+  AuthKey_B8TQ2VVZMA.p8         App Store Connect API private key — GITIGNORED
+  asc_api_key.json              key id / issuer id / key path     — GITIGNORED
+  metadata/ios/<locale>/
+    name.txt                    ≤ 30 chars
+    subtitle.txt                ≤ 30 chars
+    keywords.txt                ≤ 100 chars (comma-separated)
+    description.txt             ≤ 4000 chars
+    promotional_text.txt        ≤ 170 chars (editable without review)
+    release_notes.txt           "What's New"
+    support_url.txt / marketing_url.txt
+  metadata/ios/copyright.txt
+  metadata/ios/primary_category.txt
+```
+
+Key id `B8TQ2VVZMA`, issuer `cb228e56-508d-4ed5-9a25-89923265a7ad`. The `.p8` is
+**gitignored** and backed up in `ProtonDrive/knabberfuchs-secrets/` (alongside a
+`.base64` for CI). Never commit, print, or paste it.
+
+## Lanes
+
+```sh
+fastlane ios validate   # check App Store metadata locally, no upload
+fastlane ios listing    # push listing text as a draft (no binary, no screenshots)
+fastlane ios beta       # upload the built IPA to TestFlight
+```
+
+Build the IPA first for `beta` (macOS only): `flutter build ipa --release`.
+
+## CI
+
+`.github/workflows/ios.yml` runs `beta` on a `v*` tag using the free macOS
+runner. It needs these repo secrets — the first three we already have, the rest
+come from the first Mac build:
+
+| Secret | Status |
+|---|---|
+| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_API_KEY_P8_BASE64` | ✅ in ProtonDrive |
+| `IOS_DIST_CERT_P12_BASE64`, `IOS_DIST_CERT_PASSWORD` | ⏳ export on Mac |
+| `IOS_PROVISION_PROFILE_BASE64`, `KEYCHAIN_PASSWORD` | ⏳ export on Mac |
+
+## Still needed (the Mac step — #4)
+
+1. `flutter create --platforms=ios .` to generate `ios/`.
+2. In Xcode: bundle id `ch.knabberfuchs.app`, add the **HealthKit** capability,
+   and Info.plist usage strings (camera, photo library, HealthKit share/update).
+3. One manual signed **TestFlight** build (Xcode automatic signing creates the
+   distribution cert + provisioning profile). Export them + `ios/ExportOptions.plist`,
+   `base64` them into the GitHub secrets above, then CI takes over.
+4. **Screenshots** (6.7"/6.9" iPhone) under `fastlane/screenshots/ios/<locale>/`,
+   and set the **privacy policy URL** + App Privacy answers in the Console — these
+   are required to submit, and `deliver` doesn't cover the privacy questionnaire.
+
+## Notes
+
+- The de/fr/it copy is reused from the Play listing (first-pass, **unreviewed**)
+  with "Health Connect" adapted to **Apple Health**. Read before publishing.
+- `keywords.txt` is iOS-only (Play has none) — tune for App Store search.
+- `support_url` / `marketing_url` currently point at the public GitHub repo —
+  swap for a dedicated support page if you make one.

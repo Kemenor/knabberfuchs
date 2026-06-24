@@ -1,0 +1,26 @@
+Knabberfuchs est un compteur de calories qui vous respecte : pas de publicité, pas d'abonnement, pas de pop-up, pas de compte. Juste un outil rapide et honnête pour noter ce que vous mangez – et vos données restent sur votre téléphone.
+
+Né parce que tous les trackers populaires harcèlent avec des paywalls. Pas celui-ci – et ça ne changera jamais.
+
+CE QUE VOUS POUVEZ FAIRE
+• Scanner des codes-barres – valeurs nutritionnelles instantanées depuis Open Food Facts. Absent de la base ? Ajoutez-le vous-même en scannant l'étiquette ; il sera enregistré pour la prochaine fois.
+• Rechercher vite, hors ligne – Open Food Facts plus la Base suisse de composition des aliments, avec vos propres aliments.
+• Ajout rapide – vous connaissez déjà le chiffre ? Notez « Lasagnes · 816 kcal » en quelques touches.
+• Photographier un repas – la reconnaissance par IA estime le plat et la portion. Par défaut, elle fonctionne sur l'appareil (pas de compte, pas de cloud). En option, ajoutez votre propre clé Google Gemini pour des résultats plus précis avec les macros complètes.
+• Un repas à partir d'une photo – photographiez une liste d'ingrédients imprimée ; la reconnaissance de texte sur l'appareil la transforme en repas.
+• Recettes – créez une recette une fois, puis enregistrez une portion n'importe quel jour ; elle est décomposée en ses véritables ingrédients. Partagez par QR code ou image, importez par QR ou texte.
+• Jour après jour – les repas se regroupent automatiquement, avec total et macros en direct.
+• Objectifs par jour de la semaine – un minimum, un maximum ou les deux. Les jours d'entraînement peuvent différer.
+• Hors ligne, partout – téléchargez l'une des 106 bases de données nationales et cherchez sans connexion.
+• Apple Santé – synchronisation facultative, en écriture seule, de vos calories et macros.
+• Sauvegarde et restauration – exportez tout dans un ZIP (JSON + CSV) et restaurez-le à tout moment. Pas de cloud, pas de dépendance.
+
+MULTILINGUE
+Disponible en anglais, allemand, français et italien.
+
+CONFIDENTIALITÉ DÈS LA CONCEPTION
+Aucun compte, aucune analyse, aucune publicité, aucun traceur. Nous n'avons pas de serveur et ne voyons jamais vos données. La seule chose qui quitte votre téléphone est une photo de repas Gemini facultative – et uniquement si vous configurez votre propre clé. Tout le reste reste sur l'appareil.
+
+Données alimentaires : Open Food Facts (ODbL) et la Base suisse de composition des aliments (OSAV). La reconnaissance de repas sur l'appareil utilise le modèle alimentaire Google AIY, intégré et exécuté localement.
+
+Conçu en Suisse. 🦊

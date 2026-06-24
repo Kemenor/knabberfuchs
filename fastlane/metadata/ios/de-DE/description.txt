@@ -1,0 +1,26 @@
+Knabberfuchs ist ein Kalorienzähler, der dich respektiert: keine Werbung, keine Abos, keine Pop-ups, kein Konto. Nur ein schnelles, ehrliches Werkzeug, um zu erfassen, was du isst – und deine Daten bleiben auf deinem Handy.
+
+Entstanden, weil alle bekannten Tracker mit Bezahlschranken nerven. Dieser nicht – und das wird auch so bleiben.
+
+WAS DU TUN KANNST
+• Barcodes scannen – sofort Nährwerte aus Open Food Facts. Nicht in der Datenbank? Füge das Produkt selbst hinzu, indem du das Etikett scannst – beim nächsten Mal ist es gespeichert.
+• Schnell suchen, offline – Open Food Facts plus die kuratierte Schweizer Nährwertdatenbank, dazu deine eigenen Lebensmittel.
+• Schnell erfassen – Zahl schon bekannt? „Lasagne · 816 kcal" mit wenigen Tippern eintragen.
+• Mahlzeit fotografieren – die KI-Erkennung schätzt Gericht und Portion. Standardmäßig läuft sie auf dem Gerät (kein Konto, keine Cloud). Optional fügst du deinen eigenen Google-Gemini-Schlüssel hinzu, für genauere Ergebnisse mit vollständigen Makros.
+• Mahlzeit aus einem Foto – fotografiere eine gedruckte Zutatenliste; die Texterkennung auf dem Gerät macht daraus eine Mahlzeit.
+• Rezepte – ein Rezept einmal anlegen und dann eine Portion an einem beliebigen Tag eintragen; es wird in seine echten Zutaten aufgeschlüsselt. Per QR-Code oder Bild teilen, per QR oder Text importieren.
+• Tag für Tag – Mahlzeiten werden beim Hinzufügen automatisch gruppiert, mit laufender Summe und Makros.
+• Ziele pro Wochentag – Minimum, Maximum oder beides. Trainingstage dürfen anders sein als Ruhetage.
+• Offline, weltweit – lade eine von 106 Länderdatenbanken herunter und suche ohne Verbindung.
+• Apple Health – optionaler, nur schreibender Abgleich deiner Kalorien und Makros.
+• Sichern & Wiederherstellen – exportiere alles in eine ZIP-Datei (JSON + CSV) und stelle sie jederzeit wieder her. Keine Cloud, kein Lock-in.
+
+MEHRSPRACHIG
+Verfügbar in Englisch, Deutsch, Französisch und Italienisch.
+
+PRIVATSPHÄRE VON GRUND AUF
+Keine Konten, keine Analyse, keine Werbung, keine Tracker. Wir betreiben keinen Server und sehen deine Daten nie. Das Einzige, was dein Handy je verlässt, ist ein optionales Gemini-Foto deiner Mahlzeit – und nur, wenn du deinen eigenen Schlüssel einrichtest. Alles andere bleibt auf dem Gerät.
+
+Lebensmitteldaten: Open Food Facts (ODbL) und die Schweizer Nährwertdatenbank (BLV). Die Mahlzeitenerkennung auf dem Gerät nutzt das Google-AIY-Lebensmittelmodell, lokal eingebettet und ausgeführt.
+
+Hergestellt in der Schweiz. 🦊

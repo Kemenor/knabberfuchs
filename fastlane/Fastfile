@@ -33,3 +33,59 @@ platform :android do
     )
   end
 end
+
+# Knabberfuchs — App Store Connect (TestFlight + metadata), the iOS twin of the
+# Play lanes above. Auth is the App Store Connect API key (App Manager). The
+# key IDs aren't secret and live here as fallbacks; the private .p8 is
+# gitignored in fastlane/ (backed up in ProtonDrive). On CI the workflow
+# recreates the .p8 from a base64 secret at the same path. Nothing is ever
+# submitted for review — you press "Submit" in App Store Connect.
+platform :ios do
+  def asc_key
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"] || "B8TQ2VVZMA",
+      issuer_id: ENV["ASC_ISSUER_ID"] || "cb228e56-508d-4ed5-9a25-89923265a7ad",
+      key_filepath: ENV["ASC_KEY_FILEPATH"] || "fastlane/AuthKey_B8TQ2VVZMA.p8",
+      duration: 1200,
+    )
+  end
+
+  desc "Upload the built IPA to TestFlight (run `flutter build ipa` first)"
+  lane :beta do
+    ipa = Dir["build/ios/ipa/*.ipa"].max_by { |f| File.mtime(f) }
+    UI.user_error!("No IPA in build/ios/ipa — run `flutter build ipa` first") unless ipa
+    upload_to_testflight(
+      api_key: asc_key,
+      ipa: ipa,
+      skip_waiting_for_build_processing: true,
+      changelog: File.read("fastlane/metadata/ios/en-US/release_notes.txt").strip,
+    )
+  end
+
+  desc "Push App Store listing text (no binary, no screenshots) — staged, not submitted"
+  lane :listing do
+    upload_to_app_store(
+      api_key: asc_key,
+      metadata_path: "fastlane/metadata/ios",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+      force: true, # no interactive HTML preview
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+    )
+  end
+
+  desc "Validate the App Store metadata locally — no upload"
+  lane :validate do
+    upload_to_app_store(
+      api_key: asc_key,
+      metadata_path: "fastlane/metadata/ios",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      verify_only: true,
+      force: true,
+      run_precheck_before_submit: false,
+    )
+  end
+end

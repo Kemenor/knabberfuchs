@@ -1,0 +1,82 @@
+name: iOS · TestFlight
+
+# Build the iOS app and upload it to TestFlight on a version tag (v*).
+# Free on GitHub-hosted macOS runners because this repo is public.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   ASC_KEY_ID                    App Store Connect API key id      — HAVE (B8TQ2VVZMA)
+#   ASC_ISSUER_ID                 App Store Connect issuer id       — HAVE
+#   ASC_API_KEY_P8_BASE64         base64 of AuthKey_<id>.p8         — HAVE (ProtonDrive *.base64)
+#   IOS_DIST_CERT_P12_BASE64      base64 of the Apple Distribution .p12       — TODO (export on Mac)
+#   IOS_DIST_CERT_PASSWORD        password set when exporting that .p12       — TODO
+#   IOS_PROVISION_PROFILE_BASE64  base64 of the App Store .mobileprovision    — TODO
+#   KEYCHAIN_PASSWORD             any random string for the temp keychain     — TODO
+#
+# The TODO secrets come from the first signed build on the Mac: Xcode automatic
+# signing creates the distribution cert + provisioning profile; export them,
+# `base64` them, and paste here. This workflow also needs ios/ExportOptions.plist,
+# generated during that same Mac step. Until those exist it will fail at the
+# signing/build step — that is expected; #1–3 of the setup are scaffolding.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  testflight:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.2"
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Install App Store Connect API key (.p8)
+        env:
+          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          mkdir -p fastlane
+          echo "$ASC_API_KEY_P8_BASE64" | base64 --decode > "fastlane/AuthKey_${ASC_KEY_ID}.p8"
+
+      - name: Import signing certificate & provisioning profile
+        env:
+          IOS_DIST_CERT_P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERT="$RUNNER_TEMP/dist.p12"
+          PROFILE="$RUNNER_TEMP/profile.mobileprovision"
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
+          echo "$IOS_DIST_CERT_P12_BASE64" | base64 --decode > "$CERT"
+          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > "$PROFILE"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$CERT" -P "$IOS_DIST_CERT_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security list-keychain -d user -s "$KEYCHAIN" login.keychain-db
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$PROFILE" "$HOME/Library/MobileDevice/Provisioning Profiles/"
+
+      - name: Build signed IPA
+        # ios/ExportOptions.plist is created during Mac setup (flutter create +
+        # first Xcode archive): method=app-store, teamID=2Q964MD3Q2, manual
+        # signing, the App Store provisioning profile.
+        run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+
+      - name: Upload to TestFlight
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_FILEPATH: fastlane/AuthKey_${{ secrets.ASC_KEY_ID }}.p8
+        run: fastlane ios beta
