@@ -14,15 +14,18 @@ void main() {
     expect(searchTokens('courgette'), ['zucchini']);
   });
 
-  test('synonyms match whole tokens, never corrupt words that contain them', () {
-    // The alias 'chickpea'→'chickpeas' must not turn the already-plural
-    // "chickpeas" into "chickpeass" (the old substring-replace bug).
-    expect(searchTokens('chickpeas'), ['chickpeas']);
-    expect(searchTokens('chickpea'), ['chickpeas']);
-    // 'mince'→'ground' must not rewrite "minced" into "groundd".
-    expect(searchTokens('mince'), ['ground']);
-    expect(searchTokens('minced beef'), ['minced', 'beef']);
-  });
+  test(
+    'synonyms match whole tokens, never corrupt words that contain them',
+    () {
+      // The alias 'chickpea'→'chickpeas' must not turn the already-plural
+      // "chickpeas" into "chickpeass" (the old substring-replace bug).
+      expect(searchTokens('chickpeas'), ['chickpeas']);
+      expect(searchTokens('chickpea'), ['chickpeas']);
+      // 'mince'→'ground' must not rewrite "minced" into "groundd".
+      expect(searchTokens('mince'), ['ground']);
+      expect(searchTokens('minced beef'), ['minced', 'beef']);
+    },
+  );
 
   test('empty / whitespace yields no tokens', () {
     expect(searchTokens('   '), isEmpty);

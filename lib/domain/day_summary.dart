@@ -10,14 +10,14 @@ class EntryView {
   final Nutrition nutrition;
 
   EntryView(this.entry)
-      : nutrition = Nutrition.fromPer100g(
-          kcal100: entry.sKcal100,
-          protein100: entry.sProtein100,
-          carb100: entry.sCarb100,
-          fat100: entry.sFat100,
-          micros100: decodeMicros(entry.sMicrosJson),
-          grams: entry.grams,
-        );
+    : nutrition = Nutrition.fromPer100g(
+        kcal100: entry.sKcal100,
+        protein100: entry.sProtein100,
+        carb100: entry.sCarb100,
+        fat100: entry.sFat100,
+        micros100: decodeMicros(entry.sMicrosJson),
+        grams: entry.grams,
+      );
 
   int get id => entry.id;
   String get name => entry.sName;
@@ -67,8 +67,7 @@ class DaySummary {
   bool get hasTarget => kcalMin != null || kcalMax != null;
 
   /// kcal left before hitting the max (negative = over). Null when no max.
-  double? get remainingToMax =>
-      kcalMax == null ? null : kcalMax! - total.kcal;
+  double? get remainingToMax => kcalMax == null ? null : kcalMax! - total.kcal;
 
   /// kcal still needed to reach the min (positive = short). Null when no min.
   double? get shortOfMin => kcalMin == null ? null : kcalMin! - total.kcal;
@@ -91,8 +90,5 @@ CalorieTarget resolveTarget(
   int weekdayIndex,
 ) {
   final t = targets.firstWhereOrNull((t) => t.weekday == weekdayIndex);
-  return CalorieTarget(
-    t?.kcalMin ?? defaultMin,
-    t?.kcalMax ?? defaultMax,
-  );
+  return CalorieTarget(t?.kcalMin ?? defaultMin, t?.kcalMax ?? defaultMax);
 }

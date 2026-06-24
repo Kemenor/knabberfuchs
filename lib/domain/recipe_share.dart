@@ -23,12 +23,12 @@ class RecipeShareItem {
   });
 
   Nutrition get nutrition => Nutrition.fromPer100g(
-        kcal100: kcal100,
-        protein100: protein100,
-        carb100: carb100,
-        fat100: fat100,
-        grams: grams,
-      );
+    kcal100: kcal100,
+    protein100: protein100,
+    carb100: carb100,
+    fat100: fat100,
+    grams: grams,
+  );
 }
 
 class RecipeShare {
@@ -54,8 +54,7 @@ class RecipeShare {
     );
   }
 
-  double get totalGrams =>
-      items.fold(0.0, (sum, i) => sum + i.grams);
+  double get totalGrams => items.fold(0.0, (sum, i) => sum + i.grams);
 }
 
 /// Compact, versioned, serverless codec for QR / file sharing.
@@ -77,7 +76,7 @@ class RecipeCodec {
             if (i.protein100 != null) 'p': i.protein100,
             if (i.carb100 != null) 'c': i.carb100,
             if (i.fat100 != null) 'f': i.fat100,
-          }
+          },
       ],
     };
     final gz = gzip.encode(utf8.encode(jsonEncode(map)));
@@ -96,14 +95,16 @@ class RecipeCodec {
       final items = <RecipeShareItem>[];
       for (final raw in (map['i'] as List? ?? const [])) {
         if (raw is! Map) continue;
-        items.add(RecipeShareItem(
-          name: (raw['n'] ?? '').toString(),
-          grams: d(raw['g']) ?? 0,
-          kcal100: d(raw['k']) ?? 0,
-          protein100: d(raw['p']),
-          carb100: d(raw['c']),
-          fat100: d(raw['f']),
-        ));
+        items.add(
+          RecipeShareItem(
+            name: (raw['n'] ?? '').toString(),
+            grams: d(raw['g']) ?? 0,
+            kcal100: d(raw['k']) ?? 0,
+            protein100: d(raw['p']),
+            carb100: d(raw['c']),
+            fat100: d(raw['f']),
+          ),
+        );
       }
       return RecipeShare(
         name: (map['n'] ?? 'Recipe').toString(),

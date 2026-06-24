@@ -21,11 +21,25 @@ class NutritionLabel {
 // carbs) so "of which sugars" doesn't get read as carbohydrate.
 const _energy = ['energie', 'énergie', 'energy', 'energia', 'brennwert'];
 const _satFat = ['gesättigt', 'satur', 'saturé', 'saturi'];
-const _fat = ['fett', 'matières grasses', 'matieres grasses', 'lipides', 'fat', 'grassi'];
+const _fat = [
+  'fett',
+  'matières grasses',
+  'matieres grasses',
+  'lipides',
+  'fat',
+  'grassi',
+];
 const _fiber = ['ballaststoffe', 'fibres', 'fibre', 'fiber'];
 const _sugar = ['zucker', 'sucres', 'sugars', 'zuccheri'];
 const _carb = ['kohlenhydrate', 'glucides', 'carbohydrate', 'carboidrati'];
-const _protein = ['eiweiß', 'eiweiss', 'protéines', 'proteines', 'protein', 'proteine'];
+const _protein = [
+  'eiweiß',
+  'eiweiss',
+  'protéines',
+  'proteines',
+  'protein',
+  'proteine',
+];
 const _salt = ['salz', 'sel', 'salt', 'sale'];
 
 bool _has(String line, List<String> keys) => keys.any(line.contains);

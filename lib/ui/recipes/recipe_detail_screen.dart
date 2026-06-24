@@ -60,11 +60,13 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
         title: Text(l10n.recipeDeleteConfirm(_recipe.name)),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l10n.actionCancel)),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.actionCancel),
+          ),
           FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(l10n.actionDelete)),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.actionDelete),
+          ),
         ],
       ),
     );
@@ -92,9 +94,11 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
             IconButton(
               tooltip: l10n.actionShare,
               icon: const Icon(Icons.ios_share),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => RecipeShareScreen(share: share),
-              )),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => RecipeShareScreen(share: share),
+                ),
+              ),
             ),
           IconButton(
             tooltip: l10n.actionDelete,
@@ -111,8 +115,10 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                 _NutritionCard(share: share),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                  child: Text(l10n.ingredients,
-                      style: theme.textTheme.titleMedium),
+                  child: Text(
+                    l10n.ingredients,
+                    style: theme.textTheme.titleMedium,
+                  ),
                 ),
                 for (final i in share.items)
                   ListTile(
@@ -147,7 +153,10 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
 /// Load a [recipe]'s ingredients and open the "log a portion to a day" sheet.
 /// Reused by the recipes-list swipe action.
 Future<void> showLogPortionForRecipe(
-    BuildContext context, WidgetRef ref, Recipe recipe) async {
+  BuildContext context,
+  WidgetRef ref,
+  Recipe recipe,
+) async {
   final repo = ref.read(recipeRepositoryProvider);
   final share = repo.toShare(recipe, await repo.items(recipe.id));
   if (!context.mounted) return;
@@ -178,15 +187,24 @@ class _NutritionCard extends StatelessWidget {
           children: [
             Text(l10n.recipeWhole, style: theme.textTheme.labelMedium),
             Text(
-              l10n.kcalDotGrams(kcalStr(total.kcal), gramsStr(share.totalGrams)),
+              l10n.kcalDotGrams(
+                kcalStr(total.kcal),
+                gramsStr(share.totalGrams),
+              ),
               style: theme.textTheme.titleLarge,
             ),
             const Divider(height: 20),
-            Text(l10n.recipePerServing(share.servings.toStringAsFixed(0)),
-                style: theme.textTheme.labelMedium),
             Text(
-              l10n.macroPcf(kcalStr(per.kcal), macroStr(per.protein),
-                  macroStr(per.carb), macroStr(per.fat)),
+              l10n.recipePerServing(share.servings.toStringAsFixed(0)),
+              style: theme.textTheme.labelMedium,
+            ),
+            Text(
+              l10n.macroPcf(
+                kcalStr(per.kcal),
+                macroStr(per.protein),
+                macroStr(per.carb),
+                macroStr(per.fat),
+              ),
               style: theme.textTheme.titleMedium,
             ),
           ],
@@ -229,53 +247,57 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
       top: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+          16,
+          0,
+          16,
+          MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.recipeLogPortionTitle, style: theme.textTheme.titleLarge),
-          const SizedBox(height: 12),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.calendar_today),
-            title: Text(dayLabel(context, _day)),
-            trailing: const Icon(Icons.edit),
-            onTap: _pickDay,
-          ),
-          const SizedBox(height: 4),
-          Text(l10n.recipePortions, style: theme.textTheme.labelLarge),
-          Row(
-            children: [
-              IconButton.filledTonal(
-                onPressed: _portions > 0.5
-                    ? () => setState(() => _portions -= 0.5)
-                    : null,
-                icon: const Icon(Icons.remove),
-              ),
-              Expanded(
-                child: Text(
-                  '${_portions.toStringAsFixed(_portions == _portions.roundToDouble() ? 0 : 1)} '
-                  '(${gramsStr(grams)} g · ${kcalStr(nutrition.kcal)} kcal)',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleMedium,
-                ),
-              ),
-              IconButton.filledTonal(
-                onPressed: () => setState(() => _portions += 0.5),
-                icon: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: (grams <= 0 || _saving) ? null : _log,
-              child: Text(l10n.recipeLogToDay(dayLabel(context, _day))),
+            const SizedBox(height: 12),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.calendar_today),
+              title: Text(dayLabel(context, _day)),
+              trailing: const Icon(Icons.edit),
+              onTap: _pickDay,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(l10n.recipePortions, style: theme.textTheme.labelLarge),
+            Row(
+              children: [
+                IconButton.filledTonal(
+                  onPressed: _portions > 0.5
+                      ? () => setState(() => _portions -= 0.5)
+                      : null,
+                  icon: const Icon(Icons.remove),
+                ),
+                Expanded(
+                  child: Text(
+                    '${_portions.toStringAsFixed(_portions == _portions.roundToDouble() ? 0 : 1)} '
+                    '(${gramsStr(grams)} g · ${kcalStr(nutrition.kcal)} kcal)',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                IconButton.filledTonal(
+                  onPressed: () => setState(() => _portions += 0.5),
+                  icon: const Icon(Icons.add),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: (grams <= 0 || _saving) ? null : _log,
+                child: Text(l10n.recipeLogToDay(dayLabel(context, _day))),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -303,12 +325,15 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
     final label = dayLabel(context, _day);
     try {
       // Log the portion as its own meal group named after the recipe.
-      final groupId =
-          await ref.read(dbProvider).createEntryGroup(_day, widget.share.name);
+      final groupId = await ref
+          .read(dbProvider)
+          .createEntryGroup(_day, widget.share.name);
       final meal =
           (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
               .inferNow();
-      await ref.read(recipeRepositoryProvider).logPortionGrams(
+      await ref
+          .read(recipeRepositoryProvider)
+          .logPortionGrams(
             share: widget.share,
             grams: grams,
             meal: meal,

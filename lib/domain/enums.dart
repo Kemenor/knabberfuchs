@@ -29,17 +29,17 @@ enum MealType {
 
 extension MealTypeLabel on MealType {
   String get label => switch (this) {
-        MealType.breakfast => 'Breakfast',
-        MealType.lunch => 'Lunch',
-        MealType.dinner => 'Dinner',
-        MealType.snack => 'Snacks',
-      };
+    MealType.breakfast => 'Breakfast',
+    MealType.lunch => 'Lunch',
+    MealType.dinner => 'Dinner',
+    MealType.snack => 'Snacks',
+  };
 
   /// Singular form, used when naming a single meal ("Snack 14:02").
   String get title => switch (this) {
-        MealType.breakfast => 'Breakfast',
-        MealType.lunch => 'Lunch',
-        MealType.dinner => 'Dinner',
-        MealType.snack => 'Snack',
-      };
+    MealType.breakfast => 'Breakfast',
+    MealType.lunch => 'Lunch',
+    MealType.dinner => 'Dinner',
+    MealType.snack => 'Snack',
+  };
 }

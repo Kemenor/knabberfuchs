@@ -25,10 +25,10 @@ class TokenBucket {
     required this.window,
     double Function()? now,
     Future<void> Function(Duration)? sleep,
-  })  : _nowMs = now ?? _defaultNow,
-        _sleep = sleep ?? Future.delayed,
-        _tokens = capacity.toDouble(),
-        _lastMs = (now ?? _defaultNow)();
+  }) : _nowMs = now ?? _defaultNow,
+       _sleep = sleep ?? Future.delayed,
+       _tokens = capacity.toDouble(),
+       _lastMs = (now ?? _defaultNow)();
 
   static double _defaultNow() =>
       DateTime.now().millisecondsSinceEpoch.toDouble();
@@ -61,16 +61,18 @@ class TokenBucket {
     final prev = _tail;
     final completer = Completer<void>();
     _tail = completer.future;
-    return prev.then((_) async {
-      while (true) {
-        final wait = _waitMs();
-        if (wait <= 0) {
-          _tokens -= 1;
-          return;
-        }
-        await _sleep(Duration(milliseconds: wait.ceil()));
-      }
-    }).whenComplete(completer.complete);
+    return prev
+        .then((_) async {
+          while (true) {
+            final wait = _waitMs();
+            if (wait <= 0) {
+              _tokens -= 1;
+              return;
+            }
+            await _sleep(Duration(milliseconds: wait.ceil()));
+          }
+        })
+        .whenComplete(completer.complete);
   }
 
   /// Run [action] once a token is available.

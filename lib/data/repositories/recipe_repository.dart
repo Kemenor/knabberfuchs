@@ -21,20 +21,20 @@ class RecipeRepository {
 
   /// Build the self-contained share model from stored rows.
   RecipeShare toShare(Recipe recipe, List<RecipeItem> items) => RecipeShare(
-        name: recipe.name,
-        servings: recipe.servings,
-        items: [
-          for (final i in items)
-            RecipeShareItem(
-              name: i.sName,
-              grams: i.grams,
-              kcal100: i.sKcal100,
-              protein100: i.sProtein100,
-              carb100: i.sCarb100,
-              fat100: i.sFat100,
-            ),
-        ],
-      );
+    name: recipe.name,
+    servings: recipe.servings,
+    items: [
+      for (final i in items)
+        RecipeShareItem(
+          name: i.sName,
+          grams: i.grams,
+          kcal100: i.sKcal100,
+          protein100: i.sProtein100,
+          carb100: i.sCarb100,
+          fat100: i.sFat100,
+        ),
+    ],
+  );
 
   Future<int> create({
     required String name,
@@ -101,7 +101,8 @@ class RecipeRepository {
   }) async {
     final totalG = share.totalGrams;
     if (totalG <= 0 || grams <= 0) return;
-    final factor = grams / totalG; // fraction of the whole recipe in this portion
+    final factor =
+        grams / totalG; // fraction of the whole recipe in this portion
     for (final item in share.items) {
       final g = item.grams * factor;
       if (g <= 0) continue;
@@ -120,6 +121,7 @@ class RecipeRepository {
   }
 
   /// Convenience: grams for one of [servings] equal portions.
-  double portionGramsForServings(RecipeShare share) =>
-      share.servings <= 0 ? share.totalGrams : share.totalGrams / share.servings;
+  double portionGramsForServings(RecipeShare share) => share.servings <= 0
+      ? share.totalGrams
+      : share.totalGrams / share.servings;
 }

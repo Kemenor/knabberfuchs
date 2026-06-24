@@ -66,13 +66,13 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
     try {
-      await ref.read(diaryRepositoryProvider).splitGroupAcrossDays(
-            groupId: widget.group.id,
-            days: _days,
-          );
+      await ref
+          .read(diaryRepositoryProvider)
+          .splitGroupAcrossDays(groupId: widget.group.id, days: _days);
       if (mounted) Navigator.of(context).pop();
       messenger.showAutoSnackBar(
-          SnackBar(content: Text(l10n.splitInto('$_n'))));
+        SnackBar(content: Text(l10n.splitInto('$_n'))),
+      );
     } catch (_) {
       if (mounted) setState(() => _saving = false);
     }
@@ -88,60 +88,65 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
       top: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+          16,
+          0,
+          16,
+          MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.splitTitle(widget.group.name),
+            Text(
+              l10n.splitTitle(widget.group.name),
               style: theme.textTheme.titleLarge,
               maxLines: 1,
-              overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
-          Text(
-            l10n.splitDescription,
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Text(l10n.recipePortions, style: theme.textTheme.labelLarge),
-              const Spacer(),
-              IconButton.filledTonal(
-                onPressed: _n > 2 ? () => _setCount(_n - 1) : null,
-                icon: const Icon(Icons.remove),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text('$_n', style: theme.textTheme.titleLarge),
-              ),
-              IconButton.filledTonal(
-                onPressed: _n < 10 ? () => _setCount(_n + 1) : null,
-                icon: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          Text(l10n.splitKcalEach(kcalStr(perPortionKcal)),
-              style: theme.textTheme.bodySmall),
-          const SizedBox(height: 8),
-          for (var i = 0; i < _days.length; i++)
-            ListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.calendar_today, size: 20),
-              title: Text(dayLabel(context, _days[i])),
-              trailing: const Icon(Icons.edit, size: 18),
-              onTap: () => _pickDay(i),
+              overflow: TextOverflow.ellipsis,
             ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: _saving ? null : _split,
-              child: Text(l10n.splitInto('$_n')),
+            const SizedBox(height: 4),
+            Text(l10n.splitDescription, style: theme.textTheme.bodySmall),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Text(l10n.recipePortions, style: theme.textTheme.labelLarge),
+                const Spacer(),
+                IconButton.filledTonal(
+                  onPressed: _n > 2 ? () => _setCount(_n - 1) : null,
+                  icon: const Icon(Icons.remove),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('$_n', style: theme.textTheme.titleLarge),
+                ),
+                IconButton.filledTonal(
+                  onPressed: _n < 10 ? () => _setCount(_n + 1) : null,
+                  icon: const Icon(Icons.add),
+                ),
+              ],
             ),
-          ),
-        ],
+            Text(
+              l10n.splitKcalEach(kcalStr(perPortionKcal)),
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 8),
+            for (var i = 0; i < _days.length; i++)
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.calendar_today, size: 20),
+                title: Text(dayLabel(context, _days[i])),
+                trailing: const Icon(Icons.edit, size: 18),
+                onTap: () => _pickDay(i),
+              ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _saving ? null : _split,
+                child: Text(l10n.splitInto('$_n')),
+              ),
+            ),
+          ],
         ),
       ),
     );

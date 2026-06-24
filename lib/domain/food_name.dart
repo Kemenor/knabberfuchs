@@ -7,11 +7,11 @@ extension FoodLocalizedName on Food {
   /// canonical English [name] when there's no localized override (e.g.
   /// single-language USDA/OFF/custom rows, or Italian until it's translated).
   String localizedName(String? languageCode) => switch (languageCode) {
-        'de' => nameDe ?? name,
-        'fr' => nameFr ?? name,
-        'it' => nameIt ?? name,
-        _ => name,
-      };
+    'de' => nameDe ?? name,
+    'fr' => nameFr ?? name,
+    'it' => nameIt ?? name,
+    _ => name,
+  };
 
   /// Convenience: resolve against the active UI locale from [context].
   String localizedNameOf(BuildContext context) =>

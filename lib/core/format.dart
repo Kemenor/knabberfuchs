@@ -12,9 +12,9 @@ void setNumberLocale(String? languageCode) => _numLocale = languageCode;
 // de/fr/it render a decimal comma ("1,5"); kcal totals get thousands grouping.
 
 /// Rounded calories, with locale thousands grouping ("2.000" / "2 000").
-String kcalStr(double v) =>
-    (NumberFormat.decimalPattern(_numLocale)..maximumFractionDigits = 0)
-        .format(v.round());
+String kcalStr(double v) => (NumberFormat.decimalPattern(
+  _numLocale,
+)..maximumFractionDigits = 0).format(v.round());
 
 /// Grams: whole numbers as-is, otherwise one decimal. No grouping — this also
 /// pre-fills editable fields, and the input parsers don't strip group separators.

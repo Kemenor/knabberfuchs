@@ -55,8 +55,10 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
     if (q.isNotEmpty) {
       _controller.text = q;
       // Select the whole prefill so typing replaces it in one go.
-      _controller.selection =
-          TextSelection(baseOffset: 0, extentOffset: q.length);
+      _controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: q.length,
+      );
       _query = q;
       if (q.length >= 2) {
         _debounce = Timer(const Duration(milliseconds: 600), _runOnline);
@@ -96,8 +98,9 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
     final seq = ++_seq;
     setState(() => _searchingOnline = true);
     try {
-      final results =
-          await ref.read(foodRepositoryProvider).searchOnline(value);
+      final results = await ref
+          .read(foodRepositoryProvider)
+          .searchOnline(value);
       if (mounted && seq == _seq) setState(() => _online = results);
     } catch (_) {
       // network/rate-limit issues are non-fatal; local results remain.
@@ -139,19 +142,20 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
                   ? const Padding(
                       padding: EdgeInsets.all(12),
                       child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     )
                   : (_query.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _controller.clear();
-                            _onChanged('');
-                          },
-                        )
-                      : null),
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _controller.clear();
+                              _onChanged('');
+                            },
+                          )
+                        : null),
               border: const OutlineInputBorder(),
             ),
           ),
@@ -159,8 +163,11 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
         if (widget.onQuickAdd != null && _query.trim().isNotEmpty)
           ListTile(
             leading: const Icon(Icons.bolt),
-            title: Text(l10n.quickAddNamed(_query.trim()),
-                maxLines: 1, overflow: TextOverflow.ellipsis),
+            title: Text(
+              l10n.quickAddNamed(_query.trim()),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             subtitle: Text(l10n.quickAddSubtitle),
             onTap: () => widget.onQuickAdd!(_query.trim()),
           ),
@@ -169,10 +176,12 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
-              child: Text(l10n.searchRecentlyUsed,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
-                      )),
+              child: Text(
+                l10n.searchRecentlyUsed,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
             ),
           ),
         Expanded(
@@ -181,7 +190,8 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
               : ListView.separated(
                   // Bottom inset so the last row clears a floating action button.
                   padding: const EdgeInsets.only(bottom: 88),
-                  itemCount: results.length + (widget.onCreateCustom != null ? 1 : 0),
+                  itemCount:
+                      results.length + (widget.onCreateCustom != null ? 1 : 0),
                   separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (context, i) {
                     if (i == results.length) {
@@ -192,7 +202,9 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
                       );
                     }
                     return _FoodTile(
-                        food: results[i], onTap: () => widget.onPick(results[i]));
+                      food: results[i],
+                      onTap: () => widget.onPick(results[i]),
+                    );
                   },
                 ),
         ),
@@ -218,12 +230,17 @@ class _FoodTile extends StatelessWidget {
       },
     ];
     return ListTile(
-      title: Text(food.localizedNameOf(context),
-          maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(
+        food.localizedNameOf(context),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       subtitle: Text(parts.join(' · ')),
-      trailing: Text(l10n.kcalPer100Short(kcalStr(food.kcal100)),
-          textAlign: TextAlign.right,
-          style: Theme.of(context).textTheme.bodySmall),
+      trailing: Text(
+        l10n.kcalPer100Short(kcalStr(food.kcal100)),
+        textAlign: TextAlign.right,
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
       onTap: onTap,
     );
   }
@@ -241,8 +258,11 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.no_food_outlined,
-              size: 48, color: Theme.of(context).disabledColor),
+          Icon(
+            Icons.no_food_outlined,
+            size: 48,
+            color: Theme.of(context).disabledColor,
+          ),
           const SizedBox(height: 12),
           Text(
             query.isEmpty

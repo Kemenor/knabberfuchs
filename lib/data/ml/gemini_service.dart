@@ -69,10 +69,10 @@ class GeminiService {
           'parts': [
             {'text': _prompt},
             {
-              'inline_data': {'mime_type': 'image/jpeg', 'data': b64}
+              'inline_data': {'mime_type': 'image/jpeg', 'data': b64},
             },
-          ]
-        }
+          ],
+        },
       ],
       'generationConfig': {
         'temperature': 0.2,
@@ -100,8 +100,11 @@ class GeminiService {
       final client = _injected ?? http.Client();
       try {
         final resp = await client
-            .post(uri,
-                headers: {'Content-Type': 'application/json'}, body: body)
+            .post(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: body,
+            )
             .timeout(const Duration(seconds: 30));
         if (resp.statusCode != 200) {
           debugPrint('[gemini] $model HTTP ${resp.statusCode} — next model');
@@ -129,8 +132,9 @@ class GeminiService {
     final decoded = img.decodeImage(bytes);
     if (decoded == null) return bytes;
     var im = decoded;
-    final maxSide =
-        decoded.width >= decoded.height ? decoded.width : decoded.height;
+    final maxSide = decoded.width >= decoded.height
+        ? decoded.width
+        : decoded.height;
     if (maxSide > 768) {
       im = decoded.width >= decoded.height
           ? img.copyResize(decoded, width: 768)
@@ -149,9 +153,12 @@ class GeminiService {
 GeminiFoodResult? parseGeminiResponse(String responseBody) {
   try {
     final data = jsonDecode(responseBody) as Map<String, dynamic>;
-    final text = (((data['candidates'] as List?)?.first
-            as Map<String, dynamic>?)?['content']?['parts'] as List?)
-        ?.first?['text'] as String?;
+    final text =
+        (((data['candidates'] as List?)?.first
+                        as Map<String, dynamic>?)?['content']?['parts']
+                    as List?)
+                ?.first?['text']
+            as String?;
     if (text == null) return null;
     final j = jsonDecode(text) as Map<String, dynamic>;
     if (j['is_food'] == false) return null;

@@ -31,8 +31,11 @@ Future<bool> startRecognizeFoodFlow(
 
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
-  final img = await ImagePicker()
-      .pickImage(source: source, maxWidth: 1024, imageQuality: 85);
+  final img = await ImagePicker().pickImage(
+    source: source,
+    maxWidth: 1024,
+    imageQuality: 85,
+  );
   if (img == null || !context.mounted) return false;
   final bytes = await img.readAsBytes();
   if (!context.mounted) return false;
@@ -57,7 +60,9 @@ Future<bool> startRecognizeFoodFlow(
     );
     GeminiFoodResult? r;
     try {
-      r = await ref.read(geminiServiceProvider).recognizeFood(
+      r = await ref
+          .read(geminiServiceProvider)
+          .recognizeFood(
             bytes,
             geminiKey.trim(),
             preferredModel: preferredModel,
@@ -66,17 +71,20 @@ Future<bool> startRecognizeFoodFlow(
     if (context.mounted) navigator.pop();
     if (!context.mounted) return false;
     if (r != null) {
-      return await showQuickAddSheet(context, ref,
-              day: day,
-              meal: meal,
-              resolveGroup: resolveGroup,
-              initialName: r.name,
-              initialKcal: r.kcal.round(),
-              initialProtein: r.protein,
-              initialCarb: r.carb,
-              initialFat: r.fat,
-              initialWeight: r.grams,
-              sourceLabel: l10n.recognizeByGemini) ==
+      return await showQuickAddSheet(
+            context,
+            ref,
+            day: day,
+            meal: meal,
+            resolveGroup: resolveGroup,
+            initialName: r.name,
+            initialKcal: r.kcal.round(),
+            initialProtein: r.protein,
+            initialCarb: r.carb,
+            initialFat: r.fat,
+            initialWeight: r.grams,
+            sourceLabel: l10n.recognizeByGemini,
+          ) ==
           true;
     }
     messenger.showAutoSnackBar(SnackBar(content: Text(l10n.geminiFailed)));
@@ -90,7 +98,9 @@ Future<bool> startRecognizeFoodFlow(
     // canPop:false blocks the hardware back button so the matching
     // navigator.pop() always closes this dialog, not a route underneath it.
     builder: (_) => const PopScope(
-        canPop: false, child: Center(child: CircularProgressIndicator())),
+      canPop: false,
+      child: Center(child: CircularProgressIndicator()),
+    ),
   );
   List<FoodGuess> guesses;
   try {
@@ -120,13 +130,16 @@ Future<bool> startRecognizeFoodFlow(
       ? null
       : await ref.read(foodRepositoryProvider).estimateKcalForLabel(name);
   if (!context.mounted) return false;
-  final added = await showQuickAddSheet(context, ref,
-      day: day,
-      meal: meal,
-      resolveGroup: resolveGroup,
-      initialName: name,
-      initialKcal: kcal,
-      sourceLabel: name != null ? l10n.recognizeByOnDevice : null);
+  final added = await showQuickAddSheet(
+    context,
+    ref,
+    day: day,
+    meal: meal,
+    resolveGroup: resolveGroup,
+    initialName: name,
+    initialKcal: kcal,
+    sourceLabel: name != null ? l10n.recognizeByOnDevice : null,
+  );
   return added == true;
 }
 
@@ -195,8 +208,9 @@ class _GeminiLoadingDialogState extends State<_GeminiLoadingDialog> {
                 child: Text(
                   l10n.geminiSlow,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.colorScheme.outline),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
                 ),
               ),
           ],
@@ -241,8 +255,10 @@ class _GuessSheet extends StatelessWidget {
                 dense: true,
                 leading: const Icon(Icons.restaurant),
                 title: Text(g.label),
-                trailing: Text('${(g.score * 100).round()}%',
-                    style: theme.textTheme.bodySmall),
+                trailing: Text(
+                  '${(g.score * 100).round()}%',
+                  style: theme.textTheme.bodySmall,
+                ),
                 onTap: () => Navigator.pop(context, g.label),
               ),
             const Divider(),

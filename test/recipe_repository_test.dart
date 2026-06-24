@@ -27,7 +27,10 @@ void main() {
 
   test('create + toShare round-trips items', () async {
     final id = await repo.create(
-        name: share.name, servings: share.servings, items: share.items);
+      name: share.name,
+      servings: share.servings,
+      items: share.items,
+    );
     final recipe = (await db.allRecipes()).firstWhere((r) => r.id == id);
     final items = await repo.items(id);
     final back = repo.toShare(recipe, items);
@@ -44,7 +47,11 @@ void main() {
     expect(grams, 200);
 
     await repo.logPortionGrams(
-        share: share, grams: grams, meal: MealType.dinner, day: '2026-06-17');
+      share: share,
+      grams: grams,
+      meal: MealType.dinner,
+      day: '2026-06-17',
+    );
     final entries = await db.watchDay('2026-06-17').first;
     expect(entries.length, 2); // one entry per ingredient, not a single dish
     expect(entries.map((e) => e.sName), containsAll(['Beans', 'Beef']));
@@ -53,16 +60,26 @@ void main() {
       expect(e.grams, closeTo(100, 0.001));
     }
     // total still 1/4 of 1400 = 350 kcal
-    final totalKcal =
-        entries.fold<double>(0, (s, e) => s + e.sKcal100 * e.grams / 100);
+    final totalKcal = entries.fold<double>(
+      0,
+      (s, e) => s + e.sKcal100 * e.grams / 100,
+    );
     expect(totalKcal, closeTo(350, 0.001));
   });
 
   test('portions across two days split the batch', () async {
     await repo.logPortionGrams(
-        share: share, grams: 200, meal: MealType.dinner, day: '2026-06-17');
+      share: share,
+      grams: 200,
+      meal: MealType.dinner,
+      day: '2026-06-17',
+    );
     await repo.logPortionGrams(
-        share: share, grams: 200, meal: MealType.lunch, day: '2026-06-18');
+      share: share,
+      grams: 200,
+      meal: MealType.lunch,
+      day: '2026-06-18',
+    );
     // two ingredients -> two entries per portion
     expect((await db.watchDay('2026-06-17').first).length, 2);
     expect((await db.watchDay('2026-06-18').first).length, 2);

@@ -32,15 +32,19 @@ class FoodClassifier {
 
   /// Classify a JPEG/PNG image and return the top [topK] food guesses, best
   /// first, excluding the background class and anything below [minScore].
-  Future<List<FoodGuess>> classify(Uint8List bytes,
-      {int topK = 5, double minScore = 0.02}) async {
+  Future<List<FoodGuess>> classify(
+    Uint8List bytes, {
+    int topK = 5,
+    double minScore = 0.02,
+  }) async {
     await _ensureLoaded();
     final decoded = img.decodeImage(bytes);
     if (decoded == null) return const [];
     // Centre-crop to a square first so the model sees the dish without the
     // aspect-ratio distortion a straight stretch-to-192 would introduce.
-    final side =
-        decoded.width < decoded.height ? decoded.width : decoded.height;
+    final side = decoded.width < decoded.height
+        ? decoded.width
+        : decoded.height;
     final square = img.copyCrop(
       decoded,
       x: (decoded.width - side) ~/ 2,
@@ -48,8 +52,11 @@ class FoodClassifier {
       width: side,
       height: side,
     );
-    final resized =
-        img.copyResize(square, width: _inputSize, height: _inputSize);
+    final resized = img.copyResize(
+      square,
+      width: _inputSize,
+      height: _inputSize,
+    );
 
     // [1, 192, 192, 3] uint8
     final input = [

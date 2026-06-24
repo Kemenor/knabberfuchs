@@ -41,27 +41,39 @@ class _ScaleSheetState extends ConsumerState<_ScaleSheet> {
       top: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+          16,
+          0,
+          16,
+          MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.mealMenuScale, style: theme.textTheme.titleLarge),
             const SizedBox(height: 2),
-            Text(widget.group.group.name,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: theme.colorScheme.outline)),
+            Text(
+              widget.group.group.name,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+            ),
             const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text('$_pct%',
-                    style: theme.textTheme.headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  '$_pct%',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const Spacer(),
-                Text('${kcalStr(currentKcal)} → ${kcalStr(newKcal)} kcal',
-                    style: theme.textTheme.titleMedium),
+                Text(
+                  '${kcalStr(currentKcal)} → ${kcalStr(newKcal)} kcal',
+                  style: theme.textTheme.titleMedium,
+                ),
               ],
             ),
             Slider(
@@ -105,6 +117,8 @@ class _ScaleSheetState extends ConsumerState<_ScaleSheet> {
         .read(diaryRepositoryProvider)
         .scaleGroup(groupId: widget.group.group.id, factor: _factor);
     if (mounted) Navigator.of(context).pop();
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.scaleMealDone(pct))));
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.scaleMealDone(pct))),
+    );
   }
 }

@@ -45,7 +45,9 @@ final regionPackStoreProvider = Provider<RegionPackStore>((ref) {
 
 final offlinePackServiceProvider = Provider<OfflinePackService>(
   (ref) => OfflinePackService(
-      ref.watch(dbProvider), ref.watch(regionPackStoreProvider)),
+    ref.watch(dbProvider),
+    ref.watch(regionPackStoreProvider),
+  ),
 );
 
 final installedPacksProvider = StreamProvider<List<InstalledPack>>(
@@ -57,8 +59,11 @@ final offlineManifestProvider = FutureProvider<OfflineManifest>(
 );
 
 final foodRepositoryProvider = Provider<FoodRepository>(
-  (ref) => FoodRepository(ref.watch(dbProvider), ref.watch(offApiProvider),
-      ref.watch(regionPackStoreProvider)),
+  (ref) => FoodRepository(
+    ref.watch(dbProvider),
+    ref.watch(offApiProvider),
+    ref.watch(regionPackStoreProvider),
+  ),
 );
 
 final diaryRepositoryProvider = Provider<DiaryRepository>(
@@ -67,7 +72,9 @@ final diaryRepositoryProvider = Provider<DiaryRepository>(
 
 final recipeRepositoryProvider = Provider<RecipeRepository>(
   (ref) => RecipeRepository(
-      ref.watch(dbProvider), ref.watch(diaryRepositoryProvider)),
+    ref.watch(dbProvider),
+    ref.watch(diaryRepositoryProvider),
+  ),
 );
 
 final recipesProvider = StreamProvider<List<Recipe>>(
@@ -115,8 +122,10 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
   return s;
 });
 
-final healthSyncEnabledProvider = StreamProvider<bool>((ref) =>
-    ref.watch(dbProvider).watchSetting('healthSync').map((v) => v == 'true'));
+final healthSyncEnabledProvider = StreamProvider<bool>(
+  (ref) =>
+      ref.watch(dbProvider).watchSetting('healthSync').map((v) => v == 'true'),
+);
 
 /// Raw entries for the selected day (used to drive Health Connect auto-sync).
 final selectedDayEntriesProvider = StreamProvider<List<Entry>>((ref) {
@@ -204,13 +213,14 @@ class ActiveGroupNotifier extends Notifier<int?> {
     }
     final now = DateTime.now();
     final settings = {
-      for (final s in await _db.watchAllSettings().first) s.key: s.value
+      for (final s in await _db.watchAllSettings().first) s.key: s.value,
     };
     final mt = MealTimes.fromSettings(settings);
     // Localize the auto-name at creation in the active UI language (no
     // BuildContext here, so resolve the locale code directly).
     final locale = resolveUiLocale(settings['appLocale']);
-    final name = '${mealTypeTitle(mt.inferAt(now), locale)} '
+    final name =
+        '${mealTypeTitle(mt.inferAt(now), locale)} '
         '${DateFormat('HH:mm').format(now)}';
     final id = await _db.createEntryGroup(day, name);
     await _setActive(id);
@@ -245,8 +255,9 @@ class ActiveGroupNotifier extends Notifier<int?> {
   }
 }
 
-final activeGroupProvider =
-    NotifierProvider<ActiveGroupNotifier, int?>(ActiveGroupNotifier.new);
+final activeGroupProvider = NotifierProvider<ActiveGroupNotifier, int?>(
+  ActiveGroupNotifier.new,
+);
 
 // ---------------- Settings ----------------
 
@@ -270,16 +281,24 @@ final targetsProvider = StreamProvider<List<Target>>(
 
 /// The UI language override. `null` = follow the device locale; otherwise a
 /// `Locale` built from the stored language code ('en'/'de'/'fr'/'it').
-final localeProvider = StreamProvider<Locale?>((ref) => ref
-    .watch(dbProvider)
-    .watchSetting('appLocale')
-    .map((v) => (v == null || v.isEmpty || v == 'system') ? null : Locale(v)));
+final localeProvider = StreamProvider<Locale?>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('appLocale')
+      .map((v) => (v == null || v.isEmpty || v == 'system') ? null : Locale(v)),
+);
 
 /// User-configured meal windows. Used to auto-label a new meal group (its name)
 /// and to tag entries for Health Connect.
-final mealTimesProvider = StreamProvider<MealTimes>((ref) =>
-    ref.watch(dbProvider).watchAllSettings().map((rows) =>
-        MealTimes.fromSettings({for (final s in rows) s.key: s.value})));
+final mealTimesProvider = StreamProvider<MealTimes>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchAllSettings()
+      .map(
+        (rows) =>
+            MealTimes.fromSettings({for (final s in rows) s.key: s.value}),
+      ),
+);
 
 // ---------------- Day selection & summary ----------------
 
@@ -292,8 +311,9 @@ class SelectedDayNotifier extends Notifier<String> {
   void today() => state = DayKey.today();
 }
 
-final selectedDayProvider =
-    NotifierProvider<SelectedDayNotifier, String>(SelectedDayNotifier.new);
+final selectedDayProvider = NotifierProvider<SelectedDayNotifier, String>(
+  SelectedDayNotifier.new,
+);
 
 /// HomeShell bottom-nav tab index (0 = Day, 1 = Recipes, 2 = Settings). A
 /// provider so flows like "log a recipe portion to a day" can jump to the Day
@@ -304,8 +324,9 @@ class HomeTabNotifier extends Notifier<int> {
   void set(int index) => state = index;
 }
 
-final homeTabProvider =
-    NotifierProvider<HomeTabNotifier, int>(HomeTabNotifier.new);
+final homeTabProvider = NotifierProvider<HomeTabNotifier, int>(
+  HomeTabNotifier.new,
+);
 
 final daySummaryProvider = StreamProvider<DaySummary>((ref) {
   final db = ref.watch(dbProvider);
@@ -313,10 +334,16 @@ final daySummaryProvider = StreamProvider<DaySummary>((ref) {
   final targets = ref.watch(targetsProvider).asData?.value ?? const [];
   final defaultMin = ref.watch(defaultMinProvider).asData?.value;
   final defaultMax = ref.watch(defaultMaxProvider).asData?.value;
-  final target =
-      resolveTarget(targets, defaultMin, defaultMax, DayKey.weekdayIndex(day));
+  final target = resolveTarget(
+    targets,
+    defaultMin,
+    defaultMax,
+    DayKey.weekdayIndex(day),
+  );
 
-  return db.watchDay(day).map(
+  return db
+      .watchDay(day)
+      .map(
         (entries) => DaySummary(
           day: day,
           entries: entries.map(EntryView.new).toList(),

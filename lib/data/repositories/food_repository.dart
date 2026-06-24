@@ -75,26 +75,28 @@ class FoodRepository {
   /// stored row. A no-op for foods already in the catalog.
   Future<Food> ensurePersisted(Food food) async {
     if (food.id != 0) return food;
-    final id = await db.upsertFood(FoodsCompanion.insert(
-      source: food.source,
-      externalId: Value(food.externalId),
-      barcode: Value(food.barcode),
-      name: food.name,
-      brand: Value(food.brand),
-      locale: Value(food.locale),
-      servingG: Value(food.servingG),
-      servingLabel: Value(food.servingLabel),
-      kcal100: food.kcal100,
-      protein100: Value(food.protein100),
-      carb100: Value(food.carb100),
-      fat100: Value(food.fat100),
-      fiber100: Value(food.fiber100),
-      sugar100: Value(food.sugar100),
-      satFat100: Value(food.satFat100),
-      sodiumMg100: Value(food.sodiumMg100),
-      saltG100: Value(food.saltG100),
-      microsJson: Value(food.microsJson),
-    ));
+    final id = await db.upsertFood(
+      FoodsCompanion.insert(
+        source: food.source,
+        externalId: Value(food.externalId),
+        barcode: Value(food.barcode),
+        name: food.name,
+        brand: Value(food.brand),
+        locale: Value(food.locale),
+        servingG: Value(food.servingG),
+        servingLabel: Value(food.servingLabel),
+        kcal100: food.kcal100,
+        protein100: Value(food.protein100),
+        carb100: Value(food.carb100),
+        fat100: Value(food.fat100),
+        fiber100: Value(food.fiber100),
+        sugar100: Value(food.sugar100),
+        satFat100: Value(food.satFat100),
+        sodiumMg100: Value(food.sodiumMg100),
+        saltG100: Value(food.saltG100),
+        microsJson: Value(food.microsJson),
+      ),
+    );
     return (await db.foodById(id))!;
   }
 
@@ -150,23 +152,25 @@ class FoodRepository {
     double? servingG,
     String? servingLabel,
   }) async {
-    final id = await db.upsertFood(FoodsCompanion.insert(
-      source: FoodSource.custom,
-      externalId: Value(barcode),
-      barcode: Value(barcode),
-      name: name,
-      brand: Value(brand),
-      kcal100: kcal100,
-      protein100: Value(protein100),
-      carb100: Value(carb100),
-      fat100: Value(fat100),
-      fiber100: Value(fiber100),
-      sugar100: Value(sugar100),
-      satFat100: Value(satFat100),
-      saltG100: Value(saltG100),
-      servingG: Value(servingG),
-      servingLabel: Value(servingLabel),
-    ));
+    final id = await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.custom,
+        externalId: Value(barcode),
+        barcode: Value(barcode),
+        name: name,
+        brand: Value(brand),
+        kcal100: kcal100,
+        protein100: Value(protein100),
+        carb100: Value(carb100),
+        fat100: Value(fat100),
+        fiber100: Value(fiber100),
+        sugar100: Value(sugar100),
+        satFat100: Value(satFat100),
+        saltG100: Value(saltG100),
+        servingG: Value(servingG),
+        servingLabel: Value(servingLabel),
+      ),
+    );
     return (await db.foodById(id))!;
   }
 

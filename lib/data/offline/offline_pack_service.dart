@@ -26,7 +26,9 @@ class OfflinePackService {
     if (res.statusCode != 200) {
       throw Exception('Manifest unavailable (${res.statusCode})');
     }
-    return OfflineManifest.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+    return OfflineManifest.fromJson(
+      jsonDecode(res.body) as Map<String, dynamic>,
+    );
   }
 
   Future<Directory> _packsDir() async {
@@ -46,7 +48,10 @@ class OfflinePackService {
     RegionInfo region, {
     void Function(double progress)? onProgress,
   }) async {
-    final req = http.Request('GET', Uri.parse(region.downloadUrl(manifest.baseUrl)));
+    final req = http.Request(
+      'GET',
+      Uri.parse(region.downloadUrl(manifest.baseUrl)),
+    );
     final resp = await http.Client().send(req);
     if (resp.statusCode != 200) {
       throw Exception('Download failed (${resp.statusCode})');
@@ -70,13 +75,15 @@ class OfflinePackService {
     final dir = await _packsDir();
     await File(_packPath(dir.path, region.code)).writeAsBytes(raw, flush: true);
 
-    await db.upsertInstalledPack(InstalledPacksCompanion.insert(
-      code: region.code,
-      name: region.name,
-      version: region.version,
-      products: region.products,
-      sizeBytes: raw.length,
-    ));
+    await db.upsertInstalledPack(
+      InstalledPacksCompanion.insert(
+        code: region.code,
+        name: region.name,
+        version: region.version,
+        products: region.products,
+        sizeBytes: raw.length,
+      ),
+    );
     await syncStore();
   }
 

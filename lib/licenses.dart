@@ -5,10 +5,9 @@ import 'package:flutter/foundation.dart';
 /// package licenses automatically, but not bundled files like the food model.
 void registerBundledLicenses() {
   LicenseRegistry.addLicense(() async* {
-    yield const LicenseEntryWithLineBreaks(
-      ['Knabberfuchs — Google AIY Vision food_V1 model'],
-      _aiyNotice,
-    );
+    yield const LicenseEntryWithLineBreaks([
+      'Knabberfuchs — Google AIY Vision food_V1 model',
+    ], _aiyNotice);
   });
 }
 

@@ -49,7 +49,10 @@ class HealthService {
     final end = start.add(const Duration(days: 1));
     try {
       await _health.delete(
-          type: h.HealthDataType.NUTRITION, startTime: start, endTime: end);
+        type: h.HealthDataType.NUTRITION,
+        startTime: start,
+        endTime: end,
+      );
       for (var i = 0; i < entries.length; i++) {
         final e = entries[i];
         final factor = e.grams / 100.0;
@@ -101,9 +104,9 @@ class HealthService {
   }
 
   h.MealType _mealType(MealType m) => switch (m) {
-        MealType.breakfast => h.MealType.BREAKFAST,
-        MealType.lunch => h.MealType.LUNCH,
-        MealType.dinner => h.MealType.DINNER,
-        MealType.snack => h.MealType.SNACK,
-      };
+    MealType.breakfast => h.MealType.BREAKFAST,
+    MealType.lunch => h.MealType.LUNCH,
+    MealType.dinner => h.MealType.DINNER,
+    MealType.snack => h.MealType.SNACK,
+  };
 }

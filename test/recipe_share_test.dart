@@ -6,8 +6,22 @@ void main() {
     name: 'Porridge',
     servings: 2,
     items: const [
-      RecipeShareItem(name: 'Oats', grams: 100, kcal100: 389, protein100: 16.9, carb100: 66, fat100: 6.9),
-      RecipeShareItem(name: 'Milk', grams: 400, kcal100: 64, protein100: 3.4, carb100: 4.8, fat100: 3.6),
+      RecipeShareItem(
+        name: 'Oats',
+        grams: 100,
+        kcal100: 389,
+        protein100: 16.9,
+        carb100: 66,
+        fat100: 6.9,
+      ),
+      RecipeShareItem(
+        name: 'Milk',
+        grams: 400,
+        kcal100: 64,
+        protein100: 3.4,
+        carb100: 4.8,
+        fat100: 3.6,
+      ),
     ],
   );
 

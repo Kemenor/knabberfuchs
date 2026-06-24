@@ -21,7 +21,10 @@ class RecipesScreen extends ConsumerWidget {
 
     // Decode a shared payload (from QR or pasted text) and import it.
     // [messenger] is captured before the await so there's no context-after-gap.
-    Future<void> applyImport(ScaffoldMessengerState messenger, String? text) async {
+    Future<void> applyImport(
+      ScaffoldMessengerState messenger,
+      String? text,
+    ) async {
       final share = text == null ? null : RecipeCodec.decode(text.trim());
       if (share == null) {
         messenger.showAutoSnackBar(SnackBar(content: Text(l10n.qrNotRecipe)));
@@ -29,7 +32,8 @@ class RecipesScreen extends ConsumerWidget {
       }
       await ref.read(recipeRepositoryProvider).importShare(share);
       messenger.showAutoSnackBar(
-          SnackBar(content: Text(l10n.recipeImported(share.name))));
+        SnackBar(content: Text(l10n.recipeImported(share.name))),
+      );
     }
 
     Future<void> importFromQr() async {
@@ -62,16 +66,19 @@ class RecipesScreen extends ConsumerWidget {
               minLines: 2,
               maxLines: 5,
               decoration: InputDecoration(
-                  hintText: l10n.importTextHint,
-                  border: const OutlineInputBorder()),
+                hintText: l10n.importTextHint,
+                border: const OutlineInputBorder(),
+              ),
             ),
             actions: [
               TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(l10n.actionCancel)),
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(l10n.actionCancel),
+              ),
               FilledButton(
-                  onPressed: () => Navigator.pop(ctx, controller.text),
-                  child: Text(l10n.actionImport)),
+                onPressed: () => Navigator.pop(ctx, controller.text),
+                child: Text(l10n.actionImport),
+              ),
             ],
           ),
         );
@@ -98,8 +105,9 @@ class RecipesScreen extends ConsumerWidget {
                 subtitle: Text(l10n.createBuildManuallySub),
                 onTap: () {
                   Navigator.pop(sheetCtx);
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => const RecipeEditScreen()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const RecipeEditScreen()),
+                  );
                 },
               ),
               ListTile(
@@ -145,10 +153,7 @@ class RecipesScreen extends ConsumerWidget {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
-                child: Text(
-                  l10n.recipesEmpty,
-                  textAlign: TextAlign.center,
-                ),
+                child: Text(l10n.recipesEmpty, textAlign: TextAlign.center),
               ),
             );
           }
@@ -166,15 +171,19 @@ class RecipesScreen extends ConsumerWidget {
                   color: theme.colorScheme.primaryContainer,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 20),
-                  child: Icon(Icons.event_available,
-                      color: theme.colorScheme.onPrimaryContainer),
+                  child: Icon(
+                    Icons.event_available,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
                 ),
                 secondaryBackground: Container(
                   color: theme.colorScheme.errorContainer,
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(right: 20),
-                  child: Icon(Icons.delete_outline,
-                      color: theme.colorScheme.onErrorContainer),
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: theme.colorScheme.onErrorContainer,
+                  ),
                 ),
                 confirmDismiss: (dir) async {
                   if (dir == DismissDirection.startToEnd) {
@@ -187,11 +196,13 @@ class RecipesScreen extends ConsumerWidget {
                       title: Text(l10n.recipeDeleteConfirm(r.name)),
                       actions: [
                         TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: Text(l10n.actionCancel)),
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: Text(l10n.actionCancel),
+                        ),
                         FilledButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: Text(l10n.actionDelete)),
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: Text(l10n.actionDelete),
+                        ),
                       ],
                     ),
                   );
@@ -203,11 +214,17 @@ class RecipesScreen extends ConsumerWidget {
                 child: ListTile(
                   leading: const Icon(Icons.menu_book_outlined),
                   title: Text(r.name),
-                  subtitle: Text(l10n.recipeServings(r.servings.toStringAsFixed(
-                      r.servings == r.servings.roundToDouble() ? 0 : 1))),
+                  subtitle: Text(
+                    l10n.recipeServings(
+                      r.servings.toStringAsFixed(
+                        r.servings == r.servings.roundToDouble() ? 0 : 1,
+                      ),
+                    ),
+                  ),
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
-                        builder: (_) => RecipeDetailScreen(recipe: r)),
+                      builder: (_) => RecipeDetailScreen(recipe: r),
+                    ),
                   ),
                 ),
               );

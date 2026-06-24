@@ -19,18 +19,24 @@ class BackupService {
   Future<File> buildZip() async {
     final now = DateTime.now();
     final map = await buildBackupMap(db, exportedAt: now);
-    final jsonBytes = utf8.encode(const JsonEncoder.withIndent('  ').convert(map));
+    final jsonBytes = utf8.encode(
+      const JsonEncoder.withIndent('  ').convert(map),
+    );
     final csvBytes = utf8.encode(buildEntriesCsv(await db.allEntries()));
-    final manifestBytes = utf8.encode(jsonEncode({
-      'app': 'calorie_tracker',
-      'schemaVersion': backupSchemaVersion,
-      'exportedAt': now.toIso8601String(),
-    }));
+    final manifestBytes = utf8.encode(
+      jsonEncode({
+        'app': 'calorie_tracker',
+        'schemaVersion': backupSchemaVersion,
+        'exportedAt': now.toIso8601String(),
+      }),
+    );
 
     final archive = Archive()
       ..addFile(ArchiveFile('backup.json', jsonBytes.length, jsonBytes))
       ..addFile(ArchiveFile('entries.csv', csvBytes.length, csvBytes))
-      ..addFile(ArchiveFile('manifest.json', manifestBytes.length, manifestBytes));
+      ..addFile(
+        ArchiveFile('manifest.json', manifestBytes.length, manifestBytes),
+      );
 
     final zipBytes = ZipEncoder().encode(archive);
     final dir = await getTemporaryDirectory();
@@ -42,10 +48,12 @@ class BackupService {
 
   Future<void> shareBackup({String? subject}) async {
     final file = await buildZip();
-    await SharePlus.instance.share(ShareParams(
-      files: [XFile(file.path)],
-      subject: subject ?? 'Knabberfuchs backup',
-    ));
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(file.path)],
+        subject: subject ?? 'Knabberfuchs backup',
+      ),
+    );
   }
 
   /// Replace all user data with the contents of a backup .zip. Throws
@@ -58,8 +66,9 @@ class BackupService {
       orElse: () =>
           throw const FormatException('Not a valid backup (no backup.json).'),
     );
-    final map = jsonDecode(utf8.decode(jsonFile.content as List<int>))
-        as Map<String, dynamic>;
+    final map =
+        jsonDecode(utf8.decode(jsonFile.content as List<int>))
+            as Map<String, dynamic>;
     await restoreBackupMap(db, map);
   }
 }

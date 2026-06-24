@@ -76,14 +76,16 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
 
 class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
   late final _name = TextEditingController(text: widget.initialName ?? '');
-  late final _kcal =
-      TextEditingController(text: widget.initialKcal?.toString() ?? '');
+  late final _kcal = TextEditingController(
+    text: widget.initialKcal?.toString() ?? '',
+  );
   late final _protein = TextEditingController(text: _g(widget.initialProtein));
   late final _carb = TextEditingController(text: _g(widget.initialCarb));
   late final _fat = TextEditingController(text: _g(widget.initialFat));
   late final _weight = TextEditingController(text: _g(widget.initialWeight));
   final _weightFocus = FocusNode();
-  late bool _showMacros = widget.initialProtein != null ||
+  late bool _showMacros =
+      widget.initialProtein != null ||
       widget.initialCarb != null ||
       widget.initialFat != null;
 
@@ -138,8 +140,11 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
     _lastWeight = w;
   }
 
-  void _scaleField(TextEditingController c, double ratio,
-      {bool decimals = true}) {
+  void _scaleField(
+    TextEditingController c,
+    double ratio, {
+    bool decimals = true,
+  }) {
     final v = _num(c);
     if (v == null) return;
     final scaled = v * ratio;
@@ -160,8 +165,9 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
       // Tapping "Add" doesn't blur the weight field, so commit any pending
       // rescale first (idempotent if the focus listener already ran).
       _applyWeightScale();
-      final groupId =
-          widget.resolveGroup == null ? null : await widget.resolveGroup!();
+      final groupId = widget.resolveGroup == null
+          ? null
+          : await widget.resolveGroup!();
       // The fields hold portion totals. With a weight, store the real grams and
       // a correct per-100 g snapshot (total / grams * 100) so the entry scales
       // when edited; without one, fall back to grams=100 (totals verbatim).
@@ -173,7 +179,9 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
         return v == null ? null : v * f;
       }
 
-      await ref.read(diaryRepositoryProvider).logSnapshot(
+      await ref
+          .read(diaryRepositoryProvider)
+          .logSnapshot(
             name: _name.text.trim(),
             kcal100: _num(_kcal)! * f,
             protein100: per(_protein),
@@ -197,7 +205,11 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
       top: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+          16,
+          0,
+          16,
+          MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,24 +219,32 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.auto_awesome,
-                      size: 14, color: Theme.of(context).colorScheme.outline),
+                  Icon(
+                    Icons.auto_awesome,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                   const SizedBox(width: 6),
-                  Text(widget.sourceLabel!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.outline)),
+                  Text(
+                    widget.sourceLabel!,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
                 ],
               ),
             ],
             const SizedBox(height: 12),
             TextField(
               controller: _name,
-              autofocus: widget.initialName == null ||
+              autofocus:
+                  widget.initialName == null ||
                   widget.initialName!.trim().isEmpty,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
-                  labelText: l10n.quickAddName,
-                  border: const OutlineInputBorder()),
+                labelText: l10n.quickAddName,
+                border: const OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -234,12 +254,14 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
                   flex: 3,
                   child: TextField(
                     controller: _kcal,
-                    autofocus: widget.initialName != null &&
+                    autofocus:
+                        widget.initialName != null &&
                         widget.initialName!.trim().isNotEmpty,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                     ],
                     decoration: InputDecoration(
                       labelText: l10n.quickAddCalories,
@@ -254,10 +276,11 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
                   child: TextField(
                     controller: _weight,
                     focusNode: _weightFocus,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                     ],
                     decoration: InputDecoration(
                       labelText: l10n.quickAddWeight,
@@ -303,16 +326,14 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
   }
 
   Widget _macroField(TextEditingController c, String label) => TextField(
-        controller: c,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))
-        ],
-        decoration: InputDecoration(
-          labelText: label,
-          suffixText: 'g',
-          isDense: true,
-          border: const OutlineInputBorder(),
-        ),
-      );
+    controller: c,
+    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+    decoration: InputDecoration(
+      labelText: label,
+      suffixText: 'g',
+      isDense: true,
+      border: const OutlineInputBorder(),
+    ),
+  );
 }

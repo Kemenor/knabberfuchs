@@ -15,7 +15,10 @@ void main() {
   });
 
   test('density applies to volumes only', () {
-    expect(AmountUnit.tablespoon.toGrams(2, density: 0.92), closeTo(27.6, 0.001));
+    expect(
+      AmountUnit.tablespoon.toGrams(2, density: 0.92),
+      closeTo(27.6, 0.001),
+    );
     expect(AmountUnit.grams.toGrams(100, density: 0.92), 100);
   });
 

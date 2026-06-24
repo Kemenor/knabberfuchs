@@ -29,17 +29,25 @@ class AddFoodScreen extends ConsumerWidget {
 
   Future<void> _pick(BuildContext context, WidgetRef ref, Food food) async {
     // Search hits from region packs are synthetic (id 0) — persist before logging.
-    final persisted = await ref.read(foodRepositoryProvider).ensurePersisted(food);
+    final persisted = await ref
+        .read(foodRepositoryProvider)
+        .ensurePersisted(food);
     if (!context.mounted) return;
-    final added = await showLogFoodSheet(context, ref,
-        food: persisted, day: day, meal: meal, resolveGroup: resolveGroup);
+    final added = await showLogFoodSheet(
+      context,
+      ref,
+      food: persisted,
+      day: day,
+      meal: meal,
+      resolveGroup: resolveGroup,
+    );
     if (added == true && context.mounted) Navigator.of(context).pop();
   }
 
   Future<void> _scan(BuildContext context, WidgetRef ref) async {
-    final barcode = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) => const ScanScreen()),
-    );
+    final barcode = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => const ScanScreen()));
     if (barcode == null || !context.mounted) return;
     final hit = await ref.read(foodRepositoryProvider).lookupBarcode(barcode);
     if (!context.mounted) return;
@@ -49,22 +57,35 @@ class AddFoodScreen extends ConsumerWidget {
       reminder?.call(); // after the log sheet closes, so it isn't hidden
     } else {
       // Not found anywhere — let the user add it (and optionally send to OFF).
-      final created = await Navigator.of(context).push<Food>(MaterialPageRoute(
-          builder: (_) => FoodFormScreen(barcode: barcode)));
-      if (created != null && context.mounted) await _pick(context, ref, created);
+      final created = await Navigator.of(context).push<Food>(
+        MaterialPageRoute(builder: (_) => FoodFormScreen(barcode: barcode)),
+      );
+      if (created != null && context.mounted) {
+        await _pick(context, ref, created);
+      }
     }
   }
 
   Future<void> _createCustom(BuildContext context, WidgetRef ref) async {
-    final food = await Navigator.of(context).push<Food>(
-      MaterialPageRoute(builder: (_) => const FoodFormScreen()),
-    );
+    final food = await Navigator.of(
+      context,
+    ).push<Food>(MaterialPageRoute(builder: (_) => const FoodFormScreen()));
     if (food != null && context.mounted) await _pick(context, ref, food);
   }
 
-  Future<void> _quickAdd(BuildContext context, WidgetRef ref, String name) async {
-    final added = await showQuickAddSheet(context, ref,
-        day: day, meal: meal, resolveGroup: resolveGroup, initialName: name);
+  Future<void> _quickAdd(
+    BuildContext context,
+    WidgetRef ref,
+    String name,
+  ) async {
+    final added = await showQuickAddSheet(
+      context,
+      ref,
+      day: day,
+      meal: meal,
+      resolveGroup: resolveGroup,
+      initialName: name,
+    );
     if (added == true && context.mounted) Navigator.of(context).pop();
   }
 

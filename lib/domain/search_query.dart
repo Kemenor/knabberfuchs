@@ -44,7 +44,10 @@ List<String> searchTokens(String raw) {
     ..sort((a, b) => b.split(' ').length.compareTo(a.split(' ').length));
   for (final key in keys) {
     tokens = _replacePhrase(
-        tokens, key.split(' '), kSearchSynonyms[key]!.split(' '));
+      tokens,
+      key.split(' '),
+      kSearchSynonyms[key]!.split(' '),
+    );
   }
 
   // Dedupe while preserving order (synonyms can introduce repeats).
@@ -53,7 +56,10 @@ List<String> searchTokens(String raw) {
 
 /// Replace every contiguous run of [find] tokens with [replace] tokens.
 List<String> _replacePhrase(
-    List<String> tokens, List<String> find, List<String> replace) {
+  List<String> tokens,
+  List<String> find,
+  List<String> replace,
+) {
   if (find.isEmpty) return tokens;
   final out = <String>[];
   var i = 0;

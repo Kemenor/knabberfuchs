@@ -21,14 +21,18 @@ class FoodPickerScreen extends ConsumerWidget {
   const FoodPickerScreen({super.key, this.title, this.initialQuery});
 
   Future<void> _scan(BuildContext context, WidgetRef ref) async {
-    final barcode = await Navigator.of(context).push<String>(MaterialPageRoute(
-      builder: (_) => const ScanScreen(formats: [
-        BarcodeFormat.ean13,
-        BarcodeFormat.ean8,
-        BarcodeFormat.upcA,
-        BarcodeFormat.upcE,
-      ]),
-    ));
+    final barcode = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => const ScanScreen(
+          formats: [
+            BarcodeFormat.ean13,
+            BarcodeFormat.ean8,
+            BarcodeFormat.upcA,
+            BarcodeFormat.upcE,
+          ],
+        ),
+      ),
+    );
     if (barcode == null || !context.mounted) return;
     final hit = await ref.read(foodRepositoryProvider).lookupBarcode(barcode);
     if (!context.mounted) return;
@@ -37,16 +41,19 @@ class FoodPickerScreen extends ConsumerWidget {
       Navigator.of(context).pop(hit.food);
       reminder?.call(); // shows on the screen we return to
     } else {
-      final created = await Navigator.of(context).push<Food>(MaterialPageRoute(
-          builder: (_) => FoodFormScreen(barcode: barcode)));
-      if (created != null && context.mounted) Navigator.of(context).pop(created);
+      final created = await Navigator.of(context).push<Food>(
+        MaterialPageRoute(builder: (_) => FoodFormScreen(barcode: barcode)),
+      );
+      if (created != null && context.mounted) {
+        Navigator.of(context).pop(created);
+      }
     }
   }
 
   Future<void> _createCustom(BuildContext context) async {
-    final food = await Navigator.of(context).push<Food>(
-      MaterialPageRoute(builder: (_) => const FoodFormScreen()),
-    );
+    final food = await Navigator.of(
+      context,
+    ).push<Food>(MaterialPageRoute(builder: (_) => const FoodFormScreen()));
     if (food != null && context.mounted) Navigator.of(context).pop(food);
   }
 

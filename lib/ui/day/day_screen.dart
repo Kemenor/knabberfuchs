@@ -194,26 +194,36 @@ void addFoodByDay(BuildContext context, WidgetRef ref, String day) {
 
 /// AI photo recognition that logs into [day]'s active (or new) meal group.
 Future<void> recognizeFoodByDay(
-    BuildContext context, WidgetRef ref, String day) async {
+  BuildContext context,
+  WidgetRef ref,
+  String day,
+) async {
   final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
       .inferNow();
-  await startRecognizeFoodFlow(context, ref,
-      day: day,
-      meal: meal,
-      resolveGroup: () =>
-          ref.read(activeGroupProvider.notifier).ensureGroup(day));
+  await startRecognizeFoodFlow(
+    context,
+    ref,
+    day: day,
+    meal: meal,
+    resolveGroup: () => ref.read(activeGroupProvider.notifier).ensureGroup(day),
+  );
 }
 
 /// Free add (name + calories) that logs into [day]'s active (or new) group.
 Future<void> quickAddByDay(
-    BuildContext context, WidgetRef ref, String day) async {
+  BuildContext context,
+  WidgetRef ref,
+  String day,
+) async {
   final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
       .inferNow();
-  await showQuickAddSheet(context, ref,
-      day: day,
-      meal: meal,
-      resolveGroup: () =>
-          ref.read(activeGroupProvider.notifier).ensureGroup(day));
+  await showQuickAddSheet(
+    context,
+    ref,
+    day: day,
+    meal: meal,
+    resolveGroup: () => ref.read(activeGroupProvider.notifier).ensureGroup(day),
+  );
 }
 
 class _DayBody extends ConsumerWidget {
@@ -227,15 +237,17 @@ class _DayBody extends ConsumerWidget {
     final groups = ref.watch(dayGroupViewsProvider);
     final ungrouped = ref.watch(ungroupedDayEntriesProvider);
     if (groups.isEmpty && ungrouped.isEmpty) {
-      children.add(Padding(
-        padding: const EdgeInsets.all(48),
-        child: Center(
-          child: Text(
-            AppLocalizations.of(context).dayEmptyHint,
-            textAlign: TextAlign.center,
+      children.add(
+        Padding(
+          padding: const EdgeInsets.all(48),
+          child: Center(
+            child: Text(
+              AppLocalizations.of(context).dayEmptyHint,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
-      ));
+      );
     } else {
       children.addAll([
         for (final g in groups) _GroupSection(group: g, day: summary.day),
@@ -279,9 +291,10 @@ class _SummaryCard extends StatelessWidget {
     final statusText = switch (status) {
       TargetStatus.over => l10n.targetOver(kcalStr(-summary.remainingToMax!)),
       TargetStatus.under => l10n.targetToGo(kcalStr(summary.shortOfMin!)),
-      TargetStatus.inRange => summary.kcalMax != null
-          ? l10n.targetLeft(kcalStr(summary.remainingToMax!))
-          : l10n.targetMinReached,
+      TargetStatus.inRange =>
+        summary.kcalMax != null
+            ? l10n.targetLeft(kcalStr(summary.remainingToMax!))
+            : l10n.targetMinReached,
       TargetStatus.none => '',
     };
 
@@ -296,17 +309,22 @@ class _SummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(kcalStr(total.kcal),
-                    style: theme.textTheme.displaySmall
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  kcalStr(total.kcal),
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(width: 4),
                 Text(l10n.unitKcal, style: theme.textTheme.titleMedium),
                 const Spacer(),
                 if (summary.hasTarget)
                   Text(
                     statusText,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(color: color, fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
               ],
             ),
@@ -327,8 +345,10 @@ class _SummaryCard extends StatelessWidget {
             ],
             if (summary.hasTarget) ...[
               const SizedBox(height: 4),
-              Text(_rangeLabel(l10n, summary),
-                  style: theme.textTheme.bodySmall),
+              Text(
+                _rangeLabel(l10n, summary),
+                style: theme.textTheme.bodySmall,
+              ),
             ],
             const SizedBox(height: 12),
             _MacroRow(total: total),
@@ -360,9 +380,12 @@ class _MacroRow extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Text('${macroStr(grams)} g',
-            style: theme.textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '${macroStr(grams)} g',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         Text(label, style: theme.textTheme.bodySmall),
       ],
     );
@@ -401,15 +424,20 @@ class _GroupSection extends ConsumerWidget {
                   child: Row(
                     children: [
                       Flexible(
-                        child: Text(group.name,
-                            style: theme.textTheme.titleSmall
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
+                        child: Text(
+                          group.name,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       const SizedBox(width: 8),
-                      Text('${kcalStr(group.subtotal.kcal)} kcal',
-                          style: theme.textTheme.bodySmall),
+                      Text(
+                        '${kcalStr(group.subtotal.kcal)} kcal',
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ],
                   ),
                 ),
@@ -433,20 +461,32 @@ class _GroupSection extends ConsumerWidget {
                 itemBuilder: (_) => [
                   PopupMenuItem(value: 'edit', child: Text(l10n.mealMenuEdit)),
                   PopupMenuItem(
-                      value: 'scale', child: Text(l10n.mealMenuScale)),
+                    value: 'scale',
+                    child: Text(l10n.mealMenuScale),
+                  ),
                   PopupMenuItem(
-                      value: 'split', child: Text(l10n.mealMenuSplit)),
+                    value: 'split',
+                    child: Text(l10n.mealMenuSplit),
+                  ),
                   PopupMenuItem(
-                      value: 'recipe', child: Text(l10n.mealMenuSaveRecipe)),
+                    value: 'recipe',
+                    child: Text(l10n.mealMenuSaveRecipe),
+                  ),
                   PopupMenuItem(
-                      value: 'delete', child: Text(l10n.mealMenuDelete)),
+                    value: 'delete',
+                    child: Text(l10n.mealMenuDelete),
+                  ),
                 ],
               ),
               if (isActive)
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   tooltip: l10n.mealFinish,
-                  icon: Icon(Icons.check, size: 22, color: theme.colorScheme.primary),
+                  icon: Icon(
+                    Icons.check,
+                    size: 22,
+                    color: theme.colorScheme.primary,
+                  ),
                   onPressed: () => ref.read(activeGroupProvider.notifier).end(),
                 )
               else
@@ -477,7 +517,9 @@ class _GroupSection extends ConsumerWidget {
   Future<void> _saveAsRecipe(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
-    await ref.read(recipeRepositoryProvider).create(
+    await ref
+        .read(recipeRepositoryProvider)
+        .create(
           name: group.name,
           servings: 1,
           items: [
@@ -493,7 +535,8 @@ class _GroupSection extends ConsumerWidget {
           ],
         );
     messenger.showAutoSnackBar(
-        SnackBar(content: Text(l10n.mealSavedToRecipes(group.name))));
+      SnackBar(content: Text(l10n.mealSavedToRecipes(group.name))),
+    );
   }
 
   Future<void> _delete(WidgetRef ref) async {
@@ -516,8 +559,9 @@ class _EditMealSheet extends ConsumerStatefulWidget {
 }
 
 class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
-  late final TextEditingController _nameCtrl =
-      TextEditingController(text: widget.group.name);
+  late final TextEditingController _nameCtrl = TextEditingController(
+    text: widget.group.name,
+  );
   late MealType _meal = widget.group.items.isNotEmpty
       ? widget.group.items.first.meal
       : MealType.snack;
@@ -552,18 +596,32 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {
-      setState(() => _when =
-          DateTime(picked.year, picked.month, picked.day, _when.hour, _when.minute));
+      setState(
+        () => _when = DateTime(
+          picked.year,
+          picked.month,
+          picked.day,
+          _when.hour,
+          _when.minute,
+        ),
+      );
     }
   }
 
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
-        context: context, initialTime: TimeOfDay.fromDateTime(_when));
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_when),
+    );
     if (picked != null) {
       setState(() {
         _when = DateTime(
-            _when.year, _when.month, _when.day, picked.hour, picked.minute);
+          _when.year,
+          _when.month,
+          _when.day,
+          picked.hour,
+          picked.minute,
+        );
         if (!_nameDirty) _nameCtrl.text = _autoName;
       });
     }
@@ -575,12 +633,12 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
     final db = ref.read(dbProvider);
     final health = ref.read(healthServiceProvider);
     await db.editEntryGroup(
-          id: widget.group.id,
-          name: name.isEmpty ? _autoName : name,
-          day: newDay,
-          time: _when,
-          mealType: _meal,
-        );
+      id: widget.group.id,
+      name: name.isEmpty ? _autoName : name,
+      day: newDay,
+      time: _when,
+      mealType: _meal,
+    );
     // Re-sync Health Connect for both the source and destination day. The
     // day-screen listener only covers the selected day, so a cross-day move
     // would otherwise leave the meal double-counted on the old day. Each call
@@ -602,7 +660,11 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
       top: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-            16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+          16,
+          0,
+          16,
+          MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -626,8 +688,12 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
               children: [
                 for (final m in MealType.values)
                   ChoiceChip(
-                    label: Text(mealTypeTitle(
-                        m, Localizations.localeOf(context).languageCode)),
+                    label: Text(
+                      mealTypeTitle(
+                        m,
+                        Localizations.localeOf(context).languageCode,
+                      ),
+                    ),
                     selected: _meal == m,
                     onSelected: (_) => _reclassify(m),
                   ),

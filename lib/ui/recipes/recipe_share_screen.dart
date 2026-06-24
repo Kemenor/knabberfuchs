@@ -33,8 +33,9 @@ class _RecipeShareScreenState extends State<RecipeShareScreen> {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/recipe_qr.png');
     await file.writeAsBytes(data.buffer.asUint8List());
-    await SharePlus.instance
-        .share(ShareParams(files: [XFile(file.path)], subject: subject));
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(file.path)], subject: subject),
+    );
   }
 
   @override

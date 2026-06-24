@@ -33,15 +33,22 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
     final l10n = AppLocalizations.of(context);
     setState(() => _progress[r.code] = 0);
     try {
-      await ref.read(offlinePackServiceProvider).install(m, r,
-          onProgress: (p) {
-        if (mounted) setState(() => _progress[r.code] = p);
-      });
-      messenger
-          .showAutoSnackBar(SnackBar(content: Text(l10n.regionDownloaded(r.name))));
+      await ref
+          .read(offlinePackServiceProvider)
+          .install(
+            m,
+            r,
+            onProgress: (p) {
+              if (mounted) setState(() => _progress[r.code] = p);
+            },
+          );
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.regionDownloaded(r.name))),
+      );
     } catch (e) {
       messenger.showAutoSnackBar(
-          SnackBar(content: Text(l10n.regionDownloadFailed('$e'))));
+        SnackBar(content: Text(l10n.regionDownloadFailed('$e'))),
+      );
     } finally {
       if (mounted) setState(() => _progress.remove(r.code));
     }
@@ -53,8 +60,9 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
     final messenger = ScaffoldMessenger.of(context);
     await ref.read(offlinePackServiceProvider).remove(code);
     if (mounted) {
-      messenger
-          .showAutoSnackBar(SnackBar(content: Text(l10n.regionRemoved(name))));
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.regionRemoved(name))),
+      );
     }
   }
 
@@ -64,8 +72,9 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
     final l10n = AppLocalizations.of(context);
     final manifestAsync = ref.watch(offlineManifestProvider);
     final installed = {
-      for (final p in ref.watch(installedPacksProvider).asData?.value ?? const [])
-        p.code: p
+      for (final p
+          in ref.watch(installedPacksProvider).asData?.value ?? const [])
+        p.code: p,
     };
 
     return Scaffold(
@@ -75,28 +84,32 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
         error: (e, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text(l10n.regionLoadError, textAlign: TextAlign.center),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () => ref.invalidate(offlineManifestProvider),
-                child: Text(l10n.actionRetry),
-              ),
-            ]),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(l10n.regionLoadError, textAlign: TextAlign.center),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () => ref.invalidate(offlineManifestProvider),
+                  child: Text(l10n.actionRetry),
+                ),
+              ],
+            ),
           ),
         ),
         data: (manifest) {
           final q = _query.trim().toLowerCase();
-          final regions = manifest.regions
-              .where((r) => q.isEmpty || r.name.toLowerCase().contains(q))
-              .toList()
-            ..sort((a, b) {
-              // Installed first, then alphabetical by name.
-              final ai = installed.containsKey(a.code);
-              final bi = installed.containsKey(b.code);
-              if (ai != bi) return ai ? -1 : 1;
-              return a.name.compareTo(b.name);
-            });
+          final regions =
+              manifest.regions
+                  .where((r) => q.isEmpty || r.name.toLowerCase().contains(q))
+                  .toList()
+                ..sort((a, b) {
+                  // Installed first, then alphabetical by name.
+                  final ai = installed.containsKey(a.code);
+                  final bi = installed.containsKey(b.code);
+                  if (ai != bi) return ai ? -1 : 1;
+                  return a.name.compareTo(b.name);
+                });
 
           return Column(
             children: [
@@ -129,8 +142,11 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
               Expanded(
                 child: regions.isEmpty
                     ? Center(
-                        child: Text(l10n.regionNoMatch(_query),
-                            style: theme.textTheme.bodyMedium))
+                        child: Text(
+                          l10n.regionNoMatch(_query),
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      )
                     : ListView(
                         children: [
                           for (final r in regions)
@@ -144,8 +160,10 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
                           const Divider(),
                           Padding(
                             padding: const EdgeInsets.all(16),
-                            child: Text(manifest.attribution,
-                                style: theme.textTheme.bodySmall),
+                            child: Text(
+                              manifest.attribution,
+                              style: theme.textTheme.bodySmall,
+                            ),
                           ),
                         ],
                       ),
@@ -180,8 +198,7 @@ class _RegionTile extends StatelessWidget {
     final isInstalled = installed != null;
     final updatable = isInstalled && installed!.version != region.version;
     final subtitle = l10n.regionSubtitle(
-      (region.products / 1000)
-          .toStringAsFixed(region.products >= 1000 ? 0 : 1),
+      (region.products / 1000).toStringAsFixed(region.products >= 1000 ? 0 : 1),
       _mb(region.size),
     );
 
@@ -224,8 +241,8 @@ class _RegionTile extends StatelessWidget {
         isInstalled && !updatable
             ? l10n.regionSubtitleInstalled(subtitle)
             : updatable
-                ? l10n.regionSubtitleUpdatable(subtitle)
-                : subtitle,
+            ? l10n.regionSubtitleUpdatable(subtitle)
+            : subtitle,
       ),
       trailing: trailing,
     );

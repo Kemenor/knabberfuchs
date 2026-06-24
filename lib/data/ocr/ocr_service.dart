@@ -7,8 +7,9 @@ import '../../domain/ocr_ingredient.dart';
 /// position so a name and its (separately-styled) quantity land on one line,
 /// then parses ingredients.
 class OcrService {
-  final TextRecognizer _recognizer =
-      TextRecognizer(script: TextRecognitionScript.latin);
+  final TextRecognizer _recognizer = TextRecognizer(
+    script: TextRecognitionScript.latin,
+  );
 
   Future<List<OcrIngredient>> ingredientsFromImage(String path) async {
     return parseIngredientLines(await _rows(path));
@@ -20,8 +21,9 @@ class OcrService {
   }
 
   Future<List<String>> _rows(String path) async {
-    final result =
-        await _recognizer.processImage(InputImage.fromFilePath(path));
+    final result = await _recognizer.processImage(
+      InputImage.fromFilePath(path),
+    );
 
     final lines = <_L>[];
     for (final block in result.blocks) {

@@ -27,7 +27,13 @@ Entry _entry({
 void main() {
   group('DaySummary', () {
     final entries = [
-      _entry(id: 1, meal: MealType.breakfast, grams: 100, kcal100: 200, protein100: 10),
+      _entry(
+        id: 1,
+        meal: MealType.breakfast,
+        grams: 100,
+        kcal100: 200,
+        protein100: 10,
+      ),
       _entry(id: 2, meal: MealType.breakfast, grams: 50, kcal100: 100),
       _entry(id: 3, meal: MealType.dinner, grams: 200, kcal100: 150),
     ].map(EntryView.new).toList();
@@ -48,7 +54,11 @@ void main() {
 
     test('in range', () {
       final s = DaySummary(
-          day: '2026-06-17', entries: entries, kcalMin: 400, kcalMax: 600);
+        day: '2026-06-17',
+        entries: entries,
+        kcalMin: 400,
+        kcalMax: 600,
+      );
       expect(s.status, TargetStatus.inRange);
       expect(s.remainingToMax, closeTo(50, 0.001));
     });

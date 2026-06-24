@@ -69,8 +69,8 @@ class SettingsScreen extends ConsumerWidget {
                       // Localized weekday name (Mon=0…Sun=6); 2024-01-01 was a
                       // Monday, so offset by wd from it.
                       label: DateFormat.EEEE(
-                              Localizations.localeOf(context).languageCode)
-                          .format(DateTime(2024, 1, 1).add(Duration(days: wd))),
+                        Localizations.localeOf(context).languageCode,
+                      ).format(DateTime(2024, 1, 1).add(Duration(days: wd))),
                       keyPrefix: 'wd$wd',
                       initialMin: rowFor(wd).kcalMin,
                       initialMax: rowFor(wd).kcalMax,
@@ -106,8 +106,11 @@ class SettingsScreen extends ConsumerWidget {
                 leading: const Icon(Icons.public),
                 title: Text(l10n.settingsOfflineRegions),
                 subtitle: Text(l10n.settingsOfflineRegionsSub),
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => const OfflineRegionsScreen())),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const OfflineRegionsScreen(),
+                  ),
+                ),
               ),
               const Divider(),
               _SectionHeader(l10n.settingsAi),
@@ -154,8 +157,13 @@ class SettingsScreen extends ConsumerWidget {
                   final locale = Localizations.localeOf(context).toString();
                   final ok = await contactDeveloper(locale: locale);
                   if (!ok) {
-                    messenger.showAutoSnackBar(SnackBar(
-                        content: Text(l10n.settingsContactDevNoApp(supportEmail))));
+                    messenger.showAutoSnackBar(
+                      SnackBar(
+                        content: Text(
+                          l10n.settingsContactDevNoApp(supportEmail),
+                        ),
+                      ),
+                    );
                   }
                 },
               ),
@@ -168,7 +176,10 @@ class SettingsScreen extends ConsumerWidget {
 }
 
 Future<void> _toggleHealthSync(
-    BuildContext context, WidgetRef ref, bool value) async {
+  BuildContext context,
+  WidgetRef ref,
+  bool value,
+) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = AppLocalizations.of(context);
   final db = ref.read(dbProvider);
@@ -177,20 +188,19 @@ Future<void> _toggleHealthSync(
   if (!value) {
     await db.setSetting('healthSync', 'false');
     await health.refreshEnabled(db);
-    messenger.showAutoSnackBar(
-        SnackBar(content: Text(l10n.healthSyncOff)));
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.healthSyncOff)));
     return;
   }
 
   if (!await health.isAvailable()) {
-    messenger.showAutoSnackBar(
-        SnackBar(content: Text(l10n.healthUnavailable)));
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.healthUnavailable)));
     return;
   }
   final granted = await health.requestPermissions();
   if (!granted) {
     messenger.showAutoSnackBar(
-        SnackBar(content: Text(l10n.healthNoPermission)));
+      SnackBar(content: Text(l10n.healthNoPermission)),
+    );
     return;
   }
   await db.setSetting('healthSync', 'true');
@@ -209,8 +219,9 @@ Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
         .read(backupServiceProvider)
         .shareBackup(subject: l10n.backupShareSubject);
   } catch (e) {
-    messenger
-        .showAutoSnackBar(SnackBar(content: Text(l10n.backupExportFailed('$e'))));
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.backupExportFailed('$e'))),
+    );
   }
 }
 
@@ -231,11 +242,13 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
       content: Text(l10n.backupReplaceBody),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.actionCancel)),
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(l10n.actionCancel),
+        ),
         FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.actionImport)),
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(l10n.actionImport),
+        ),
       ],
     ),
   );
@@ -243,11 +256,11 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
 
   try {
     await ref.read(backupServiceProvider).restoreFromZip(file.path);
-    messenger
-        .showAutoSnackBar(SnackBar(content: Text(l10n.backupRestored)));
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.backupRestored)));
   } catch (e) {
-    messenger
-        .showAutoSnackBar(SnackBar(content: Text(l10n.backupImportFailed('$e'))));
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.backupImportFailed('$e'))),
+    );
   }
 }
 
@@ -284,8 +297,9 @@ class _AboutTile extends ConsumerWidget {
 class _OpenFoodFactsThanks extends StatelessWidget {
   const _OpenFoodFactsThanks();
 
-  static final _donateUrl =
-      Uri.parse('https://world.openfoodfacts.org/donate-to-open-food-facts');
+  static final _donateUrl = Uri.parse(
+    'https://world.openfoodfacts.org/donate-to-open-food-facts',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -298,9 +312,12 @@ class _OpenFoodFactsThanks extends StatelessWidget {
           children: [
             Icon(Icons.favorite, size: 18, color: theme.colorScheme.primary),
             const SizedBox(width: 6),
-            Text(l10n.offThanksTitle,
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              l10n.offThanksTitle,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -312,15 +329,19 @@ class _OpenFoodFactsThanks extends StatelessWidget {
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               try {
-                final ok = await launchUrl(_donateUrl,
-                    mode: LaunchMode.externalApplication);
+                final ok = await launchUrl(
+                  _donateUrl,
+                  mode: LaunchMode.externalApplication,
+                );
                 if (!ok) {
                   messenger.showAutoSnackBar(
-                      SnackBar(content: Text(l10n.couldNotOpenLink)));
+                    SnackBar(content: Text(l10n.couldNotOpenLink)),
+                  );
                 }
               } catch (_) {
                 messenger.showAutoSnackBar(
-                    SnackBar(content: Text(l10n.couldNotOpenLink)));
+                  SnackBar(content: Text(l10n.couldNotOpenLink)),
+                );
               }
             },
             icon: const Icon(Icons.favorite_border, size: 18),
@@ -356,7 +377,9 @@ class _MealTimeRow extends ConsumerWidget {
       if (picked == null) return;
       final mins = picked.hour * 60 + picked.minute;
       await db.setSetting(
-          isStart ? MealTimes.startKey(meal) : MealTimes.endKey(meal), '$mins');
+        isStart ? MealTimes.startKey(meal) : MealTimes.endKey(meal),
+        '$mins',
+      );
     }
 
     return Padding(
@@ -364,14 +387,22 @@ class _MealTimeRow extends ConsumerWidget {
       child: Row(
         children: [
           Expanded(
-              child: Text(mealTypeLabel(
-                  meal, Localizations.localeOf(context).languageCode))),
+            child: Text(
+              mealTypeLabel(meal, Localizations.localeOf(context).languageCode),
+            ),
+          ),
           OutlinedButton(
-              onPressed: () => pick(true), child: Text(_fmtMins(start))),
+            onPressed: () => pick(true),
+            child: Text(_fmtMins(start)),
+          ),
           const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8), child: Text('–')),
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text('–'),
+          ),
           OutlinedButton(
-              onPressed: () => pick(false), child: Text(_fmtMins(end))),
+            onPressed: () => pick(false),
+            child: Text(_fmtMins(end)),
+          ),
         ],
       ),
     );
@@ -409,10 +440,7 @@ class _LanguagePicker extends ConsumerWidget {
           child: Column(
             children: [
               for (final e in options.entries)
-                RadioListTile<String>(
-                  value: e.key,
-                  title: Text(e.value),
-                ),
+                RadioListTile<String>(value: e.key, title: Text(e.value)),
             ],
           ),
         ),
@@ -421,8 +449,8 @@ class _LanguagePicker extends ConsumerWidget {
           child: Text(
             l10n.languageMachineNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
         ),
       ],
@@ -480,9 +508,12 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.aiKeyDesc,
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.outline)),
+          Text(
+            l10n.aiKeyDesc,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
           const SizedBox(height: 12),
           TextField(
             controller: _ctrl,
@@ -496,15 +527,20 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               isDense: true,
               suffixIcon: IconButton(
                 icon: Icon(
-                    _obscure ? Icons.visibility : Icons.visibility_off,
-                    size: 20),
+                  _obscure ? Icons.visibility : Icons.visibility_off,
+                  size: 20,
+                ),
                 onPressed: () => setState(() => _obscure = !_obscure),
               ),
             ),
             onChanged: (v) {
               setState(() {}); // toggle visibility follows the key field
-              ref.read(dbProvider).setSetting(
-                  geminiKeySetting, v.trim().isEmpty ? null : v.trim());
+              ref
+                  .read(dbProvider)
+                  .setSetting(
+                    geminiKeySetting,
+                    v.trim().isEmpty ? null : v.trim(),
+                  );
             },
           ),
           Align(
@@ -514,15 +550,18 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
                 final messenger = ScaffoldMessenger.of(context);
                 try {
                   final ok = await launchUrl(
-                      Uri.parse('https://aistudio.google.com/apikey'),
-                      mode: LaunchMode.externalApplication);
+                    Uri.parse('https://aistudio.google.com/apikey'),
+                    mode: LaunchMode.externalApplication,
+                  );
                   if (!ok) {
                     messenger.showAutoSnackBar(
-                        SnackBar(content: Text(l10n.couldNotOpenLink)));
+                      SnackBar(content: Text(l10n.couldNotOpenLink)),
+                    );
                   }
                 } catch (_) {
                   messenger.showAutoSnackBar(
-                      SnackBar(content: Text(l10n.couldNotOpenLink)));
+                    SnackBar(content: Text(l10n.couldNotOpenLink)),
+                  );
                 }
               },
               icon: const Icon(Icons.open_in_new, size: 16),
@@ -559,11 +598,13 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
                 ),
                 items: [
                   DropdownMenuItem(
-                      value: 'gemini-2.5-flash',
-                      child: Text(l10n.aiModelReliable)),
+                    value: 'gemini-2.5-flash',
+                    child: Text(l10n.aiModelReliable),
+                  ),
                   DropdownMenuItem(
-                      value: 'gemini-3.5-flash',
-                      child: Text(l10n.aiModelAccurate)),
+                    value: 'gemini-3.5-flash',
+                    child: Text(l10n.aiModelAccurate),
+                  ),
                 ],
                 onChanged: (v) {
                   if (v == null) return;
@@ -573,9 +614,12 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 6),
-                child: Text(l10n.aiModelNote,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.colorScheme.outline)),
+                child: Text(
+                  l10n.aiModelNote,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
               ),
             ],
           ],
@@ -594,9 +638,12 @@ class _SectionHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(title,
-          style: theme.textTheme.titleSmall
-              ?.copyWith(color: theme.colorScheme.primary)),
+      child: Text(
+        title,
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: theme.colorScheme.primary,
+        ),
+      ),
     );
   }
 }
@@ -677,7 +724,8 @@ class _TargetField extends StatefulWidget {
 
 class _TargetFieldState extends State<_TargetField> {
   late final TextEditingController _c = TextEditingController(
-      text: widget.initial == null ? '' : widget.initial!.toStringAsFixed(0));
+    text: widget.initial == null ? '' : widget.initial!.toStringAsFixed(0),
+  );
 
   @override
   void dispose() {
@@ -692,10 +740,7 @@ class _TargetFieldState extends State<_TargetField> {
       textAlign: TextAlign.end,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      decoration: InputDecoration(
-        isDense: true,
-        hintText: widget.hint ?? '—',
-      ),
+      decoration: InputDecoration(isDense: true, hintText: widget.hint ?? '—'),
       onChanged: (v) {
         final parsed = v.trim().isEmpty ? null : double.tryParse(v.trim());
         widget.onChanged(parsed);

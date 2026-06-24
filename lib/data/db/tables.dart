@@ -49,6 +49,7 @@ class Foods extends Table {
 
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get usageCount => integer().withDefault(const Constant(0))();
+
   /// Last time this food was logged; powers the "recently used" default list.
   DateTimeColumn get lastUsedAt => dateTime().nullable()();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
@@ -57,8 +58,8 @@ class Foods extends Table {
   /// under SQLite semantics, so unlimited custom foods are fine.
   @override
   List<Set<Column>> get uniqueKeys => [
-        {source, externalId},
-      ];
+    {source, externalId},
+  ];
 }
 
 /// An ad-hoc meal group for track-by-day mode: consecutive adds form a group
@@ -81,13 +82,18 @@ class Entries extends Table {
 
   /// In track-by-day mode, the ad-hoc group this entry belongs to (null in
   /// meal mode, where mealType organizes the day instead).
-  IntColumn get groupId => integer()
-      .nullable()
-      .references(EntryGroups, #id, onDelete: KeyAction.cascade)();
+  IntColumn get groupId => integer().nullable().references(
+    EntryGroups,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
 
   /// Convenience link back to the catalog food (nullable; snapshot is the source of truth).
-  IntColumn get foodId =>
-      integer().nullable().references(Foods, #id, onDelete: KeyAction.setNull)();
+  IntColumn get foodId => integer().nullable().references(
+    Foods,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
 
   RealColumn get grams => real()();
 
@@ -149,7 +155,8 @@ class InstalledPacks extends Table {
   TextColumn get version => text()();
   IntColumn get products => integer()();
   IntColumn get sizeBytes => integer()();
-  DateTimeColumn get installedAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get installedAt =>
+      dateTime().withDefault(currentDateAndTime)();
 
   @override
   Set<Column> get primaryKey => {code};

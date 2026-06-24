@@ -37,7 +37,11 @@ void main() {
   group('Nutrition aggregation', () {
     test('+ adds macros and merges micros', () {
       const a = Nutrition(kcal: 100, protein: 5, micros: {'iron_mg': 1});
-      const b = Nutrition(kcal: 50, protein: 2, micros: {'iron_mg': 2, 'zinc_mg': 1});
+      const b = Nutrition(
+        kcal: 50,
+        protein: 2,
+        micros: {'iron_mg': 2, 'zinc_mg': 1},
+      );
       final c = a + b;
       expect(c.kcal, 150);
       expect(c.protein, 7);

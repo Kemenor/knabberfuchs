@@ -39,17 +39,17 @@ class MealTimes {
   MealType inferNow() => inferAt(DateTime.now());
 
   int startOf(MealType m) => switch (m) {
-        MealType.breakfast => breakfastStart,
-        MealType.lunch => lunchStart,
-        MealType.dinner => dinnerStart,
-        MealType.snack => 0,
-      };
+    MealType.breakfast => breakfastStart,
+    MealType.lunch => lunchStart,
+    MealType.dinner => dinnerStart,
+    MealType.snack => 0,
+  };
   int endOf(MealType m) => switch (m) {
-        MealType.breakfast => breakfastEnd,
-        MealType.lunch => lunchEnd,
-        MealType.dinner => dinnerEnd,
-        MealType.snack => 0,
-      };
+    MealType.breakfast => breakfastEnd,
+    MealType.lunch => lunchEnd,
+    MealType.dinner => dinnerEnd,
+    MealType.snack => 0,
+  };
 
   /// Setting keys for each window edge.
   static String startKey(MealType m) => 'meal${_cap(m.name)}Start';

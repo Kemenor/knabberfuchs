@@ -56,8 +56,18 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   @override
   void dispose() {
     for (final c in [
-      _barcode, _name, _brand, _serving, _kcal, _protein, _carb, _fat,
-      _fiber, _sugar, _satfat, _salt,
+      _barcode,
+      _name,
+      _brand,
+      _serving,
+      _kcal,
+      _protein,
+      _carb,
+      _fat,
+      _fiber,
+      _sugar,
+      _satfat,
+      _salt,
     ]) {
       c.dispose();
     }
@@ -68,9 +78,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
       double.tryParse(c.text.replaceAll(',', '.'));
 
   Future<void> _scanBarcode() async {
-    final code = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) => const ScanScreen()),
-    );
+    final code = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => const ScanScreen()));
     if (code != null && code.trim().isNotEmpty && mounted) {
       _barcode.text = code.trim();
     }
@@ -78,7 +88,10 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
 
   Future<void> _scanLabel() async {
     final l10n = AppLocalizations.of(context);
-    final source = await pickImageSource(context, cameraLabel: l10n.addPhotoOfTable);
+    final source = await pickImageSource(
+      context,
+      cameraLabel: l10n.addPhotoOfTable,
+    );
     if (source == null || !mounted) return;
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -88,7 +101,8 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     // Crop to just the nutrition table for much better OCR.
     final bytes = await img.readAsBytes();
     final cropped = await navigator.push<Uint8List>(
-        MaterialPageRoute(builder: (_) => CropScreen(image: bytes)));
+      MaterialPageRoute(builder: (_) => CropScreen(image: bytes)),
+    );
     if (cropped == null || !mounted) return;
     final processed = preprocessLabelImage(cropped);
     final path = '${(await getTemporaryDirectory()).path}/label_ocr.jpg';
@@ -109,9 +123,13 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
       set(_sugar, n.sugar100);
       set(_satfat, n.satFat100);
       set(_salt, n.saltG100);
-      messenger.showAutoSnackBar(SnackBar(
+      messenger.showAutoSnackBar(
+        SnackBar(
           content: Text(
-              n.hasAny ? l10n.addFilledFromLabel : l10n.addCouldntRead)));
+            n.hasAny ? l10n.addFilledFromLabel : l10n.addCouldntRead,
+          ),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _ocrBusy = false);
     }
@@ -127,13 +145,16 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     final kcal = _val(_kcal);
     if (name.isEmpty || kcal == null) {
       messenger.showAutoSnackBar(
-          SnackBar(content: Text(l10n.addNameEnergyRequired)));
+        SnackBar(content: Text(l10n.addNameEnergyRequired)),
+      );
       return;
     }
     setState(() => _saving = true);
     try {
       final barcode = _barcode.text.trim();
-      final food = await ref.read(foodRepositoryProvider).createFood(
+      final food = await ref
+          .read(foodRepositoryProvider)
+          .createFood(
             barcode: barcode.isEmpty ? null : barcode,
             name: name,
             brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
@@ -149,7 +170,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
           );
       if (mounted) Navigator.of(context).pop(food);
     } catch (e) {
-      messenger.showAutoSnackBar(SnackBar(content: Text(l10n.genericError('$e'))));
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.genericError('$e'))),
+      );
       if (mounted) setState(() => _saving = false);
     }
   }
@@ -187,16 +210,18 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
             controller: _name,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
-                labelText: l10n.addProductName,
-                border: const OutlineInputBorder()),
+              labelText: l10n.addProductName,
+              border: const OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _brand,
             textCapitalization: TextCapitalization.words,
             decoration: InputDecoration(
-                labelText: l10n.manualBrandOptional,
-                border: const OutlineInputBorder()),
+              labelText: l10n.manualBrandOptional,
+              border: const OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: 12),
           _numField(_serving, l10n.addServingSize, 'g'),
@@ -207,11 +232,16 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
               const Spacer(),
               _ocrBusy
                   ? const SizedBox(
-                      width: 20, height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2))
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : OutlinedButton.icon(
                       onPressed: _scanLabel,
-                      icon: const Icon(Icons.document_scanner_outlined, size: 18),
+                      icon: const Icon(
+                        Icons.document_scanner_outlined,
+                        size: 18,
+                      ),
                       label: Text(l10n.addScanLabel),
                     ),
             ],
@@ -240,16 +270,19 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
                 try {
                   final ok = await launchUrl(
                     Uri.parse(
-                        'https://world.openfoodfacts.org/how-to-add-a-product'),
+                      'https://world.openfoodfacts.org/how-to-add-a-product',
+                    ),
                     mode: LaunchMode.externalApplication,
                   );
                   if (!ok) {
                     messenger.showAutoSnackBar(
-                        SnackBar(content: Text(l10n.couldNotOpenLink)));
+                      SnackBar(content: Text(l10n.couldNotOpenLink)),
+                    );
                   }
                 } catch (_) {
                   messenger.showAutoSnackBar(
-                      SnackBar(content: Text(l10n.couldNotOpenLink)));
+                    SnackBar(content: Text(l10n.couldNotOpenLink)),
+                  );
                 }
               },
               borderRadius: BorderRadius.circular(8),
@@ -258,14 +291,18 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.volunteer_activism_outlined,
-                        size: 16, color: theme.colorScheme.outline),
+                    Icon(
+                      Icons.volunteer_activism_outlined,
+                      size: 16,
+                      color: theme.colorScheme.outline,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text.rich(
                         TextSpan(
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: theme.colorScheme.outline),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.outline,
+                          ),
                           children: [
                             TextSpan(text: '${l10n.shareToOff} '),
                             TextSpan(

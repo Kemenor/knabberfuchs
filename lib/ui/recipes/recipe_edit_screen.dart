@@ -59,8 +59,9 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     // + the amount sheet (unit selector, quick-picks, serving).
     final food = await Navigator.of(context).push<Food>(
       MaterialPageRoute(
-          builder: (_) =>
-              FoodPickerScreen(title: AppLocalizations.of(context).addIngredient)),
+        builder: (_) =>
+            FoodPickerScreen(title: AppLocalizations.of(context).addIngredient),
+      ),
     );
     if (food == null || !mounted) return;
     final foodName = food.localizedNameOf(context);
@@ -77,14 +78,16 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     );
     if (grams == null || !mounted) return;
     setState(() {
-      _items.add(RecipeShareItem(
-        name: foodName,
-        grams: grams,
-        kcal100: food.kcal100,
-        protein100: food.protein100,
-        carb100: food.carb100,
-        fat100: food.fat100,
-      ));
+      _items.add(
+        RecipeShareItem(
+          name: foodName,
+          grams: grams,
+          kcal100: food.kcal100,
+          protein100: food.protein100,
+          carb100: food.carb100,
+          fat100: food.fat100,
+        ),
+      );
     });
   }
 
@@ -127,7 +130,8 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     }
     if (_items.isEmpty) {
       messenger.showAutoSnackBar(
-          SnackBar(content: Text(l10n.recipeNeedIngredient)));
+        SnackBar(content: Text(l10n.recipeNeedIngredient)),
+      );
       return;
     }
     setState(() => _saving = true);
@@ -137,14 +141,17 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
         await repo.create(name: name, servings: servings, items: _items);
       } else {
         await repo.update(
-            id: widget.recipe!.id,
-            name: name,
-            servings: servings,
-            items: _items);
+          id: widget.recipe!.id,
+          name: name,
+          servings: servings,
+          items: _items,
+        );
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
-      messenger.showAutoSnackBar(SnackBar(content: Text(l10n.genericError('$e'))));
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.genericError('$e'))),
+      );
       if (mounted) setState(() => _saving = false);
     }
   }
@@ -170,14 +177,17 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
             controller: _name,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
-                labelText: l10n.recipeName,
-                border: const OutlineInputBorder()),
+              labelText: l10n.recipeName,
+              border: const OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _servings,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
             decoration: InputDecoration(
               labelText: l10n.recipeServingsField,
               border: const OutlineInputBorder(),
@@ -186,11 +196,15 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Text(l10n.ingredients,
-                  style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                l10n.ingredients,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const Spacer(),
-              Text(l10n.kcalTotal(kcalStr(total.kcal)),
-                  style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                l10n.kcalTotal(kcalStr(total.kcal)),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -198,10 +212,17 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
             ListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
-              title: Text(_items[i].name,
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
-              subtitle: Text(l10n.gramsKcal(gramsStr(_items[i].grams),
-                  kcalStr(_items[i].nutrition.kcal))),
+              title: Text(
+                _items[i].name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                l10n.gramsKcal(
+                  gramsStr(_items[i].grams),
+                  kcalStr(_items[i].nutrition.kcal),
+                ),
+              ),
               onTap: () => _editIngredient(i),
               trailing: IconButton(
                 visualDensity: VisualDensity.compact,

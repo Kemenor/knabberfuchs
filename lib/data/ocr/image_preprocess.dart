@@ -13,8 +13,11 @@ Uint8List preprocessLabelImage(Uint8List bytes) {
   var im = decoded;
   const targetW = 1400;
   if (im.width < targetW) {
-    im = img.copyResize(im,
-        width: targetW, interpolation: img.Interpolation.cubic);
+    im = img.copyResize(
+      im,
+      width: targetW,
+      interpolation: img.Interpolation.cubic,
+    );
   }
   im = img.grayscale(im);
   im = img.adjustColor(im, contrast: 1.15);

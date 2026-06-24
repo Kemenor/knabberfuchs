@@ -16,19 +16,25 @@ Future<bool> contactDeveloper({String? locale}) async {
     ..writeln('App: Knabberfuchs ${info.version} (${info.buildNumber})');
   if (Platform.isAndroid) {
     final a = await DeviceInfoPlugin().androidInfo;
-    diag.writeln('Device: ${a.manufacturer} ${a.model} '
-        '(Android ${a.version.release}, API ${a.version.sdkInt})');
+    diag.writeln(
+      'Device: ${a.manufacturer} ${a.model} '
+      '(Android ${a.version.release}, API ${a.version.sdkInt})',
+    );
   }
   if (locale != null) diag.writeln('Language: $locale');
 
-  final body = '\n\n\n'
+  final body =
+      '\n\n\n'
       '--- diagnostics (helps me debug — feel free to delete) ---\n$diag';
-  final subject = 'Knabberfuchs feedback — ${info.version} (${info.buildNumber})';
+  final subject =
+      'Knabberfuchs feedback — ${info.version} (${info.buildNumber})';
   // Build the mailto by hand so spaces encode as %20 (not + which some mail
   // apps show literally in the body).
-  final uri = Uri.parse('mailto:$supportEmail'
-      '?subject=${Uri.encodeComponent(subject)}'
-      '&body=${Uri.encodeComponent(body)}');
+  final uri = Uri.parse(
+    'mailto:$supportEmail'
+    '?subject=${Uri.encodeComponent(subject)}'
+    '&body=${Uri.encodeComponent(body)}',
+  );
   try {
     return await launchUrl(uri, mode: LaunchMode.externalApplication);
   } catch (_) {

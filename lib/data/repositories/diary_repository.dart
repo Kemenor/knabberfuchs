@@ -24,19 +24,21 @@ class DiaryRepository {
     int? groupId,
     String? displayName,
   }) async {
-    await db.addEntry(EntriesCompanion.insert(
-      day: day,
-      mealType: meal,
-      groupId: Value(groupId),
-      grams: grams,
-      foodId: Value(food.id),
-      sName: displayName ?? food.name,
-      sKcal100: food.kcal100,
-      sProtein100: Value(food.protein100),
-      sCarb100: Value(food.carb100),
-      sFat100: Value(food.fat100),
-      sMicrosJson: Value(food.microsJson),
-    ));
+    await db.addEntry(
+      EntriesCompanion.insert(
+        day: day,
+        mealType: meal,
+        groupId: Value(groupId),
+        grams: grams,
+        foodId: Value(food.id),
+        sName: displayName ?? food.name,
+        sKcal100: food.kcal100,
+        sProtein100: Value(food.protein100),
+        sCarb100: Value(food.carb100),
+        sFat100: Value(food.fat100),
+        sMicrosJson: Value(food.microsJson),
+      ),
+    );
     await db.bumpFoodUsage(food.id);
   }
 
@@ -53,30 +55,37 @@ class DiaryRepository {
     required String day,
     int? groupId,
   }) async {
-    await db.addEntry(EntriesCompanion.insert(
-      day: day,
-      mealType: meal,
-      groupId: Value(groupId),
-      grams: grams,
-      sName: name,
-      sKcal100: kcal100,
-      sProtein100: Value(protein100),
-      sCarb100: Value(carb100),
-      sFat100: Value(fat100),
-      sMicrosJson: Value(microsJson),
-    ));
+    await db.addEntry(
+      EntriesCompanion.insert(
+        day: day,
+        mealType: meal,
+        groupId: Value(groupId),
+        grams: grams,
+        sName: name,
+        sKcal100: kcal100,
+        sProtein100: Value(protein100),
+        sCarb100: Value(carb100),
+        sFat100: Value(fat100),
+        sMicrosJson: Value(microsJson),
+      ),
+    );
   }
 
-  Future<void> editEntry(Entry entry,
-          {required double grams, required MealType meal}) =>
-      db.updateEntry(entry.copyWith(grams: grams, mealType: meal));
+  Future<void> editEntry(
+    Entry entry, {
+    required double grams,
+    required MealType meal,
+  }) => db.updateEntry(entry.copyWith(grams: grams, mealType: meal));
 
   Future<void> deleteEntry(int id) => db.deleteEntry(id);
 
   /// Scale every entry in a meal group by [factor] (e.g. 0.6 = you ate 60%).
   /// Each entry's grams — and so its kcal/macros — is multiplied; the per-100 g
   /// snapshot is unchanged. A factor of 1 is a no-op.
-  Future<void> scaleGroup({required int groupId, required double factor}) async {
+  Future<void> scaleGroup({
+    required int groupId,
+    required double factor,
+  }) async {
     if (factor <= 0 || factor == 1) return;
     final items = await db.entriesForGroup(groupId);
     await db.transaction(() async {
@@ -104,20 +113,22 @@ class DiaryRepository {
         final gid = await db.createEntryGroup(day, group.name);
         for (var i = 0; i < items.length; i++) {
           final e = items[i];
-          await db.addEntry(EntriesCompanion.insert(
-            day: day,
-            mealType: e.mealType,
-            groupId: Value(gid),
-            grams: e.grams / n,
-            foodId: Value(e.foodId),
-            sName: e.sName,
-            sKcal100: e.sKcal100,
-            sProtein100: Value(e.sProtein100),
-            sCarb100: Value(e.sCarb100),
-            sFat100: Value(e.sFat100),
-            sMicrosJson: Value(e.sMicrosJson),
-            sortIndex: Value(i),
-          ));
+          await db.addEntry(
+            EntriesCompanion.insert(
+              day: day,
+              mealType: e.mealType,
+              groupId: Value(gid),
+              grams: e.grams / n,
+              foodId: Value(e.foodId),
+              sName: e.sName,
+              sKcal100: e.sKcal100,
+              sProtein100: Value(e.sProtein100),
+              sCarb100: Value(e.sCarb100),
+              sFat100: Value(e.sFat100),
+              sMicrosJson: Value(e.sMicrosJson),
+              sortIndex: Value(i),
+            ),
+          );
         }
       }
       await db.deleteEntryGroup(groupId); // removes the original + its entries

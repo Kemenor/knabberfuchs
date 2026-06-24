@@ -82,26 +82,28 @@ List<FoodsCompanion> parseSwissCsv(String csv) {
     if (kcal == null) continue;
     final name = r[1].trim();
     if (name.isEmpty) continue;
-    out.add(FoodsCompanion.insert(
-      source: FoodSource.swissFcdb,
-      externalId: Value(r[0]),
-      name: name,
-      nameDe: Value(s(r[2])),
-      nameFr: Value(s(r[3])),
-      nameIt: Value(s(r[4])),
-      searchText: Value(s(r[13])),
-      servingG: Value(r.length > 14 ? n(r[14]) : null),
-      servingLabel: Value(r.length > 15 ? s(r[15]) : null),
-      densityGPerMl: Value(r.length > 16 ? n(r[16]) : null),
-      kcal100: kcal,
-      protein100: Value(n(r[6])),
-      carb100: Value(n(r[7])),
-      fat100: Value(n(r[8])),
-      fiber100: Value(n(r[9])),
-      sugar100: Value(n(r[10])),
-      satFat100: Value(n(r[11])),
-      sodiumMg100: Value(n(r[12])),
-    ));
+    out.add(
+      FoodsCompanion.insert(
+        source: FoodSource.swissFcdb,
+        externalId: Value(r[0]),
+        name: name,
+        nameDe: Value(s(r[2])),
+        nameFr: Value(s(r[3])),
+        nameIt: Value(s(r[4])),
+        searchText: Value(s(r[13])),
+        servingG: Value(r.length > 14 ? n(r[14]) : null),
+        servingLabel: Value(r.length > 15 ? s(r[15]) : null),
+        densityGPerMl: Value(r.length > 16 ? n(r[16]) : null),
+        kcal100: kcal,
+        protein100: Value(n(r[6])),
+        carb100: Value(n(r[7])),
+        fat100: Value(n(r[8])),
+        fiber100: Value(n(r[9])),
+        sugar100: Value(n(r[10])),
+        satFat100: Value(n(r[11])),
+        sodiumMg100: Value(n(r[12])),
+      ),
+    );
   }
   return out;
 }
@@ -121,17 +123,19 @@ Future<int> seedSwissIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
     // asset can be a view into a larger shared buffer, so a bare
     // `buffer.asUint8List()` hands gzip trailing bytes → "trailing data" throw →
     // the catch below silently skips seeding (no Swiss foods on device).
-    final bytes =
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    final bytes = data.buffer.asUint8List(
+      data.offsetInBytes,
+      data.lengthInBytes,
+    );
     final csv = utf8.decode(gzip.decode(bytes));
     final companions = parseSwissCsv(csv);
     await db.transaction(() async {
       // Replace any previously-seeded Swiss rows. The entries FK is set-null on
       // delete, so logged history is unaffected. (The old USDA layer is already
       // gone — removed by the v8 migration / earlier reseeds.)
-      await (db.delete(db.foods)
-            ..where((f) => f.source.equalsValue(FoodSource.swissFcdb)))
-          .go();
+      await (db.delete(
+        db.foods,
+      )..where((f) => f.source.equalsValue(FoodSource.swissFcdb))).go();
       await db.batch((batch) {
         batch.insertAll(db.foods, companions, mode: InsertMode.insertOrIgnore);
       });

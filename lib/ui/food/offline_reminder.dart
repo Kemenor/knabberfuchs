@@ -17,10 +17,12 @@ bool _remindedThisSession = false;
 /// pack is already installed). Captures messenger/navigator up front so it
 /// survives the navigation that follows the scan.
 VoidCallback? offlinePackReminder(
-    BuildContext context, WidgetRef ref, BarcodeSource source) {
+  BuildContext context,
+  WidgetRef ref,
+  BarcodeSource source,
+) {
   if (source != BarcodeSource.online || _remindedThisSession) return null;
-  final installed =
-      ref.read(installedPacksProvider).asData?.value ?? const [];
+  final installed = ref.read(installedPacksProvider).asData?.value ?? const [];
   if (installed.isNotEmpty) return null;
 
   final messenger = ScaffoldMessenger.of(context);
@@ -29,14 +31,17 @@ VoidCallback? offlinePackReminder(
   return () {
     if (_remindedThisSession) return;
     _remindedThisSession = true;
-    messenger.showAutoSnackBar(SnackBar(
-      duration: const Duration(seconds: 6),
-      content: Text(l10n.offlineReminderText),
-      action: SnackBarAction(
-        label: l10n.offlineReminderAction,
-        onPressed: () => navigator.push(MaterialPageRoute(
-            builder: (_) => const OfflineRegionsScreen())),
+    messenger.showAutoSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 6),
+        content: Text(l10n.offlineReminderText),
+        action: SnackBarAction(
+          label: l10n.offlineReminderAction,
+          onPressed: () => navigator.push(
+            MaterialPageRoute(builder: (_) => const OfflineRegionsScreen()),
+          ),
+        ),
       ),
-    ));
+    );
   };
 }

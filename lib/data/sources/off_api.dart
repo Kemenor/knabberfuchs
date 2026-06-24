@@ -29,17 +29,20 @@ class OffApi {
     http.Client? client,
     TokenBucket? productBucket,
     TokenBucket? searchBucket,
-  })  : _client = client ?? http.Client(),
-        productBucket = productBucket ??
-            TokenBucket(capacity: 15, window: const Duration(minutes: 1)),
-        searchBucket = searchBucket ??
-            TokenBucket(capacity: 10, window: const Duration(minutes: 1));
+  }) : _client = client ?? http.Client(),
+       productBucket =
+           productBucket ??
+           TokenBucket(capacity: 15, window: const Duration(minutes: 1)),
+       searchBucket =
+           searchBucket ??
+           TokenBucket(capacity: 10, window: const Duration(minutes: 1));
 
   /// Look up a single product by barcode. Returns null if unknown / no energy.
   Future<FoodsCompanion?> productByBarcode(String barcode) async {
     await productBucket.acquire();
-    final uri = Uri.https(_host, '/api/v2/product/$barcode.json',
-        {'fields': _fields});
+    final uri = Uri.https(_host, '/api/v2/product/$barcode.json', {
+      'fields': _fields,
+    });
     try {
       final res = await _client
           .get(uri, headers: _headers)

@@ -7,8 +7,10 @@ import '../../l10n/app_localizations.dart';
 /// feature (AI scan, nutrition-label scan, ingredient-list OCR) behaves
 /// identically. [cameraLabel] overrides the default "Take a photo" wording.
 /// Returns the chosen [ImageSource], or null if dismissed.
-Future<ImageSource?> pickImageSource(BuildContext context,
-    {String? cameraLabel}) {
+Future<ImageSource?> pickImageSource(
+  BuildContext context, {
+  String? cameraLabel,
+}) {
   final l10n = AppLocalizations.of(context);
   return showModalBottomSheet<ImageSource>(
     context: context,

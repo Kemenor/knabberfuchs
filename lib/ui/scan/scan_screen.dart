@@ -116,8 +116,9 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(l10n.actionCancel)),
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.actionCancel),
+            ),
             FilledButton(
               onPressed: () => Navigator.pop(ctx, controller.text.trim()),
               child: Text(l10n.scanLookUp),
@@ -192,9 +193,11 @@ class _CameraError extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 6),
-            Text(message,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
             if (onManual != null) ...[
               const SizedBox(height: 16),
               FilledButton.icon(

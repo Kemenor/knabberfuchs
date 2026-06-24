@@ -29,13 +29,16 @@ void main() {
     expect(r.products, 86026);
     expect(r.size, 6083384);
     expect(r.sha256, 'abc123');
-    expect(r.downloadUrl(m.baseUrl),
-        'https://example/resolve/main/packs/ch/20260617/region_ch.sqlite.gz');
+    expect(
+      r.downloadUrl(m.baseUrl),
+      'https://example/resolve/main/packs/ch/20260617/region_ch.sqlite.gz',
+    );
   });
 
   test('tolerates missing optional fields', () {
     final m = OfflineManifest.fromJson(
-        jsonDecode('{"regions":[]}') as Map<String, dynamic>);
+      jsonDecode('{"regions":[]}') as Map<String, dynamic>,
+    );
     expect(m.regions, isEmpty);
     expect(m.baseUrl, '');
   });

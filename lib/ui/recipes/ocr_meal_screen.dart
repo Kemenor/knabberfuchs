@@ -43,17 +43,19 @@ Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
   for (final f in files) {
     try {
       all.addAll(await ocr.ingredientsFromImage(f.path));
-    } catch (_) {/* skip unreadable image */}
+    } catch (_) {
+      /* skip unreadable image */
+    }
   }
   navigator.pop(); // close the loading dialog
 
   if (all.isEmpty) {
-    messenger.showAutoSnackBar(
-        SnackBar(content: Text(l10n.ocrNoIngredients)));
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.ocrNoIngredients)));
     return;
   }
-  navigator
-      .push(MaterialPageRoute(builder: (_) => OcrMealScreen(ingredients: all)));
+  navigator.push(
+    MaterialPageRoute(builder: (_) => OcrMealScreen(ingredients: all)),
+  );
 }
 
 class _Item {
@@ -75,8 +77,7 @@ class OcrMealScreen extends ConsumerStatefulWidget {
 }
 
 class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
-  late final List<_Item> _items =
-      widget.ingredients.map(_Item.new).toList();
+  late final List<_Item> _items = widget.ingredients.map(_Item.new).toList();
   final _name = TextEditingController();
   bool _nameInit = false;
 
@@ -105,8 +106,9 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   Future<void> _autoMatch() async {
     final db = ref.read(dbProvider);
     for (var i = 0; i < _items.length; i++) {
-      final food =
-          await db.mappedFoodForOcr(normalizeOcrName(_items[i].parsed.name));
+      final food = await db.mappedFoodForOcr(
+        normalizeOcrName(_items[i].parsed.name),
+      );
       if (food != null && mounted) setState(() => _items[i].matched = food);
     }
   }
@@ -138,13 +140,17 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   Future<void> _match(int i) async {
     final food = await Navigator.of(context).push<Food>(
       MaterialPageRoute(
-          builder: (_) => FoodPickerScreen(
-              title: _items[i].parsed.name,
-              initialQuery: _items[i].parsed.name)),
+        builder: (_) => FoodPickerScreen(
+          title: _items[i].parsed.name,
+          initialQuery: _items[i].parsed.name,
+        ),
+      ),
     );
     if (food == null || !mounted) return;
     // Persist + remember the mapping so this name auto-matches next time.
-    final persisted = await ref.read(foodRepositoryProvider).ensurePersisted(food);
+    final persisted = await ref
+        .read(foodRepositoryProvider)
+        .ensurePersisted(food);
     await ref
         .read(dbProvider)
         .setOcrMapping(normalizeOcrName(_items[i].parsed.name), persisted.id);
@@ -154,26 +160,34 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   Future<void> _addIngredient() async {
     final food = await Navigator.of(context).push<Food>(
       MaterialPageRoute(
-          builder: (_) =>
-              FoodPickerScreen(title: AppLocalizations.of(context).addIngredient)),
+        builder: (_) =>
+            FoodPickerScreen(title: AppLocalizations.of(context).addIngredient),
+      ),
     );
     if (food == null || !mounted) return;
-    final persisted = await ref.read(foodRepositoryProvider).ensurePersisted(food);
+    final persisted = await ref
+        .read(foodRepositoryProvider)
+        .ensurePersisted(food);
     if (!mounted) return;
     setState(() {
-      _items.add(_Item(OcrIngredient(
-        name: persisted.name,
-        amount: persisted.servingG ?? 100,
-        unit: AmountUnit.grams,
-        rawUnit: 'g',
-      ))..matched = persisted);
+      _items.add(
+        _Item(
+          OcrIngredient(
+            name: persisted.name,
+            amount: persisted.servingG ?? 100,
+            unit: AmountUnit.grams,
+            rawUnit: 'g',
+          ),
+        )..matched = persisted,
+      );
     });
   }
 
   Future<void> _editGrams(int i) async {
     final l10n = AppLocalizations.of(context);
     final c = TextEditingController(
-        text: _grams(_items[i])?.let(gramsStr) ?? '');
+      text: _grams(_items[i])?.let(gramsStr) ?? '',
+    );
     double? g;
     try {
       g = await showDialog<double>(
@@ -184,16 +198,21 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
             controller: c,
             autofocus: true,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
             decoration: const InputDecoration(suffixText: 'g'),
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(l10n.actionCancel)),
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.actionCancel),
+            ),
             FilledButton(
               onPressed: () => Navigator.pop(
-                  ctx, double.tryParse(c.text.replaceAll(',', '.'))),
+                ctx,
+                double.tryParse(c.text.replaceAll(',', '.')),
+              ),
               child: Text(l10n.actionSet),
             ),
           ],
@@ -210,11 +229,12 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
     if (ready.isEmpty) {
-      messenger.showAutoSnackBar(
-          SnackBar(content: Text(l10n.ocrNeedMatch)));
+      messenger.showAutoSnackBar(SnackBar(content: Text(l10n.ocrNeedMatch)));
       return;
     }
-    await ref.read(recipeRepositoryProvider).create(
+    await ref
+        .read(recipeRepositoryProvider)
+        .create(
           name: _name.text.trim().isEmpty
               ? l10n.ocrDefaultMealName
               : _name.text.trim(),
@@ -240,8 +260,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
     if (ready.isEmpty) {
-      messenger.showAutoSnackBar(
-          SnackBar(content: Text(l10n.ocrNeedMatch)));
+      messenger.showAutoSnackBar(SnackBar(content: Text(l10n.ocrNeedMatch)));
       return;
     }
     final picked = await showDatePicker(
@@ -255,10 +274,13 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final dayLbl = dayLabel(context, day);
     final db = ref.read(dbProvider);
     final diary = ref.read(diaryRepositoryProvider);
-    final gid = await db.createEntryGroup(day,
-        _name.text.trim().isEmpty ? l10n.ocrDefaultMealName : _name.text.trim());
-    final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
-        .inferNow();
+    final gid = await db.createEntryGroup(
+      day,
+      _name.text.trim().isEmpty ? l10n.ocrDefaultMealName : _name.text.trim(),
+    );
+    final meal =
+        (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
+            .inferNow();
     for (final it in ready) {
       await diary.logSnapshot(
         name: it.matched!.name,
@@ -273,8 +295,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       );
     }
     if (mounted) Navigator.of(context).pop();
-    messenger
-        .showAutoSnackBar(SnackBar(content: Text(l10n.loggedTo(dayLbl))));
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.loggedTo(dayLbl))));
   }
 
   @override
@@ -322,28 +343,36 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
               controller: _name,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
-                  labelText: l10n.ocrMealName,
-                  border: const OutlineInputBorder()),
+                labelText: l10n.ocrMealName,
+                border: const OutlineInputBorder(),
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Text(l10n.ocrMatched('$matched', '${_items.length}'),
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  l10n.ocrMatched('$matched', '${_items.length}'),
+                  style: theme.textTheme.bodySmall,
+                ),
                 const Spacer(),
-                Text(l10n.kcalValue(kcalStr(total.kcal)),
-                    style: theme.textTheme.titleMedium),
+                Text(
+                  l10n.kcalValue(kcalStr(total.kcal)),
+                  style: theme.textTheme.titleMedium,
+                ),
               ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-            child: Text(l10n.ocrSwipeHint,
-                style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.outline,
-                    fontStyle: FontStyle.italic)),
+            child: Text(
+              l10n.ocrSwipeHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
           ),
           const Divider(height: 1),
           Expanded(
@@ -398,20 +427,25 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
               : theme.disabledColor,
         ),
         title: Text(it.matched?.name ?? it.parsed.name),
-        subtitle: Text(it.matched != null && it.matched!.name != it.parsed.name
-            ? l10n.ocrFromSource(amountLabel, it.parsed.name)
-            : it.matched == null
-                ? l10n.ocrPickHintSub(amountLabel)
-                : amountLabel),
+        subtitle: Text(
+          it.matched != null && it.matched!.name != it.parsed.name
+              ? l10n.ocrFromSource(amountLabel, it.parsed.name)
+              : it.matched == null
+              ? l10n.ocrPickHintSub(amountLabel)
+              : amountLabel,
+        ),
         trailing: it.matched == null
             ? null
             : (n != null
-                ? Text(l10n.kcalGrams(kcalStr(n.kcal), gramsStr(g!)),
-                    textAlign: TextAlign.right,
-                    style: theme.textTheme.bodySmall)
-                : TextButton(
-                    onPressed: () => _editGrams(i),
-                    child: Text(l10n.ocrSetGrams))),
+                  ? Text(
+                      l10n.kcalGrams(kcalStr(n.kcal), gramsStr(g!)),
+                      textAlign: TextAlign.right,
+                      style: theme.textTheme.bodySmall,
+                    )
+                  : TextButton(
+                      onPressed: () => _editGrams(i),
+                      child: Text(l10n.ocrSetGrams),
+                    )),
         onTap: () => it.matched == null ? _match(i) : _editGrams(i),
       ),
     );

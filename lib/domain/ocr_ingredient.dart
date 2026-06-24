@@ -30,12 +30,32 @@ class OcrIngredient {
 String normalizeOcrName(String s) {
   var n = s.toLowerCase().trim();
   const accents = {
-    'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'ã': 'a', 'å': 'a',
-    'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
-    'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',
-    'ò': 'o', 'ó': 'o', 'ô': 'o', 'ö': 'o', 'õ': 'o',
-    'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u',
-    'ç': 'c', 'ñ': 'n', 'ß': 'ss',
+    'à': 'a',
+    'á': 'a',
+    'â': 'a',
+    'ä': 'a',
+    'ã': 'a',
+    'å': 'a',
+    'è': 'e',
+    'é': 'e',
+    'ê': 'e',
+    'ë': 'e',
+    'ì': 'i',
+    'í': 'i',
+    'î': 'i',
+    'ï': 'i',
+    'ò': 'o',
+    'ó': 'o',
+    'ô': 'o',
+    'ö': 'o',
+    'õ': 'o',
+    'ù': 'u',
+    'ú': 'u',
+    'û': 'u',
+    'ü': 'u',
+    'ç': 'c',
+    'ñ': 'n',
+    'ß': 'ss',
   };
   accents.forEach((k, v) => n = n.replaceAll(k, v));
   return n
@@ -47,10 +67,39 @@ String normalizeOcrName(String s) {
 /// Count-style units we keep (the food is matched separately); anything else
 /// unrecognized (mins, people, kcal, …) is treated as a non-ingredient line.
 const _countUnits = {
-  'x', 'clove', 'cloves', 'head', 'heads', 'slice', 'slices', 'piece', 'pieces',
-  'pinch', 'pinches', 'can', 'cans', 'tin', 'tins', 'bunch', 'bunches', 'sprig',
-  'sprigs', 'handful', 'handfuls', 'leaf', 'leaves', 'stick', 'sticks', 'ball',
-  'balls', 'pack', 'packs', 'jar', 'jars', 'sheet', 'sheets',
+  'x',
+  'clove',
+  'cloves',
+  'head',
+  'heads',
+  'slice',
+  'slices',
+  'piece',
+  'pieces',
+  'pinch',
+  'pinches',
+  'can',
+  'cans',
+  'tin',
+  'tins',
+  'bunch',
+  'bunches',
+  'sprig',
+  'sprigs',
+  'handful',
+  'handfuls',
+  'leaf',
+  'leaves',
+  'stick',
+  'sticks',
+  'ball',
+  'balls',
+  'pack',
+  'packs',
+  'jar',
+  'jars',
+  'sheet',
+  'sheets',
 };
 
 final _lineRe = RegExp(r'^(.+?)\s+(\d+(?:[.,]\d+)?)\s*([a-zA-Z]+)\.?$');
@@ -94,8 +143,9 @@ List<OcrIngredient> parseIngredientLines(Iterable<String> lines) {
     // Skip lines whose "unit" is an unrecognized word (mins, people, kcal…).
     if (unit == null && !_countUnits.contains(rawUnit)) continue;
 
-    out.add(OcrIngredient(
-        name: name, amount: amount, unit: unit, rawUnit: rawUnit));
+    out.add(
+      OcrIngredient(name: name, amount: amount, unit: unit, rawUnit: rawUnit),
+    );
   }
   return out;
 }

@@ -32,9 +32,10 @@ class _CropScreenState extends State<CropScreen> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Center(
                 child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
               ),
             )
           else
