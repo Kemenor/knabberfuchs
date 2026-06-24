@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Knabberfuchs verwendet die Kamera, um Barcodes und Nährwertangaben von Produkten zu scannen, damit du Lebensmittel schnell erfassen kannst.";
+"NSHealthShareUsageDescription" = "Knabberfuchs liest Kalorien und Makros aus Apple Health, um deine Erfassung synchron zu halten.";
+"NSHealthUpdateUsageDescription" = "Knabberfuchs speichert die von dir erfassten Kalorien und Makros in Apple Health.";

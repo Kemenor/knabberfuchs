@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Knabberfuchs uses the camera to scan product barcodes and nutrition labels so you can log food quickly.";
+"NSHealthShareUsageDescription" = "Knabberfuchs reads calories and macros from Apple Health to keep your tracking in sync.";
+"NSHealthUpdateUsageDescription" = "Knabberfuchs saves the calories and macros you log to Apple Health.";
