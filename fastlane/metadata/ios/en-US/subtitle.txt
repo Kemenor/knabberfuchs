@@ -1,1 +1,1 @@
-Calorie & macro tracker
+An honest calorie tracker.

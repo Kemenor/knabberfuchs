@@ -1,1 +1,1 @@
-Calories et macros
+Compteur de calories honnête.
