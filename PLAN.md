@@ -4,7 +4,7 @@ An ad-free, no-subscription, no-popup calorie tracker. Android-first (Flutter, s
 iOS stays possible). Local-first data, optional Health Connect sync, serverless
 recipe sharing, ZIP backup/restore.
 
-## Open reminders / TODO (updated 2026-06-23)
+## Open reminders / TODO (updated 2026-06-26)
 
 - ✅ **Shipped 2026-06-23 (food-flow + AI batch):** **Free add** (quick name+kcal log, in the
   search list and the Day bolt menu); **AI meal recognition** — on-device (Phase 13a) + optional
@@ -68,6 +68,19 @@ recipe sharing, ZIP backup/restore.
   lightweight secondary classifier or heuristics for the weak categories; improve the
   label→catalog kcal mapping for recognized items. The opt-in **Gemini** cloud path already
   handles these well, so this is specifically about closing the on-device gap.
+- 🥫 **Additional food sources** (backlog): broaden the generic / whole-foods catalog beyond the
+  bundled **Swiss FCDB** + **Open Food Facts** live API. Preferred route keeps the keyless,
+  offline-first ethos — add more **public, attribution-only food-composition databases as
+  build-time bundles** through the existing `tool/` pipeline (exactly how Swiss FCDB ships): e.g.
+  **CIQUAL** (FR / ANSES), **USDA FoodData Central** (re-add as an optional English source — the
+  old build pipeline + `FoodSource.usda` enum value live in git history), UK **CoFID**, or other
+  national tables. Each ID-joins into the multilingual `foods` table (`nameDe/Fr/It/searchText`),
+  `FoodSource` gains one value per source, and each gets its own credit in Settings → About. The
+  real new logic is **cross-source dedup + ranking** (the same food can appear in several). Strictly
+  **opt-in, power-user only**: user-supplied-key commercial APIs (FatSecret / Nutritionix /
+  Edamam) — these need an account/key, against the keyless default, so only if users ask, mirroring
+  the optional USDA-key and Gemini-key patterns. No runtime keys in the default build; everything
+  stays offline-first.
 - 🧭 **UI consistency: barcode scan as a bottom-right FAB** (fix): in the *"from an ingredient
   list" → add-food* flow the barcode-scan action should sit as a lower-right FAB, matching the
   rest of the app (add food / new recipe / scan all use a bottom-right FAB). Keeps the primary
