@@ -163,18 +163,9 @@ class _Chart extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final locale = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context);
     final isWeek = range == TrendRange.week;
-    final barWidth = isWeek ? 18.0 : 6.0;
-
-    // The target can differ per weekday. When every day in the window shares the
-    // same bounds, draw one clean reference band; when they differ (customized
-    // per-day goals), draw each day's own target zone behind its bar instead, so
-    // the bar colors and the target shading always agree.
-    final first = trends.first.target;
-    final uniformTarget = trends.every(
-      (t) => t.target.min == first.min && t.target.max == first.max,
-    );
-    final showBand = uniformTarget && !first.isEmpty;
+    final hasTarget = trends.any((t) => !t.target.isEmpty);
 
     final maxKcal = trends.fold<double>(0, (m, t) => t.kcal > m ? t.kcal : m);
     final maxTarget = trends.fold<double>(
@@ -187,56 +178,75 @@ class _Chart extends StatelessWidget {
         ? 500.0
         : (topY <= 5000 ? 1000.0 : 2000.0);
 
-    final lines = <HorizontalLine>[
-      if (showBand && first.max != null)
-        HorizontalLine(
-          y: first.max!,
-          color: scheme.primary.withValues(alpha: 0.7),
-          strokeWidth: 1.5,
-          dashArray: [5, 4],
-        ),
-      if (showBand && first.min != null)
-        HorizontalLine(
-          y: first.min!,
-          color: scheme.tertiary.withValues(alpha: 0.7),
-          strokeWidth: 1.5,
-          dashArray: [5, 4],
-        ),
+    // Intake line — a gap (null spot) on un-logged days so the line breaks
+    // rather than dropping to zero.
+    final intake = [
+      for (var i = 0; i < trends.length; i++)
+        trends[i].kcal > 0
+            ? FlSpot(i.toDouble(), trends[i].kcal)
+            : FlSpot.nullSpot,
+    ];
+    // The target band: a filled area between each day's min and max — flat when
+    // goals are uniform, sloped when they vary per weekday. Days without a goal
+    // break the band. Always visible (it sits behind the line), so overshooting
+    // never hides it.
+    FlSpot edge(int i, double? bound, double fallback) => trends[i].target.isEmpty
+        ? FlSpot.nullSpot
+        : FlSpot(i.toDouble(), bound ?? fallback);
+    final bandMin = [
+      for (var i = 0; i < trends.length; i++) edge(i, trends[i].target.min, 0),
+    ];
+    final bandMax = [
+      for (var i = 0; i < trends.length; i++)
+        edge(i, trends[i].target.max, topY),
     ];
 
-    return BarChart(
-      BarChartData(
-        alignment: BarChartAlignment.spaceBetween,
+    return LineChart(
+      LineChartData(
+        minX: -0.4,
+        maxX: trends.length - 1 + 0.4,
         minY: 0,
         maxY: topY,
-        barGroups: [
-          for (var i = 0; i < trends.length; i++)
-            BarChartGroupData(
-              x: i,
-              barRods: [
-                BarChartRodData(
-                  toY: trends[i].kcal,
-                  color: statusColor(scheme, trends[i].status),
-                  width: barWidth,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(3),
-                  ),
-                  // Per-day target zone (only when goals vary; otherwise the
-                  // single dashed band above covers it).
-                  backDrawRodData: BackgroundBarChartRodData(
-                    show:
-                        !showBand &&
-                        (trends[i].target.min != null ||
-                            trends[i].target.max != null),
-                    fromY: trends[i].target.min ?? 0,
-                    toY: trends[i].target.max ?? topY,
-                    color: scheme.primary.withValues(alpha: 0.15),
-                  ),
-                ),
-              ],
+        lineBarsData: [
+          // Intake line, dots colored by that day's status.
+          LineChartBarData(
+            spots: intake,
+            isCurved: false,
+            color: scheme.outline,
+            barWidth: 2.5,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, pct, bar, index) => FlDotCirclePainter(
+                radius: isWeek ? 4.5 : 2.5,
+                color: statusColor(scheme, trends[spot.x.round()].status),
+                strokeWidth: 0,
+              ),
+            ),
+          ),
+          // Invisible band edges — only the fill between them shows.
+          if (hasTarget) ...[
+            LineChartBarData(
+              spots: bandMin,
+              barWidth: 0,
+              color: Colors.transparent,
+              dotData: const FlDotData(show: false),
+            ),
+            LineChartBarData(
+              spots: bandMax,
+              barWidth: 0,
+              color: Colors.transparent,
+              dotData: const FlDotData(show: false),
+            ),
+          ],
+        ],
+        betweenBarsData: [
+          if (hasTarget)
+            BetweenBarsData(
+              fromIndex: 1,
+              toIndex: 2,
+              color: scheme.primary.withValues(alpha: 0.13),
             ),
         ],
-        extraLinesData: ExtraLinesData(horizontalLines: lines),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
@@ -258,7 +268,7 @@ class _Chart extends StatelessWidget {
               reservedSize: 44,
               interval: interval,
               getTitlesWidget: (value, meta) {
-                if (value == 0) return const SizedBox.shrink();
+                if (value <= 0 || value > topY) return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(right: 4),
                   child: Text(
@@ -274,19 +284,19 @@ class _Chart extends StatelessWidget {
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
+              interval: 1,
               reservedSize: 24,
               getTitlesWidget: (value, meta) {
-                final i = value.toInt();
-                if (i < 0 || i >= trends.length) {
+                final i = value.round();
+                if (i < 0 || i >= trends.length || (value - i).abs() > 0.01) {
                   return const SizedBox.shrink();
                 }
-                final date = trends[i].date;
                 // Week: every weekday initial. Month: day-of-month every 5th.
                 final show = isWeek || i % 5 == 0;
                 if (!show) return const SizedBox.shrink();
                 final label = isWeek
-                    ? DateFormat('EEE', locale).format(date)
-                    : DateFormat('d', locale).format(date);
+                    ? DateFormat('EEE', locale).format(trends[i].date)
+                    : DateFormat('d', locale).format(trends[i].date);
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
@@ -300,17 +310,20 @@ class _Chart extends StatelessWidget {
             ),
           ),
         ),
-        barTouchData: BarTouchData(
-          touchTooltipData: BarTouchTooltipData(
+        lineTouchData: LineTouchData(
+          touchTooltipData: LineTouchTooltipData(
             getTooltipColor: (_) => scheme.inverseSurface,
-            getTooltipItem: (group, _, rod, _) {
-              final t = trends[group.x];
-              return BarTooltipItem(
-                '${DateFormat.MMMd(locale).format(t.date)}\n'
-                '${AppLocalizations.of(context).kcalValue(kcalStr(t.kcal))}',
-                TextStyle(color: scheme.onInverseSurface, fontSize: 12),
-              );
-            },
+            getTooltipItems: (touched) => [
+              for (final s in touched)
+                if (s.barIndex == 0)
+                  LineTooltipItem(
+                    '${DateFormat.MMMd(locale).format(trends[s.x.round()].date)}\n'
+                    '${l10n.kcalValue(kcalStr(trends[s.x.round()].kcal))}',
+                    TextStyle(color: scheme.onInverseSurface, fontSize: 12),
+                  )
+                else
+                  null,
+            ],
           ),
         ),
       ),

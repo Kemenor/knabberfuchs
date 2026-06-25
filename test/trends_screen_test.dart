@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('renders a BarChart and summary for logged days', (tester) async {
+  testWidgets('renders a LineChart and summary for logged days', (tester) async {
     const target = CalorieTarget(1800, 2200);
     final trends = [
       for (var i = 0; i < 7; i++)
@@ -37,7 +37,7 @@ void main() {
 
     // The chart builds (fl_chart construction would throw here otherwise) and
     // the summary card shows.
-    expect(find.byType(BarChart), findsOneWidget);
+    expect(find.byType(LineChart), findsOneWidget);
     expect(find.text('Average / day'), findsOneWidget);
     expect(find.text('Days in target'), findsOneWidget);
   });
@@ -66,7 +66,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(BarChart), findsNothing);
+    expect(find.byType(LineChart), findsNothing);
     expect(find.textContaining('No entries yet'), findsOneWidget);
   });
 }
