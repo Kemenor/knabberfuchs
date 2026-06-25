@@ -168,6 +168,12 @@ abstract class AppLocalizations {
   /// **'Custom'**
   String get trendsCustom;
 
+  /// No description provided for @trendsWeeklyAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly average'**
+  String get trendsWeeklyAvg;
+
   /// No description provided for @trendsAvgPerDay.
   ///
   /// In en, this message translates to:

@@ -67,4 +67,28 @@ void main() {
     expect(statusFor(1799, const CalorieTarget(1800, 2000)), TargetStatus.under);
     expect(statusFor(2000, const CalorieTarget(null, null)), TargetStatus.none);
   });
+
+  test('bucketTrends: weekly avg over logged days, only past 45 days', () {
+    const target = CalorieTarget(1800, 2200);
+    DayTrend d(int i, double kcal) => DayTrend(
+      date: DateTime(2026, 1, 1).add(Duration(days: i)),
+      kcal: kcal,
+      target: target,
+      status: statusFor(kcal, target),
+    );
+    final daily = [
+      // Week 1: three logged days @2100, rest un-logged; weeks 2–7 @2000.
+      for (var i = 0; i < 49; i++) d(i, i < 3 ? 2100 : (i < 7 ? 0 : 2000)),
+    ];
+
+    final weekly = bucketTrends(daily);
+    expect(weekly.length, 7); // 49 / 7
+    expect(weekly.first.kcal, 2100); // average of the 3 logged days only
+    expect(weekly[1].kcal, 2000);
+    expect(weekly.first.date, DateTime(2026, 1, 1));
+    expect(weekly.first.target.max, 2200);
+
+    // A short series (<= 45 days) is returned unchanged.
+    expect(bucketTrends(daily.take(30).toList()).length, 30);
+  });
 }

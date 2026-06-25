@@ -43,6 +43,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get trendsCustom => 'Person.';
 
   @override
+  String get trendsWeeklyAvg => 'Media settimanale';
+
+  @override
   String get trendsAvgPerDay => 'Media / giorno';
 
   @override

@@ -132,6 +132,44 @@ List<DayTrend> buildDayTrends(
   return out;
 }
 
+/// Collapse a long daily series into weekly buckets so a long range (e.g. a
+/// year) stays readable as a chart. Series of [dailyMax] days or fewer are
+/// returned unchanged. Each bucket holds the average intake over its *logged*
+/// days (0 = an un-logged week → a gap) and the average target across the week.
+List<DayTrend> bucketTrends(List<DayTrend> daily, {int dailyMax = 45}) {
+  if (daily.length <= dailyMax) return daily;
+  final out = <DayTrend>[];
+  for (var i = 0; i < daily.length; i += 7) {
+    final end = i + 7 < daily.length ? i + 7 : daily.length;
+    final chunk = daily.sublist(i, end);
+    final logged = chunk.where((d) => d.kcal > 0).toList();
+    final kcal = logged.isEmpty
+        ? 0.0
+        : logged.fold<double>(0, (s, d) => s + d.kcal) / logged.length;
+    double? avgBound(double? Function(DayTrend) pick) {
+      final vs = [
+        for (final d in chunk)
+          if (pick(d) != null) pick(d)!,
+      ];
+      return vs.isEmpty ? null : vs.reduce((a, b) => a + b) / vs.length;
+    }
+
+    final target = CalorieTarget(
+      avgBound((d) => d.target.min),
+      avgBound((d) => d.target.max),
+    );
+    out.add(
+      DayTrend(
+        date: chunk.first.date,
+        kcal: kcal,
+        target: target,
+        status: statusFor(kcal, target),
+      ),
+    );
+  }
+  return out;
+}
+
 /// Resolve the calorie bounds for a weekday: the weekday's own values if set,
 /// otherwise the app-wide defaults.
 CalorieTarget resolveTarget(

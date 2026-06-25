@@ -184,4 +184,29 @@ void main() {
       matchesGoldenFile('goldens/trends_custom_week.png'),
     );
   });
+
+  testWidgets('trends — long custom range aggregates to weekly', (tester) async {
+    tester.view.physicalSize = const Size(1080, 1700);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    // ~4 months of data: the chart collapses to weekly buckets.
+    await tester.pumpWidget(
+      app(
+        seed(120),
+        TrendWindow(
+          TrendMode.custom,
+          0,
+          DateTime(2026, 2, 22),
+          DateTime(2026, 6, 21),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await expectLater(
+      find.byType(TrendsScreen),
+      matchesGoldenFile('goldens/trends_long_custom.png'),
+    );
+  });
 }

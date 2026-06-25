@@ -43,6 +43,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trendsCustom => 'Custom';
 
   @override
+  String get trendsWeeklyAvg => 'Weekly average';
+
+  @override
   String get trendsAvgPerDay => 'Average / day';
 
   @override

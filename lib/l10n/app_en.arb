@@ -20,6 +20,7 @@
   "trendsWeek": "Week",
   "trendsMonth": "Month",
   "trendsCustom": "Custom",
+  "trendsWeeklyAvg": "Weekly average",
   "trendsAvgPerDay": "Average / day",
   "trendsDaysInTarget": "Days in target",
   "trendsEmpty": "No entries yet for this range. Log some food to see your trends.",

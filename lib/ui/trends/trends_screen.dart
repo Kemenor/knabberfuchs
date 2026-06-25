@@ -45,10 +45,17 @@ class TrendsScreen extends ConsumerWidget {
               ],
               selected: {window.mode},
               onSelectionChanged: (s) {
-                if (s.first == TrendMode.custom) {
-                  pickCustomRange(context, ref, window);
+                final notifier = ref.read(trendRangeProvider.notifier);
+                if (s.first != TrendMode.custom) {
+                  notifier.setMode(s.first);
+                  return;
+                }
+                // Reuse the last custom range if there is one; otherwise pick.
+                final saved = notifier.savedCustom;
+                if (saved != null) {
+                  notifier.setCustom(saved.start, saved.end);
                 } else {
-                  ref.read(trendRangeProvider.notifier).setMode(s.first);
+                  pickCustomRange(context, ref, window);
                 }
               },
             ),
@@ -171,12 +178,15 @@ class _TrendsBody extends StatelessWidget {
       );
     }
 
-    final avg =
-        logged.fold<double>(0, (s, t) => s + t.kcal) / logged.length;
+    // Summary is computed on the daily data; the chart collapses long ranges
+    // into weekly buckets so they stay readable.
+    final avg = logged.fold<double>(0, (s, t) => s + t.kcal) / logged.length;
     final withTarget =
         trends.where((t) => t.status != TargetStatus.none).toList();
     final inTarget =
         withTarget.where((t) => t.status == TargetStatus.inRange).length;
+    final points = bucketTrends(trends);
+    final aggregated = points.length != trends.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -186,8 +196,18 @@ class _TrendsBody extends StatelessWidget {
           inTarget: inTarget,
           targetedDays: withTarget.length,
         ),
-        const SizedBox(height: 16),
-        Expanded(child: _Chart(trends: trends)),
+        const SizedBox(height: 12),
+        if (aggregated) ...[
+          Text(
+            l10n.trendsWeeklyAvg,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
+          const SizedBox(height: 4),
+        ],
+        Expanded(child: _Chart(trends: points)),
       ],
     );
   }
