@@ -209,4 +209,32 @@ void main() {
       matchesGoldenFile('goldens/trends_long_custom.png'),
     );
   });
+
+  testWidgets('trends — multi-year custom range aggregates to monthly', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 1700);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    // ~2 years of data: the chart collapses to monthly buckets.
+    final trends = seed(800);
+    await tester.pumpWidget(
+      app(
+        trends,
+        TrendWindow(
+          TrendMode.custom,
+          0,
+          trends.first.date,
+          trends.last.date,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await expectLater(
+      find.byType(TrendsScreen),
+      matchesGoldenFile('goldens/trends_monthly.png'),
+    );
+  });
 }

@@ -46,6 +46,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trendsWeeklyAvg => 'Moyenne hebdomadaire';
 
   @override
+  String get trendsMonthlyAvg => 'Moyenne mensuelle';
+
+  @override
   String get trendsAvgPerDay => 'Moyenne / jour';
 
   @override

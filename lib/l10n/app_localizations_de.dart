@@ -46,6 +46,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trendsWeeklyAvg => 'Wochendurchschnitt';
 
   @override
+  String get trendsMonthlyAvg => 'Monatsdurchschnitt';
+
+  @override
   String get trendsAvgPerDay => 'Ø pro Tag';
 
   @override

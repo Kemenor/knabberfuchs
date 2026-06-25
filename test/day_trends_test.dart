@@ -91,4 +91,25 @@ void main() {
     // A short series (<= 45 days) is returned unchanged.
     expect(bucketTrends(daily.take(30).toList()).length, 30);
   });
+
+  test('bucketTrends: monthly buckets past a year', () {
+    const target = CalorieTarget(1800, 2200);
+    final daily = [
+      for (var i = 0; i < 400; i++) // Jan 2025 → early Feb 2026
+        DayTrend(
+          date: DateTime(2025, 1, 1).add(Duration(days: i)),
+          kcal: 2000,
+          target: target,
+          status: statusFor(2000, target),
+        ),
+    ];
+
+    expect(trendBucketFor(366), TrendBucket.weekly); // a year stays weekly
+    expect(trendBucketFor(367), TrendBucket.monthly); // beyond → monthly
+
+    final monthly = bucketTrends(daily);
+    expect(monthly.length, 14); // 12 months of 2025 + Jan, Feb 2026
+    expect(monthly.first.date, DateTime(2025, 1, 1));
+    expect(monthly.first.kcal, 2000);
+  });
 }

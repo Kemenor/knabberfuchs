@@ -185,8 +185,8 @@ class _TrendsBody extends StatelessWidget {
         trends.where((t) => t.status != TargetStatus.none).toList();
     final inTarget =
         withTarget.where((t) => t.status == TargetStatus.inRange).length;
+    final bucket = trendBucketFor(trends.length);
     final points = bucketTrends(trends);
-    final aggregated = points.length != trends.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -197,9 +197,11 @@ class _TrendsBody extends StatelessWidget {
           targetedDays: withTarget.length,
         ),
         const SizedBox(height: 12),
-        if (aggregated) ...[
+        if (bucket != TrendBucket.daily) ...[
           Text(
-            l10n.trendsWeeklyAvg,
+            bucket == TrendBucket.monthly
+                ? l10n.trendsMonthlyAvg
+                : l10n.trendsWeeklyAvg,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
@@ -207,7 +209,7 @@ class _TrendsBody extends StatelessWidget {
           ),
           const SizedBox(height: 4),
         ],
-        Expanded(child: _Chart(trends: points)),
+        Expanded(child: _Chart(trends: points, bucket: bucket)),
       ],
     );
   }
@@ -261,7 +263,8 @@ class _SummaryCard extends StatelessWidget {
 
 class _Chart extends StatelessWidget {
   final List<DayTrend> trends;
-  const _Chart({required this.trends});
+  final TrendBucket bucket;
+  const _Chart({required this.trends, required this.bucket});
 
   @override
   Widget build(BuildContext context) {
@@ -404,9 +407,20 @@ class _Chart extends StatelessWidget {
                 if ((trends.length - 1 - i) % labelStep != 0) {
                   return const SizedBox.shrink();
                 }
-                final label = dense
-                    ? DateFormat('d/M', locale).format(trends[i].date)
-                    : DateFormat('EEE', locale).format(trends[i].date);
+                final date = trends[i].date;
+                final label = switch (bucket) {
+                  // Months by name (with year if the range spans years).
+                  TrendBucket.monthly => DateFormat(
+                    trends.first.date.year != trends.last.date.year
+                        ? 'MMM yy'
+                        : 'MMM',
+                    locale,
+                  ).format(date),
+                  TrendBucket.weekly => DateFormat('d/M', locale).format(date),
+                  TrendBucket.daily => dense
+                      ? DateFormat('d/M', locale).format(date)
+                      : DateFormat('EEE', locale).format(date),
+                };
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(

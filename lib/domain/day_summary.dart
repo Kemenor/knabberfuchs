@@ -132,42 +132,73 @@ List<DayTrend> buildDayTrends(
   return out;
 }
 
-/// Collapse a long daily series into weekly buckets so a long range (e.g. a
-/// year) stays readable as a chart. Series of [dailyMax] days or fewer are
-/// returned unchanged. Each bucket holds the average intake over its *logged*
-/// days (0 = an un-logged week → a gap) and the average target across the week.
-List<DayTrend> bucketTrends(List<DayTrend> daily, {int dailyMax = 45}) {
-  if (daily.length <= dailyMax) return daily;
-  final out = <DayTrend>[];
-  for (var i = 0; i < daily.length; i += 7) {
-    final end = i + 7 < daily.length ? i + 7 : daily.length;
-    final chunk = daily.sublist(i, end);
-    final logged = chunk.where((d) => d.kcal > 0).toList();
-    final kcal = logged.isEmpty
-        ? 0.0
-        : logged.fold<double>(0, (s, d) => s + d.kcal) / logged.length;
-    double? avgBound(double? Function(DayTrend) pick) {
-      final vs = [
-        for (final d in chunk)
-          if (pick(d) != null) pick(d)!,
-      ];
-      return vs.isEmpty ? null : vs.reduce((a, b) => a + b) / vs.length;
-    }
+/// How the chart aggregates a range of [dayCount] days: daily up to ~6 weeks,
+/// weekly up to a year, monthly beyond.
+enum TrendBucket { daily, weekly, monthly }
 
-    final target = CalorieTarget(
-      avgBound((d) => d.target.min),
-      avgBound((d) => d.target.max),
-    );
-    out.add(
-      DayTrend(
-        date: chunk.first.date,
-        kcal: kcal,
-        target: target,
-        status: statusFor(kcal, target),
-      ),
-    );
+TrendBucket trendBucketFor(int dayCount) => dayCount <= 45
+    ? TrendBucket.daily
+    : dayCount <= 366
+    ? TrendBucket.weekly
+    : TrendBucket.monthly;
+
+/// Reduce a bucket of consecutive days to one point: the average intake over its
+/// *logged* days (0 = a gap) and the average target.
+DayTrend _reduceBucket(List<DayTrend> chunk) {
+  final logged = chunk.where((d) => d.kcal > 0).toList();
+  final kcal = logged.isEmpty
+      ? 0.0
+      : logged.fold<double>(0, (s, d) => s + d.kcal) / logged.length;
+  double? avgBound(double? Function(DayTrend) pick) {
+    final vs = [
+      for (final d in chunk)
+        if (pick(d) != null) pick(d)!,
+    ];
+    return vs.isEmpty ? null : vs.reduce((a, b) => a + b) / vs.length;
   }
-  return out;
+
+  final target = CalorieTarget(
+    avgBound((d) => d.target.min),
+    avgBound((d) => d.target.max),
+  );
+  return DayTrend(
+    date: chunk.first.date,
+    kcal: kcal,
+    target: target,
+    status: statusFor(kcal, target),
+  );
+}
+
+/// Collapse a long daily series into weekly or monthly buckets (see
+/// [trendBucketFor]) so a long range stays readable as a chart. Short ranges are
+/// returned unchanged.
+List<DayTrend> bucketTrends(List<DayTrend> daily) {
+  switch (trendBucketFor(daily.length)) {
+    case TrendBucket.daily:
+      return daily;
+    case TrendBucket.weekly:
+      final out = <DayTrend>[];
+      for (var i = 0; i < daily.length; i += 7) {
+        final end = i + 7 < daily.length ? i + 7 : daily.length;
+        out.add(_reduceBucket(daily.sublist(i, end)));
+      }
+      return out;
+    case TrendBucket.monthly:
+      final out = <DayTrend>[];
+      var i = 0;
+      while (i < daily.length) {
+        final y = daily[i].date.year, m = daily[i].date.month;
+        var j = i;
+        while (j < daily.length &&
+            daily[j].date.year == y &&
+            daily[j].date.month == m) {
+          j++;
+        }
+        out.add(_reduceBucket(daily.sublist(i, j)));
+        i = j;
+      }
+      return out;
+  }
 }
 
 /// Resolve the calorie bounds for a weekday: the weekday's own values if set,
