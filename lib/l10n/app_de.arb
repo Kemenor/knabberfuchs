@@ -6,6 +6,17 @@
   "navDay": "Tag",
   "navRecipes": "Rezepte",
   "navSettings": "Einstellungen",
+  "navTrends": "Verlauf",
+
+  "settingsDisplay": "Anzeige",
+  "settingsShowTrends": "Verlauf-Tab anzeigen",
+  "settingsShowTrendsSub": "Einen Tab mit wöchentlichen und monatlichen Kaloriendiagrammen hinzufügen",
+
+  "trendsWeek": "Woche",
+  "trendsMonth": "Monat",
+  "trendsAvgPerDay": "Ø pro Tag",
+  "trendsDaysInTarget": "Tage im Ziel",
+  "trendsEmpty": "Noch keine Einträge in diesem Zeitraum. Erfasse etwas, um deinen Verlauf zu sehen.",
 
   "actionSave": "Speichern",
   "actionCancel": "Abbrechen",

@@ -41,11 +41,23 @@ class SettingsScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text(l10nTop.genericError('$e'))),
         data: (targets) {
           final l10n = AppLocalizations.of(context);
+          final showTrends =
+              ref.watch(showTrendsProvider).asData?.value ?? true;
           Target rowFor(int wd) => targets.firstWhere((t) => t.weekday == wd);
           return ListView(
             children: [
               _SectionHeader(l10n.settingsSectionLanguage),
               const _LanguagePicker(),
+              const Divider(),
+              _SectionHeader(l10n.settingsDisplay),
+              SwitchListTile(
+                secondary: const Icon(Icons.insights_outlined),
+                title: Text(l10n.settingsShowTrends),
+                subtitle: Text(l10n.settingsShowTrendsSub),
+                value: showTrends,
+                onChanged: (v) =>
+                    db.setSetting('showTrends', v ? 'true' : 'false'),
+              ),
               const Divider(),
               _SectionHeader(l10n.settingsTargets),
               Padding(

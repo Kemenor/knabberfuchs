@@ -21,6 +21,35 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navSettings => 'Einstellungen';
 
   @override
+  String get navTrends => 'Verlauf';
+
+  @override
+  String get settingsDisplay => 'Anzeige';
+
+  @override
+  String get settingsShowTrends => 'Verlauf-Tab anzeigen';
+
+  @override
+  String get settingsShowTrendsSub =>
+      'Einen Tab mit wöchentlichen und monatlichen Kaloriendiagrammen hinzufügen';
+
+  @override
+  String get trendsWeek => 'Woche';
+
+  @override
+  String get trendsMonth => 'Monat';
+
+  @override
+  String get trendsAvgPerDay => 'Ø pro Tag';
+
+  @override
+  String get trendsDaysInTarget => 'Tage im Ziel';
+
+  @override
+  String get trendsEmpty =>
+      'Noch keine Einträge in diesem Zeitraum. Erfasse etwas, um deinen Verlauf zu sehen.';
+
+  @override
   String get actionSave => 'Speichern';
 
   @override

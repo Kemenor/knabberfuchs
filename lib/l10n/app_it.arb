@@ -6,6 +6,17 @@
   "navDay": "Giorno",
   "navRecipes": "Ricette",
   "navSettings": "Impostazioni",
+  "navTrends": "Andamento",
+
+  "settingsDisplay": "Visualizzazione",
+  "settingsShowTrends": "Mostra scheda Andamento",
+  "settingsShowTrendsSub": "Aggiungi una scheda con grafici delle calorie settimanali e mensili",
+
+  "trendsWeek": "Settimana",
+  "trendsMonth": "Mese",
+  "trendsAvgPerDay": "Media / giorno",
+  "trendsDaysInTarget": "Giorni in linea",
+  "trendsEmpty": "Nessun dato per questo periodo. Registra del cibo per vedere l'andamento.",
 
   "actionSave": "Salva",
   "actionCancel": "Annulla",

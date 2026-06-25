@@ -30,6 +30,9 @@ void main() {
                 for (var wd = 0; wd < 7; wd++) Target(weekday: wd),
               ]),
             ),
+            // Keep the optional Trends tab off so the smoke test stays on the
+            // three core tabs (and doesn't touch the real DB).
+            showTrendsProvider.overrideWith((ref) => Stream.value(false)),
           ],
           child: const CalorieApp(),
         ),

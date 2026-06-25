@@ -21,6 +21,35 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navSettings => 'Impostazioni';
 
   @override
+  String get navTrends => 'Andamento';
+
+  @override
+  String get settingsDisplay => 'Visualizzazione';
+
+  @override
+  String get settingsShowTrends => 'Mostra scheda Andamento';
+
+  @override
+  String get settingsShowTrendsSub =>
+      'Aggiungi una scheda con grafici delle calorie settimanali e mensili';
+
+  @override
+  String get trendsWeek => 'Settimana';
+
+  @override
+  String get trendsMonth => 'Mese';
+
+  @override
+  String get trendsAvgPerDay => 'Media / giorno';
+
+  @override
+  String get trendsDaysInTarget => 'Giorni in linea';
+
+  @override
+  String get trendsEmpty =>
+      'Nessun dato per questo periodo. Registra del cibo per vedere l\'andamento.';
+
+  @override
   String get actionSave => 'Salva';
 
   @override

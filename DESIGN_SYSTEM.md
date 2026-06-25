@@ -13,9 +13,12 @@ This is a Flutter + Riverpod (Material 3) app. Entry: `lib/main.dart` →
 
 ## 1. Navigation
 
-- Root is a Material 3 `NavigationBar` with a fixed three-tab order: **Day,
-  Recipes, Settings**. Each tab pairs an `_outlined` unselected icon with a
-  filled `selectedIcon`. Live: `lib/ui/home_shell.dart:25-45`.
+- Root is a Material 3 `NavigationBar` ordered **Day, [Trends], Recipes,
+  Settings**. **Day is always index 0** (the only programmatic jump target). The
+  **Trends** tab is optional — toggled in Settings via `showTrendsProvider`; the
+  `pages`/`destinations` lists are built conditionally and the active index is
+  `clamp`ed. Each tab pairs an `_outlined` unselected icon with a filled
+  `selectedIcon`. Live: `lib/ui/home_shell.dart`.
 - Tab index lives in `homeTabProvider` (`lib/providers.dart:307`). Switch tabs
   with `ref.read(homeTabProvider.notifier).set(i)`; pages are kept alive in an
   `IndexedStack` so scroll/search survive switching (`home_shell.dart:24`).

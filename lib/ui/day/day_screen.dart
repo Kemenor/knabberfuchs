@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/date_label.dart';
 import '../../core/date_x.dart';
 import '../../core/format.dart';
+import '../../core/status_color.dart';
 import '../../domain/day_summary.dart';
 import '../../domain/enums.dart';
 import '../../domain/meal_type_i18n.dart';
@@ -282,12 +283,7 @@ class _SummaryCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final total = summary.total;
     final status = summary.status;
-    final color = switch (status) {
-      TargetStatus.over => theme.colorScheme.error,
-      TargetStatus.under => theme.colorScheme.tertiary,
-      TargetStatus.inRange => theme.colorScheme.primary,
-      TargetStatus.none => theme.colorScheme.onSurfaceVariant,
-    };
+    final color = statusColor(theme.colorScheme, status);
     final statusText = switch (status) {
       TargetStatus.over => l10n.targetOver(kcalStr(-summary.remainingToMax!)),
       TargetStatus.under => l10n.targetToGo(kcalStr(summary.shortOfMin!)),

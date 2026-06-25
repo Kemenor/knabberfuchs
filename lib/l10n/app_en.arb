@@ -10,6 +10,18 @@
   "@navRecipes": { "description": "Bottom navigation: the recipes tab" },
   "navSettings": "Settings",
   "@navSettings": { "description": "Bottom navigation: the settings tab" },
+  "navTrends": "Trends",
+  "@navTrends": { "description": "Bottom navigation: the trends/charts tab" },
+
+  "settingsDisplay": "Display",
+  "settingsShowTrends": "Show Trends tab",
+  "settingsShowTrendsSub": "Add a tab with weekly and monthly calorie charts",
+
+  "trendsWeek": "Week",
+  "trendsMonth": "Month",
+  "trendsAvgPerDay": "Average / day",
+  "trendsDaysInTarget": "Days in target",
+  "trendsEmpty": "No entries yet for this range. Log some food to see your trends.",
 
   "actionSave": "Save",
   "actionCancel": "Cancel",

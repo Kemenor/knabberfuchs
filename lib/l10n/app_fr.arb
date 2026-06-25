@@ -6,6 +6,17 @@
   "navDay": "Jour",
   "navRecipes": "Recettes",
   "navSettings": "Réglages",
+  "navTrends": "Tendances",
+
+  "settingsDisplay": "Affichage",
+  "settingsShowTrends": "Afficher l'onglet Tendances",
+  "settingsShowTrendsSub": "Ajouter un onglet avec des graphiques de calories hebdomadaires et mensuels",
+
+  "trendsWeek": "Semaine",
+  "trendsMonth": "Mois",
+  "trendsAvgPerDay": "Moyenne / jour",
+  "trendsDaysInTarget": "Jours dans la cible",
+  "trendsEmpty": "Aucune entrée pour cette période. Enregistrez des aliments pour voir vos tendances.",
 
   "actionSave": "Enregistrer",
   "actionCancel": "Annuler",

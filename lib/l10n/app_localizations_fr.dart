@@ -21,6 +21,35 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navSettings => 'Réglages';
 
   @override
+  String get navTrends => 'Tendances';
+
+  @override
+  String get settingsDisplay => 'Affichage';
+
+  @override
+  String get settingsShowTrends => 'Afficher l\'onglet Tendances';
+
+  @override
+  String get settingsShowTrendsSub =>
+      'Ajouter un onglet avec des graphiques de calories hebdomadaires et mensuels';
+
+  @override
+  String get trendsWeek => 'Semaine';
+
+  @override
+  String get trendsMonth => 'Mois';
+
+  @override
+  String get trendsAvgPerDay => 'Moyenne / jour';
+
+  @override
+  String get trendsDaysInTarget => 'Jours dans la cible';
+
+  @override
+  String get trendsEmpty =>
+      'Aucune entrée pour cette période. Enregistrez des aliments pour voir vos tendances.';
+
+  @override
   String get actionSave => 'Enregistrer';
 
   @override

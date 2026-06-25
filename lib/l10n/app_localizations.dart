@@ -126,6 +126,60 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get navSettings;
 
+  /// Bottom navigation: the trends/charts tab
+  ///
+  /// In en, this message translates to:
+  /// **'Trends'**
+  String get navTrends;
+
+  /// No description provided for @settingsDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get settingsDisplay;
+
+  /// No description provided for @settingsShowTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Trends tab'**
+  String get settingsShowTrends;
+
+  /// No description provided for @settingsShowTrendsSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a tab with weekly and monthly calorie charts'**
+  String get settingsShowTrendsSub;
+
+  /// No description provided for @trendsWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get trendsWeek;
+
+  /// No description provided for @trendsMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get trendsMonth;
+
+  /// No description provided for @trendsAvgPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Average / day'**
+  String get trendsAvgPerDay;
+
+  /// No description provided for @trendsDaysInTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Days in target'**
+  String get trendsDaysInTarget;
+
+  /// No description provided for @trendsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No entries yet for this range. Log some food to see your trends.'**
+  String get trendsEmpty;
+
   /// No description provided for @actionSave.
   ///
   /// In en, this message translates to:

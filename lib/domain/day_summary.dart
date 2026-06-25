@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 
+import '../core/date_x.dart';
 import '../data/db/database.dart';
 import 'enums.dart';
 import 'nutrition.dart';
@@ -72,13 +73,63 @@ class DaySummary {
   /// kcal still needed to reach the min (positive = short). Null when no min.
   double? get shortOfMin => kcalMin == null ? null : kcalMin! - total.kcal;
 
-  TargetStatus get status {
-    final t = total.kcal;
-    if (kcalMax != null && t > kcalMax!) return TargetStatus.over;
-    if (kcalMin != null && t < kcalMin!) return TargetStatus.under;
-    if (hasTarget) return TargetStatus.inRange;
-    return TargetStatus.none;
+  TargetStatus get status =>
+      statusFor(total.kcal, CalorieTarget(kcalMin, kcalMax));
+}
+
+/// Where [kcal] sits relative to a [target] (single source of truth shared by
+/// the day screen and the trends charts).
+TargetStatus statusFor(double kcal, CalorieTarget target) {
+  if (target.max != null && kcal > target.max!) return TargetStatus.over;
+  if (target.min != null && kcal < target.min!) return TargetStatus.under;
+  if (!target.isEmpty) return TargetStatus.inRange;
+  return TargetStatus.none;
+}
+
+/// One day's logged kcal paired with its resolved target and status — a point
+/// in the trends charts.
+class DayTrend {
+  final DateTime date;
+  final double kcal;
+  final CalorieTarget target;
+  final TargetStatus status;
+  const DayTrend({
+    required this.date,
+    required this.kcal,
+    required this.target,
+    required this.status,
+  });
+}
+
+/// One [DayTrend] per calendar day in [start, end] (inclusive). Days with no
+/// entries get 0 kcal; each day resolves its own weekday target. [kcalByDay] is
+/// keyed by 'YYYY-MM-DD' (see AppDatabase.watchDailyKcal).
+List<DayTrend> buildDayTrends(
+  DateTime start,
+  DateTime end,
+  Map<String, double> kcalByDay,
+  List<Target> targets,
+  double? defaultMin,
+  double? defaultMax,
+) {
+  final out = <DayTrend>[];
+  var d = DateTime(start.year, start.month, start.day);
+  final last = DateTime(end.year, end.month, end.day);
+  while (!d.isAfter(last)) {
+    final kcal = kcalByDay[DayKey.of(d)] ?? 0;
+    // DateTime.weekday is Mon=1…Sun=7; resolveTarget wants Mon=0…Sun=6.
+    final target = resolveTarget(targets, defaultMin, defaultMax, d.weekday - 1);
+    out.add(
+      DayTrend(
+        date: d,
+        kcal: kcal,
+        target: target,
+        status: statusFor(kcal, target),
+      ),
+    );
+    d = d.add(const Duration(days: 1));
   }
+  return out;
 }
 
 /// Resolve the calorie bounds for a weekday: the weekday's own values if set,

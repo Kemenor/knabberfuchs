@@ -21,6 +21,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSettings => 'Settings';
 
   @override
+  String get navTrends => 'Trends';
+
+  @override
+  String get settingsDisplay => 'Display';
+
+  @override
+  String get settingsShowTrends => 'Show Trends tab';
+
+  @override
+  String get settingsShowTrendsSub =>
+      'Add a tab with weekly and monthly calorie charts';
+
+  @override
+  String get trendsWeek => 'Week';
+
+  @override
+  String get trendsMonth => 'Month';
+
+  @override
+  String get trendsAvgPerDay => 'Average / day';
+
+  @override
+  String get trendsDaysInTarget => 'Days in target';
+
+  @override
+  String get trendsEmpty =>
+      'No entries yet for this range. Log some food to see your trends.';
+
+  @override
   String get actionSave => 'Save';
 
   @override

@@ -296,6 +296,30 @@ class AppDatabase extends _$AppDatabase {
     return rows.map((r) => r.read<String>('day')).toList();
   }
 
+  /// Live total logged kcal per day within [startDay, endDay] (inclusive,
+  /// 'YYYY-MM-DD'). Only days with entries are returned; per-entry kcal is the
+  /// snapshot per-100 g scaled by grams. Used by the trends charts.
+  Stream<List<({String day, double kcal})>> watchDailyKcal(
+    String startDay,
+    String endDay,
+  ) {
+    return customSelect(
+      'SELECT day, SUM(s_kcal100 * grams / 100.0) AS kcal FROM entries '
+      'WHERE day >= ? AND day <= ? GROUP BY day ORDER BY day',
+      variables: [Variable.withString(startDay), Variable.withString(endDay)],
+      readsFrom: {entries},
+    ).watch().map(
+      (rows) => rows
+          .map(
+            (r) => (
+              day: r.read<String>('day'),
+              kcal: r.readNullable<double>('kcal') ?? 0,
+            ),
+          )
+          .toList(),
+    );
+  }
+
   // ---------------- Targets ----------------
 
   Future<List<Target>> allTargets() => select(targets).get();

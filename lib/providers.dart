@@ -333,9 +333,10 @@ final selectedDayProvider = NotifierProvider<SelectedDayNotifier, String>(
   SelectedDayNotifier.new,
 );
 
-/// HomeShell bottom-nav tab index (0 = Day, 1 = Recipes, 2 = Settings). A
-/// provider so flows like "log a recipe portion to a day" can jump to the Day
-/// tab on the day they just logged to.
+/// HomeShell bottom-nav tab index. Day is always 0; the remaining tabs depend
+/// on whether the Trends tab is enabled ([showTrendsProvider]) — Day, [Trends],
+/// Recipes, Settings. A provider so flows like "log a recipe portion to a day"
+/// can jump to the Day tab (index 0) on the day they just logged to.
 class HomeTabNotifier extends Notifier<int> {
   @override
   int build() => 0;
@@ -370,3 +371,49 @@ final daySummaryProvider = StreamProvider<DaySummary>((ref) {
         ),
       );
 });
+
+// ---------------- Trends ----------------
+
+/// Rolling window shown in the trends charts.
+enum TrendRange { week, month }
+
+class TrendRangeNotifier extends Notifier<TrendRange> {
+  @override
+  TrendRange build() => TrendRange.week;
+  void set(TrendRange range) => state = range;
+}
+
+final trendRangeProvider = NotifierProvider<TrendRangeNotifier, TrendRange>(
+  TrendRangeNotifier.new,
+);
+
+/// Per-day kcal vs target for the selected window (last 7 or 30 days ending
+/// today), gap-filled so every day has a bar.
+final trendsProvider = StreamProvider<List<DayTrend>>((ref) {
+  final db = ref.watch(dbProvider);
+  final range = ref.watch(trendRangeProvider);
+  final targets = ref.watch(targetsProvider).asData?.value ?? const [];
+  final defaultMin = ref.watch(defaultMinProvider).asData?.value;
+  final defaultMax = ref.watch(defaultMaxProvider).asData?.value;
+  final days = range == TrendRange.week ? 7 : 30;
+  final end = DayKey.parse(DayKey.today());
+  final start = end.subtract(Duration(days: days - 1));
+  return db
+      .watchDailyKcal(DayKey.of(start), DayKey.of(end))
+      .map(
+        (rows) => buildDayTrends(
+          start,
+          end,
+          {for (final r in rows) r.day: r.kcal},
+          targets,
+          defaultMin,
+          defaultMax,
+        ),
+      );
+});
+
+/// Whether the Trends tab is shown (default on; only an explicit 'false' hides).
+final showTrendsProvider = StreamProvider<bool>(
+  (ref) =>
+      ref.watch(dbProvider).watchSetting('showTrends').map((v) => v != 'false'),
+);
