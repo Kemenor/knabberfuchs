@@ -103,4 +103,48 @@ void main() {
       matchesGoldenFile('goldens/trends_month.png'),
     );
   });
+
+  testWidgets('trends — week view with customized per-day goals', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 1700);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    // A distinct goal per weekday (Mon=0…Sun=6) so each bar renders its own
+    // target zone instead of one shared band.
+    const goals = {
+      0: CalorieTarget(1800, 2100),
+      1: CalorieTarget(1800, 2100),
+      2: CalorieTarget(1700, 2000),
+      3: CalorieTarget(1900, 2200),
+      4: CalorieTarget(2000, 2500),
+      5: CalorieTarget(2000, 2700),
+      6: CalorieTarget(1600, 2000),
+    };
+    const pattern = [1650.0, 2000.0, 2450.0, 1950.0, 0.0, 2200.0, 1500.0];
+    final end = DateTime(2026, 6, 21);
+    final trends = [
+      for (var i = 6; i >= 0; i--)
+        () {
+          final date = end.subtract(Duration(days: i));
+          final kcal = pattern[(6 - i) % pattern.length];
+          final t = goals[date.weekday - 1]!;
+          return DayTrend(
+            date: date,
+            kcal: kcal,
+            target: t,
+            status: statusFor(kcal, t),
+          );
+        }(),
+    ];
+
+    await tester.pumpWidget(app(trends));
+    await tester.pumpAndSettle();
+
+    await expectLater(
+      find.byType(TrendsScreen),
+      matchesGoldenFile('goldens/trends_custom_week.png'),
+    );
+  });
 }

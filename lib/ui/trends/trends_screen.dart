@@ -163,29 +163,41 @@ class _Chart extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final locale = Localizations.localeOf(context).languageCode;
-    final today = trends.last.target; // reference band
+    final isWeek = range == TrendRange.week;
+    final barWidth = isWeek ? 18.0 : 6.0;
+
+    // The target can differ per weekday. When every day in the window shares the
+    // same bounds, draw one clean reference band; when they differ (customized
+    // per-day goals), draw each day's own target zone behind its bar instead, so
+    // the bar colors and the target shading always agree.
+    final first = trends.first.target;
+    final uniformTarget = trends.every(
+      (t) => t.target.min == first.min && t.target.max == first.max,
+    );
+    final showBand = uniformTarget && !first.isEmpty;
 
     final maxKcal = trends.fold<double>(0, (m, t) => t.kcal > m ? t.kcal : m);
-    final bandTop = today.max ?? 0;
-    final maxY = (maxKcal > bandTop ? maxKcal : bandTop) * 1.15;
+    final maxTarget = trends.fold<double>(
+      0,
+      (m, t) => (t.target.max ?? 0) > m ? (t.target.max ?? 0) : m,
+    );
+    final maxY = (maxKcal > maxTarget ? maxKcal : maxTarget) * 1.15;
     final topY = maxY < 100 ? 100.0 : maxY;
     final interval = topY <= 2000
         ? 500.0
         : (topY <= 5000 ? 1000.0 : 2000.0);
-    final isWeek = range == TrendRange.week;
-    final barWidth = isWeek ? 18.0 : 6.0;
 
     final lines = <HorizontalLine>[
-      if (today.max != null)
+      if (showBand && first.max != null)
         HorizontalLine(
-          y: today.max!,
+          y: first.max!,
           color: scheme.primary.withValues(alpha: 0.7),
           strokeWidth: 1.5,
           dashArray: [5, 4],
         ),
-      if (today.min != null)
+      if (showBand && first.min != null)
         HorizontalLine(
-          y: today.min!,
+          y: first.min!,
           color: scheme.tertiary.withValues(alpha: 0.7),
           strokeWidth: 1.5,
           dashArray: [5, 4],
@@ -208,6 +220,17 @@ class _Chart extends StatelessWidget {
                   width: barWidth,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(3),
+                  ),
+                  // Per-day target zone (only when goals vary; otherwise the
+                  // single dashed band above covers it).
+                  backDrawRodData: BackgroundBarChartRodData(
+                    show:
+                        !showBand &&
+                        (trends[i].target.min != null ||
+                            trends[i].target.max != null),
+                    fromY: trends[i].target.min ?? 0,
+                    toY: trends[i].target.max ?? topY,
+                    color: scheme.primary.withValues(alpha: 0.15),
                   ),
                 ),
               ],
