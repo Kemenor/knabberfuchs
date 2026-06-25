@@ -392,8 +392,40 @@ class TrendWindow {
 }
 
 class TrendRangeNotifier extends Notifier<TrendWindow> {
+  static const _settingKey = 'trendRange';
+
   @override
-  TrendWindow build() => preset(TrendMode.week, 0);
+  TrendWindow build() {
+    _restore();
+    return preset(TrendMode.week, 0);
+  }
+
+  /// Restore the last-used selection (mode, plus exact dates for a custom range)
+  /// from settings. Async; the default week shows until it resolves.
+  Future<void> _restore() async {
+    final raw = await ref.read(dbProvider).getSetting(_settingKey);
+    if (raw == null) return;
+    final parts = raw.split(':');
+    if (parts.first == 'custom' && parts.length == 3) {
+      final s = DateTime.tryParse(parts[1]);
+      final e = DateTime.tryParse(parts[2]);
+      if (s != null && e != null) state = TrendWindow(TrendMode.custom, 0, s, e);
+    } else {
+      final mode = TrendMode.values.firstWhere(
+        (m) => m.name == parts.first,
+        orElse: () => TrendMode.week,
+      );
+      if (mode != TrendMode.custom) state = preset(mode, 0);
+    }
+  }
+
+  void _persist() {
+    final s = state;
+    final raw = s.mode == TrendMode.custom
+        ? 'custom:${DayKey.of(s.start)}:${DayKey.of(s.end)}'
+        : s.mode.name;
+    ref.read(dbProvider).setSetting(_settingKey, raw);
+  }
 
   /// A week/month window [offset] whole periods before today.
   TrendWindow preset(TrendMode mode, int offset) {
@@ -405,7 +437,10 @@ class TrendRangeNotifier extends Notifier<TrendWindow> {
   }
 
   /// Switch Week/Month (resets to the current, latest period).
-  void setMode(TrendMode mode) => state = preset(mode, 0);
+  void setMode(TrendMode mode) {
+    state = preset(mode, 0);
+    _persist();
+  }
 
   /// Step to the older adjacent period.
   void older() {
@@ -427,6 +462,7 @@ class TrendRangeNotifier extends Notifier<TrendWindow> {
       DateTime(start.year, start.month, start.day),
       DateTime(end.year, end.month, end.day),
     );
+    _persist();
   }
 }
 

@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Skips the real notifier's DB-backed restore (no DB in these widget tests).
+class _NoRestore extends TrendRangeNotifier {
+  @override
+  TrendWindow build() => preset(TrendMode.week, 0);
+}
+
 void main() {
   testWidgets('renders a LineChart and summary for logged days', (tester) async {
     const target = CalorieTarget(1800, 2200);
@@ -25,7 +31,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [trendsProvider.overrideWith((ref) => Stream.value(trends))],
+        overrides: [
+          trendsProvider.overrideWith((ref) => Stream.value(trends)),
+          trendRangeProvider.overrideWith(() => _NoRestore()),
+        ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -56,6 +65,7 @@ void main() {
               ),
             ]),
           ),
+          trendRangeProvider.overrideWith(() => _NoRestore()),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,

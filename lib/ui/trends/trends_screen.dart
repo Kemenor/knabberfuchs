@@ -379,8 +379,11 @@ class _Chart extends StatelessWidget {
                   return const SizedBox.shrink();
                 }
                 // Short ranges show weekday initials; longer ones thin out to
-                // ~6 day/month labels.
-                if (i % labelStep != 0) return const SizedBox.shrink();
+                // ~6 labels, anchored from the right so the latest day (the
+                // focal point) is always labeled.
+                if ((trends.length - 1 - i) % labelStep != 0) {
+                  return const SizedBox.shrink();
+                }
                 final label = dense
                     ? DateFormat('d/M', locale).format(trends[i].date)
                     : DateFormat('EEE', locale).format(trends[i].date);
