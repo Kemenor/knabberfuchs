@@ -496,8 +496,9 @@ re-download already works at these sizes. Instead, fix update-detection to be co
   an optional initial-query param on OfflineRegionsScreen. Small-to-medium plumbing.
 
 ## Prerequisites / open dev details
-- ✅ Toolchain ready: Flutter 3.44.2 / Dart 3.12.2 / JDK 21 / Android SDK 35+36 in the
-  `flutter` distrobox; debug APK builds.
+- ✅ Toolchain ready: Flutter 3.44.4 / Dart 3.12.2 / JDK 21 / Android SDK 35+36 in the
+  `flutter` distrobox; debug APK builds. (CI pins Flutter 3.44.4 in `ios.yml` + `test.yml`,
+  kept in lockstep; goldens are regenerated on a Flutter bump — see `test/flutter_test_config.dart`.)
 - No runtime API keys needed (OFF keyless; USDA bundled). Optional user-supplied USDA key
   is a future power-user setting only.
 - Default locale → device locale (German for CH); OFF returns multilingual names.
