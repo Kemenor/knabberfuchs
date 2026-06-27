@@ -4,7 +4,40 @@ An ad-free, no-subscription, no-popup calorie tracker. Android-first (Flutter, s
 iOS stays possible). Local-first data, optional Health Connect sync, serverless
 recipe sharing, ZIP backup/restore.
 
-## Open reminders / TODO (updated 2026-06-26)
+## Open reminders / TODO (updated 2026-06-27)
+
+### New feedback (2026-06-27)
+
+- 📊 **Macro goals + macro visualization toggle** (feedback): let the user set **min/max
+  targets for the three macros** (protein / carb / fat), and on the day-view visualization
+  **toggle between** kcal and each macro. The data model already anticipates this — the
+  `targets` table is per-weekday with a `default` row and was migrated to `kcalMin/kcalMax`
+  (schema v2); extend it with `proteinMin/Max`, `carbMin/Max`, `fatMin/Max` (all optional,
+  same per-weekday + default shape, schema bump). Settings → Targets grows three optional
+  min/max pairs alongside the existing kcal ones. Day screen: a segmented toggle (kcal · P ·
+  C · F) that swaps the progress/over-under readout to the selected macro, reusing the
+  existing status-color logic (under=`tertiary` / in-range=`primary` / over=`error`). Entries
+  already snapshot macros, so the day total per macro is available with no model change to
+  `entries`. Keep all targets optional so users who only track calories are unaffected.
+- 🔗 **Make "Contribute to Open Food Facts" prominent in the food form** (feedback): in
+  `lib/ui/food/food_form_screen.dart` the OFF contribution link today sits at the **bottom**
+  of the form, only when a barcode is present, as small muted text, and points at the generic
+  `how-to-add-a-product` page. Improve it: **move it to the top** (just under the barcode
+  field), **deep-link to the product page** `https://world.openfoodfacts.org/product/{barcode}`
+  (and/or the add/edit URL from Phase 9c — confirm which best lands an editable/contributable
+  view), and **explain more** — a short sentence on why contributing helps (fills the shared
+  open database so the next person's scan resolves) and that OFF handles its own login. Keep
+  it barcode-gated (no barcode → nothing to contribute) and localized (en/de/fr/it). Builds on
+  Phase 9c's link-out approach; still no API/OAuth on our side.
+- 📷 **Barcode scanning reliability** (feedback): scans sometimes miss. First, **tune
+  `mobile_scanner` config** — restrict `formats` to the barcode symbologies we actually expect
+  (EAN-13/EAN-8/UPC-A/UPC-E for grocery), consider `detectionSpeed` (normal vs unrestricted),
+  resolution/`cameraResolution`, autofocus, and a torch toggle for low light. If config alone
+  isn't enough, add a **consensus capture**: read several frames and only accept a barcode once
+  **≥2 of N agree** (e.g. best-2-of-3), debouncing single bad reads. Investigate via the scan
+  screen + on real packages (some printed codes are low-contrast/curved). Measure miss rate
+  before/after. No backend; pure client-side scanner tuning.
+
 
 - ✅ **Shipped 2026-06-23 (food-flow + AI batch):** **Free add** (quick name+kcal log, in the
   search list and the Day bolt menu); **AI meal recognition** — on-device (Phase 13a) + optional
@@ -68,7 +101,9 @@ recipe sharing, ZIP backup/restore.
   lightweight secondary classifier or heuristics for the weak categories; improve the
   label→catalog kcal mapping for recognized items. The opt-in **Gemini** cloud path already
   handles these well, so this is specifically about closing the on-device gap.
-- 🥫 **Additional food sources** (backlog): broaden the generic / whole-foods catalog beyond the
+- 🥫 **Additional food sources** (backlog; **re-raised by feedback 2026-06-27** — user perceives
+  it as "OFF only" today, i.e. the bundled Swiss FCDB isn't visible enough as a source): broaden
+  the generic / whole-foods catalog beyond the
   bundled **Swiss FCDB** + **Open Food Facts** live API. Preferred route keeps the keyless,
   offline-first ethos — add more **public, attribution-only food-composition databases as
   build-time bundles** through the existing `tool/` pipeline (exactly how Swiss FCDB ships): e.g.
