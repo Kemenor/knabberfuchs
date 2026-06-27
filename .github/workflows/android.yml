@@ -1,4 +1,4 @@
-name: Android · Play internal
+name: Android · Play
 
 # Build the signed Android App Bundle and stage it on the Play "alpha" closed-
 # testing track on a version tag (v*) — the Android counterpart to ios.yml (which
