@@ -118,21 +118,25 @@ recipe sharing, ZIP backup/restore.
   lightweight secondary classifier or heuristics for the weak categories; improve the
   label→catalog kcal mapping for recognized items. The opt-in **Gemini** cloud path already
   handles these well, so this is specifically about closing the on-device gap.
-- 🥫 **Additional food sources** (backlog; **re-raised by feedback 2026-06-27** — user perceives
-  it as "OFF only" today, i.e. the bundled Swiss FCDB isn't visible enough as a source): broaden
-  the generic / whole-foods catalog beyond the
-  bundled **Swiss FCDB** + **Open Food Facts** live API. Preferred route keeps the keyless,
-  offline-first ethos — add more **public, attribution-only food-composition databases as
-  build-time bundles** through the existing `tool/` pipeline (exactly how Swiss FCDB ships): e.g.
-  **CIQUAL** (FR / ANSES), **USDA FoodData Central** (re-add as an optional English source — the
-  old build pipeline + `FoodSource.usda` enum value live in git history), UK **CoFID**, or other
-  national tables. Each ID-joins into the multilingual `foods` table (`nameDe/Fr/It/searchText`),
-  `FoodSource` gains one value per source, and each gets its own credit in Settings → About. The
-  real new logic is **cross-source dedup + ranking** (the same food can appear in several). Strictly
-  **opt-in, power-user only**: user-supplied-key commercial APIs (FatSecret / Nutritionix /
-  Edamam) — these need an account/key, against the keyless default, so only if users ask, mirroring
-  the optional USDA-key and Gemini-key patterns. No runtime keys in the default build; everything
-  stays offline-first.
+- 🥫 **Additional food sources** — **DECISION 2026-06-27: demoted to a non-goal for grocery; kept
+  only as "more *generic* tables if a locale needs them."** Research conclusion (Kemenor): for
+  **branded grocery products, Open Food Facts *is* the open database** — there is no serious second
+  one. Everything else is the wrong shape or the wrong licence:
+  - **The open national tables are generic/whole-foods, not branded grocery:** CIQUAL (FR/ANSES),
+    UK CoFID, USDA Foundation/SR Legacy, and the bundled Swiss FCDB. Bundling more of these broadens
+    *generic* coverage only — it does **not** close the packaged-products gap. Still fine to add a
+    locale's table on demand via the existing `tool/` pipeline (ID-joins into `foods`,
+    `FoodSource` gains a value, credited in About; the real work is cross-source dedup + ranking).
+  - **USDA FoodData Central → Branded Foods** is the one open *branded* set (public-domain, GS1/
+    Label Insight, ~hundreds of k products) — but it's **US-centric**, so low value for a Swiss/EU
+    user; most local shelf products aren't in it. Deliberately still excluded.
+  - **Commercial APIs (Nutritionix / FatSecret / Edamam / Spoonacular / Passio) are all paid/
+    key-gated;** GS1 itself doesn't give nutrition away. Only ever as **opt-in user-key power-user**
+    features (mirrors the Gemini/USDA-key pattern), never in the keyless default.
+  - **Strategy instead of a new source:** the grocery gap is an *OFF-coverage* problem, and the two
+    right levers already ship — **offline regional packs** (Phase 5/10, better local OFF coverage)
+    and the **contribute-back flow** (OCR label + the prominent OFF link, 2026-06-27). Improving OFF
+    is the serverless answer to "more grocery products."
 - 🧭 **UI consistency: barcode scan as a bottom-right FAB** (fix): in the *"from an ingredient
   list" → add-food* flow the barcode-scan action should sit as a lower-right FAB, matching the
   rest of the app (add food / new recipe / scan all use a bottom-right FAB). Keeps the primary
