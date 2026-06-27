@@ -5,8 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import '../../core/external_link.dart';
 import '../../core/format.dart';
 import '../../core/snackbar.dart';
 import '../../data/db/database.dart';
@@ -314,9 +313,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     if (code.isEmpty) return;
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final uri = Uri.parse('https://world.openfoodfacts.org/product/$code');
+    final url = 'https://world.openfoodfacts.org/product/$code';
     try {
-      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final ok = await openExternalUrl(url);
       if (!ok) {
         messenger.showAutoSnackBar(
           SnackBar(content: Text(l10n.couldNotOpenLink)),
