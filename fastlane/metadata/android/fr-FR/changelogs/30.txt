@@ -1,0 +1,1 @@
+Nouveau : définissez des objectifs de protéines, glucides et lipides (par jour, comme les calories) — l'écran du jour affiche une barre de progression par macro, et les Tendances peuvent représenter chacune d'elles. Et une invitation plus claire à ajouter un nouveau code-barres à Open Food Facts.

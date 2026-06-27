@@ -1,0 +1,1 @@
+Neu: Lege Ziele für Eiweiss, Kohlenhydrate und Fett fest (pro Tag, wie bei Kalorien) — die Tagesansicht zeigt nun einen Fortschrittsbalken pro Makro, und im Verlauf lässt sich jedes davon darstellen. Ausserdem ein klarerer Hinweis, einen neuen Barcode zu Open Food Facts hinzuzufügen.

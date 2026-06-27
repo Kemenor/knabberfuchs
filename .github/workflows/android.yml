@@ -1,7 +1,9 @@
 name: Android · Play internal
 
-# Build the signed Android App Bundle and stage it on the Play "internal" track
-# on a version tag (v*) — the Android counterpart to ios.yml. Reuses the local
+# Build the signed Android App Bundle and stage it on the Play "alpha" closed-
+# testing track on a version tag (v*) — the Android counterpart to ios.yml (which
+# ships the iOS build to TestFlight, the iOS closed-testing equivalent). Reuses
+# the local
 # release tooling: the upload keystore for signing + tool/play_upload_aab.py
 # (service account) for the upload, exactly as documented in CLAUDE.md.
 #
@@ -23,9 +25,9 @@ on:
     inputs:
       track:
         description: "Play track to stage the release on"
-        default: "internal"
+        default: "alpha"
         type: choice
-        options: [internal, alpha, beta, production]
+        options: [alpha, internal, beta, production]
 
 jobs:
   play:
@@ -82,4 +84,4 @@ jobs:
       - name: Upload to Play
         run: |
           python3 -m pip install --quiet google-api-python-client google-auth
-          python3 tool/play_upload_aab.py "${{ github.event.inputs.track || 'internal' }}"
+          python3 tool/play_upload_aab.py "${{ github.event.inputs.track || 'alpha' }}"
