@@ -10,7 +10,6 @@ import '../../domain/day_summary.dart';
 import '../../domain/enums.dart';
 import '../../domain/meal_type_i18n.dart';
 import '../../domain/meal_times.dart';
-import '../../domain/nutrition.dart';
 import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
@@ -284,6 +283,7 @@ class _SummaryCard extends StatelessWidget {
     final total = summary.total;
     final status = summary.status;
     final color = statusColor(theme.colorScheme, status);
+    final kcalBar = summary.barFractionFor(TargetMetric.kcal);
     final statusText = switch (status) {
       TargetStatus.over => l10n.targetOver(kcalStr(-summary.remainingToMax!)),
       TargetStatus.under => l10n.targetToGo(kcalStr(summary.shortOfMin!)),
@@ -324,14 +324,12 @@ class _SummaryCard extends StatelessWidget {
                   ),
               ],
             ),
-            if (summary.kcalMax != null) ...[
+            if (kcalBar != null) ...[
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
-                  value: summary.kcalMax == 0
-                      ? 0
-                      : (total.kcal / summary.kcalMax!).clamp(0.0, 1.0),
+                  value: kcalBar,
                   minHeight: 8,
                   color: status == TargetStatus.over
                       ? theme.colorScheme.error
@@ -347,7 +345,7 @@ class _SummaryCard extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 12),
-            _MacroRow(total: total),
+            _MacroRow(summary: summary),
           ],
         ),
       ),
@@ -356,34 +354,63 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _MacroRow extends StatelessWidget {
-  final Nutrition total;
-  const _MacroRow({required this.total});
+  final DaySummary summary;
+  const _MacroRow({required this.summary});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _macro(context, l10n.macroProtein, total.protein),
-        _macro(context, l10n.macroCarbs, total.carb),
-        _macro(context, l10n.macroFat, total.fat),
+        _macro(context, TargetMetric.protein, l10n.macroProtein),
+        _macro(context, TargetMetric.carb, l10n.macroCarbs),
+        _macro(context, TargetMetric.fat, l10n.macroFat),
       ],
     );
   }
 
-  Widget _macro(BuildContext context, String label, double grams) {
+  /// One macro: its gram total, a thin progress bar when the macro has a target
+  /// (status-colored), and the label. Targetless macros stay plain — a reserved
+  /// gap keeps the three labels aligned. Mirrors the kcal bar above.
+  Widget _macro(BuildContext context, TargetMetric metric, String label) {
     final theme = Theme.of(context);
-    return Column(
-      children: [
-        Text(
-          '${macroStr(grams)} g',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
+    final value = summary.valueFor(metric);
+    final frac = summary.barFractionFor(metric);
+    final status = summary.statusForMetric(metric);
+    final color = frac == null ? null : statusColor(theme.colorScheme, status);
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            '${macroStr(value)} g',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
           ),
-        ),
-        Text(label, style: theme.textTheme.bodySmall),
-      ],
+          const SizedBox(height: 4),
+          SizedBox(
+            height: 4,
+            child: frac == null
+                ? null
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: frac,
+                        minHeight: 4,
+                        color: status == TargetStatus.over
+                            ? theme.colorScheme.error
+                            : null,
+                      ),
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: theme.textTheme.bodySmall),
+        ],
+      ),
     );
   }
 }
