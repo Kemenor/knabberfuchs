@@ -334,6 +334,35 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  /// Live per-day totals for kcal *and* each macro within [startDay, endDay]
+  /// (inclusive). Each is the snapshot per-100 g scaled by grams; only days with
+  /// entries are returned. Lets the trends chart swap which metric it plots.
+  Stream<List<({String day, double kcal, double protein, double carb, double fat})>>
+  watchDailyTotals(String startDay, String endDay) {
+    return customSelect(
+      'SELECT day, '
+      'SUM(s_kcal100 * grams / 100.0) AS kcal, '
+      'SUM(s_protein100 * grams / 100.0) AS protein, '
+      'SUM(s_carb100 * grams / 100.0) AS carb, '
+      'SUM(s_fat100 * grams / 100.0) AS fat '
+      'FROM entries WHERE day >= ? AND day <= ? GROUP BY day ORDER BY day',
+      variables: [Variable.withString(startDay), Variable.withString(endDay)],
+      readsFrom: {entries},
+    ).watch().map(
+      (rows) => rows
+          .map(
+            (r) => (
+              day: r.read<String>('day'),
+              kcal: r.readNullable<double>('kcal') ?? 0,
+              protein: r.readNullable<double>('protein') ?? 0,
+              carb: r.readNullable<double>('carb') ?? 0,
+              fat: r.readNullable<double>('fat') ?? 0,
+            ),
+          )
+          .toList(),
+    );
+  }
+
   // ---------------- Targets ----------------
 
   Future<List<Target>> allTargets() => select(targets).get();

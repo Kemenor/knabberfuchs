@@ -139,8 +139,9 @@ TargetStatus statusFor(double kcal, CalorieTarget target) {
   return TargetStatus.none;
 }
 
-/// One day's logged kcal paired with its resolved target and status — a point
-/// in the trends charts.
+/// One day's logged value for the charted metric, paired with its resolved
+/// target and status — a point in the trends charts. [kcal] holds whichever
+/// metric the chart is showing (kcal or a macro's grams).
 class DayTrend {
   final DateTime date;
   final double kcal;
@@ -154,9 +155,38 @@ class DayTrend {
   });
 }
 
-/// One [DayTrend] per calendar day in [start, end] (inclusive). Days with no
-/// entries get 0 kcal; each day resolves its own weekday target. [kcalByDay] is
-/// keyed by 'YYYY-MM-DD' (see AppDatabase.watchDailyKcal).
+/// One [DayTrend] per calendar day in [start, end] (inclusive) for [metric].
+/// Days with no entries get 0; each day resolves its own weekday target,
+/// falling back to [defaults]. [valueByDay] is keyed by 'YYYY-MM-DD'.
+List<DayTrend> buildMetricDayTrends(
+  DateTime start,
+  DateTime end,
+  Map<String, double> valueByDay,
+  List<Target> targets,
+  TargetMetric metric,
+  CalorieTarget defaults,
+) {
+  final out = <DayTrend>[];
+  var d = DateTime(start.year, start.month, start.day);
+  final last = DateTime(end.year, end.month, end.day);
+  while (!d.isAfter(last)) {
+    final value = valueByDay[DayKey.of(d)] ?? 0;
+    // DateTime.weekday is Mon=1…Sun=7; resolveMetricTarget wants Mon=0…Sun=6.
+    final target = resolveMetricTarget(targets, metric, defaults, d.weekday - 1);
+    out.add(
+      DayTrend(
+        date: d,
+        kcal: value,
+        target: target,
+        status: statusFor(value, target),
+      ),
+    );
+    d = d.add(const Duration(days: 1));
+  }
+  return out;
+}
+
+/// Calorie convenience over [buildMetricDayTrends] (kept for existing callers).
 List<DayTrend> buildDayTrends(
   DateTime start,
   DateTime end,
@@ -164,26 +194,14 @@ List<DayTrend> buildDayTrends(
   List<Target> targets,
   double? defaultMin,
   double? defaultMax,
-) {
-  final out = <DayTrend>[];
-  var d = DateTime(start.year, start.month, start.day);
-  final last = DateTime(end.year, end.month, end.day);
-  while (!d.isAfter(last)) {
-    final kcal = kcalByDay[DayKey.of(d)] ?? 0;
-    // DateTime.weekday is Mon=1…Sun=7; resolveTarget wants Mon=0…Sun=6.
-    final target = resolveTarget(targets, defaultMin, defaultMax, d.weekday - 1);
-    out.add(
-      DayTrend(
-        date: d,
-        kcal: kcal,
-        target: target,
-        status: statusFor(kcal, target),
-      ),
-    );
-    d = d.add(const Duration(days: 1));
-  }
-  return out;
-}
+) => buildMetricDayTrends(
+  start,
+  end,
+  kcalByDay,
+  targets,
+  TargetMetric.kcal,
+  CalorieTarget(defaultMin, defaultMax),
+);
 
 /// How the chart aggregates a range of [dayCount] days: daily up to ~6 weeks,
 /// weekly up to a year, monthly beyond.

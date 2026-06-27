@@ -483,24 +483,51 @@ final trendRangeProvider = NotifierProvider<TrendRangeNotifier, TrendWindow>(
   TrendRangeNotifier.new,
 );
 
-/// Per-day kcal vs target for the selected window, gap-filled so every day has
-/// a point.
+/// Which metric the Trends chart plots. In-memory (resets to kcal each launch);
+/// the Trends screen's SegmentedButton drives it.
+class SelectedTrendMetricNotifier extends Notifier<TargetMetric> {
+  @override
+  TargetMetric build() => TargetMetric.kcal;
+  void set(TargetMetric m) => state = m;
+}
+
+final selectedTrendMetricProvider =
+    NotifierProvider<SelectedTrendMetricNotifier, TargetMetric>(
+      SelectedTrendMetricNotifier.new,
+    );
+
+/// Per-day value (for the selected metric) vs that metric's target for the
+/// chosen window, gap-filled so every day has a point.
 final trendsProvider = StreamProvider<List<DayTrend>>((ref) {
   final db = ref.watch(dbProvider);
   final w = ref.watch(trendRangeProvider);
+  final metric = ref.watch(selectedTrendMetricProvider);
   final targets = ref.watch(targetsProvider).asData?.value ?? const [];
   final defaultMin = ref.watch(defaultMinProvider).asData?.value;
   final defaultMax = ref.watch(defaultMaxProvider).asData?.value;
+  final macroDefaults =
+      ref.watch(macroDefaultsProvider).asData?.value ?? const {};
+  final defaults = metric == TargetMetric.kcal
+      ? CalorieTarget(defaultMin, defaultMax)
+      : (macroDefaults[metric] ?? const CalorieTarget(null, null));
+  double pick(
+    ({String day, double kcal, double protein, double carb, double fat}) r,
+  ) => switch (metric) {
+    TargetMetric.kcal => r.kcal,
+    TargetMetric.protein => r.protein,
+    TargetMetric.carb => r.carb,
+    TargetMetric.fat => r.fat,
+  };
   return db
-      .watchDailyKcal(DayKey.of(w.start), DayKey.of(w.end))
+      .watchDailyTotals(DayKey.of(w.start), DayKey.of(w.end))
       .map(
-        (rows) => buildDayTrends(
+        (rows) => buildMetricDayTrends(
           w.start,
           w.end,
-          {for (final r in rows) r.day: r.kcal},
+          {for (final r in rows) r.day: pick(r)},
           targets,
-          defaultMin,
-          defaultMax,
+          metric,
+          defaults,
         ),
       );
 });

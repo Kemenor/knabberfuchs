@@ -9,9 +9,10 @@ import '../../domain/day_summary.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 
-/// Calorie history against the user's target: a line of daily intake over a
-/// shaded target band, each day's dot colored by its status (under / in-range /
-/// over). Pick Week / Month / a custom range, and step through periods.
+/// Intake history for the chosen metric (calories or a macro) against the
+/// user's target: a line of daily values over a shaded target band, each day's
+/// dot colored by its status (under / in-range / over). A metric toggle picks
+/// kcal/P/C/F; Week / Month / a custom range steps through periods.
 class TrendsScreen extends ConsumerWidget {
   const TrendsScreen({super.key});
 
@@ -19,6 +20,7 @@ class TrendsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final window = ref.watch(trendRangeProvider);
+    final metric = ref.watch(selectedTrendMetricProvider);
     final trendsAsync = ref.watch(trendsProvider);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navTrends)),
@@ -27,6 +29,31 @@ class TrendsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SegmentedButton<TargetMetric>(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(
+                  value: TargetMetric.kcal,
+                  label: Text(l10n.unitKcal),
+                ),
+                ButtonSegment(
+                  value: TargetMetric.protein,
+                  label: Text(l10n.macroProtein),
+                ),
+                ButtonSegment(
+                  value: TargetMetric.carb,
+                  label: Text(l10n.macroCarbs),
+                ),
+                ButtonSegment(
+                  value: TargetMetric.fat,
+                  label: Text(l10n.macroFat),
+                ),
+              ],
+              selected: {metric},
+              onSelectionChanged: (s) =>
+                  ref.read(selectedTrendMetricProvider.notifier).set(s.first),
+            ),
+            const SizedBox(height: 8),
             SegmentedButton<TrendMode>(
               showSelectedIcon: false,
               segments: [
@@ -66,7 +93,7 @@ class TrendsScreen extends ConsumerWidget {
               child: trendsAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(child: Text(l10n.genericError('$e'))),
-                data: (trends) => _TrendsBody(trends: trends),
+                data: (trends) => _TrendsBody(trends: trends, metric: metric),
               ),
             ),
           ],
@@ -151,9 +178,25 @@ String _rangeLabel(DateTime s, DateTime e, String locale) {
   return '${fmt.format(s)} – ${fmt.format(e)}';
 }
 
+/// Format a metric value with its unit: "1850 kcal" for calories, "82 g" for a
+/// macro.
+String _metricValue(AppLocalizations l10n, TargetMetric m, double v) =>
+    m == TargetMetric.kcal ? l10n.kcalValue(kcalStr(v)) : '${macroStr(v)} g';
+
+/// A "nice" y-axis gridline interval (~≤6 lines) that suits both the kcal range
+/// (thousands) and macro grams (tens to low hundreds).
+double _niceInterval(double topY) {
+  const List<double> steps = [10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000];
+  for (final s in steps) {
+    if (topY / s <= 6) return s;
+  }
+  return 10000;
+}
+
 class _TrendsBody extends StatelessWidget {
   final List<DayTrend> trends;
-  const _TrendsBody({required this.trends});
+  final TargetMetric metric;
+  const _TrendsBody({required this.trends, required this.metric});
 
   @override
   Widget build(BuildContext context) {
@@ -195,6 +238,7 @@ class _TrendsBody extends StatelessWidget {
           avgKcal: avg,
           inTarget: inTarget,
           targetedDays: withTarget.length,
+          metric: metric,
         ),
         const SizedBox(height: 12),
         if (bucket != TrendBucket.daily) ...[
@@ -209,7 +253,7 @@ class _TrendsBody extends StatelessWidget {
           ),
           const SizedBox(height: 4),
         ],
-        Expanded(child: _Chart(trends: points, bucket: bucket)),
+        Expanded(child: _Chart(trends: points, bucket: bucket, metric: metric)),
       ],
     );
   }
@@ -219,10 +263,12 @@ class _SummaryCard extends StatelessWidget {
   final double avgKcal;
   final int inTarget;
   final int targetedDays;
+  final TargetMetric metric;
   const _SummaryCard({
     required this.avgKcal,
     required this.inTarget,
     required this.targetedDays,
+    required this.metric,
   });
 
   @override
@@ -248,7 +294,10 @@ class _SummaryCard extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: stat(l10n.kcalValue(kcalStr(avgKcal)), l10n.trendsAvgPerDay),
+              child: stat(
+                _metricValue(l10n, metric, avgKcal),
+                l10n.trendsAvgPerDay,
+              ),
             ),
             if (targetedDays > 0)
               Expanded(
@@ -264,7 +313,12 @@ class _SummaryCard extends StatelessWidget {
 class _Chart extends StatelessWidget {
   final List<DayTrend> trends;
   final TrendBucket bucket;
-  const _Chart({required this.trends, required this.bucket});
+  final TargetMetric metric;
+  const _Chart({
+    required this.trends,
+    required this.bucket,
+    required this.metric,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -277,16 +331,18 @@ class _Chart extends StatelessWidget {
     final labelStep = dense ? (trends.length / 6).ceil() : 1;
     final hasTarget = trends.any((t) => !t.target.isEmpty);
 
-    final maxKcal = trends.fold<double>(0, (m, t) => t.kcal > m ? t.kcal : m);
+    final maxValue = trends.fold<double>(0, (m, t) => t.kcal > m ? t.kcal : m);
     final maxTarget = trends.fold<double>(
       0,
       (m, t) => (t.target.max ?? 0) > m ? (t.target.max ?? 0) : m,
     );
-    final maxY = (maxKcal > maxTarget ? maxKcal : maxTarget) * 1.15;
-    final topY = maxY < 100 ? 100.0 : maxY;
-    final interval = topY <= 2000
-        ? 500.0
-        : (topY <= 5000 ? 1000.0 : 2000.0);
+    final rawMax = maxValue > maxTarget ? maxValue : maxTarget;
+    // Floor so an empty/low chart isn't degenerate — kcal sits in the thousands,
+    // macros in the tens.
+    final topY = rawMax <= 0
+        ? (metric == TargetMetric.kcal ? 100.0 : 50.0)
+        : rawMax * 1.15;
+    final interval = _niceInterval(topY);
 
     // Intake line — a gap (null spot) on un-logged days so the line breaks
     // rather than dropping to zero.
@@ -442,7 +498,7 @@ class _Chart extends StatelessWidget {
                 if (s.barIndex == 0)
                   LineTooltipItem(
                     '${DateFormat.MMMd(locale).format(trends[s.x.round()].date)}\n'
-                    '${l10n.kcalValue(kcalStr(trends[s.x.round()].kcal))}',
+                    '${_metricValue(l10n, metric, trends[s.x.round()].kcal)}',
                     TextStyle(color: scheme.onInverseSurface, fontSize: 12),
                   )
                 else

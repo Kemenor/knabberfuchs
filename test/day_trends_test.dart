@@ -112,4 +112,22 @@ void main() {
     expect(monthly.first.date, DateTime(2025, 1, 1));
     expect(monthly.first.kcal, 2000);
   });
+
+  test('buildMetricDayTrends resolves a macro target + status per day', () {
+    final start = DateTime(2026, 6, 15); // Mon (weekday index 0)
+    final end = DateTime(2026, 6, 16); // Tue (weekday index 1)
+    // Monday has a protein floor of 150; Tuesday inherits the default floor 120.
+    final trends = buildMetricDayTrends(
+      start,
+      end,
+      {'2026-06-15': 100, '2026-06-16': 130},
+      [const Target(weekday: 0, proteinMin: 150)],
+      TargetMetric.protein,
+      const CalorieTarget(120, null),
+    );
+    expect(trends[0].kcal, 100); // the value field carries the metric (grams)
+    expect(trends[0].status, TargetStatus.under); // 100 < Monday floor 150
+    expect(trends[1].kcal, 130);
+    expect(trends[1].status, TargetStatus.inRange); // 130 >= default floor 120
+  });
 }
