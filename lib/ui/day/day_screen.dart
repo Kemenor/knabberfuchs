@@ -294,7 +294,14 @@ class _SummaryCard extends StatelessWidget {
       TargetStatus.none => '',
     };
 
+    // Hero card: a subtle warm tint over the base card colour distinguishes the
+    // day summary as the feature card (the meal cards stay plain near-white).
+    final heroColor = Color.alphaBlend(
+      theme.colorScheme.primary.withValues(alpha: 0.08),
+      theme.cardTheme.color ?? theme.colorScheme.surface,
+    );
     return Card(
+      color: heroColor,
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Padding(
         padding: const EdgeInsets.all(16),
