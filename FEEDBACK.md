@@ -79,3 +79,52 @@ tracks tester-driven changes specifically.
 - [Nährwertkennzeichnung und Nährwerttabelle Schweiz — Santina GmbH](https://santina-gmbh.ch/naehrwertkennzeichnung-bei-lebensmitteln/)
 - [Nährwertkennzeichnung — Lebensmittelverband Deutschland](https://www.lebensmittelverband.de/de/lebensmittel/kennzeichnung/naehrwert)
 - [Die Nährwerttabelle laut LMIV — Thomas Markel](https://thomasmarkel.de/naehrwerttabelle-laut-lmiv-2-2/)
+
+## Feedback (2026-06-27)
+
+- ✅ **Per-macro goals, not just calories** — DONE 2026-06-27. Testers wanted to track
+  protein / carbs / fat against targets, not only kcal. Added optional **per-weekday min/max
+  targets** for protein, carbs and fat (full parity with the calorie target), shown as
+  glanceable bars on the Day card and as a swappable metric (kcal · P · C · F) on the Trends
+  chart. Settings → Targets sub-screen. (Schema v11; commits `cb45c53`…`7579833`.)
+
+- ✅ **Make "Contribute to Open Food Facts" obvious** — DONE 2026-06-27. The contribute link
+  was buried at the bottom of the Add-food form. Moved it to a prominent card at the **top**
+  (when a barcode is present), deep-linking to the product page with a short note on why
+  contributing helps the shared database. (commit `9f3f720`.)
+
+- ✅ **Barcode scanning sometimes misses** — DONE 2026-06-27. Hardened the scanner: restricted
+  to the grocery symbologies, higher camera resolution, a **torch toggle** for low light, and
+  **consensus capture** (accept a code only once ≥2 of N frames agree) to reject single bad
+  reads. (commit `73db76b`.)
+
+- ✅ **Smaller fixes from testing** — DONE late June. Tapping an external Open Food Facts link
+  now returns cleanly to the app on Android Back (`9623c01`); the amount field in the log sheet
+  is pre-selected on focus so you can overtype it immediately (`e224df4`).
+
+## Feedback (2026-06-28)
+
+- ✅ **AI photo estimate is sometimes off — let me add context** — DONE 2026-06-28. A tester
+  noted the photo guess can misread an ambiguous dish. Added an **optional text hint**: after
+  picking a photo (cloud/Gemini path), a sheet lets you add a short description
+  (e.g. "homemade lasagne, large portion") sent with the image to tighten the estimate.
+  Optional and skippable; the keyless on-device path is unchanged. (commits `4fc0b92`, `595fb0a`.)
+
+- ✅ **On-device recognition weak on drinks / portion sizes** — DONE 2026-06-28. Improved the
+  recognised-label → calorie mapping (realistic per-category portion sizes instead of a flat
+  default, and an estimate even when the local catalog has no match), and added a nudge to set
+  up the free Gemini key for sharper results — including drinks the on-device model can't
+  recognise. (commit `a7eb950`.) Note: a fully-offline beverage model isn't feasible under a
+  permissive licence today, so drinks route to the optional cloud path by design.
+
+- ✅ **App felt generic; some surfaces hard to read** — DONE 2026-06-28. Acting on review
+  feedback, reskinned the whole app onto a consistent design system:
+  - a warmer, distinct **colour palette** (the old green was an accidental default);
+  - **cards that stand out** from the background (white cards + hairline borders) — fixing
+    low-contrast meal lists and a hero card that didn't read as the summary;
+  - **calmer status colours** — no alarming red; under / in-range / over read as focus /
+    achieved / gentle nudge;
+  - friendlier **typography** with an **accessibility typeface picker** (incl. low-vision
+    Atkinson Hyperlegible and OpenDyslexic fonts) and rounded icons;
+  - first-class **dark mode**, including a fix for dark-mode header icons that rendered
+    near-invisible. (Redesign commit series `896fb1b`…`d13ef7a`.)
