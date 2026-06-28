@@ -438,40 +438,19 @@ class _LanguagePicker extends ConsumerWidget {
     final db = ref.read(dbProvider);
     final current =
         ref.watch(localeProvider).asData?.value?.languageCode ?? 'system';
-    final options = <String, String>{
-      'system': l10n.languageSystem,
-      'en': l10n.languageEnglish,
-      'de': l10n.languageGerman,
-      'fr': l10n.languageFrench,
-      'it': l10n.languageItalian,
-    };
-    return ExpansionTile(
-      leading: const Icon(Symbols.translate_rounded),
-      title: Text(l10n.settingsLanguage),
-      subtitle: Text(options[current] ?? options['system']!),
-      children: [
-        RadioGroup<String>(
-          groupValue: current,
-          onChanged: (v) {
-            if (v != null) db.setSetting('appLocale', v);
-          },
-          child: Column(
-            children: [
-              for (final e in options.entries)
-                RadioListTile<String>(value: e.key, title: Text(e.value)),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Text(
-            l10n.languageMachineNote,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
-          ),
-        ),
-      ],
+    return FuchsbauChoicePicker<String>(
+      icon: Symbols.translate_rounded,
+      title: l10n.settingsLanguage,
+      value: current,
+      options: {
+        'system': l10n.languageSystem,
+        'en': l10n.languageEnglish,
+        'de': l10n.languageGerman,
+        'fr': l10n.languageFrench,
+        'it': l10n.languageItalian,
+      },
+      onChanged: (v) => db.setSetting('appLocale', v),
+      footnote: l10n.languageMachineNote,
     );
   }
 }
@@ -487,35 +466,18 @@ class _TypefacePicker extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final db = ref.read(dbProvider);
     final current = ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
-    // Per-option helper subtitles (accessibility intent); names stay proper nouns.
-    String? sub(FuchsbauFont f) => switch (f) {
-      FuchsbauFont.figtree => l10n.typefaceDefault,
-      FuchsbauFont.atkinsonHyperlegible => l10n.typefaceLowVision,
-      FuchsbauFont.openDyslexic => l10n.typefaceDyslexia,
-      FuchsbauFont.system => null,
-    };
-    return ExpansionTile(
-      leading: const Icon(Symbols.text_fields_rounded),
-      title: Text(l10n.settingsTypeface),
-      subtitle: Text(current.label),
-      children: [
-        RadioGroup<FuchsbauFont>(
-          groupValue: current,
-          onChanged: (v) {
-            if (v != null) db.setSetting('appFont', v.name);
-          },
-          child: Column(
-            children: [
-              for (final f in FuchsbauFont.values)
-                RadioListTile<FuchsbauFont>(
-                  value: f,
-                  title: Text(f.label),
-                  subtitle: sub(f) == null ? null : Text(sub(f)!),
-                ),
-            ],
-          ),
-        ),
-      ],
+    return FuchsbauChoicePicker<FuchsbauFont>(
+      icon: Symbols.text_fields_rounded,
+      title: l10n.settingsTypeface,
+      value: current,
+      options: {for (final f in FuchsbauFont.values) f: f.label},
+      // Per-option helper subtitles (accessibility intent); names stay proper nouns.
+      subtitles: {
+        FuchsbauFont.figtree: l10n.typefaceDefault,
+        FuchsbauFont.atkinsonHyperlegible: l10n.typefaceLowVision,
+        FuchsbauFont.openDyslexic: l10n.typefaceDyslexia,
+      },
+      onChanged: (f) => db.setSetting('appFont', f.name),
     );
   }
 }
@@ -532,34 +494,19 @@ class _ThemePicker extends ConsumerWidget {
     final db = ref.read(dbProvider);
     final current =
         ref.watch(themeModeProvider).asData?.value ?? ThemeMode.system;
-    final labels = <ThemeMode, String>{
-      ThemeMode.system: l10n.themeSystem,
-      ThemeMode.light: l10n.themeLight,
-      ThemeMode.dark: l10n.themeDark,
-    };
-    return ExpansionTile(
-      leading: const Icon(Symbols.brightness_6_rounded),
-      title: Text(l10n.settingsTheme),
-      subtitle: Text(labels[current]!),
-      children: [
-        RadioGroup<ThemeMode>(
-          groupValue: current,
-          onChanged: (v) {
-            if (v != null) {
-              db.setSetting(
-                'appThemeMode',
-                v == ThemeMode.system ? null : v.name,
-              );
-            }
-          },
-          child: Column(
-            children: [
-              for (final e in labels.entries)
-                RadioListTile<ThemeMode>(value: e.key, title: Text(e.value)),
-            ],
-          ),
-        ),
-      ],
+    return FuchsbauChoicePicker<ThemeMode>(
+      icon: Symbols.brightness_6_rounded,
+      title: l10n.settingsTheme,
+      value: current,
+      options: {
+        ThemeMode.system: l10n.themeSystem,
+        ThemeMode.light: l10n.themeLight,
+        ThemeMode.dark: l10n.themeDark,
+      },
+      onChanged: (v) => db.setSetting(
+        'appThemeMode',
+        v == ThemeMode.system ? null : v.name,
+      ),
     );
   }
 }
