@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart' show Locale;
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuchsbau/fuchsbau.dart';
 import 'package:intl/intl.dart';
@@ -336,6 +337,18 @@ final fontProvider = StreamProvider<FuchsbauFont>(
           (f) => f.name == v,
           orElse: () => FuchsbauFont.figtree,
         ),
+      ),
+);
+
+/// Light / dark / follow-system, persisted as the `appThemeMode` setting;
+/// defaults to following the OS (ThemeMode.system).
+final themeModeProvider = StreamProvider<ThemeMode>(
+  (ref) => ref.watch(dbProvider).watchSetting('appThemeMode').map(
+        (v) => switch (v) {
+          'light' => ThemeMode.light,
+          'dark' => ThemeMode.dark,
+          _ => ThemeMode.system,
+        },
       ),
 );
 

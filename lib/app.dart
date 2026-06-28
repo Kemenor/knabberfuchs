@@ -40,11 +40,14 @@ class _CalorieAppState extends ConsumerState<CalorieApp> {
     ref.listen(localeProvider, (_, next) => _syncNumberLocale(next));
     final font =
         ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
+    final themeMode =
+        ref.watch(themeModeProvider).asData?.value ?? ThemeMode.system;
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Brightness.light, font: font),
       darkTheme: buildTheme(Brightness.dark, font: font),
+      themeMode: themeMode,
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

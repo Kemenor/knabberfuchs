@@ -28,6 +28,10 @@
   "actionImport": "Importer",
 
   "settingsSectionLanguage": "Langue",
+  "settingsTheme": "Thème",
+  "themeSystem": "Système",
+  "themeLight": "Clair",
+  "themeDark": "Sombre",
   "settingsTypeface": "Police",
   "typefaceDefault": "Par défaut",
   "typefaceLowVision": "Lisibilité (basse vision)",

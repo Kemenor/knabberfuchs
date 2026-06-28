@@ -28,6 +28,10 @@
   "actionImport": "Importa",
 
   "settingsSectionLanguage": "Lingua",
+  "settingsTheme": "Tema",
+  "themeSystem": "Sistema",
+  "themeLight": "Chiaro",
+  "themeDark": "Scuro",
   "settingsTypeface": "Carattere",
   "typefaceDefault": "Predefinito",
   "typefaceLowVision": "Leggibilità (ipovisione)",

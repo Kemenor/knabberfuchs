@@ -34,6 +34,10 @@
 
   "settingsSectionLanguage": "Language",
   "@settingsSectionLanguage": { "description": "Settings section header for the app language" },
+  "settingsTheme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
   "settingsTypeface": "Typeface",
   "typefaceDefault": "Default",
   "typefaceLowVision": "Low-vision legibility",

@@ -42,6 +42,8 @@ class SettingsScreen extends ConsumerWidget {
               ref.watch(showTrendsProvider).asData?.value ?? true;
           return ListView(
             children: [
+              _SectionHeader(l10n.settingsTheme),
+              const _SettingsCard(children: [_ThemePicker()]),
               _SectionHeader(l10n.settingsSectionLanguage),
               const _SettingsCard(children: [_LanguagePicker()]),
               _SectionHeader(l10n.settingsTypeface),
@@ -518,6 +520,50 @@ class _TypefacePicker extends ConsumerWidget {
   }
 }
 
+/// Light / dark / follow-system. Writes the 'appThemeMode' setting, which drives
+/// [themeModeProvider] → MaterialApp.themeMode. Collapsible radio list to match
+/// the Language and Typeface pickers.
+class _ThemePicker extends ConsumerWidget {
+  const _ThemePicker();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final db = ref.read(dbProvider);
+    final current =
+        ref.watch(themeModeProvider).asData?.value ?? ThemeMode.system;
+    final labels = <ThemeMode, String>{
+      ThemeMode.system: l10n.themeSystem,
+      ThemeMode.light: l10n.themeLight,
+      ThemeMode.dark: l10n.themeDark,
+    };
+    return ExpansionTile(
+      leading: const Icon(Symbols.brightness_6_rounded),
+      title: Text(l10n.settingsTheme),
+      subtitle: Text(labels[current]!),
+      children: [
+        RadioGroup<ThemeMode>(
+          groupValue: current,
+          onChanged: (v) {
+            if (v != null) {
+              db.setSetting(
+                'appThemeMode',
+                v == ThemeMode.system ? null : v.name,
+              );
+            }
+          },
+          child: Column(
+            children: [
+              for (final e in labels.entries)
+                RadioListTile<ThemeMode>(value: e.key, title: Text(e.value)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Optional Google Gemini key (the user's own free-tier key) for cloud food
 /// recognition. Empty = the on-device classifier stays the default.
 class _AiKeyTile extends ConsumerStatefulWidget {
@@ -564,7 +610,7 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

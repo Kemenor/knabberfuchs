@@ -28,6 +28,10 @@
   "actionImport": "Importieren",
 
   "settingsSectionLanguage": "Sprache",
+  "settingsTheme": "Design",
+  "themeSystem": "System",
+  "themeLight": "Hell",
+  "themeDark": "Dunkel",
   "settingsTypeface": "Schriftart",
   "typefaceDefault": "Standard",
   "typefaceLowVision": "Bessere Lesbarkeit (Sehschwäche)",
