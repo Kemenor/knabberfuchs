@@ -187,6 +187,7 @@
   "recognizeLooksLike": "On dirait…",
   "recognizeNoneManual": "Aucun de ceux-ci – saisir manuellement",
   "recognizeNoGuess": "Aliment non reconnu. Ajoutez-le manuellement.",
+  "recognizeGeminiNudge": "Astuce : ajoutez une clé Gemini gratuite dans les Réglages pour de meilleurs résultats, y compris les boissons que le modèle sur l'appareil ne reconnaît pas.",
   "dayCaptureTooltip": "Ajouter depuis une photo",
   "captureScanAi": "Scanner un repas avec l'IA",
   "captureScanAiSub": "Photographiez un plat — on devine le plat et les calories",

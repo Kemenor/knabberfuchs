@@ -233,6 +233,7 @@
   "recognizeLooksLike": "Looks like…",
   "recognizeNoneManual": "None of these — enter manually",
   "recognizeNoGuess": "Couldn't recognize the food. Add it manually.",
+  "recognizeGeminiNudge": "Tip: add a free Gemini key in Settings for better results — including drinks the on-device model can't recognize.",
   "dayCaptureTooltip": "Add from a photo",
   "captureScanAi": "Scan a meal with AI",
   "captureScanAiSub": "Photograph a dish — we'll guess it and the calories",

@@ -572,6 +572,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t recognize the food. Add it manually.';
 
   @override
+  String get recognizeGeminiNudge =>
+      'Tip: add a free Gemini key in Settings for better results — including drinks the on-device model can\'t recognize.';
+
+  @override
   String get dayCaptureTooltip => 'Add from a photo';
 
   @override

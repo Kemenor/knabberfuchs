@@ -71,14 +71,10 @@ recipe sharing, ZIP backup/restore.
   OCR/barcode native libs ~bigger than the 21 MB AIY food model) + the Flutter engine. For a
   Store release, use `flutter build appbundle` (Play splits per-device automatically).
 
-- ⏳ **Italian food data** (Phase 12): the Swiss FCDB Italian export wasn't on the Wayback
-  Machine and `naehrwertdaten.ch` was down on 2026-06-22. When it's reachable again, fetch
-  `it.xlsx` into `tool/swiss_fcdb/` (see that README for the URL), re-run `build.py`, bump
-  `swissDatasetVersion` in `lib/data/sources/swiss_seed.dart`. ID join slots Italian names in
-  with **zero code change**. Until then `nameIt` is null → Italian UI shows English food names.
-- 📝 **Translation review** (Phase 11c): DE/FR/IT UI strings are a machine-translation first
-  pass. Kemenor (Swiss, DE/FR) to review microcopy; **IT entirely unreviewed**. Disclosed in-app
-  under the language picker.
+- ✅ **Italian food data** (Phase 12): DONE — `it.xlsx` fetched into `tool/swiss_fcdb/`, dataset
+  regenerated with **full Italian** (commit `9214694`), `swissDatasetVersion` bumped to 5 so
+  existing installs re-seed. `name_it` populated for all 1190 rows; consumed via `food_name.dart`.
+- ✅ **Translation review** (Phase 11c): DONE — DE/FR/IT microcopy reviewed (closed 2026-06-28).
 - ✅ **Locale-aware number display** (Phase 11d): DONE 2026-06-22 — `core/format.dart` renders a
   decimal comma in de/fr/it + thousands grouping on kcal, via a number-locale set from the app
   (separate from `Intl.defaultLocale` so dates are untouched). CSV export uses raw period decimals.
@@ -88,8 +84,9 @@ recipe sharing, ZIP backup/restore.
   `domain/meal_type_i18n.dart` (a locale map, NOT the ARB, so the no-context provider can build
   the auto-name): auto-name localized **at creation** ("Abendessen 20:57"), display chips/rows
   localized, CSV pinned to English. Verified on emulator in German; 82 tests pass.
-- 🍽️ **Per-food density / piece weights** (units follow-up): volume→grams still assumes ~1 g/ml;
-  no per-piece weights yet.
+- ✅ **Per-food density / piece weights** (units follow-up): DONE — per-food `density` + natural-
+  portion weights ("1 medium cucumber = 300 g") shipped (commits `3fed236`/`28deced`/`59ebb43`);
+  `density` populated for all 1190 Swiss rows, consumed in `food_repository`/`recipe_repository`.
 - ⚖️ **Quick add + Gemini: optional weight (grams)** — ✅ DONE 2026-06-23 (v1.0.13+14): Quick add
   has a Weight (g) field; Gemini prefills its estimated portion grams; entered totals ÷ weight →
   correct per-100 g snapshot with real grams (blank still = grams 100). Original note: Free add / Quick add stored the
@@ -111,13 +108,22 @@ recipe sharing, ZIP backup/restore.
      backup ZIP; gives visible/cross-device backups but adds an account + a key, against the
      no-account default → strictly opt-in, only if users ask. Either way: opt-in and disclosed
      (data leaves the device to the user's own Drive).
-- 🤖 **Improve on-device recognition** (backlog): the bundled AIY food_V1 model (2024 dish
-  classes, skewed to North-American/global *dishes*) is weak on or misses whole categories —
-  e.g. **beverages** (coffee/juice/soda/smoothies), drinks, and many packaged/regional foods.
-  Options: evaluate a newer/larger on-device food classifier (or a beverage-aware one); add a
-  lightweight secondary classifier or heuristics for the weak categories; improve the
-  label→catalog kcal mapping for recognized items. The opt-in **Gemini** cloud path already
-  handles these well, so this is specifically about closing the on-device gap.
+- 🤖 **Improve on-device recognition** — **DECISION 2026-06-28: cheap wins shipped; model swap is
+  a non-goal (nothing to swap to); offline beverages parked.** The bundled AIY food_V1 (2022 dish
+  classes, NA-skewed, **zero beverage classes** — confirmed by reading its label map) is the only
+  serious Apache-2.0 on-device food classifier that exists. Research (license-verified across HF/
+  Kaggle/TF Hub/Roboflow) found **no permissively-licensed off-the-shelf `.tflite` beverage or
+  better-food classifier**: alternatives are research-only (Food2K, ISIA Food-500), unlicensed,
+  proprietary (STMicro SLA0044), container-detectors, or hosted SaaS. ImageNet-MobileNet as a drink
+  fallback is a trap (only 3 real drink-content classes: red wine/espresso/eggnog). So:
+  - ✅ **Done — better label→portion/kcal mapping** (`data/ml/food_kcal_fallback.dart`): a curated,
+    whole-word category table gives realistic portion grams (was a flat 300 g for ~85% of catalog
+    rows that lack a serving size) and a sane kcal estimate even on a catalog miss (was null).
+  - ✅ **Done — Gemini nudge:** when no key is set, the on-device path points at the free cloud key
+    (richer estimates incl. drinks) — in the guess sheet + the empty-result snackbar; localized.
+  - ⏸️ **Parked — offline beverages:** the *only* legitimate path is training our own ~3–5 MB
+    EfficientNet-Lite0/MobileNetV3 on Open Images V7 (CC-BY-4.0) + Wikimedia — a build-it-yourself
+    project, and single-photo drink-type ID is inherently hard. Not worth it; Gemini covers drinks.
 - 🥫 **Additional food sources** — **DECISION 2026-06-27: demoted to a non-goal for grocery; kept
   only as "more *generic* tables if a locale needs them."** Research conclusion (Kemenor): for
   **branded grocery products, Open Food Facts *is* the open database** — there is no serious second
@@ -137,10 +143,9 @@ recipe sharing, ZIP backup/restore.
     right levers already ship — **offline regional packs** (Phase 5/10, better local OFF coverage)
     and the **contribute-back flow** (OCR label + the prominent OFF link, 2026-06-27). Improving OFF
     is the serverless answer to "more grocery products."
-- 🧭 **UI consistency: barcode scan as a bottom-right FAB** (fix): in the *"from an ingredient
-  list" → add-food* flow the barcode-scan action should sit as a lower-right FAB, matching the
-  rest of the app (add food / new recipe / scan all use a bottom-right FAB). Keeps the primary
-  action in the same place everywhere so it doesn't feel off.
+- ✅ **UI consistency: barcode scan as a bottom-right FAB** (fix): DONE — `food_picker_screen.dart`
+  (the ingredient-matching flow) now uses a bottom-right `FloatingActionButton.extended`, matching
+  `add_food_screen.dart` and the rest of the app.
 - 📐 **Scale a meal** — ✅ DONE 2026-06-23 (v1.0.16+17): meal ⋮ → Scale meal: slider + preset chips (25/50/75/150/200%) with a live kcal preview; multiplies every entry's grams. Original note: add an action to the meal's overflow
   menu to **scale the whole meal by a factor** — multiply every entry's grams (and so kcal/macros)
   by a chosen ratio. Primary use is *down*scaling: you logged a full meal/recipe portion but only

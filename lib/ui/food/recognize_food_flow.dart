@@ -55,6 +55,7 @@ Future<bool> startRecognizeFoodFlow(
   final db = ref.read(dbProvider);
   final geminiKey = await db.getSetting(geminiKeySetting);
   final onDeviceOnly = await db.getSetting(aiOnDeviceOnlySetting) == 'true';
+  final noGeminiKey = geminiKey == null || geminiKey.trim().isEmpty;
   if (geminiKey != null && geminiKey.trim().isNotEmpty && !onDeviceOnly) {
     if (!context.mounted) return false;
     final preferredModel = await db.getSetting(geminiModelSetting);
@@ -122,13 +123,20 @@ Future<bool> startRecognizeFoodFlow(
 
   String? chosen;
   if (guesses.isEmpty) {
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.recognizeNoGuess)));
+    // On-device drew a blank — the best moment to point at the (free) cloud
+    // path, which also handles drinks the on-device model can't.
+    messenger.showAutoSnackBar(
+      SnackBar(
+        content: Text(noGeminiKey ? l10n.recognizeGeminiNudge : l10n.recognizeNoGuess),
+      ),
+    );
   } else {
     chosen = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _GuessSheet(image: bytes, guesses: guesses),
+      builder: (_) =>
+          _GuessSheet(image: bytes, guesses: guesses, showGeminiNudge: noGeminiKey),
     );
     if (chosen == null || !context.mounted) return false; // dismissed
   }
@@ -232,7 +240,12 @@ class _GeminiLoadingDialogState extends State<_GeminiLoadingDialog> {
 class _GuessSheet extends StatelessWidget {
   final Uint8List image;
   final List<FoodGuess> guesses;
-  const _GuessSheet({required this.image, required this.guesses});
+  final bool showGeminiNudge;
+  const _GuessSheet({
+    required this.image,
+    required this.guesses,
+    this.showGeminiNudge = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -276,6 +289,29 @@ class _GuessSheet extends StatelessWidget {
               icon: const Icon(Icons.edit_outlined),
               label: Text(l10n.recognizeNoneManual),
             ),
+            if (showGeminiNudge)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 16,
+                      color: theme.colorScheme.outline,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.recognizeGeminiNudge,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

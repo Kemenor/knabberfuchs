@@ -575,6 +575,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aliment non reconnu. Ajoutez-le manuellement.';
 
   @override
+  String get recognizeGeminiNudge =>
+      'Astuce : ajoutez une clé Gemini gratuite dans les Réglages pour de meilleurs résultats, y compris les boissons que le modèle sur l\'appareil ne reconnaît pas.';
+
+  @override
   String get dayCaptureTooltip => 'Ajouter depuis une photo';
 
   @override

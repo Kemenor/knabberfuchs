@@ -1068,6 +1068,12 @@ abstract class AppLocalizations {
   /// **'Couldn\'t recognize the food. Add it manually.'**
   String get recognizeNoGuess;
 
+  /// No description provided for @recognizeGeminiNudge.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: add a free Gemini key in Settings for better results — including drinks the on-device model can\'t recognize.'**
+  String get recognizeGeminiNudge;
+
   /// No description provided for @dayCaptureTooltip.
   ///
   /// In en, this message translates to:
