@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/date_label.dart';
 import '../../core/date_x.dart';
+import '../../core/food_icon.dart';
 import '../../core/format.dart';
 import '../../core/status_color.dart';
 import '../../domain/day_summary.dart';
@@ -448,11 +449,13 @@ class _GroupSection extends ConsumerWidget {
       if (context.mounted) addFoodByDay(context, ref, day);
     }
 
-    return Column(
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
+          padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
           child: Row(
             children: [
               IconButton(
@@ -548,9 +551,14 @@ class _GroupSection extends ConsumerWidget {
           ),
         ),
         if (!isCollapsed)
-          for (final e in group.items) _EntryTile(view: e, day: day),
-        const Divider(height: 1, indent: 16, endIndent: 16),
+          for (var i = 0; i < group.items.length; i++) ...[
+            if (i > 0)
+              const Divider(height: 1, indent: 16, endIndent: 16),
+            _EntryTile(view: group.items[i], day: day),
+          ],
+        const SizedBox(height: 4),
       ],
+      ),
     );
   }
 
@@ -804,6 +812,10 @@ class _EntryTile extends ConsumerWidget {
       },
       child: ListTile(
         dense: true,
+        leading: Icon(
+          foodIconFor(view.name),
+          color: Theme.of(context).colorScheme.primary,
+        ),
         title: Text(view.name, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text('${gramsStr(view.grams)} g'),
         trailing: Text('${kcalStr(view.nutrition.kcal)} kcal'),
