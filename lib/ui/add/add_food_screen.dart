@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../data/db/database.dart';
 import '../../domain/enums.dart';
@@ -102,7 +103,7 @@ class AddFoodScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'addFoodScanFab',
         onPressed: () => _scan(context, ref),
-        icon: const Icon(Icons.qr_code_scanner),
+        icon: const Icon(Symbols.qr_code_scanner_rounded),
         label: Text(l10n.scanBarcode),
       ),
     );

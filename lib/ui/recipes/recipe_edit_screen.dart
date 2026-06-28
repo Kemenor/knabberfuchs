@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/format.dart';
 import '../../data/db/database.dart';
@@ -167,7 +168,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'recipeSaveFab',
         onPressed: _saving ? null : _save,
-        icon: const Icon(Icons.check),
+        icon: const Icon(Symbols.check_rounded),
         label: Text(l10n.actionSave),
       ),
       body: ListView(
@@ -226,14 +227,14 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
               onTap: () => _editIngredient(i),
               trailing: IconButton(
                 visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.close, size: 20),
+                icon: const Icon(Symbols.close_rounded, size: 20),
                 onPressed: () => setState(() => _items.removeAt(i)),
               ),
             ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: _addIngredient,
-            icon: const Icon(Icons.add),
+            icon: const Icon(Symbols.add_rounded),
             label: Text(l10n.addIngredient),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../data/db/database.dart';
 import '../../domain/day_summary.dart';
@@ -164,7 +165,7 @@ class _MetricTargets extends StatelessWidget {
           onMax: onDefaultMax,
         ),
         ExpansionTile(
-          leading: const Icon(Icons.event_repeat),
+          leading: const Icon(Symbols.event_repeat_rounded),
           title: Text(l10n.settingsCustomizePerDay),
           subtitle: Text(l10n.settingsCustomizePerDaySub),
           childrenPadding: const EdgeInsets.only(bottom: 8),

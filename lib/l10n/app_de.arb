@@ -28,6 +28,10 @@
   "actionImport": "Importieren",
 
   "settingsSectionLanguage": "Sprache",
+  "settingsTypeface": "Schriftart",
+  "typefaceDefault": "Standard",
+  "typefaceLowVision": "Bessere Lesbarkeit (Sehschwäche)",
+  "typefaceDyslexia": "Legasthenie",
   "settingsLanguage": "App-Sprache",
   "languageSystem": "Systemstandard",
   "languageEnglish": "English",

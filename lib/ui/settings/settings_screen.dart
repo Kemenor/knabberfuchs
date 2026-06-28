@@ -4,7 +4,9 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fuchsbau/fuchsbau.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/support_email.dart';
 import '../../domain/enums.dart';
@@ -41,109 +43,143 @@ class SettingsScreen extends ConsumerWidget {
           return ListView(
             children: [
               _SectionHeader(l10n.settingsSectionLanguage),
-              const _LanguagePicker(),
-              const Divider(),
+              const _SettingsCard(children: [_LanguagePicker()]),
+              _SectionHeader(l10n.settingsTypeface),
+              const _SettingsCard(children: [_TypefacePicker()]),
               _SectionHeader(l10n.settingsDisplay),
-              SwitchListTile(
-                secondary: const Icon(Icons.insights_outlined),
-                title: Text(l10n.settingsShowTrends),
-                subtitle: Text(l10n.settingsShowTrendsSub),
-                value: showTrends,
-                onChanged: (v) =>
-                    db.setSetting('showTrends', v ? 'true' : 'false'),
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.flag_outlined),
-                title: Text(l10n.settingsTargets),
-                subtitle: Text(l10n.settingsTargetsSub),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const TargetsScreen()),
-                ),
-              ),
-              const Divider(),
-              _SectionHeader(l10n.settingsLogging),
-              ExpansionTile(
-                leading: const Icon(Icons.schedule),
-                title: Text(l10n.settingsMealTimes),
-                subtitle: Text(l10n.settingsMealTimesSub),
-                childrenPadding: const EdgeInsets.only(bottom: 8),
+              _SettingsCard(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    child: Text(l10n.settingsMealTimesHelp),
+                  SwitchListTile(
+                    contentPadding: _cardRowPadding,
+                    secondary: const Icon(Symbols.insights_rounded),
+                    title: Text(l10n.settingsShowTrends),
+                    subtitle: Text(l10n.settingsShowTrendsSub),
+                    value: showTrends,
+                    onChanged: (v) =>
+                        db.setSetting('showTrends', v ? 'true' : 'false'),
                   ),
-                  const _MealTimeRow(meal: MealType.breakfast),
-                  const _MealTimeRow(meal: MealType.lunch),
-                  const _MealTimeRow(meal: MealType.dinner),
+                  ListTile(
+                    contentPadding: _cardRowPadding,
+                    leading: const Icon(Symbols.flag_rounded),
+                    title: Text(l10n.settingsTargets),
+                    subtitle: Text(l10n.settingsTargetsSub),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const TargetsScreen()),
+                    ),
+                  ),
                 ],
               ),
-              const Divider(),
-              _SectionHeader(l10n.settingsFoodData),
-              ListTile(
-                leading: const Icon(Icons.public),
-                title: Text(l10n.settingsOfflineRegions),
-                subtitle: Text(l10n.settingsOfflineRegionsSub),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const OfflineRegionsScreen(),
-                  ),
-                ),
-              ),
-              const Divider(),
-              _SectionHeader(l10n.settingsAi),
-              const _AiKeyTile(),
-              const Divider(),
-              _SectionHeader(l10n.settingsHealthConnect(_healthStore())),
-              SwitchListTile(
-                secondary: const Icon(Icons.favorite_border),
-                title: Text(l10n.settingsHealthSync(_healthStore())),
-                subtitle: Text(l10n.settingsHealthSyncSub(_healthStore())),
-                value: healthSync,
-                onChanged: (v) => _toggleHealthSync(context, ref, v),
-              ),
-              if (healthSync)
-                ListTile(
-                  leading: const Icon(Icons.info_outline),
-                  dense: true,
-                  title: Text(l10n.settingsHealthTimeNote),
-                  subtitle: Text(l10n.settingsHealthTimeNoteSub),
-                ),
-              const Divider(),
-              _SectionHeader(l10n.settingsDataBackup),
-              ListTile(
-                leading: const Icon(Icons.upload_outlined),
-                title: Text(l10n.settingsExport),
-                subtitle: Text(l10n.settingsExportSub),
-                onTap: () => _exportBackup(context, ref),
-              ),
-              ListTile(
-                leading: const Icon(Icons.download_outlined),
-                title: Text(l10n.settingsImport),
-                subtitle: Text(l10n.settingsImportSub),
-                onTap: () => _importBackup(context, ref),
-              ),
-              const Divider(),
-              _SectionHeader(l10n.settingsAbout),
-              const _AboutTile(),
-              ListTile(
-                leading: const Icon(Icons.mail_outline),
-                title: Text(l10n.settingsContactDev),
-                subtitle: Text(l10n.settingsContactDevSub),
-                onTap: () async {
-                  final messenger = ScaffoldMessenger.of(context);
-                  final locale = Localizations.localeOf(context).toString();
-                  final ok = await contactDeveloper(locale: locale);
-                  if (!ok) {
-                    messenger.showAutoSnackBar(
-                      SnackBar(
-                        content: Text(
-                          l10n.settingsContactDevNoApp(supportEmail),
-                        ),
+              _SectionHeader(l10n.settingsLogging),
+              _SettingsCard(
+                children: [
+                  ExpansionTile(
+                    tilePadding: _cardRowPadding,
+                    leading: const Icon(Symbols.schedule_rounded),
+                    title: Text(l10n.settingsMealTimes),
+                    subtitle: Text(l10n.settingsMealTimesSub),
+                    childrenPadding: const EdgeInsets.only(bottom: 8),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        child: Text(l10n.settingsMealTimesHelp),
                       ),
-                    );
-                  }
-                },
+                      const _MealTimeRow(meal: MealType.breakfast),
+                      const _MealTimeRow(meal: MealType.lunch),
+                      const _MealTimeRow(meal: MealType.dinner),
+                    ],
+                  ),
+                ],
+              ),
+              _SectionHeader(l10n.settingsFoodData),
+              _SettingsCard(
+                children: [
+                  ListTile(
+                    contentPadding: _cardRowPadding,
+                    leading: const Icon(Symbols.public_rounded),
+                    title: Text(l10n.settingsOfflineRegions),
+                    subtitle: Text(l10n.settingsOfflineRegionsSub),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const OfflineRegionsScreen(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              _SectionHeader(l10n.settingsAi),
+              const _SettingsCard(children: [_AiKeyTile()]),
+              _SectionHeader(l10n.settingsHealthConnect(_healthStore())),
+              _SettingsCard(
+                children: [
+                  SwitchListTile(
+                    contentPadding: _cardRowPadding,
+                    secondary: const Icon(Symbols.favorite_border_rounded),
+                    title: Text(l10n.settingsHealthSync(_healthStore())),
+                    subtitle: Text(l10n.settingsHealthSyncSub(_healthStore())),
+                    value: healthSync,
+                    onChanged: (v) => _toggleHealthSync(context, ref, v),
+                  ),
+                  if (healthSync)
+                    ListTile(
+                      contentPadding: _cardRowPadding,
+                      leading: const Icon(Symbols.info_rounded),
+                      dense: true,
+                      title: Text(l10n.settingsHealthTimeNote),
+                      subtitle: Text(l10n.settingsHealthTimeNoteSub),
+                    ),
+                ],
+              ),
+              _SectionHeader(l10n.settingsDataBackup),
+              _SettingsCard(
+                children: [
+                  ListTile(
+                    contentPadding: _cardRowPadding,
+                    leading: const Icon(Symbols.upload_rounded),
+                    title: Text(l10n.settingsExport),
+                    subtitle: Text(l10n.settingsExportSub),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                    onTap: () => _exportBackup(context, ref),
+                  ),
+                  ListTile(
+                    contentPadding: _cardRowPadding,
+                    leading: const Icon(Symbols.download_rounded),
+                    title: Text(l10n.settingsImport),
+                    subtitle: Text(l10n.settingsImportSub),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                    onTap: () => _importBackup(context, ref),
+                  ),
+                ],
+              ),
+              _SectionHeader(l10n.settingsAbout),
+              _SettingsCard(
+                children: [
+                  const _AboutTile(),
+                  ListTile(
+                    contentPadding: _cardRowPadding,
+                    leading: const Icon(Symbols.mail_rounded),
+                    title: Text(l10n.settingsContactDev),
+                    subtitle: Text(l10n.settingsContactDevSub),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final locale = Localizations.localeOf(
+                        context,
+                      ).toString();
+                      final ok = await contactDeveloper(locale: locale);
+                      if (!ok) {
+                        messenger.showAutoSnackBar(
+                          SnackBar(
+                            content: Text(
+                              l10n.settingsContactDevNoApp(supportEmail),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
             ],
           );
@@ -254,9 +290,11 @@ class _AboutTile extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final version = ref.watch(appVersionProvider).asData?.value;
     return ListTile(
-      leading: const Icon(Icons.info_outline),
+      contentPadding: _cardRowPadding,
+      leading: const Icon(Symbols.info_rounded),
       title: const Text('Knabberfuchs'),
       subtitle: version == null ? null : Text(version),
+      trailing: const Icon(Symbols.chevron_right_rounded),
       onTap: () => showAboutDialog(
         context: context,
         applicationName: 'Knabberfuchs',
@@ -288,7 +326,7 @@ class _OpenFoodFactsThanks extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.favorite, size: 18, color: theme.colorScheme.primary),
+            Icon(Symbols.favorite_rounded, size: 18, color: theme.colorScheme.primary),
             const SizedBox(width: 6),
             Text(
               l10n.offThanksTitle,
@@ -322,7 +360,7 @@ class _OpenFoodFactsThanks extends StatelessWidget {
                 );
               }
             },
-            icon: const Icon(Icons.favorite_border, size: 18),
+            icon: const Icon(Symbols.favorite_border_rounded, size: 18),
             label: Text(l10n.offDonate),
           ),
         ),
@@ -406,7 +444,7 @@ class _LanguagePicker extends ConsumerWidget {
       'it': l10n.languageItalian,
     };
     return ExpansionTile(
-      leading: const Icon(Icons.translate),
+      leading: const Icon(Symbols.translate_rounded),
       title: Text(l10n.settingsLanguage),
       subtitle: Text(options[current] ?? options['system']!),
       children: [
@@ -429,6 +467,50 @@ class _LanguagePicker extends ConsumerWidget {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.outline,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Typeface override (DESIGN.md §2 accessibility picker): Figtree / System /
+/// Atkinson Hyperlegible / OpenDyslexic. Writes the 'appFont' setting (the enum
+/// `name`), which drives [fontProvider] → the theme's fontFamily.
+class _TypefacePicker extends ConsumerWidget {
+  const _TypefacePicker();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final db = ref.read(dbProvider);
+    final current = ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
+    // Per-option helper subtitles (accessibility intent); names stay proper nouns.
+    String? sub(FuchsbauFont f) => switch (f) {
+      FuchsbauFont.figtree => l10n.typefaceDefault,
+      FuchsbauFont.atkinsonHyperlegible => l10n.typefaceLowVision,
+      FuchsbauFont.openDyslexic => l10n.typefaceDyslexia,
+      FuchsbauFont.system => null,
+    };
+    return ExpansionTile(
+      leading: const Icon(Symbols.text_fields_rounded),
+      title: Text(l10n.settingsTypeface),
+      subtitle: Text(current.label),
+      children: [
+        RadioGroup<FuchsbauFont>(
+          groupValue: current,
+          onChanged: (v) {
+            if (v != null) db.setSetting('appFont', v.name);
+          },
+          child: Column(
+            children: [
+              for (final f in FuchsbauFont.values)
+                RadioListTile<FuchsbauFont>(
+                  value: f,
+                  title: Text(f.label),
+                  subtitle: sub(f) == null ? null : Text(sub(f)!),
+                ),
+            ],
           ),
         ),
       ],
@@ -505,7 +587,7 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               isDense: true,
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscure ? Icons.visibility : Icons.visibility_off,
+                  _obscure ? Symbols.visibility_rounded : Symbols.visibility_off_rounded,
                   size: 20,
                 ),
                 onPressed: () => setState(() => _obscure = !_obscure),
@@ -542,7 +624,7 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
                   );
                 }
               },
-              icon: const Icon(Icons.open_in_new, size: 16),
+              icon: const Icon(Symbols.open_in_new_rounded, size: 16),
               label: Text(l10n.aiKeyGet),
             ),
           ),
@@ -607,6 +689,33 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   }
 }
 
+/// Consistent horizontal inset for rows living inside a [_SettingsCard], so
+/// leading icons/labels align with the card's content padding.
+const _cardRowPadding = EdgeInsets.symmetric(horizontal: 12);
+
+/// Groups a section's rows inside a single white [Card], inserting a hairline
+/// divider between consecutive rows. Card fill/border/radius come from the
+/// theme — do not override them here.
+class _SettingsCard extends StatelessWidget {
+  final List<Widget> children;
+  const _SettingsCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <Widget>[];
+    for (var i = 0; i < children.length; i++) {
+      if (i > 0) {
+        rows.add(const Divider(height: 1, indent: 16, endIndent: 16));
+      }
+      rows.add(children[i]);
+    }
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Column(children: rows),
+    );
+  }
+}
+
 class _SectionHeader extends StatelessWidget {
   final String title;
   const _SectionHeader(this.title);
@@ -615,11 +724,13 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Text(
-        title,
-        style: theme.textTheme.titleSmall?.copyWith(
-          color: theme.colorScheme.primary,
+        title.toUpperCase(),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.outline,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.6,
         ),
       ),
     );

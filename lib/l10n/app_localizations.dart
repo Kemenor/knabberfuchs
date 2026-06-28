@@ -234,6 +234,30 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get settingsSectionLanguage;
 
+  /// No description provided for @settingsTypeface.
+  ///
+  /// In en, this message translates to:
+  /// **'Typeface'**
+  String get settingsTypeface;
+
+  /// No description provided for @typefaceDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get typefaceDefault;
+
+  /// No description provided for @typefaceLowVision.
+  ///
+  /// In en, this message translates to:
+  /// **'Low-vision legibility'**
+  String get typefaceLowVision;
+
+  /// No description provided for @typefaceDyslexia.
+  ///
+  /// In en, this message translates to:
+  /// **'Dyslexia'**
+  String get typefaceDyslexia;
+
   /// Settings row title for choosing the UI language
   ///
   /// In en, this message translates to:

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fuchsbau/fuchsbau.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import 'core/format.dart';
 import 'core/locale.dart';
@@ -36,11 +38,13 @@ class _CalorieAppState extends ConsumerState<CalorieApp> {
     // Keep the number formatters in sync as the locale changes — done via
     // listen (a side effect) rather than inline so build() stays pure.
     ref.listen(localeProvider, (_, next) => _syncNumberLocale(next));
+    final font =
+        ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(Brightness.light),
-      darkTheme: buildTheme(Brightness.dark),
+      theme: buildTheme(Brightness.light, font: font),
+      darkTheme: buildTheme(Brightness.dark, font: font),
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -75,7 +79,7 @@ class _Splash extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.restaurant_menu, size: 56),
+            const Icon(Symbols.restaurant_menu_rounded, size: 56),
             const SizedBox(height: 16),
             Text(AppLocalizations.of(context).splashPreparing),
             const SizedBox(height: 16),

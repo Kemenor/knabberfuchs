@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/format.dart';
 import '../../data/db/database.dart';
@@ -375,7 +376,7 @@ class _LogSheetState extends State<_LogSheet> {
                               if (mounted) setState(() => _busy = false);
                             }
                           },
-                    icon: const Icon(Icons.delete_outline),
+                    icon: const Icon(Symbols.delete_rounded),
                     label: Text(l10n.actionDelete),
                     style: TextButton.styleFrom(
                       foregroundColor: theme.colorScheme.error,

@@ -28,6 +28,10 @@
   "actionImport": "Importa",
 
   "settingsSectionLanguage": "Lingua",
+  "settingsTypeface": "Carattere",
+  "typefaceDefault": "Predefinito",
+  "typefaceLowVision": "Leggibilità (ipovisione)",
+  "typefaceDyslexia": "Dislessia",
   "settingsLanguage": "Lingua dell'app",
   "languageSystem": "Predefinita di sistema",
   "languageEnglish": "English",

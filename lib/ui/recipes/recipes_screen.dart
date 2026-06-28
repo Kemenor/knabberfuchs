@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/snackbar.dart';
 import '../../domain/recipe_share.dart';
@@ -100,7 +101,7 @@ class RecipesScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.edit_outlined),
+                leading: const Icon(Symbols.edit_rounded),
                 title: Text(l10n.createBuildManually),
                 subtitle: Text(l10n.createBuildManuallySub),
                 onTap: () {
@@ -111,7 +112,7 @@ class RecipesScreen extends ConsumerWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.document_scanner_outlined),
+                leading: const Icon(Symbols.document_scanner_rounded),
                 title: Text(l10n.createFromList),
                 subtitle: Text(l10n.createFromListSub),
                 onTap: () {
@@ -120,7 +121,7 @@ class RecipesScreen extends ConsumerWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.qr_code_scanner),
+                leading: const Icon(Symbols.qr_code_scanner_rounded),
                 title: Text(l10n.createFromQr),
                 subtitle: Text(l10n.createFromQrSub),
                 onTap: () {
@@ -129,7 +130,7 @@ class RecipesScreen extends ConsumerWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.content_paste),
+                leading: const Icon(Symbols.content_paste_rounded),
                 title: Text(l10n.createFromText),
                 subtitle: Text(l10n.createFromTextSub),
                 onTap: () {
@@ -157,85 +158,105 @@ class RecipesScreen extends ConsumerWidget {
               ),
             );
           }
-          return ListView.separated(
-            itemCount: recipes.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
-            itemBuilder: (context, i) {
-              final r = recipes[i];
-              final theme = Theme.of(context);
-              return Dismissible(
-                key: ValueKey('recipe-${r.id}'),
-                // Swipe → log a portion; swipe ← delete. Both perform their
-                // action and return false (the recipes stream redraws the list).
-                background: Container(
-                  color: theme.colorScheme.primaryContainer,
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Icon(
-                    Icons.event_available,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
-                ),
-                secondaryBackground: Container(
-                  color: theme.colorScheme.errorContainer,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 20),
-                  child: Icon(
-                    Icons.delete_outline,
-                    color: theme.colorScheme.onErrorContainer,
-                  ),
-                ),
-                confirmDismiss: (dir) async {
-                  if (dir == DismissDirection.startToEnd) {
-                    await showLogPortionForRecipe(context, ref, r);
-                    return false;
-                  }
-                  final ok = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text(l10n.recipeDeleteConfirm(r.name)),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: Text(l10n.actionCancel),
-                        ),
-                        FilledButton(
-                          onPressed: () => Navigator.pop(ctx, true),
-                          child: Text(l10n.actionDelete),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (ok == true) {
-                    await ref.read(recipeRepositoryProvider).delete(r.id);
-                  }
-                  return false;
-                },
-                child: ListTile(
-                  leading: const Icon(Icons.menu_book_outlined),
-                  title: Text(r.name),
-                  subtitle: Text(
-                    l10n.recipeServings(
-                      r.servings.toStringAsFixed(
-                        r.servings == r.servings.roundToDouble() ? 0 : 1,
+          final theme = Theme.of(context);
+          return ListView(
+            padding: const EdgeInsets.only(bottom: 96),
+            children: [
+              Card(
+                margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  children: [
+                    for (var i = 0; i < recipes.length; i++) ...[
+                      if (i > 0)
+                        const Divider(height: 1, indent: 16, endIndent: 16),
+                      Builder(
+                        builder: (context) {
+                          final r = recipes[i];
+                          return Dismissible(
+                            key: ValueKey('recipe-${r.id}'),
+                            // Swipe → log a portion; swipe ← delete. Both perform
+                            // their action and return false (the recipes stream
+                            // redraws the list).
+                            background: Container(
+                              color: theme.colorScheme.primaryContainer,
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Icon(
+                                Symbols.event_available_rounded,
+                                color: theme.colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                            secondaryBackground: Container(
+                              color: theme.colorScheme.errorContainer,
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: Icon(
+                                Symbols.delete_rounded,
+                                color: theme.colorScheme.onErrorContainer,
+                              ),
+                            ),
+                            confirmDismiss: (dir) async {
+                              if (dir == DismissDirection.startToEnd) {
+                                await showLogPortionForRecipe(context, ref, r);
+                                return false;
+                              }
+                              final ok = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text(l10n.recipeDeleteConfirm(r.name)),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx, false),
+                                      child: Text(l10n.actionCancel),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      child: Text(l10n.actionDelete),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (ok == true) {
+                                await ref
+                                    .read(recipeRepositoryProvider)
+                                    .delete(r.id);
+                              }
+                              return false;
+                            },
+                            child: ListTile(
+                              leading: const Icon(Symbols.menu_book_rounded),
+                              title: Text(r.name),
+                              subtitle: Text(
+                                l10n.recipeServings(
+                                  r.servings.toStringAsFixed(
+                                    r.servings == r.servings.roundToDouble()
+                                        ? 0
+                                        : 1,
+                                  ),
+                                ),
+                              ),
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => RecipeDetailScreen(recipe: r),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    ),
-                  ),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => RecipeDetailScreen(recipe: r),
-                    ),
-                  ),
+                    ],
+                  ],
                 ),
-              );
-            },
+              ),
+            ],
           );
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'recipesNewFab',
         onPressed: showCreateMenu,
-        icon: const Icon(Icons.add),
+        icon: const Icon(Symbols.add_rounded),
         label: Text(l10n.recipeNew),
       ),
     );

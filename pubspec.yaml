@@ -39,11 +39,13 @@ dependencies:
   fuchsbau:
     git:
       url: git@github.com:Kemenor/fuchsbau.git
-      ref: 530e7ded76e318edeea427ce464ec004510c56e0
+      ref: 220a37fa96c642c44593b279578c5c87cf639a3a
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  # Material Symbols Rounded — the family icon set (DESIGN.md §4).
+  material_symbols_icons: ^4.2951.0
   flutter_riverpod: ^3.3.2
   drift: ^2.34.0
   drift_flutter: ^0.3.0

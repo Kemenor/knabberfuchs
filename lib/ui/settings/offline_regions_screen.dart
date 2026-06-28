@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../data/db/database.dart';
 import '../../domain/offline_manifest.dart';
@@ -124,13 +125,13 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
                   onChanged: (v) => setState(() => _query = v),
                   decoration: InputDecoration(
                     isDense: true,
-                    prefixIcon: const Icon(Icons.search),
+                    prefixIcon: const Icon(Symbols.search_rounded),
                     hintText: l10n.regionSearchHint,
                     border: const OutlineInputBorder(),
                     suffixIcon: _query.isEmpty
                         ? null
                         : IconButton(
-                            icon: const Icon(Icons.clear),
+                            icon: const Icon(Symbols.clear_rounded),
                             onPressed: () {
                               _searchCtrl.clear();
                               setState(() => _query = '');
@@ -215,7 +216,7 @@ class _RegionTile extends StatelessWidget {
     } else if (!isInstalled) {
       trailing = IconButton(
         tooltip: l10n.regionTooltipDownload,
-        icon: const Icon(Icons.download),
+        icon: const Icon(Symbols.download_rounded),
         onPressed: onDownload,
       );
     } else {
@@ -225,10 +226,10 @@ class _RegionTile extends StatelessWidget {
           if (updatable)
             TextButton(onPressed: onDownload, child: Text(l10n.regionUpdate))
           else
-            Icon(Icons.check_circle, color: theme.colorScheme.primary),
+            Icon(Symbols.check_circle_rounded, color: theme.colorScheme.primary),
           IconButton(
             tooltip: l10n.regionTooltipRemove,
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(Symbols.delete_rounded),
             onPressed: onRemove,
           ),
         ],

@@ -28,6 +28,10 @@
   "actionImport": "Importer",
 
   "settingsSectionLanguage": "Langue",
+  "settingsTypeface": "Police",
+  "typefaceDefault": "Par défaut",
+  "typefaceLowVision": "Lisibilité (basse vision)",
+  "typefaceDyslexia": "Dyslexie",
   "settingsLanguage": "Langue de l'application",
   "languageSystem": "Réglage du système",
   "languageEnglish": "English",

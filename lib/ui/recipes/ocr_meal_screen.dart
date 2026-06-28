@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/date_label.dart';
 import '../../core/date_x.dart';
@@ -310,7 +311,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'ocrAddIngredientFab',
         onPressed: _addIngredient,
-        icon: const Icon(Icons.add),
+        icon: const Icon(Symbols.add_rounded),
         label: Text(l10n.addIngredient),
       ),
       bottomNavigationBar: SafeArea(
@@ -403,13 +404,13 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
         color: theme.colorScheme.primaryContainer,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 20),
-        child: const Icon(Icons.search),
+        child: const Icon(Symbols.search_rounded),
       ),
       secondaryBackground: Container(
         color: theme.colorScheme.errorContainer,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        child: const Icon(Icons.delete_outline),
+        child: const Icon(Symbols.delete_rounded),
       ),
       confirmDismiss: (dir) async {
         if (dir == DismissDirection.startToEnd) {
@@ -421,7 +422,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       onDismissed: (_) => setState(() => _items.removeAt(i)),
       child: ListTile(
         leading: Icon(
-          it.matched != null ? Icons.check_circle : Icons.help_outline,
+          it.matched != null ? Symbols.check_circle_rounded : Symbols.help_rounded,
           color: it.matched != null
               ? theme.colorScheme.primary
               : theme.disabledColor,

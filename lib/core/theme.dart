@@ -5,8 +5,11 @@ import 'package:fuchsbau/fuchsbau.dart';
 /// tangerine triad, replacing the old accidental-green M3 seed). knabberfuchs's
 /// own component tweaks layer on top here; record any deviation in
 /// `DESIGN_SYSTEM.md` with a pointer back to fuchsbau.
-ThemeData buildTheme(Brightness brightness) {
-  final base = fuchsbauTheme(brightness);
+ThemeData buildTheme(
+  Brightness brightness, {
+  FuchsbauFont font = FuchsbauFont.figtree,
+}) {
+  final base = fuchsbauTheme(brightness, font: font);
   final scheme = base.colorScheme;
   // knabberfuchs deviation (see DESIGN_SYSTEM.md): the action FAB is emerald —
   // a positive, distinct CTA against the tangerine surface — the deep,

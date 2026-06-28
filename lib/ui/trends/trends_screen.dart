@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/format.dart';
 import '../../core/status_color.dart';
@@ -142,7 +143,7 @@ class _RangeHeader extends ConsumerWidget {
     if (window.mode == TrendMode.custom) {
       return Center(
         child: TextButton.icon(
-          icon: const Icon(Icons.edit_calendar_outlined, size: 18),
+          icon: const Icon(Symbols.edit_calendar_rounded, size: 18),
           label: Text(label),
           onPressed: () => pickCustomRange(context, ref, window),
         ),
@@ -152,7 +153,7 @@ class _RangeHeader extends ConsumerWidget {
     return Row(
       children: [
         IconButton(
-          icon: const Icon(Icons.chevron_left),
+          icon: const Icon(Symbols.chevron_left_rounded),
           onPressed: notifier.older,
         ),
         Expanded(
@@ -163,7 +164,7 @@ class _RangeHeader extends ConsumerWidget {
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.chevron_right),
+          icon: const Icon(Symbols.chevron_right_rounded),
           onPressed: window.isCurrent ? null : notifier.newer,
         ),
       ],
@@ -210,7 +211,7 @@ class _TrendsBody extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.insights_outlined,
+              Symbols.insights_rounded,
               size: 48,
               color: theme.disabledColor,
             ),

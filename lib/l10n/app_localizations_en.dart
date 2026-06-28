@@ -77,6 +77,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSectionLanguage => 'Language';
 
   @override
+  String get settingsTypeface => 'Typeface';
+
+  @override
+  String get typefaceDefault => 'Default';
+
+  @override
+  String get typefaceLowVision => 'Low-vision legibility';
+
+  @override
+  String get typefaceDyslexia => 'Dyslexia';
+
+  @override
   String get settingsLanguage => 'App language';
 
   @override

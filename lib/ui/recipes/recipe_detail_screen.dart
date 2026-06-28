@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/date_label.dart';
 import '../../core/date_x.dart';
+import '../../core/food_icon.dart';
 import '../../core/format.dart';
 import '../../data/db/database.dart';
 import '../../domain/meal_times.dart';
@@ -87,13 +89,13 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
           if (share != null)
             IconButton(
               tooltip: l10n.actionEdit,
-              icon: const Icon(Icons.edit_outlined),
+              icon: const Icon(Symbols.edit_rounded),
               onPressed: _edit,
             ),
           if (share != null)
             IconButton(
               tooltip: l10n.actionShare,
-              icon: const Icon(Icons.ios_share),
+              icon: const Icon(Symbols.ios_share_rounded),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => RecipeShareScreen(share: share),
@@ -102,7 +104,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
             ),
           IconButton(
             tooltip: l10n.actionDelete,
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(Symbols.delete_rounded),
             onPressed: _delete,
           ),
         ],
@@ -114,19 +116,47 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
               children: [
                 _NutritionCard(share: share),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
                   child: Text(
-                    l10n.ingredients,
-                    style: theme.textTheme.titleMedium,
+                    l10n.ingredients.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.outline,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.6,
+                    ),
                   ),
                 ),
-                for (final i in share.items)
-                  ListTile(
-                    dense: true,
-                    title: Text(i.name),
-                    subtitle: Text(l10n.gramsValue(gramsStr(i.grams))),
-                    trailing: Text(l10n.kcalValue(kcalStr(i.nutrition.kcal))),
+                Card(
+                  margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < share.items.length; i++) ...[
+                        if (i > 0)
+                          const Divider(
+                            height: 1,
+                            indent: 16,
+                            endIndent: 16,
+                          ),
+                        ListTile(
+                          leading: Icon(
+                            foodIconFor(share.items[i].name),
+                            color: theme.colorScheme.primary,
+                          ),
+                          title: Text(share.items[i].name),
+                          subtitle: Text(
+                            l10n.gramsValue(gramsStr(share.items[i].grams)),
+                          ),
+                          trailing: Text(
+                            l10n.kcalValue(
+                              kcalStr(share.items[i].nutrition.kcal),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+                ),
               ],
             ),
       floatingActionButton: share == null
@@ -134,7 +164,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
           : FloatingActionButton.extended(
               heroTag: 'recipeLogPortionFab',
               onPressed: () => _showLogPortion(context, share),
-              icon: const Icon(Icons.event_available),
+              icon: const Icon(Symbols.event_available_rounded),
               label: Text(l10n.recipeLogPortion),
             ),
     );
@@ -178,37 +208,126 @@ class _NutritionCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final total = share.total;
     final per = share.perServing;
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.recipeWhole, style: theme.textTheme.labelMedium),
-            Text(
-              l10n.kcalDotGrams(
-                kcalStr(total.kcal),
-                gramsStr(share.totalGrams),
-              ),
-              style: theme.textTheme.titleLarge,
+    final servingsStr = share.servings.toStringAsFixed(
+      share.servings == share.servings.roundToDouble() ? 0 : 1,
+    );
+    return Column(
+      children: [
+        // Hero header: recipe name, servings, and whole-recipe kcal.
+        Card(
+          margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  share.name,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.recipeServings(servingsStr),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      l10n.kcalValue(kcalStr(total.kcal)),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      l10n.recipeWhole,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const Divider(height: 20),
-            Text(
-              l10n.recipePerServing(share.servings.toStringAsFixed(0)),
-              style: theme.textTheme.labelMedium,
-            ),
-            Text(
-              l10n.macroPcf(
-                kcalStr(per.kcal),
-                macroStr(per.protein),
-                macroStr(per.carb),
-                macroStr(per.fat),
-              ),
-              style: theme.textTheme.titleMedium,
-            ),
-          ],
+          ),
         ),
+        // Per-serving: kcal headline + a Protein / Carbs / Fat macro row.
+        Card(
+          margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      l10n.kcalValue(kcalStr(per.kcal)),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      l10n.recipePerServing(servingsStr),
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    _Macro(label: l10n.macroProtein, grams: per.protein),
+                    _Macro(label: l10n.macroCarbs, grams: per.carb),
+                    _Macro(label: l10n.macroFat, grams: per.fat),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// One Protein/Carbs/Fat column in the per-serving macro row.
+class _Macro extends StatelessWidget {
+  final String label;
+  final double grams;
+  const _Macro({required this.label, required this.grams});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            l10n.gramsValue(macroStr(grams)),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -260,9 +379,9 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
             const SizedBox(height: 12),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.calendar_today),
+              leading: const Icon(Symbols.calendar_today_rounded),
               title: Text(dayLabel(context, _day)),
-              trailing: const Icon(Icons.edit),
+              trailing: const Icon(Symbols.edit_rounded),
               onTap: _pickDay,
             ),
             const SizedBox(height: 4),
@@ -273,7 +392,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
                   onPressed: _portions > 0.5
                       ? () => setState(() => _portions -= 0.5)
                       : null,
-                  icon: const Icon(Icons.remove),
+                  icon: const Icon(Symbols.remove_rounded),
                 ),
                 Expanded(
                   child: Text(
@@ -285,7 +404,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
                 ),
                 IconButton.filledTonal(
                   onPressed: () => setState(() => _portions += 0.5),
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Symbols.add_rounded),
                 ),
               ],
             ),

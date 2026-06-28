@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/snackbar.dart';
 import '../../data/ml/food_classifier.dart';
@@ -275,7 +276,7 @@ class _GuessSheet extends StatelessWidget {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 dense: true,
-                leading: const Icon(Icons.restaurant),
+                leading: const Icon(Symbols.restaurant_rounded),
                 title: Text(g.label),
                 trailing: Text(
                   '${(g.score * 100).round()}%',
@@ -286,7 +287,7 @@ class _GuessSheet extends StatelessWidget {
             const Divider(),
             TextButton.icon(
               onPressed: () => Navigator.pop(context, ''),
-              icon: const Icon(Icons.edit_outlined),
+              icon: const Icon(Symbols.edit_rounded),
               label: Text(l10n.recognizeNoneManual),
             ),
             if (showGeminiNudge)
@@ -296,7 +297,7 @@ class _GuessSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
-                      Icons.auto_awesome,
+                      Symbols.auto_awesome_rounded,
                       size: 16,
                       color: theme.colorScheme.outline,
                     ),

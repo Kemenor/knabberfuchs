@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../l10n/app_localizations.dart';
 import '../providers.dart';
@@ -29,24 +30,24 @@ class HomeShell extends ConsumerWidget {
     ];
     final destinations = <NavigationDestination>[
       NavigationDestination(
-        icon: const Icon(Icons.today_outlined),
-        selectedIcon: const Icon(Icons.today),
+        icon: const Icon(Symbols.today_rounded),
+        selectedIcon: const Icon(Symbols.today_rounded, fill: 1),
         label: l10n.navDay,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.menu_book_outlined),
-        selectedIcon: const Icon(Icons.menu_book),
+        icon: const Icon(Symbols.menu_book_rounded),
+        selectedIcon: const Icon(Symbols.menu_book_rounded, fill: 1),
         label: l10n.navRecipes,
       ),
       if (showTrends)
         NavigationDestination(
-          icon: const Icon(Icons.insights_outlined),
-          selectedIcon: const Icon(Icons.insights),
+          icon: const Icon(Symbols.insights_rounded),
+          selectedIcon: const Icon(Symbols.insights_rounded, fill: 1),
           label: l10n.navTrends,
         ),
       NavigationDestination(
-        icon: const Icon(Icons.settings_outlined),
-        selectedIcon: const Icon(Icons.settings),
+        icon: const Icon(Symbols.settings_rounded),
+        selectedIcon: const Icon(Symbols.settings_rounded, fill: 1),
         label: l10n.navSettings,
       ),
     ];

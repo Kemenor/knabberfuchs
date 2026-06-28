@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/date_label.dart';
 import '../../core/date_x.dart';
@@ -76,19 +77,19 @@ class _DayScreenState extends ConsumerState<DayScreen>
             children: [
               Text(dayLabel(context, day)),
               const SizedBox(width: 4),
-              const Icon(Icons.arrow_drop_down, size: 22),
+              const Icon(Symbols.arrow_drop_down_rounded, size: 22),
             ],
           ),
         ),
         leading: IconButton(
           tooltip: l10n.dayPreviousDay,
-          icon: const Icon(Icons.chevron_left),
+          icon: const Icon(Symbols.chevron_left_rounded),
           onPressed: () => shiftDay(-1),
         ),
         actions: [
           IconButton(
             tooltip: l10n.dayNextDay,
-            icon: const Icon(Icons.chevron_right),
+            icon: const Icon(Symbols.chevron_right_rounded),
             onPressed: () => shiftDay(1),
           ),
         ],
@@ -105,13 +106,13 @@ class _DayScreenState extends ConsumerState<DayScreen>
             heroTag: 'dayCapture',
             tooltip: l10n.quickAdd,
             onPressed: () => _showCaptureMenu(context, ref, day),
-            child: const Icon(Icons.bolt),
+            child: const Icon(Symbols.bolt_rounded),
           ),
           const SizedBox(width: 12),
           FloatingActionButton.extended(
             heroTag: 'dayAddFood',
             onPressed: () => addFoodByDay(context, ref, day),
-            icon: const Icon(Icons.add),
+            icon: const Icon(Symbols.add_rounded),
             label: Text(l10n.dayAddFood),
           ),
         ],
@@ -130,7 +131,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.bolt),
+              leading: const Icon(Symbols.bolt_rounded),
               title: Text(l10n.quickAdd),
               subtitle: Text(l10n.quickAddSubtitle),
               onTap: () {
@@ -139,7 +140,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.center_focus_weak),
+              leading: const Icon(Symbols.center_focus_weak_rounded),
               title: Text(l10n.captureScanAi),
               subtitle: Text(l10n.captureScanAiSub),
               onTap: () {
@@ -148,7 +149,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.document_scanner_outlined),
+              leading: const Icon(Symbols.document_scanner_rounded),
               title: Text(l10n.createFromList),
               subtitle: Text(l10n.createFromListSub),
               onTap: () {
@@ -462,7 +463,7 @@ class _GroupSection extends ConsumerWidget {
                 visualDensity: VisualDensity.compact,
                 tooltip: isCollapsed ? l10n.mealExpand : l10n.mealCollapse,
                 icon: Icon(
-                  isCollapsed ? Icons.expand_more : Icons.expand_less,
+                  isCollapsed ? Symbols.expand_more_rounded : Symbols.expand_less_rounded,
                   size: 22,
                 ),
                 onPressed: () =>
@@ -494,7 +495,7 @@ class _GroupSection extends ConsumerWidget {
                 ),
               ),
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, size: 20),
+                icon: const Icon(Symbols.more_vert_rounded, size: 20),
                 onSelected: (v) {
                   switch (v) {
                     case 'edit':
@@ -534,7 +535,7 @@ class _GroupSection extends ConsumerWidget {
                   visualDensity: VisualDensity.compact,
                   tooltip: l10n.mealFinish,
                   icon: Icon(
-                    Icons.check,
+                    Symbols.check_rounded,
                     size: 22,
                     color: theme.colorScheme.primary,
                   ),
@@ -544,7 +545,7 @@ class _GroupSection extends ConsumerWidget {
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   tooltip: l10n.mealAddTo,
-                  icon: const Icon(Icons.add, size: 22),
+                  icon: const Icon(Symbols.add_rounded, size: 22),
                   onPressed: reopenAndAdd,
                 ),
             ],
@@ -763,14 +764,14 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    icon: const Icon(Icons.calendar_today, size: 18),
+                    icon: const Icon(Symbols.calendar_today_rounded, size: 18),
                     label: Text(dayLabel(context, DayKey.of(_when))),
                     onPressed: _pickDate,
                   ),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
-                  icon: const Icon(Icons.schedule, size: 18),
+                  icon: const Icon(Symbols.schedule_rounded, size: 18),
                   label: Text(_timeLabel),
                   onPressed: _pickTime,
                 ),
@@ -804,7 +805,7 @@ class _EntryTile extends ConsumerWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
         color: Theme.of(context).colorScheme.errorContainer,
-        child: const Icon(Icons.delete_outline),
+        child: const Icon(Symbols.delete_rounded),
       ),
       onDismissed: (_) async {
         await ref.read(diaryRepositoryProvider).deleteEntry(view.id);

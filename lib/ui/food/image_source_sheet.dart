@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/app_localizations.dart';
 
@@ -20,12 +21,12 @@ Future<ImageSource?> pickImageSource(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: const Icon(Icons.photo_camera),
+            leading: const Icon(Symbols.photo_camera_rounded),
             title: Text(cameraLabel ?? l10n.recognizeTakePhoto),
             onTap: () => Navigator.pop(context, ImageSource.camera),
           ),
           ListTile(
-            leading: const Icon(Icons.photo_library),
+            leading: const Icon(Symbols.photo_library_rounded),
             title: Text(l10n.addChooseGallery),
             onTap: () => Navigator.pop(context, ImageSource.gallery),
           ),

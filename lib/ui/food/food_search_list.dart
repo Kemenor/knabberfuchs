@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/format.dart';
 import '../../data/db/database.dart';
@@ -137,7 +138,7 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
             onChanged: _onChanged,
             decoration: InputDecoration(
               hintText: l10n.searchFoodsHint,
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: const Icon(Symbols.search_rounded),
               suffixIcon: _searchingOnline
                   ? const Padding(
                       padding: EdgeInsets.all(12),
@@ -149,7 +150,7 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
                     )
                   : (_query.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear),
+                            icon: const Icon(Symbols.clear_rounded),
                             onPressed: () {
                               _controller.clear();
                               _onChanged('');
@@ -162,7 +163,7 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
         ),
         if (widget.onQuickAdd != null && _query.trim().isNotEmpty)
           ListTile(
-            leading: const Icon(Icons.bolt),
+            leading: const Icon(Symbols.bolt_rounded),
             title: Text(
               l10n.quickAddNamed(_query.trim()),
               maxLines: 1,
@@ -196,7 +197,7 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
                   itemBuilder: (context, i) {
                     if (i == results.length) {
                       return ListTile(
-                        leading: const Icon(Icons.add),
+                        leading: const Icon(Symbols.add_rounded),
                         title: Text(l10n.createCustomFood),
                         onTap: widget.onCreateCustom,
                       );
@@ -259,7 +260,7 @@ class _EmptyState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.no_food_outlined,
+            Symbols.no_food_rounded,
             size: 48,
             color: Theme.of(context).disabledColor,
           ),
@@ -274,7 +275,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 12),
             FilledButton.tonalIcon(
               onPressed: onCreate,
-              icon: const Icon(Icons.add),
+              icon: const Icon(Symbols.add_rounded),
               label: Text(l10n.createCustomFood),
             ),
           ],

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fuchsbau/fuchsbau.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -325,6 +326,17 @@ final localeProvider = StreamProvider<Locale?>(
       .watch(dbProvider)
       .watchSetting('appLocale')
       .map((v) => (v == null || v.isEmpty || v == 'system') ? null : Locale(v)),
+);
+
+/// The user-selected typeface (DESIGN.md §2 accessibility picker), persisted as
+/// the `appFont` setting (stores the enum `name`); defaults to Figtree.
+final fontProvider = StreamProvider<FuchsbauFont>(
+  (ref) => ref.watch(dbProvider).watchSetting('appFont').map(
+        (v) => FuchsbauFont.values.firstWhere(
+          (f) => f.name == v,
+          orElse: () => FuchsbauFont.figtree,
+        ),
+      ),
 );
 
 /// User-configured meal windows. Used to auto-label a new meal group (its name)

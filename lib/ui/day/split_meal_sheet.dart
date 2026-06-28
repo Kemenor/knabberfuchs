@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/date_label.dart';
 import '../../core/date_x.dart';
@@ -112,7 +113,7 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
                 const Spacer(),
                 IconButton.filledTonal(
                   onPressed: _n > 2 ? () => _setCount(_n - 1) : null,
-                  icon: const Icon(Icons.remove),
+                  icon: const Icon(Symbols.remove_rounded),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -120,7 +121,7 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
                 ),
                 IconButton.filledTonal(
                   onPressed: _n < 10 ? () => _setCount(_n + 1) : null,
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Symbols.add_rounded),
                 ),
               ],
             ),
@@ -133,9 +134,9 @@ class _SplitSheetState extends ConsumerState<_SplitSheet> {
               ListTile(
                 dense: true,
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.calendar_today, size: 20),
+                leading: const Icon(Symbols.calendar_today_rounded, size: 20),
                 title: Text(dayLabel(context, _days[i])),
-                trailing: const Icon(Icons.edit, size: 18),
+                trailing: const Icon(Symbols.edit_rounded, size: 18),
                 onTap: () => _pickDay(i),
               ),
             const SizedBox(height: 12),

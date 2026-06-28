@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/app_localizations.dart';
 
@@ -168,7 +169,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
                 final on = state.torchState == TorchState.on;
                 return IconButton(
                   tooltip: l10n.scanTorch,
-                  icon: Icon(on ? Icons.flash_on : Icons.flash_off),
+                  icon: Icon(on ? Symbols.flash_on_rounded : Symbols.flash_off_rounded),
                   onPressed: () => _controller?.toggleTorch(),
                 );
               },
@@ -176,7 +177,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
           if (widget.allowManual)
             IconButton(
               tooltip: l10n.scanEnterManually,
-              icon: const Icon(Icons.keyboard),
+              icon: const Icon(Symbols.keyboard_rounded),
               onPressed: _enterManually,
             ),
         ],
@@ -218,7 +219,7 @@ class _CameraError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.photo_camera_back_outlined, size: 48),
+            const Icon(Symbols.photo_camera_back_rounded, size: 48),
             const SizedBox(height: 12),
             Text(
               l10n.scanCameraFailed,
@@ -234,7 +235,7 @@ class _CameraError extends StatelessWidget {
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: onManual,
-                icon: const Icon(Icons.keyboard),
+                icon: const Icon(Symbols.keyboard_rounded),
                 label: Text(l10n.scanEnterManuallyButton),
               ),
             ],

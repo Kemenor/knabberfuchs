@@ -34,6 +34,10 @@
 
   "settingsSectionLanguage": "Language",
   "@settingsSectionLanguage": { "description": "Settings section header for the app language" },
+  "settingsTypeface": "Typeface",
+  "typefaceDefault": "Default",
+  "typefaceLowVision": "Low-vision legibility",
+  "typefaceDyslexia": "Dyslexia",
   "settingsLanguage": "App language",
   "@settingsLanguage": { "description": "Settings row title for choosing the UI language" },
   "languageSystem": "System default",

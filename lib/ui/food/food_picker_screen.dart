@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../data/db/database.dart';
 import '../../l10n/app_localizations.dart';
@@ -65,7 +66,7 @@ class FoodPickerScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'pickerScanFab',
         onPressed: () => _scan(context, ref),
-        icon: const Icon(Icons.qr_code_scanner),
+        icon: const Icon(Symbols.qr_code_scanner_rounded),
         label: Text(l10n.scanBarcode),
       ),
       body: FoodSearchList(

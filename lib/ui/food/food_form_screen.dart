@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import '../../core/external_link.dart';
 import '../../core/format.dart';
 import '../../core/snackbar.dart';
@@ -197,7 +198,7 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'foodSaveFab',
         onPressed: _saving ? null : _save,
-        icon: const Icon(Icons.check),
+        icon: const Icon(Symbols.check_rounded),
         label: Text(l10n.actionSave),
       ),
       body: ListView(
@@ -211,7 +212,7 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 tooltip: l10n.scanBarcode,
-                icon: const Icon(Icons.qr_code_scanner),
+                icon: const Icon(Symbols.qr_code_scanner_rounded),
                 onPressed: _scanBarcode,
               ),
             ),
@@ -274,7 +275,7 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
                   : OutlinedButton.icon(
                       onPressed: _scanLabel,
                       icon: const Icon(
-                        Icons.document_scanner_outlined,
+                        Symbols.document_scanner_rounded,
                         size: 18,
                       ),
                       label: Text(l10n.addScanLabel),
@@ -369,7 +370,7 @@ class _OffContributeCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.volunteer_activism_outlined, color: scheme.primary),
+              Icon(Symbols.volunteer_activism_rounded, color: scheme.primary),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -391,7 +392,7 @@ class _OffContributeCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.open_in_new, size: 16, color: scheme.primary),
+                        Icon(Symbols.open_in_new_rounded, size: 16, color: scheme.primary),
                         const SizedBox(width: 6),
                         Text(
                           l10n.offContributeAction,

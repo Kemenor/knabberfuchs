@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/format.dart';
 import '../../domain/enums.dart';
@@ -220,7 +221,7 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
               Row(
                 children: [
                   Icon(
-                    Icons.auto_awesome,
+                    Symbols.auto_awesome_rounded,
                     size: 14,
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -307,7 +308,7 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   onPressed: () => setState(() => _showMacros = true),
-                  icon: const Icon(Icons.add, size: 18),
+                  icon: const Icon(Symbols.add_rounded, size: 18),
                   label: Text(l10n.quickAddMacros),
                 ),
               ),

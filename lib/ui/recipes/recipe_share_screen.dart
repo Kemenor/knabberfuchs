@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
@@ -93,7 +94,7 @@ class _RecipeShareScreenState extends State<RecipeShareScreen> {
                     child: FilledButton.tonalIcon(
                       onPressed: () =>
                           _shareImage(l10n.shareSubject(share.name)),
-                      icon: const Icon(Icons.image_outlined),
+                      icon: const Icon(Symbols.image_rounded),
                       label: Text(l10n.shareAsImage),
                     ),
                   ),
@@ -106,7 +107,7 @@ class _RecipeShareScreenState extends State<RecipeShareScreen> {
                           subject: l10n.shareSubject(share.name),
                         ),
                       ),
-                      icon: const Icon(Icons.notes),
+                      icon: const Icon(Symbols.notes_rounded),
                       label: Text(l10n.shareAsText),
                     ),
                   ),
