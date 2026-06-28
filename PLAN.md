@@ -458,6 +458,47 @@ Strategy:
     P32/C105/F28). The on-device path stays the keyless default.
   - **Caveat:** calorie-from-photo is inherently rough → always framed as an *estimate to confirm*.
 
+- **Phase 14 — Design-system migration (fuchsbau):** 🚧 IN PROGRESS (planned + grilled
+  2026-06-28). Re-skin knabberfuchs onto the shared **fuchsbau** design system (tangerine
+  triad, Figtree + accessibility font picker, Material Symbols Rounded, rounding/spacing
+  tokens, "red = destruction only"). knabberfuchs is the **validation consumer** of a new
+  shared `fuchsbau` Flutter package; checkfuchs migrates onto it afterwards. No feature,
+  data-model, or architecture change — the app is already theme-driven (single-source
+  `core/theme.dart`, semantic `colorScheme`, zero hardcoded `Colors.*`), so this is a re-skin
+  + token adoption, not a rewrite. Done **before** production (woven into the running 14-day
+  closed test; a new build to the closed track does NOT reset the 14-day clock).
+  - **Decisions (grilled 2026-06-28):**
+    - **Package, not copy:** `fuchsbau` becomes a Flutter package at its repo root
+      (github.com/Kemenor/fuchsbau), design-system scope only (theme builder, `FuchsbauColors`,
+      status-color `ThemeExtension`, `FuchsbauFont` + bundled OFL fonts, icon defaults). Reuse
+      checkfuchs's proven **3-seed-graft** ColorScheme (one `fromSeed` per hue, graft indigo→
+      secondary / emerald→tertiary; NOT single-seed). Backup-helper extraction explicitly OUT.
+    - **Dependency/CI:** knabberfuchs uses a **git-dep on fuchsbau (pinned ref) +
+      `dependency_overrides` → local `../fuchsbau` path** — local live-edit + green CI + pinned
+      production builds.
+    - **Status colours (ethos: status is information, never punishment; red = destruction
+      only):** in-range → **emerald**, off-target **over AND under** → **amber**, `none` →
+      `outline`. No red in status (frees red for Delete). Direction stays legible via the bar +
+      number. One-file change: `core/status_color.dart` + two `day_screen.dart` `error` sites.
+    - **Typography:** bundle Figtree (default) + Atkinson Hyperlegible + OpenDyslexic + System;
+      package owns plumbing (incl. tabular figures); knabberfuchs adds one Settings "Typeface"
+      `RadioGroup` + `fontProvider` (mirrors the Language picker). Deferrable tail.
+    - **Icons:** Material Symbols Rounded via `material_symbols_icons`; mechanical
+      `Icons.*`→`Symbols.*` sweep + rounded defaults via `IconThemeData`. Deferrable tail.
+    - **App icon:** keep the (tangerine) fox; recolor the adaptive background off the accidental
+      green to **indigo or emerald** (decided on device), regen Android + iOS + docs favicon/fox.
+    - **Execution:** branch `redesign/fuchsbau`, one self-contained commit per phase, each gated
+      on goldens (diffs read, not blind-accepted) + a whole-branch emulator look. Single version
+      bump + 4-locale changelog at the end → merge → AAB to closed track → real-device check →
+      submit production.
+    - **Store/landing:** regenerate screenshots from the current (expanded) seed fixture +
+      `integration_test/screenshots_test.dart` harness (4 locales, Android+iOS); recolor
+      `featureGraphic.png` by hand; refresh `docs/` accent CSS + screenshots — after visual freeze.
+  - **Build sequence:** P1 package skeleton + git-dep/override wiring (no visual change) → P2
+    palette swap (green seed gone) → P3 status colours → P4 shape/spacing/elevation + components
+    → P5 icons → P6 fonts + picker → P7 icon retheme → P8 store/landing → P9 ship → P10 checkfuchs
+    migrates onto the package. Regenerate the 29 goldens per visual phase.
+
 ## Phase 5 design — Offline OFF regional packs (planned 2026-06-17)
 
 **Decisions:** build on **GitHub Actions** → host on **Hugging Face** dataset; **per-country**

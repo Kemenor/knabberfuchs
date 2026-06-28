@@ -33,6 +33,14 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # Shared fuchs-family design system (theme, triad palette, fonts). Pinned by
+  # ref for reproducible CI / release builds; dependency_overrides points it at
+  # the local sibling checkout for live co-development (see bottom of file).
+  fuchsbau:
+    git:
+      url: git@github.com:Kemenor/fuchsbau.git
+      ref: 530e7ded76e318edeea427ce464ec004510c56e0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -77,6 +85,13 @@ dev_dependencies:
   drift_dev: ^2.34.0
   build_runner: ^2.15.0
   flutter_launcher_icons: ^0.14.4
+
+# Co-develop fuchsbau locally: builds use the sibling checkout instead of the
+# pinned git ref above. CI / release builds have no override, so they use the
+# pinned ref for reproducibility. Keep the ref in sync at integration points.
+dependency_overrides:
+  fuchsbau:
+    path: ../fuchsbau
 
 # App icon (Knabberfuchs). Regenerate with: dart run flutter_launcher_icons
 flutter_launcher_icons:
