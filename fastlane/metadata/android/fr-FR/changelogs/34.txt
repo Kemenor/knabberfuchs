@@ -1,0 +1,1 @@
+Accessibilité améliorée : meilleur contraste, zones tactiles plus grandes et prise en charge des lecteurs d'écran dans toute l'app. Nouveau sélecteur de thème (Système/Clair/Sombre), réglages réorganisés, et l'astuce de pack hors ligne ouvre directement le pays du produit scanné.

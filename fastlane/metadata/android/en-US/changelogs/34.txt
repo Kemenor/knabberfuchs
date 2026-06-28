@@ -1,0 +1,1 @@
+Accessibility pass: better contrast, larger tap targets and screen-reader support throughout. New theme picker (System/Light/Dark), tidier Settings, and the offline-pack tip now jumps straight to the scanned product's country.

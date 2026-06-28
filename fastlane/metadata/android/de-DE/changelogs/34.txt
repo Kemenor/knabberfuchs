@@ -1,0 +1,1 @@
+Barrierefreiheit verbessert: besserer Kontrast, größere Tippflächen und Screenreader-Unterstützung in der ganzen App. Neue Themenauswahl (System/Hell/Dunkel), aufgeräumte Einstellungen, und der Offline-Paket-Hinweis springt nun direkt zum Land des gescannten Produkts.

@@ -1,0 +1,1 @@
+Accessibilità migliorata: contrasto più alto, aree toccabili più grandi e supporto per screen reader in tutta l'app. Nuovo selettore tema (Sistema/Chiaro/Scuro), impostazioni riordinate, e il suggerimento dei pacchetti offline apre direttamente il Paese del prodotto scansionato.
