@@ -10,6 +10,11 @@ name: iOS · Screenshots
 
 on:
   workflow_dispatch:
+    inputs:
+      locales:
+        description: "Space-separated locales to generate"
+        default: "en de fr it"
+        required: false
 
 jobs:
   screenshots:
@@ -79,7 +84,7 @@ jobs:
         run: |
           set -euo pipefail
           UDID="${{ steps.sim.outputs.udid }}"
-          for L in en de fr it; do
+          for L in ${{ inputs.locales }}; do
             echo "::group::Locale $L"
             # Fresh app container each locale so the seed doesn't accumulate.
             xcrun simctl uninstall "$UDID" ch.knabberfuchs.app || true
@@ -94,7 +99,7 @@ jobs:
       - name: Verify + stage to fastlane 6.9" layout
         run: |
           set -euo pipefail
-          for L in en de fr it; do
+          for L in ${{ inputs.locales }}; do
             case $L in
               en) D=en-US;; de) D=de-DE;; fr) D=fr-FR;; it) D=it;;
             esac

@@ -364,7 +364,13 @@ void main() {
     try {
       await popToHome();
       await tab(0);
+      debugPrint('SS9: day fabs=${find.byType(FloatingActionButton).evaluate().length}');
       await tapFab('dayCapture');
+      debugPrint('SS9: after fab — scanAi="${l10n().captureScanAi}" '
+          'found=${find.text(l10n().captureScanAi).evaluate().length} '
+          'quickAdd=${find.text(l10n().quickAdd).evaluate().length} '
+          'listTiles=${find.byType(ListTile).evaluate().length}');
+      await binding.takeScreenshot('$loc/09_DIAG');
       if (await tapText(l10n().captureScanAi)) {
         for (var i = 0; i < 60; i++) {
           if (find.text(l10n().recognizeLooksLike).evaluate().isNotEmpty) break;
@@ -372,6 +378,8 @@ void main() {
         }
         await shot('09_recognize');
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('SS9 ERR: $e\n$st');
+    }
   });
 }
