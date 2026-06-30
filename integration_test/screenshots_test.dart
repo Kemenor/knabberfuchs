@@ -196,6 +196,26 @@ void main() {
             sCarb100: const Value(5.0), sFat100: const Value(1.5)),
       ],
     );
+
+    // Seed ~2 weeks of prior days (one entry each, varied totals) so the Trends
+    // chart shows a real line instead of a single point.
+    const priorKcal = [
+      1850.0, 2100.0, 1700.0, 1980.0, 2250.0, 1620.0, 1900.0,
+      2050.0, 1760.0, 2180.0, 1880.0, 1990.0, 1710.0,
+    ];
+    for (var d = 1; d <= priorKcal.length; d++) {
+      final pday = DayKey.of(DateTime.now().subtract(Duration(days: d)));
+      await db.addEntry(EntriesCompanion.insert(
+        day: pday,
+        mealType: MealType.lunch,
+        grams: 100.0,
+        sName: tr('chickenBreast'),
+        sKcal100: priorKcal[d - 1],
+        sProtein100: const Value(20.0),
+        sCarb100: const Value(50.0),
+        sFat100: const Value(15.0),
+      ));
+    }
     await settle(tester);
 
     if (Platform.isAndroid) {
@@ -212,6 +232,19 @@ void main() {
     }
 
     void tab(int i) => container.read(homeTabProvider.notifier).set(i);
+    // Settings is always the LAST tab (the Trends tab sits before it when
+    // enabled). HomeShell clamps the index to the last page, so a big number
+    // lands on Settings regardless of whether Trends is shown — index-proof.
+    void openSettings() => container.read(homeTabProvider.notifier).set(900);
+
+    // Pop any pushed routes / open sheets so each step starts from the bare tab
+    // shell — otherwise a leftover route (e.g. the add-food screen) covers the
+    // next screenshot, which is exactly how the non-English sets got corrupted.
+    Future<void> popToHome() async {
+      final ctx = tester.element(find.byType(HomeShell).first);
+      Navigator.of(ctx).popUntil((r) => r.isFirst);
+      await settle(tester);
+    }
 
     // Tap a widget by its (localized) label; returns false if not found so each
     // shot degrades gracefully instead of crashing the whole run.
@@ -244,23 +277,25 @@ void main() {
       return tapText(text);
     }
 
-    // The marketing set (matches the Android Play listing).
+    // The marketing set. Each step pops back to the bare tab shell first so a
+    // leftover route can't bleed into the next shot.
 
     // 1. Day hero (meal-grouped)
+    await popToHome();
     tab(0);
     await shot('01_day');
 
     // 2. Quick add (capture menu → Quick add)
     try {
+      await popToHome();
       tab(0);
       await tapFab('dayCapture');
       if (await tapText(l10n().quickAdd)) await shot('02_quicklog');
-      await tester.tapAt(const Offset(20, 20)); // dismiss any open sheet
-      await settle(tester);
     } catch (_) {}
 
     // 3. Add food with live search results from the food database
     try {
+      await popToHome();
       tab(0);
       await tapFab('dayAddFood');
       final search = find.byType(TextField);
@@ -269,63 +304,56 @@ void main() {
         await settle(tester);
       }
       await shot('03_search');
-      await tester.pageBack();
-      await settle(tester);
     } catch (_) {}
 
     // 4. Recipes list
     try {
+      await popToHome();
       tab(1);
       await shot('04_recipes');
     } catch (_) {}
 
     // 5. A recipe, broken into its ingredients
     try {
+      await popToHome();
       tab(1);
-      if (await tapText(tr('recipeBowl'))) {
-        await shot('05_recipe');
-        await tester.pageBack();
-        await settle(tester);
-      }
+      if (await tapText(tr('recipeBowl'))) await shot('05_recipe');
     } catch (_) {}
 
     // 6. Offline regions (Settings → Offline regions)
     try {
-      tab(2);
-      if (await tapRow(l10n().settingsOfflineRegions)) {
-        await shot('06_regions');
-        await tester.pageBack();
-        await settle(tester);
-      }
+      await popToHome();
+      openSettings();
+      await settle(tester);
+      if (await tapRow(l10n().settingsOfflineRegions)) await shot('06_regions');
     } catch (_) {}
 
-    // 7. Language — the collapsible "App language" tile at the TOP of Settings.
-    // Scroll back up to it (we may be scrolled down from the regions step),
-    // then tap to expand the picker.
+    // 7. Language — the collapsible "App language" tile near the top of Settings
+    // (Appearance section). Scroll up to it, then tap to expand the picker.
     try {
-      tab(2);
+      await popToHome();
+      openSettings();
       await settle(tester);
       for (var i = 0; i < 40; i++) {
         if (find.text(l10n().settingsLanguage).evaluate().isNotEmpty) break;
         await tester.drag(find.byType(Scrollable).first, const Offset(0, 300));
         await tester.pump(const Duration(milliseconds: 80));
       }
-      if (await tapText(l10n().settingsLanguage)) {
-        await shot('07_language');
-      }
+      if (await tapText(l10n().settingsLanguage)) await shot('07_language');
     } catch (_) {}
 
-    // 8. Settings overview (bonus — not in the marketing set)
+    // 8. Trends — the calorie/macro history chart added in the redesign.
     try {
+      await popToHome();
       tab(2);
-      await shot('08_settings');
+      await shot('08_trends');
     } catch (_) {}
 
     // 9. Recognise a meal — the injected photo drives the on-device classifier;
     // capture the guess sheet ("Looks like…" + ranked dishes).
     try {
+      await popToHome();
       tab(0);
-      await settle(tester); // let the Day tab rebuild after leaving Settings
       await tapFab('dayCapture');
       if (await tapText(l10n().captureScanAi)) {
         for (var i = 0; i < 60; i++) {
@@ -333,8 +361,6 @@ void main() {
           await tester.pump(const Duration(milliseconds: 200));
         }
         await shot('09_recognize');
-        await tester.tapAt(const Offset(20, 20)); // dismiss the sheet
-        await settle(tester);
       }
     } catch (_) {}
   });
