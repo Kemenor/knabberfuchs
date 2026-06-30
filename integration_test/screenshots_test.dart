@@ -236,11 +236,19 @@ void main() {
       await binding.takeScreenshot('$loc/$name');
     }
 
-    void tab(int i) => container.read(homeTabProvider.notifier).set(i);
+    // Switch tab and settle — the settle matters when it's a *real* switch, so
+    // the destination (and its FAB) is built before we interact with it.
+    Future<void> tab(int i) async {
+      container.read(homeTabProvider.notifier).set(i);
+      await settle(tester);
+    }
     // Settings is always the LAST tab (the Trends tab sits before it when
     // enabled). HomeShell clamps the index to the last page, so a big number
     // lands on Settings regardless of whether Trends is shown — index-proof.
-    void openSettings() => container.read(homeTabProvider.notifier).set(900);
+    Future<void> openSettings() async {
+      container.read(homeTabProvider.notifier).set(900);
+      await settle(tester);
+    }
 
     // Pop any pushed routes / open sheets so each step starts from the bare tab
     // shell — otherwise a leftover route (e.g. the add-food screen) covers the
@@ -286,13 +294,13 @@ void main() {
 
     // 1. Day hero (meal-grouped)
     await popToHome();
-    tab(0);
+    await tab(0);
     await shot('01_day');
 
     // 2. Quick add (capture menu → Quick add)
     try {
       await popToHome();
-      tab(0);
+      await tab(0);
       await tapFab('dayCapture');
       if (await tapText(l10n().quickAdd)) await shot('02_quicklog');
     } catch (_) {}
@@ -300,7 +308,7 @@ void main() {
     // 3. Add food with live search results from the food database
     try {
       await popToHome();
-      tab(0);
+      await tab(0);
       await tapFab('dayAddFood');
       final search = find.byType(TextField);
       if (search.evaluate().isNotEmpty) {
@@ -313,22 +321,21 @@ void main() {
     // 4. Recipes list
     try {
       await popToHome();
-      tab(1);
+      await tab(1);
       await shot('04_recipes');
     } catch (_) {}
 
     // 5. A recipe, broken into its ingredients
     try {
       await popToHome();
-      tab(1);
+      await tab(1);
       if (await tapText(tr('recipeBowl'))) await shot('05_recipe');
     } catch (_) {}
 
     // 6. Offline regions (Settings → Offline regions)
     try {
       await popToHome();
-      openSettings();
-      await settle(tester);
+      await openSettings();
       if (await tapRow(l10n().settingsOfflineRegions)) await shot('06_regions');
     } catch (_) {}
 
@@ -336,8 +343,7 @@ void main() {
     // (Appearance section). Scroll up to it, then tap to expand the picker.
     try {
       await popToHome();
-      openSettings();
-      await settle(tester);
+      await openSettings();
       for (var i = 0; i < 40; i++) {
         if (find.text(l10n().settingsLanguage).evaluate().isNotEmpty) break;
         await tester.drag(find.byType(Scrollable).first, const Offset(0, 300));
@@ -349,7 +355,7 @@ void main() {
     // 8. Trends — the calorie/macro history chart added in the redesign.
     try {
       await popToHome();
-      tab(2);
+      await tab(2);
       await shot('08_trends');
     } catch (_) {}
 
@@ -357,7 +363,7 @@ void main() {
     // capture the guess sheet ("Looks like…" + ranked dishes).
     try {
       await popToHome();
-      tab(0);
+      await tab(0);
       await tapFab('dayCapture');
       if (await tapText(l10n().captureScanAi)) {
         for (var i = 0; i < 60; i++) {
