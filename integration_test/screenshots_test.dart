@@ -12,35 +12,104 @@ import 'package:calorie_tracker/app.dart';
 import 'package:calorie_tracker/core/date_x.dart';
 import 'package:calorie_tracker/data/db/database.dart';
 import 'package:calorie_tracker/domain/enums.dart';
+import 'package:calorie_tracker/l10n/app_localizations.dart';
 import 'package:calorie_tracker/providers.dart';
 import 'package:calorie_tracker/ui/food/recognize_food_flow.dart';
 import 'package:calorie_tracker/ui/home_shell.dart';
 
 import 'meal_fixture.dart';
 
-/// Generates App Store screenshots. Run with:
+/// Generates App Store screenshots, one locale per run. Pass the locale with
+/// `--dart-define=LOCALE=<en|de|fr|it>` (defaults to en):
 ///   flutter drive --driver=test_driver/integration_test.dart \
-///     --target=integration_test/screenshots_test.dart -d SIMULATOR_ID
+///     --target=integration_test/screenshots_test.dart \
+///     --dart-define=LOCALE=de -d SIMULATOR_ID
+///
+/// Screenshots land in `screenshots/<locale>/NN_name.png`. Navigation taps the
+/// *localized* labels (via AppLocalizations) and the seeded demo data is
+/// translated too, so every locale's set looks native.
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  // Representative day — same foods/macros as the Play Store screenshots,
-  // organised into named meal groups (matches the app's "name meals by time").
+  const loc = String.fromEnvironment('LOCALE', defaultValue: 'en');
+
+  // Localized demo strings, keyed by a stable id then language (falls back to
+  // en). Macros/quantities are language-independent and stay inline below.
+  const strings = <String, Map<String, String>>{
+    'breakfast': {
+      'en': 'Breakfast 07:42', 'de': 'Frühstück 07:42',
+      'fr': 'Petit-déjeuner 07:42', 'it': 'Colazione 07:42',
+    },
+    'lunch': {
+      'en': 'Lunch 12:35', 'de': 'Mittagessen 12:35',
+      'fr': 'Déjeuner 12:35', 'it': 'Pranzo 12:35',
+    },
+    'greekYogurt': {
+      'en': 'Greek yogurt, plain', 'de': 'Griechischer Joghurt, natur',
+      'fr': 'Yaourt grec nature', 'it': 'Yogurt greco, naturale',
+    },
+    'granola': {
+      'en': 'Granola', 'de': 'Granola', 'fr': 'Granola', 'it': 'Granola',
+    },
+    'blueberries': {
+      'en': 'Blueberries', 'de': 'Heidelbeeren',
+      'fr': 'Myrtilles', 'it': 'Mirtilli',
+    },
+    'coffeeMilk': {
+      'en': 'Coffee with milk', 'de': 'Kaffee mit Milch',
+      'fr': 'Café au lait', 'it': 'Caffè con latte',
+    },
+    'chickenBreast': {
+      'en': 'Chicken breast, grilled', 'de': 'Hähnchenbrust, gegrillt',
+      'fr': 'Blanc de poulet grillé', 'it': 'Petto di pollo, grigliato',
+    },
+    'basmatiRice': {
+      'en': 'Basmati rice, cooked', 'de': 'Basmatireis, gekocht',
+      'fr': 'Riz basmati, cuit', 'it': 'Riso basmati, cotto',
+    },
+    'broccoli': {
+      'en': 'Broccoli, steamed', 'de': 'Brokkoli, gedämpft',
+      'fr': 'Brocoli, vapeur', 'it': 'Broccoli, al vapore',
+    },
+    'oats': {
+      'en': 'Rolled oats', 'de': 'Haferflocken',
+      'fr': "Flocons d'avoine", 'it': "Fiocchi d'avena",
+    },
+    'milk': {
+      'en': 'Milk, semi-skimmed', 'de': 'Milch, teilentrahmt',
+      'fr': 'Lait demi-écrémé', 'it': 'Latte parzialmente scremato',
+    },
+    'recipeBowl': {
+      'en': 'Chicken rice bowl', 'de': 'Hähnchen-Reis-Bowl',
+      'fr': 'Bowl poulet et riz', 'it': 'Bowl di pollo e riso',
+    },
+    'recipeOats': {
+      'en': 'Overnight oats', 'de': 'Overnight Oats',
+      'fr': 'Overnight oats', 'it': 'Overnight oats',
+    },
+    // A query with hits in every locale's bundled Swiss food data.
+    'searchQuery': {
+      'en': 'Banana', 'de': 'Banane', 'fr': 'Banane', 'it': 'Banana',
+    },
+  };
+  String tr(String k) => strings[k]![loc] ?? strings[k]!['en']!;
+
+  // Representative day — translated foods organised into named meal groups.
   final meals = <Map<String, dynamic>>[
     {
-      'group': 'Breakfast 07:42', 'meal': MealType.breakfast,
+      'group': tr('breakfast'), 'meal': MealType.breakfast,
       'foods': [
-        {'name': 'Greek yogurt, plain', 'g': 150.0, 'kcal': 59.0, 'p': 10.0, 'c': 3.6, 'f': 0.4},
-        {'name': 'Granola', 'g': 45.0, 'kcal': 471.0, 'p': 10.0, 'c': 64.0, 'f': 20.0},
-        {'name': 'Blueberries', 'g': 80.0, 'kcal': 57.0, 'p': 0.7, 'c': 14.0, 'f': 0.3},
-        {'name': 'Coffee with milk', 'g': 200.0, 'kcal': 20.0, 'p': 1.0, 'c': 2.0, 'f': 1.0},
+        {'k': 'greekYogurt', 'g': 150.0, 'kcal': 59.0, 'p': 10.0, 'c': 3.6, 'f': 0.4},
+        {'k': 'granola', 'g': 45.0, 'kcal': 471.0, 'p': 10.0, 'c': 64.0, 'f': 20.0},
+        {'k': 'blueberries', 'g': 80.0, 'kcal': 57.0, 'p': 0.7, 'c': 14.0, 'f': 0.3},
+        {'k': 'coffeeMilk', 'g': 200.0, 'kcal': 20.0, 'p': 1.0, 'c': 2.0, 'f': 1.0},
       ],
     },
     {
-      'group': 'Lunch 12:35', 'meal': MealType.lunch,
+      'group': tr('lunch'), 'meal': MealType.lunch,
       'foods': [
-        {'name': 'Chicken breast, grilled', 'g': 180.0, 'kcal': 165.0, 'p': 31.0, 'c': 0.0, 'f': 3.6},
-        {'name': 'Basmati rice, cooked', 'g': 180.0, 'kcal': 130.0, 'p': 2.7, 'c': 28.0, 'f': 0.3},
+        {'k': 'chickenBreast', 'g': 180.0, 'kcal': 165.0, 'p': 31.0, 'c': 0.0, 'f': 3.6},
+        {'k': 'basmatiRice', 'g': 180.0, 'kcal': 130.0, 'p': 2.7, 'c': 28.0, 'f': 0.3},
       ],
     },
   ];
@@ -56,7 +125,7 @@ void main() {
 
   testWidgets('App Store screenshots', (tester) async {
     await initializeDateFormatting();
-    tester.platformDispatcher.localeTestValue = const Locale('en');
+    tester.platformDispatcher.localeTestValue = Locale(loc);
 
     final container = ProviderContainer(overrides: [
       // Feed the on-device classifier a bundled meal photo instead of the
@@ -69,7 +138,7 @@ void main() {
     );
 
     final db = container.read(dbProvider);
-    await db.setSetting('appLocale', 'en');
+    await db.setSetting('appLocale', loc);
 
     // Wait out the first-run splash (Swiss food import); its spinner never
     // settles, so pump in a loop until HomeShell appears.
@@ -89,7 +158,7 @@ void main() {
           day: day,
           mealType: m['meal'] as MealType,
           grams: f['g'] as double,
-          sName: f['name'] as String,
+          sName: tr(f['k'] as String),
           sKcal100: f['kcal'] as double,
           sProtein100: Value(f['p'] as double),
           sCarb100: Value(f['c'] as double),
@@ -103,26 +172,26 @@ void main() {
 
     // A couple of recipes so the Recipes screens have content.
     await db.createRecipe(
-      RecipesCompanion.insert(name: 'Chicken rice bowl', servings: const Value(2)),
+      RecipesCompanion.insert(name: tr('recipeBowl'), servings: const Value(2)),
       [
-        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Chicken breast, grilled',
+        RecipeItemsCompanion.insert(recipeId: 0, sName: tr('chickenBreast'),
             grams: 300.0, sKcal100: 165.0, sProtein100: const Value(31.0),
             sCarb100: const Value(0.0), sFat100: const Value(3.6)),
-        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Basmati rice, cooked',
+        RecipeItemsCompanion.insert(recipeId: 0, sName: tr('basmatiRice'),
             grams: 300.0, sKcal100: 130.0, sProtein100: const Value(2.7),
             sCarb100: const Value(28.0), sFat100: const Value(0.3)),
-        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Broccoli, steamed',
+        RecipeItemsCompanion.insert(recipeId: 0, sName: tr('broccoli'),
             grams: 150.0, sKcal100: 34.0, sProtein100: const Value(2.8),
             sCarb100: const Value(7.0), sFat100: const Value(0.4)),
       ],
     );
     await db.createRecipe(
-      RecipesCompanion.insert(name: 'Overnight oats', servings: const Value(1)),
+      RecipesCompanion.insert(name: tr('recipeOats'), servings: const Value(1)),
       [
-        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Rolled oats', grams: 50.0,
+        RecipeItemsCompanion.insert(recipeId: 0, sName: tr('oats'), grams: 50.0,
             sKcal100: 389.0, sProtein100: const Value(17.0),
             sCarb100: const Value(66.0), sFat100: const Value(7.0)),
-        RecipeItemsCompanion.insert(recipeId: 0, sName: 'Milk, semi-skimmed',
+        RecipeItemsCompanion.insert(recipeId: 0, sName: tr('milk'),
             grams: 200.0, sKcal100: 47.0, sProtein100: const Value(3.4),
             sCarb100: const Value(5.0), sFat100: const Value(1.5)),
       ],
@@ -133,14 +202,18 @@ void main() {
       await binding.convertFlutterSurfaceToImage();
     }
 
+    // Localized labels for the active locale, read from the live widget tree.
+    AppLocalizations l10n() =>
+        AppLocalizations.of(tester.element(find.byType(HomeShell).first));
+
     Future<void> shot(String name) async {
       await settle(tester);
-      await binding.takeScreenshot(name);
+      await binding.takeScreenshot('$loc/$name');
     }
 
     void tab(int i) => container.read(homeTabProvider.notifier).set(i);
 
-    // Tap a widget by its (English) label; returns false if not found so each
+    // Tap a widget by its (localized) label; returns false if not found so each
     // shot degrades gracefully instead of crashing the whole run.
     Future<bool> tapText(String text) async {
       final f = find.text(text);
@@ -171,8 +244,7 @@ void main() {
       return tapText(text);
     }
 
-    // The marketing set (matches the Android Play listing), minus "recognise"
-    // (a live AI result) which can't be reproduced deterministically in a test.
+    // The marketing set (matches the Android Play listing).
 
     // 1. Day hero (meal-grouped)
     tab(0);
@@ -182,7 +254,7 @@ void main() {
     try {
       tab(0);
       await tapFab('dayCapture');
-      if (await tapText('Quick add')) await shot('02_quicklog');
+      if (await tapText(l10n().quickAdd)) await shot('02_quicklog');
       await tester.tapAt(const Offset(20, 20)); // dismiss any open sheet
       await settle(tester);
     } catch (_) {}
@@ -193,7 +265,7 @@ void main() {
       await tapFab('dayAddFood');
       final search = find.byType(TextField);
       if (search.evaluate().isNotEmpty) {
-        await tester.enterText(search.first, 'Chicken');
+        await tester.enterText(search.first, tr('searchQuery'));
         await settle(tester);
       }
       await shot('03_search');
@@ -210,7 +282,7 @@ void main() {
     // 5. A recipe, broken into its ingredients
     try {
       tab(1);
-      if (await tapText('Chicken rice bowl')) {
+      if (await tapText(tr('recipeBowl'))) {
         await shot('05_recipe');
         await tester.pageBack();
         await settle(tester);
@@ -220,7 +292,7 @@ void main() {
     // 6. Offline regions (Settings → Offline regions)
     try {
       tab(2);
-      if (await tapRow('Offline regions')) {
+      if (await tapRow(l10n().settingsOfflineRegions)) {
         await shot('06_regions');
         await tester.pageBack();
         await settle(tester);
@@ -234,11 +306,11 @@ void main() {
       tab(2);
       await settle(tester);
       for (var i = 0; i < 40; i++) {
-        if (find.text('App language').evaluate().isNotEmpty) break;
+        if (find.text(l10n().settingsLanguage).evaluate().isNotEmpty) break;
         await tester.drag(find.byType(Scrollable).first, const Offset(0, 300));
         await tester.pump(const Duration(milliseconds: 80));
       }
-      if (await tapText('App language')) {
+      if (await tapText(l10n().settingsLanguage)) {
         await shot('07_language');
       }
     } catch (_) {}
@@ -255,9 +327,9 @@ void main() {
       tab(0);
       await settle(tester); // let the Day tab rebuild after leaving Settings
       await tapFab('dayCapture');
-      if (await tapText('Scan a meal with AI')) {
+      if (await tapText(l10n().captureScanAi)) {
         for (var i = 0; i < 60; i++) {
-          if (find.text('Looks like…').evaluate().isNotEmpty) break;
+          if (find.text(l10n().recognizeLooksLike).evaluate().isNotEmpty) break;
           await tester.pump(const Duration(milliseconds: 200));
         }
         await shot('09_recognize');

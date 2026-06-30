@@ -1,0 +1,112 @@
+name: iOS · Screenshots
+
+# Generate the App Store screenshots on a GitHub-hosted macOS runner (its iOS
+# simulators are pre-initialised — no `xcodebuild -runFirstLaunch` needed, so
+# this works when a local Mac can't boot a simulator). Runs the same
+# integration_test screenshot harness used for the original set and uploads the
+# 9 PNGs (raw + renamed to the fastlane 6.9" layout) as artifacts.
+#
+# Trigger:  gh workflow run screenshots.yml   (then `gh run download` the result)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  screenshots:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Select latest Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.4"
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Boot a 6.9" iPhone simulator (1320×2868)
+        id: sim
+        run: |
+          set -euo pipefail
+          # Prefer iPhone 16 Pro Max (exactly 1320×2868); fall back to the
+          # newest available "Pro Max" device type so this survives Xcode bumps.
+          DEVTYPE=$(xcrun simctl list devicetypes \
+            | grep -Eo 'com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro-Max' \
+            | head -1 || true)
+          if [ -z "$DEVTYPE" ]; then
+            DEVTYPE=$(xcrun simctl list devicetypes \
+              | grep -Eo 'com.apple.CoreSimulator.SimDeviceType.iPhone-[0-9]+-Pro-Max' \
+              | tail -1)
+          fi
+          echo "Using device type: $DEVTYPE"
+          UDID=$(xcrun simctl create "screenshot-phone" "$DEVTYPE")
+          echo "UDID=$UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          # Clean, consistent status bar for the listing.
+          xcrun simctl status_bar "$UDID" override \
+            --time "9:41" \
+            --batteryState charged --batteryLevel 100 \
+            --cellularBars 4 --wifiBars 3 || true
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Generate screenshots (flutter drive, all 4 locales)
+        run: |
+          set -euo pipefail
+          UDID="${{ steps.sim.outputs.udid }}"
+          for L in en de fr it; do
+            echo "::group::Locale $L"
+            # Fresh app container each locale so the seed doesn't accumulate.
+            xcrun simctl uninstall "$UDID" ch.knabberfuchs.app || true
+            flutter drive \
+              --driver=test_driver/integration_test.dart \
+              --target=integration_test/screenshots_test.dart \
+              --dart-define=LOCALE=$L \
+              -d "$UDID"
+            echo "::endgroup::"
+          done
+
+      - name: Verify + stage to fastlane 6.9" layout
+        run: |
+          set -euo pipefail
+          for L in en de fr it; do
+            case $L in
+              en) D=en-US;; de) D=de-DE;; fr) D=fr-FR;; it) D=it;;
+            esac
+            echo "=== $L → $D ==="
+            ls -la "screenshots/$L/" || { echo "::warning::no screenshots for $L"; continue; }
+            for f in screenshots/$L/*.png; do
+              echo -n "  $(basename "$f"): "
+              sips -g pixelWidth -g pixelHeight "$f" | awk '/pixel/{printf "%s ", $2} END{print ""}'
+            done
+            mkdir -p "fastlane/screenshots/$D"
+            # Drop the stale set, then copy the fresh ones with the iphone69_
+            # prefix (deliver maps 1320×2868 to the 6.9" slot; prefix orders).
+            rm -f "fastlane/screenshots/$D"/iphone69_*.png
+            for f in screenshots/$L/*.png; do
+              cp "$f" "fastlane/screenshots/$D/iphone69_$(basename "$f")"
+            done
+            COUNT=$(ls "screenshots/$L"/*.png 2>/dev/null | wc -l | tr -d ' ')
+            echo "  $L: $COUNT screenshots"
+            [ "$COUNT" -lt 9 ] && echo "::warning::$L expected 9, got $COUNT" || true
+          done
+          echo "=== staged tree ==="
+          find fastlane/screenshots -name 'iphone69_*.png' | sort
+
+      - name: Upload screenshots artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appstore-screenshots
+          path: |
+            screenshots/**/*.png
+            fastlane/screenshots/*/iphone69_*.png
+          if-no-files-found: warn
