@@ -289,6 +289,16 @@ void main() {
       return tapText(text);
     }
 
+    // Pump until a label shows up (e.g. a sheet that's still animating in or a
+    // classifier result that hasn't resolved). Returns false if it never does.
+    Future<bool> waitText(String text, {int tries = 40}) async {
+      for (var i = 0; i < tries; i++) {
+        if (find.text(text).evaluate().isNotEmpty) return true;
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      return false;
+    }
+
     // The marketing set. Each step pops back to the bare tab shell first so a
     // leftover route can't bleed into the next shot.
 
@@ -360,26 +370,20 @@ void main() {
     } catch (_) {}
 
     // 9. Recognise a meal — the injected photo drives the on-device classifier;
-    // capture the guess sheet ("Looks like…" + ranked dishes).
+    // capture the guess sheet ("Looks like…" + ranked dishes). The capture sheet
+    // can be mid-animation when we reach for it, so wait for the item and retry
+    // a couple of times rather than racing it.
     try {
-      await popToHome();
-      await tab(0);
-      debugPrint('SS9: day fabs=${find.byType(FloatingActionButton).evaluate().length}');
-      await tapFab('dayCapture');
-      debugPrint('SS9: after fab — scanAi="${l10n().captureScanAi}" '
-          'found=${find.text(l10n().captureScanAi).evaluate().length} '
-          'quickAdd=${find.text(l10n().quickAdd).evaluate().length} '
-          'listTiles=${find.byType(ListTile).evaluate().length}');
-      await binding.takeScreenshot('$loc/09_DIAG');
-      if (await tapText(l10n().captureScanAi)) {
-        for (var i = 0; i < 60; i++) {
-          if (find.text(l10n().recognizeLooksLike).evaluate().isNotEmpty) break;
-          await tester.pump(const Duration(milliseconds: 200));
-        }
+      for (var attempt = 0; attempt < 3; attempt++) {
+        await popToHome();
+        await tab(0);
+        await tapFab('dayCapture');
+        if (!await waitText(l10n().captureScanAi)) continue;
+        if (!await tapText(l10n().captureScanAi)) continue;
+        final got = await waitText(l10n().recognizeLooksLike, tries: 80);
         await shot('09_recognize');
+        if (got) break;
       }
-    } catch (e, st) {
-      debugPrint('SS9 ERR: $e\n$st');
-    }
+    } catch (_) {}
   });
 }
