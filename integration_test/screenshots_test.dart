@@ -222,9 +222,14 @@ void main() {
       await binding.convertFlutterSurfaceToImage();
     }
 
+    // The HomeShell element, even when a full-screen route has pushed it
+    // offstage (the default finder skips offstage widgets — which silently
+    // broke popToHome once the add-food screen was on top).
+    Element homeCtx() =>
+        tester.element(find.byType(HomeShell, skipOffstage: false).first);
+
     // Localized labels for the active locale, read from the live widget tree.
-    AppLocalizations l10n() =>
-        AppLocalizations.of(tester.element(find.byType(HomeShell).first));
+    AppLocalizations l10n() => AppLocalizations.of(homeCtx());
 
     Future<void> shot(String name) async {
       await settle(tester);
@@ -241,8 +246,7 @@ void main() {
     // shell — otherwise a leftover route (e.g. the add-food screen) covers the
     // next screenshot, which is exactly how the non-English sets got corrupted.
     Future<void> popToHome() async {
-      final ctx = tester.element(find.byType(HomeShell).first);
-      Navigator.of(ctx).popUntil((r) => r.isFirst);
+      Navigator.of(homeCtx()).popUntil((r) => r.isFirst);
       await settle(tester);
     }
 
