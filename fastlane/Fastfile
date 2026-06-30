@@ -70,6 +70,7 @@ platform :ios do
   lane :listing do
     upload_to_app_store(
       api_key: asc_key,
+      app_version: ENV["ASC_APP_VERSION"], # target/create this editable version (nil = auto)
       metadata_path: "fastlane/metadata/ios",
       skip_binary_upload: true,
       skip_screenshots: true,
@@ -84,6 +85,7 @@ platform :ios do
   lane :screenshots do
     upload_to_app_store(
       api_key: asc_key,
+      app_version: ENV["ASC_APP_VERSION"], # target/create this editable version (nil = auto)
       screenshots_path: "fastlane/screenshots",
       metadata_path: "fastlane/metadata/ios", # avoids scanning the default path's ios/android subdirs
       skip_binary_upload: true,
