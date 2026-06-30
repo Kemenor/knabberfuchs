@@ -1,1 +1,1 @@
-Prima versione iOS di Knabberfuchs Conta calorie senza pubblicità né abbonamento – codice a barre, foto IA, ricette, offline. Grazie per il test!
+La prima versione di Knabberfuchs: conta calorie senza pubblicità né abbonamento. Scansiona codici a barre, riconosci i pasti con foto IA, salva ricette e cerca offline — senza account, e i tuoi dati restano sul telefono.

@@ -1,1 +1,1 @@
-First iOS release of Knabberfuchs Ad-free, no-subscription calorie tracking — barcode scan, AI meal photos, recipes, offline. Thanks for testing!
+The first release of Knabberfuchs: ad-free, no-subscription calorie tracking. Scan barcodes, recognise meals from AI photos, save recipes, and search offline — no account, and your data stays on your phone.
