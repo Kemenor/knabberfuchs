@@ -14,7 +14,7 @@ on:
 jobs:
   screenshots:
     runs-on: macos-26
-    timeout-minutes: 40
+    timeout-minutes: 70
     steps:
       - uses: actions/checkout@v5
 
@@ -31,6 +31,23 @@ jobs:
 
       - name: Flutter pub get
         run: flutter pub get
+
+      - name: Ensure Rosetta (run x86_64 simulator build on Apple Silicon)
+        run: sudo softwareupdate --install-rosetta --agree-to-license || true
+
+      - name: Force x86_64 simulator build (Google ML Kit has no arm64-sim slice)
+        # MLImage.framework (google_mlkit_text_recognition) ships only
+        # arm64-device + x86_64-sim, so an arm64 simulator can't link it.
+        # Build the sim app as x86_64 and run it under Rosetta. Ephemeral —
+        # touches only this CI checkout, so local dev / the device build are
+        # unaffected.
+        run: |
+          set -euo pipefail
+          # Pods: exclude arm64 for the simulator SDK (inserted into post_install).
+          perl -0pi -e 's/(flutter_additional_ios_build_settings\(target\))/$1\n      target.build_configurations.each { |c| c.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64" }/' ios/Podfile
+          # Runner: same, via the Debug xcconfig it inherits.
+          printf '\nEXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64\n' >> ios/Flutter/Debug.xcconfig
+          echo "--- Podfile post_install ---"; grep -n 'EXCLUDED_ARCHS' ios/Podfile ios/Flutter/Debug.xcconfig
 
       - name: Boot a 6.9" iPhone simulator (1320×2868)
         id: sim
