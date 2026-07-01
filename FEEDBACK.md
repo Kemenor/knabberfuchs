@@ -128,3 +128,90 @@ tracks tester-driven changes specifically.
     Atkinson Hyperlegible and OpenDyslexic fonts) and rounded icons;
   - first-class **dark mode**, including a fix for dark-mode header icons that rendered
     near-invisible. (Redesign commit series `896fb1b`…`d13ef7a`.)
+
+## Feedback (2026-07-01)
+
+- 📝 **Edit a custom food** — no decision yet. Once a custom food is created there's no
+  way to go back and fix/update it — only create-new exists today.
+  - `lib/ui/food/food_form_screen.dart:24-30` (`FoodFormScreen` ctor takes only `barcode`,
+    no edit mode), `lib/data/repositories/food_repository.dart:154` (`createFood(...)`
+    only, no `updateFood`), `lib/ui/food/food_search_list.dart:208,234-246` (tile tap
+    picks/logs the food, no edit affordance).
+  - **📝 decision:** where does edit live — a long-press/overflow menu on the food list
+    tile, or tucked under Settings as the tester suggested? Leaning: overflow menu on the
+    food tile (consistent with `PopupMenuButton` convention in `DESIGN_SYSTEM.md`), since
+    Settings is a poor discovery path for a per-food action.
+
+- 📝 **Make tracked nutrients switchable, starting with fiber** — no decision yet. Fiber
+  is captured per-food (`fiber100`, `lib/data/db/tables.dart:41`) but isn't part of the
+  target/goals system, so it never surfaces as something a user can track against.
+  - `lib/domain/day_summary.dart:56` — `enum TargetMetric { kcal, protein, carb, fat }`,
+    no fiber. `lib/data/db/tables.dart:121-124` (Targets table) has no fiber columns.
+    `lib/ui/settings/targets_screen.dart:66-104` wires protein/carb/fat rows only.
+  - Tester's framing: rather than just bolting on fiber, make the whole target list
+    **user-configurable** (pick which nutrients you care about tracking), not a fixed
+    kcal/P/C/F set.
+  - **📝 decision:** minimal fix (add fiber as a 5th fixed `TargetMetric`) vs. the bigger
+    ask (a settings toggle list for which nutrients get a target row at all). Latter is
+    more work but is what was actually requested and generalizes to future nutrients.
+
+- 📝 **Split fat into saturated vs. unsaturated in the overview/trends** — no decision
+  yet. Saturated fat is captured per-food (`satFat100`, `tables.dart:42`) but only folds
+  into the total fat number downstream — never aggregated/shown separately.
+  - `lib/ui/day/day_screen.dart:396` (`_macro(context, TargetMetric.fat, ...)` — one
+    aggregate number), `:618` (`fat100: e.entry.sFat100` aggregation point),
+    `lib/domain/day_summary.dart:18`. `lib/ui/trends/trends_screen.dart` reuses the same
+    `TargetMetric` enum, so no saturates series exists for the chart either.
+  - Same shape as the fiber ask: needs `TargetMetric` (or a parallel concept) extended to
+    carry a saturates split, plus Day-card and Trends UI to show it.
+
+- 📝 **Daily hint/recommendation for targets** — no decision yet. Tester flagged the
+  nagging risk themselves — a proactive daily recommendation prompt could feel pushy, so
+  lean towards a passive **hint in the Targets settings screen** instead (e.g. "most
+  adults aim for ~X g protein/day") rather than a runtime nudge.
+  - `lib/ui/settings/targets_screen.dart:16` (`TargetsScreen`), per-metric blocks at
+    `:64-104`, `_MetricTargets`/`_TargetRow` widgets at `:117,197` — a subtitle/hint text
+    would slot in per metric block or once near the top of the screen.
+  - **📝 decision:** static hint copy per metric vs. no hint at all (defer). No agreement
+    yet on wording or whether it's worth the l10n surface (×4 locales) for a "maybe
+    nagging" feature.
+
+- 📝 **Health Connect: full resync / clear-data-for-days button** — no decision yet.
+  Sync today is automatic push-only with no manual control beyond the on/off switch.
+  - `lib/data/health/health_service.dart:8` ("write-only... no-op until enabled"),
+    trigger is `ref.listen(selectedDayEntriesProvider, ...)` in
+    `lib/ui/day/day_screen.dart:59-65` (fires on entry changes only — no manual trigger).
+    `lib/ui/settings/settings_screen.dart:112-127` — only a `SwitchListTile` exists.
+    `deleteAll()` (`health_service.dart:111-121`) wipes everything and is only invoked
+    when the feature is toggled off — no per-day granularity.
+  - Tester wants: a **"resync"/"full sync" button** to push all days again, plus a way to
+    **clear synced data for specific days** and re-push them (useful after fixing a
+    logging mistake that already synced wrong numbers to Health Connect).
+  - **📝 decision:** scope of a first pass — global "resync everything" button only, or
+    also per-day clear+resync (needs a day picker / range picker UI)?
+
+- 📝 **Read calories burned from Health Connect (adjust the daily budget by exercise)**
+  — no decision yet. A tester sent a screenshot of Health Connect's Android developer
+  docs listing three record types: `ActiveCaloriesBurnedRecord` (energy burned by
+  workouts/activity, excludes BMR), `TotalCaloriesBurnedRecord` (active + BMR, i.e.
+  TDEE for the window), and `BasalMetabolicRateRecord` (resting energy cost as a
+  `rateKcalPerDay` power rating).
+  - **Why these numbers:** today `HealthService` is **write-only** — it only pushes
+    logged nutrition to Health Connect and never reads anything back
+    (`lib/data/health/health_service.dart:8`, `_types` only covers
+    `NUTRITION`/dietary-* at `:24-31`, no read permissions requested). The kcal target
+    is a static min/max the user sets once (`TargetMetric.kcal`,
+    `lib/ui/day/day_screen.dart:294`; `Targets` table, `lib/data/db/tables.dart:121-124`)
+    — it doesn't move with how much the user actually burned that day. Reading these
+    three record types is the standard way calorie-counting apps (MyFitnessPal, Lose
+    It, Cronometer) do **"eat back your exercise calories"**: a smartwatch/fitness app
+    writes active-energy/TDEE/BMR into Health Connect over the day, and the tracker
+    adds that to (or replaces) the static target so "remaining" reflects actual burn,
+    not just a fixed budget.
+  - The `health` package (pubspec.yaml:55, v13.3.1) already exposes the matching Dart
+    types (`HealthDataType.ACTIVE_ENERGY_BURNED`, `TOTAL_CALORIES_BURNED`,
+    `BASAL_ENERGY_BURNED`) — no new dependency needed, just read permissions + a query.
+  - **📝 decision:** which record to key off (active-only add-on vs. full TDEE
+    replacing BMR-based static target), and whether this is opt-in (separate toggle
+    from the existing write-sync switch, since it's a new read-permission grant) or
+    folds into the current Health Connect setting.
