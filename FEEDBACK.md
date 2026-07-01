@@ -215,3 +215,19 @@ tracks tester-driven changes specifically.
     replacing BMR-based static target), and whether this is opt-in (separate toggle
     from the existing write-sync switch, since it's a new read-permission grant) or
     folds into the current Health Connect setting.
+
+- 📝 **Merge two meal groups into one** — no decision yet. There's already a per-meal
+  overflow menu with scale and **split** actions, but no inverse "merge" action.
+  - `lib/ui/day/day_screen.dart:518-550` — `PopupMenuButton` per meal group with
+    `edit` / `scale` (`showScaleMealSheet`, `lib/ui/day/scale_meal_sheet.dart:12`) /
+    `split` (`showSplitMealSheet`, `lib/ui/day/split_meal_sheet.dart:14`) / `recipe` /
+    `delete`. Groups are ad-hoc (`GroupView`, keyed by `group.id`,
+    `lib/ui/day/day_screen.dart:454,462-463`), not fixed slots — a tester can end up
+    with e.g. two separate "Snack" groups on the same day and no way to combine them.
+  - `deleteEntryGroup` (`lib/data/repositories/diary_repository.dart:134`) already
+    removes a group + its entries — a merge would look like: move all entries from
+    group B into group A, then delete group B the same way `split` breaks one group's
+    entries out into a second (`split_meal_sheet.dart`), just in reverse.
+  - **📝 decision:** how does the user pick which two groups to merge — a "merge into…"
+    entry in the overflow menu that opens a picker of the day's other groups, or a
+    drag-and-drop/long-press gesture on the day list?
