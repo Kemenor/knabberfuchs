@@ -189,3 +189,29 @@ tracks tester-driven changes specifically.
     logging mistake that already synced wrong numbers to Health Connect).
   - **📝 decision:** scope of a first pass — global "resync everything" button only, or
     also per-day clear+resync (needs a day picker / range picker UI)?
+
+- 📝 **Read calories burned from Health Connect (adjust the daily budget by exercise)**
+  — no decision yet. A tester sent a screenshot of Health Connect's Android developer
+  docs listing three record types: `ActiveCaloriesBurnedRecord` (energy burned by
+  workouts/activity, excludes BMR), `TotalCaloriesBurnedRecord` (active + BMR, i.e.
+  TDEE for the window), and `BasalMetabolicRateRecord` (resting energy cost as a
+  `rateKcalPerDay` power rating).
+  - **Why these numbers:** today `HealthService` is **write-only** — it only pushes
+    logged nutrition to Health Connect and never reads anything back
+    (`lib/data/health/health_service.dart:8`, `_types` only covers
+    `NUTRITION`/dietary-* at `:24-31`, no read permissions requested). The kcal target
+    is a static min/max the user sets once (`TargetMetric.kcal`,
+    `lib/ui/day/day_screen.dart:294`; `Targets` table, `lib/data/db/tables.dart:121-124`)
+    — it doesn't move with how much the user actually burned that day. Reading these
+    three record types is the standard way calorie-counting apps (MyFitnessPal, Lose
+    It, Cronometer) do **"eat back your exercise calories"**: a smartwatch/fitness app
+    writes active-energy/TDEE/BMR into Health Connect over the day, and the tracker
+    adds that to (or replaces) the static target so "remaining" reflects actual burn,
+    not just a fixed budget.
+  - The `health` package (pubspec.yaml:55, v13.3.1) already exposes the matching Dart
+    types (`HealthDataType.ACTIVE_ENERGY_BURNED`, `TOTAL_CALORIES_BURNED`,
+    `BASAL_ENERGY_BURNED`) — no new dependency needed, just read permissions + a query.
+  - **📝 decision:** which record to key off (active-only add-on vs. full TDEE
+    replacing BMR-based static target), and whether this is opt-in (separate toggle
+    from the existing write-sync switch, since it's a new read-permission grant) or
+    folds into the current Health Connect setting.
