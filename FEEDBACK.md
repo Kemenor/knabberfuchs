@@ -138,6 +138,12 @@ tracks tester-driven changes specifically.
   `FoodRepository.updateFood` → `updateFoodById` (keyed by id, so barcode edits update the
   row instead of upserting a duplicate). Diary entries keep their logged snapshots by
   design. Tests in `test/food_update_test.dart`.
+  - Follow-up same day: the ⋮ menu also gained **Delete** (confirm dialog, recipes-style).
+    Safe by schema: entries `foodId` is set-null + snapshots, recipe items snapshot
+    everything, OCR mappings cascade. Swipe actions were considered and rejected — the
+    search list mixes sources, so only custom rows would respond, breaking the uniform
+    swipe grammar of the diary/recipes lists; a future custom-only "My foods" screen
+    would be the right home for swipes.
 
 - ⏳ **Make tracked nutrients switchable, starting with fiber** — decided 2026-07-02:
   do the tester's bigger ask (user-configurable target list), **not** a fiber bolt-on,

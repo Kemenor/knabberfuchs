@@ -212,6 +212,7 @@
   "captureScanAiSub": "Fotografiere ein Gericht — wir schätzen es und die Kalorien",
   "foodFormTitle": "Neues Lebensmittel",
   "foodFormEditTitle": "Lebensmittel bearbeiten",
+  "foodDeleteConfirm": "„{name}“ löschen?",
   "barcodeField": "Barcode (optional)",
   "settingsAi": "KI-Erkennung",
   "aiKeyDesc": "Fotos werden standardmäßig auf deinem Gerät erkannt. Füge einen Google-Gemini-API-Schlüssel hinzu für genauere Ergebnisse und Portionsschätzungen. Dein Foto wird dann an Google gesendet. Geminis kostenloser Tarif reicht für den privaten Gebrauch; wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen. Im kostenlosen Tarif kann Google deine Fotos zur Verbesserung seiner Modelle verwenden.",

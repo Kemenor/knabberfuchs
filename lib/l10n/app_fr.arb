@@ -212,6 +212,7 @@
   "captureScanAiSub": "Photographiez un plat — on devine le plat et les calories",
   "foodFormTitle": "Nouvel aliment",
   "foodFormEditTitle": "Modifier l'aliment",
+  "foodDeleteConfirm": "Supprimer « {name} » ?",
   "barcodeField": "Code-barres (facultatif)",
   "settingsAi": "Reconnaissance par IA",
   "aiKeyDesc": "Les photos sont reconnues sur votre téléphone par défaut. Ajoutez une clé API Google Gemini pour des résultats plus précis et des estimations de portions. Votre photo est alors envoyée à Google. L'offre gratuite de Gemini suffit pour un usage personnel ; si vous avez activé la facturation sur votre compte Google, une utilisation intensive peut entraîner des frais. Dans l'offre gratuite, Google peut utiliser vos photos pour améliorer ses modèles.",

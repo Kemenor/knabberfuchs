@@ -125,6 +125,31 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
     if (updated != null && mounted) _runLocal(_query);
   }
 
+  /// Confirm, then delete this custom food. Logged entries and recipes keep
+  /// their snapshots, so only the catalog row disappears.
+  Future<void> _deleteFood(Food food) async {
+    final l10n = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.foodDeleteConfirm(food.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.actionDelete),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    await ref.read(foodRepositoryProvider).deleteFood(food.id);
+    if (mounted) _runLocal(_query);
+  }
+
   List<Food> get _merged {
     // Same identity key as FoodRepository.searchLocal: pack results all carry
     // the synthetic id 0, so deduping on raw ids would collapse them into one.
@@ -216,14 +241,15 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
                       );
                     }
                     final food = results[i];
+                    // Only persisted custom foods are editable (pack rows
+                    // carry the synthetic id 0 until first use).
+                    final isCustom =
+                        food.source == FoodSource.custom && food.id != 0;
                     return _FoodTile(
                       food: food,
                       onTap: () => widget.onPick(food),
-                      // Only persisted custom foods are editable (pack rows
-                      // carry the synthetic id 0 until first use).
-                      onEdit: food.source == FoodSource.custom && food.id != 0
-                          ? () => _editFood(food)
-                          : null,
+                      onEdit: isCustom ? () => _editFood(food) : null,
+                      onDelete: isCustom ? () => _deleteFood(food) : null,
                     );
                   },
                 ),
@@ -237,7 +263,13 @@ class _FoodTile extends StatelessWidget {
   final Food food;
   final VoidCallback onTap;
   final VoidCallback? onEdit;
-  const _FoodTile({required this.food, required this.onTap, this.onEdit});
+  final VoidCallback? onDelete;
+  const _FoodTile({
+    required this.food,
+    required this.onTap,
+    this.onEdit,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -265,12 +297,21 @@ class _FoodTile extends StatelessWidget {
             textAlign: TextAlign.right,
             style: Theme.of(context).textTheme.bodySmall,
           ),
-          if (onEdit != null)
+          if (onEdit != null || onDelete != null)
             PopupMenuButton<String>(
               icon: const Icon(Symbols.more_vert_rounded, size: 20),
-              onSelected: (_) => onEdit!(),
+              onSelected: (v) => switch (v) {
+                'edit' => onEdit!(),
+                _ => onDelete!(),
+              },
               itemBuilder: (_) => [
-                PopupMenuItem(value: 'edit', child: Text(l10n.actionEdit)),
+                if (onEdit != null)
+                  PopupMenuItem(value: 'edit', child: Text(l10n.actionEdit)),
+                if (onDelete != null)
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Text(l10n.actionDelete),
+                  ),
               ],
             ),
         ],

@@ -212,6 +212,7 @@
   "captureScanAiSub": "Fotografa un piatto — indoviniamo piatto e calorie",
   "foodFormTitle": "Nuovo alimento",
   "foodFormEditTitle": "Modifica alimento",
+  "foodDeleteConfirm": "Eliminare “{name}”?",
   "barcodeField": "Codice a barre (facoltativo)",
   "settingsAi": "Riconoscimento IA",
   "aiKeyDesc": "Le foto vengono riconosciute sul telefono per impostazione predefinita. Aggiungi una chiave API Google Gemini per risultati più precisi e stime delle porzioni. La foto viene quindi inviata a Google. Il piano gratuito di Gemini è sufficiente per l'uso personale; se hai attivato la fatturazione sul tuo account Google, un uso intenso può comportare costi. Nel piano gratuito Google può usare le tue foto per migliorare i propri modelli.",

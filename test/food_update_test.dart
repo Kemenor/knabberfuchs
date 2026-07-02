@@ -3,6 +3,7 @@ import 'package:calorie_tracker/data/offline/region_pack_store.dart';
 import 'package:calorie_tracker/data/repositories/food_repository.dart';
 import 'package:calorie_tracker/data/sources/off_api.dart';
 import 'package:calorie_tracker/domain/enums.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -63,6 +64,28 @@ void main() {
       // A re-scan of the new barcode finds the edited food.
       final hit = await db.foodByExternal(FoodSource.custom, '7610000000001');
       expect(hit?.id, food.id);
+    });
+
+    test('deleteFood unlinks logged entries but keeps their snapshots', () async {
+      final food = await repo.createFood(name: 'Zopf', kcal100: 320);
+      await db.addEntry(
+        EntriesCompanion.insert(
+          day: '2026-07-01',
+          mealType: MealType.breakfast,
+          grams: 80,
+          foodId: Value(food.id),
+          sName: food.name,
+          sKcal100: food.kcal100,
+        ),
+      );
+
+      await repo.deleteFood(food.id);
+
+      expect(await db.foodById(food.id), isNull);
+      final entry = (await db.allEntries()).single;
+      expect(entry.foodId, isNull); // FK set-null, not cascade
+      expect(entry.sName, 'Zopf');
+      expect(entry.sKcal100, 320);
     });
 
     test('diary snapshots are untouched by a later edit', () async {
