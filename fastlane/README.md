@@ -68,6 +68,14 @@ Push App Store listing text (no binary, no screenshots) — staged, not submitte
 
 Replace the App Store screenshots with the repo set (overwrites all — fixes dupes)
 
+### ios release
+
+```sh
+[bundle exec] fastlane ios release
+```
+
+Submit an uploaded TestFlight build for App Store review (auto-release on approval)
+
 ### ios validate
 
 ```sh
