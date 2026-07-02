@@ -15,8 +15,12 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Install DuckDB CLI
+        # Pinned so a weekly run can't pick up a new DuckDB unreviewed; bump
+        # deliberately (with the pip duckdb below) alongside a planned republish.
+        env:
+          DUCKDB_VERSION: v1.5.4
         run: |
-          curl -fsSL https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-amd64.zip -o /tmp/duckdb.zip
+          curl -fsSL "https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/duckdb_cli-linux-amd64.zip" -o /tmp/duckdb.zip
           unzip -o /tmp/duckdb.zip -d /tmp
           sudo mv /tmp/duckdb /usr/local/bin/
           duckdb --version
@@ -26,7 +30,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python deps
-        run: pip install --quiet huggingface_hub duckdb pycountry
+        run: pip install --quiet huggingface_hub==1.21.0 duckdb==1.5.4 pycountry==26.2.16
 
       - name: Verify Python sqlite has FTS5
         run: python -c "import sqlite3; sqlite3.connect(':memory:').execute('CREATE VIRTUAL TABLE t USING fts5(x)'); print('fts5 ok')"

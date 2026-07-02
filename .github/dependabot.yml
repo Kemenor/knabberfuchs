@@ -1,0 +1,13 @@
+# Keeps the SHA-pinned actions in .github/workflows/ up to date (Dependabot
+# bumps the pinned commit and the trailing version comment together).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: pub
+    directory: "/"
+    schedule:
+      interval: monthly
