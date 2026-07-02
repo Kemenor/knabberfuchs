@@ -18,18 +18,27 @@ distrobox enter flutter -- bash -lc 'flutter <cmd>'
   the key into `app_de/fr/it.arb`. `generate: true` regenerates `AppLocalizations`
   on build, or run `flutter gen-l10n`. Config: `l10n.yaml`.
 - **Run on device/emulator:** `flutter run` (emulator restart needs `-gpu host`).
-- **Release flow (CI, the normal path):** bump `version:` in `pubspec.yaml`
-  (`x.y.z+buildNumber`) → add a one-line changelog at
-  `fastlane/metadata/android/<locale>/changelogs/<buildNumber>.txt` for all four
-  locales → push a `vX.Y.Z` tag (must match pubspec — CI asserts it). The tag
-  triggers `.github/workflows/android.yml` (analyze+test gate → signed AAB →
-  *completed* release on both Play closed-testing tracks) and `ios.yml`
-  (analyze+test gate → TestFlight). Manual fallback:
+- **Release flow (CI, the normal path):** write the four changelogs at
+  `fastlane/metadata/android/<locale>/changelogs/<nextBuildNumber>.txt`, then
+  `tool/cut_release.sh x.y.z` — it verifies tree/changelogs/CI, bumps pubspec,
+  tags `vX.Y.Z` and pushes. The tag triggers `.github/workflows/android.yml`
+  (analyze+test gate → signed AAB → *completed* release on both Play
+  closed-testing tracks) and `ios.yml` (analyze+test gate → TestFlight).
+  **App Store production:** once the build is on TestFlight, update
+  `fastlane/metadata/ios/*/release_notes.txt` and run
+  `gh workflow run ios-release.yml -f version=x.y.z -f build_number=N` —
+  submits for review, **auto-releases on approval**. Manual fallback:
   `flutter build appbundle --release` → `python3 tool/play_upload_aab.py <track>`
   (track(s) as positional args, e.g. `internal`; AAB path hardcoded in the
   script). Status: Android in Play closed testing; iOS **live on the App Store**.
   The CI Flutter version is single-sourced in `.fvmrc` (all workflows read it via
   `flutter-version-file`); bump it together with the goldens (see `test.yml`).
+- **Store screenshots (local):** `tool/screenshots.sh android|ios [locales]` runs
+  the `integration_test/screenshots_test.dart` harness (the single shot list,
+  ≤10 scenes ×4 locales) against the first adb device / booted simulator and
+  files the PNGs into the fastlane layouts; upload with `fastlane android
+  listing` / `fastlane ios screenshots`. `screenshots.yml` stays as a
+  dispatch-only CI fallback for iOS.
 - **Secrets:** keep the app keyless by default; never commit API keys. Keystore,
   `key.properties`, `play-store-key.json` are gitignored.
 
