@@ -16,6 +16,16 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Fail configuration with a pointed message on a partial key.properties instead
+// of an opaque NPE from a bare `as String` cast.
+fun keystoreProperty(name: String): String =
+    keystoreProperties.getProperty(name)
+        ?: throw GradleException(
+            "android/key.properties is missing '$name' — it must define " +
+                "keyAlias, keyPassword, storeFile and storePassword " +
+                "for release signing."
+        )
+
 android {
     namespace = "ch.knabberfuchs.app"
     compileSdk = flutter.compileSdkVersion
@@ -39,10 +49,10 @@ android {
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             create("release") {
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-                storeFile = file(keystoreProperties["storeFile"] as String)
-                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperty("keyAlias")
+                keyPassword = keystoreProperty("keyPassword")
+                storeFile = file(keystoreProperty("storeFile"))
+                storePassword = keystoreProperty("storePassword")
             }
         }
     }
@@ -51,10 +61,16 @@ android {
         release {
             // Sign with the upload key when key.properties is present, otherwise
             // fall back to debug so local `flutter run --release` still works.
-            signingConfig = if (keystorePropertiesFile.exists())
+            signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
-            else
+            } else {
+                logger.warn(
+                    "WARNING: android/key.properties not found — release " +
+                        "artifacts will be DEBUG-SIGNED and rejected by the " +
+                        "Play Store. Fine for local `flutter run --release`."
+                )
                 signingConfigs.getByName("debug")
+            }
             // Keep R8 off: it strips the reflection-heavy CameraX/ML Kit classes
             // mobile_scanner needs at runtime ("Couldn't start the camera" in
             // release only). The APK is dominated by bundled ML models, so the

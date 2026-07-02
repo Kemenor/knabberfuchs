@@ -29,8 +29,15 @@ class HealthService {
           h.HealthDataType.DIETARY_FATS_CONSUMED,
         ]
       : const [h.HealthDataType.NUTRITION];
-  static final List<h.HealthDataAccess> _perms =
-      List.filled(_types.length, h.HealthDataAccess.READ_WRITE);
+  // Android needs only WRITE: Health Connect deletes our own records by time
+  // range without a read grant. iOS must keep READ_WRITE — the plugin's
+  // delete() runs an HKSampleQuery, which needs read authorization; WRITE-only
+  // would make every re-sync silently duplicate meals instead of replacing
+  // them.
+  static final List<h.HealthDataAccess> _perms = List.filled(
+    _types.length,
+    Platform.isIOS ? h.HealthDataAccess.READ_WRITE : h.HealthDataAccess.WRITE,
+  );
 
   Future<void> _ensureConfigured() async {
     if (_configured) return;
@@ -66,7 +73,9 @@ class HealthService {
     final now = DateTime.now();
     final d = DateTime.parse(day); // 'YYYY-MM-DD' -> local midnight
     final start = DateTime(d.year, d.month, d.day);
-    final end = start.add(const Duration(days: 1));
+    // Next calendar midnight, not +24 h: a 25 h DST day would leave its last
+    // hour outside the delete window and duplicate entries on re-sync.
+    final end = DateTime(d.year, d.month, d.day + 1);
     try {
       for (final t in _types) {
         await _health.delete(type: t, startTime: start, endTime: end);
