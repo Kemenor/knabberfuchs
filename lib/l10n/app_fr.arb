@@ -161,6 +161,11 @@
   "settingsHealthResync": "Resynchroniser tous les jours",
   "settingsHealthResyncSub": "Effacer les données de cette app dans {store}, puis réécrire tout le journal",
   "healthResyncDone": "Resynchronisé avec {store}.",
+  "settingsHealthEnergyRead": "Ajuster le budget selon l'activité",
+  "settingsHealthEnergyReadSub": "Ajoute vos calories actives de {store} à l'objectif calorique quotidien",
+  "healthEnergyReadOn": "Ajustement d'activité activé.",
+  "activityBonus": "+{kcal} kcal d'activité",
+  "trendsActivityNote": "La bande d'objectif n'inclut pas les ajustements d'activité.",
 
   "backupExportFailed": "Échec de l'export : {error}",
   "backupFileType": "Sauvegarde",

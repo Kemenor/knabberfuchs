@@ -504,6 +504,26 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get settingsHealthEnergyRead => 'Ajuster le budget selon l\'activité';
+
+  @override
+  String settingsHealthEnergyReadSub(String store) {
+    return 'Ajoute vos calories actives de $store à l\'objectif calorique quotidien';
+  }
+
+  @override
+  String get healthEnergyReadOn => 'Ajustement d\'activité activé.';
+
+  @override
+  String activityBonus(String kcal) {
+    return '+$kcal kcal d\'activité';
+  }
+
+  @override
+  String get trendsActivityNote =>
+      'La bande d\'objectif n\'inclut pas les ajustements d\'activité.';
+
+  @override
   String backupExportFailed(String error) {
     return 'Échec de l\'export : $error';
   }

@@ -161,6 +161,11 @@
   "settingsHealthResync": "Alle Tage neu synchronisieren",
   "settingsHealthResyncSub": "Daten dieser App in {store} löschen und das ganze Tagebuch neu schreiben",
   "healthResyncDone": "Neu mit {store} synchronisiert.",
+  "settingsHealthEnergyRead": "Budget an Aktivität anpassen",
+  "settingsHealthEnergyReadSub": "Addiert deinen Aktivitätsverbrauch aus {store} zum täglichen Kalorienziel",
+  "healthEnergyReadOn": "Aktivitäts-Anpassung aktiv.",
+  "activityBonus": "+{kcal} kcal durch Aktivität",
+  "trendsActivityNote": "Das Zielband berücksichtigt keine Aktivitäts-Anpassungen.",
 
   "backupExportFailed": "Export fehlgeschlagen: {error}",
   "backupFileType": "Backup",
