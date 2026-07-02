@@ -7,6 +7,7 @@ import '../../core/date_label.dart';
 import '../../core/date_x.dart';
 import '../../core/food_icon.dart';
 import '../../core/format.dart';
+import '../../core/metric_labels.dart';
 import '../../core/status_color.dart';
 import '../../domain/day_summary.dart';
 import '../../domain/nutrition.dart' show decodeMicros;
@@ -384,18 +385,38 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-class _MacroRow extends StatelessWidget {
+class _MacroRow extends ConsumerWidget {
   final DaySummary summary;
   const _MacroRow({required this.summary});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    return Row(
+    // The enabled nutrients, in enum order, wrapped into rows of 3 so the
+    // default P/C/F card renders exactly as before and a track-everything
+    // card grows downward. Short rows keep empty thirds for column alignment.
+    final metrics = [
+      for (final m in TargetMetric.values)
+        if (m != TargetMetric.kcal &&
+            (ref.watch(trackedNutrientsProvider).asData?.value ??
+                    defaultTrackedNutrients)
+                .contains(m))
+          m,
+    ];
+    return Column(
       children: [
-        _macro(context, TargetMetric.protein, l10n.macroProtein),
-        _macro(context, TargetMetric.carb, l10n.macroCarbs),
-        _macro(context, TargetMetric.fat, l10n.macroFat),
+        for (var i = 0; i < metrics.length; i += 3) ...[
+          if (i > 0) const SizedBox(height: 12),
+          Row(
+            children: [
+              for (var j = i; j < i + 3; j++)
+                if (j < metrics.length)
+                  _macro(context, metrics[j], metricLabel(l10n, metrics[j]))
+                else
+                  const Expanded(child: SizedBox()),
+            ],
+          ),
+        ],
       ],
     );
   }
