@@ -229,7 +229,7 @@ class _NutritionCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  l10n.recipeServings(servingsStr),
+                  l10n.recipeServings(share.servings),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.outline,
                   ),

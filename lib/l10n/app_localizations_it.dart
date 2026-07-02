@@ -157,6 +157,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get unitKcal => 'kcal';
 
   @override
+  String get unitTsp => 'cucchiaino';
+
+  @override
+  String get unitTbsp => 'cucchiaio';
+
+  @override
+  String get unitCup => 'tazza';
+
+  @override
   String get macroProtein => 'Proteine';
 
   @override
@@ -268,8 +277,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get recipeNew => 'Nuova ricetta';
 
   @override
-  String recipeServings(String count) {
-    return '$count porzioni';
+  String recipeServings(num count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString porzioni',
+      one: '$countString porzione',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -452,6 +471,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String backupExportFailed(String error) {
     return 'Esportazione non riuscita: $error';
   }
+
+  @override
+  String get backupFileType => 'Backup';
 
   @override
   String get backupReplaceTitle => 'Sostituire tutti i dati?';
@@ -857,8 +879,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get shareAsText => 'Condividi come testo';
 
   @override
-  String shareMeta(String ingredients, String servings, String bytes) {
-    return '$ingredients ingredienti · $servings porzioni · $bytes byte';
+  String shareMeta(int ingredients, num servings, String bytes) {
+    final intl.NumberFormat servingsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String servingsString = servingsNumberFormat.format(servings);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      ingredients,
+      locale: localeName,
+      other: '$ingredients ingredienti',
+      one: '$ingredients ingrediente',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      servings,
+      locale: localeName,
+      other: '$servingsString porzioni',
+      one: '$servingsString porzione',
+    );
+    return '$_temp0 · $_temp1 · $bytes byte';
   }
 
   @override

@@ -56,6 +56,9 @@
   "dayEmptyHint": "Tippe auf +, um eine Mahlzeit zu beginnen.\nAlles, was du hinzufügst, fließt hinein, bis du auf ✓ tippst (oder 15 Min. vergehen).",
 
   "unitKcal": "kcal",
+  "unitTsp": "TL",
+  "unitTbsp": "EL",
+  "unitCup": "Tasse",
   "macroProtein": "Protein",
   "macroCarbs": "Kohlenhydrate",
   "macroFat": "Fett",
@@ -90,7 +93,7 @@
   "recipesTitle": "Rezepte",
   "recipesEmpty": "Noch keine Rezepte.\nErstelle eines, um Mahlzeiten wiederzuverwenden, zu teilen oder auf Vorrat zu kochen und auf mehrere Tage aufzuteilen.",
   "recipeNew": "Neues Rezept",
-  "recipeServings": "{count} Portionen",
+  "recipeServings": "{count, plural, one{{count} Portion} other{{count} Portionen}}",
   "recipeImported": "\"{name}\" importiert",
   "qrNotRecipe": "Das ist kein gültiges Rezept.",
 
@@ -150,6 +153,7 @@
   "healthSyncOn": "{store}-Synchronisierung aktiv — heute übertragen.",
 
   "backupExportFailed": "Export fehlgeschlagen: {error}",
+  "backupFileType": "Backup",
   "backupReplaceTitle": "Alle Daten ersetzen?",
   "backupReplaceBody": "Beim Import werden deine aktuellen Einträge, eigenen Lebensmittel, Rezepte, Ziele und Einstellungen durch den Backup-Inhalt ersetzt.",
   "backupRestored": "Backup wiederhergestellt.",
@@ -280,7 +284,7 @@
   "importTextTitle": "Rezept einfügen",
   "importTextHint": "Rezept-Code…",
   "shareAsText": "Als Text teilen",
-  "shareMeta": "{ingredients} Zutaten · {servings} Portionen · {bytes} Bytes",
+  "shareMeta": "{ingredients, plural, one{{ingredients} Zutat} other{{ingredients} Zutaten}} · {servings, plural, one{{servings} Portion} other{{servings} Portionen}} · {bytes} Bytes",
   "shareSubject": "Rezept: {name}",
 
   "ocrNoIngredients": "In diesen Bildern wurden keine Zutaten gefunden.",

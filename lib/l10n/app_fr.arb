@@ -56,6 +56,9 @@
   "dayEmptyHint": "Appuyez sur + pour commencer un repas.\nTout ce que vous ajoutez s'y intègre jusqu'à ce que vous appuyiez sur ✓ (ou après 15 min).",
 
   "unitKcal": "kcal",
+  "unitTsp": "c. à c.",
+  "unitTbsp": "c. à s.",
+  "unitCup": "tasse",
   "macroProtein": "Protéines",
   "macroCarbs": "Glucides",
   "macroFat": "Lipides",
@@ -90,7 +93,7 @@
   "recipesTitle": "Recettes",
   "recipesEmpty": "Aucune recette pour l'instant.\nCréez-en une pour réutiliser des repas, les partager ou cuisiner en grande quantité et répartir sur plusieurs jours.",
   "recipeNew": "Nouvelle recette",
-  "recipeServings": "{count} portions",
+  "recipeServings": "{count, plural, one{{count} portion} other{{count} portions}}",
   "recipeImported": "\"{name}\" importé",
   "qrNotRecipe": "Ce n'est pas une recette valide.",
 
@@ -150,6 +153,7 @@
   "healthSyncOn": "Synchronisation {store} activée — aujourd'hui envoyé.",
 
   "backupExportFailed": "Échec de l'export : {error}",
+  "backupFileType": "Sauvegarde",
   "backupReplaceTitle": "Remplacer toutes les données ?",
   "backupReplaceBody": "L'import remplacera vos entrées actuelles, aliments personnalisés, recettes, objectifs et réglages par le contenu de la sauvegarde.",
   "backupRestored": "Sauvegarde restaurée.",
@@ -280,7 +284,7 @@
   "importTextTitle": "Coller la recette",
   "importTextHint": "Code de la recette…",
   "shareAsText": "Partager en texte",
-  "shareMeta": "{ingredients} ingrédients · {servings} portions · {bytes} octets",
+  "shareMeta": "{ingredients, plural, one{{ingredients} ingrédient} other{{ingredients} ingrédients}} · {servings, plural, one{{servings} portion} other{{servings} portions}} · {bytes} octets",
   "shareSubject": "Recette : {name}",
 
   "ocrNoIngredients": "Aucun ingrédient trouvé dans ces images.",

@@ -79,8 +79,8 @@ class _RecipeShareScreenState extends State<RecipeShareScreen> {
               Text(share.name, style: theme.textTheme.titleMedium),
               Text(
                 l10n.shareMeta(
-                  '${share.items.length}',
-                  share.servings.toStringAsFixed(0),
+                  share.items.length,
+                  share.servings,
                   '${payload.length}',
                 ),
                 style: theme.textTheme.bodySmall,

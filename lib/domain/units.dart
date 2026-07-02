@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+
 /// Amount units for logging. Volume units convert to grams via a density
 /// (g/ml); default 1.0 (water-like) is a reasonable approximation for most
 /// tracked liquids. Entries are always stored in grams — the unit is only an
@@ -5,12 +7,24 @@
 enum AmountUnit { grams, milliliters, teaspoon, tablespoon, cup }
 
 extension AmountUnitX on AmountUnit {
+  /// Canonical English label — locale-independent, for machine output.
+  /// UI code should use [localizedLabel].
   String get label => switch (this) {
     AmountUnit.grams => 'g',
     AmountUnit.milliliters => 'ml',
     AmountUnit.teaspoon => 'tsp',
     AmountUnit.tablespoon => 'tbsp',
     AmountUnit.cup => 'cup',
+  };
+
+  /// Display label: tsp/tbsp/cup are words and localized; g and ml are SI
+  /// symbols, identical across all supported locales.
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    AmountUnit.grams => 'g',
+    AmountUnit.milliliters => 'ml',
+    AmountUnit.teaspoon => l10n.unitTsp,
+    AmountUnit.tablespoon => l10n.unitTbsp,
+    AmountUnit.cup => l10n.unitCup,
   };
 
   /// Milliliters per unit (1 for grams — treated as g directly).

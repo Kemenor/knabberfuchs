@@ -177,7 +177,7 @@ class _MetricTargets extends StatelessWidget {
                 // Localized weekday name (Mon=0…Sun=6); 2024-01-01 was a Monday.
                 label: DateFormat.EEEE(
                   lang,
-                ).format(DateTime(2024, 1, 1).add(Duration(days: wd))),
+                ).format(DateTime(2024, 1, 1 + wd)),
                 keyPrefix: '$keyPrefix-wd$wd',
                 initialMin: weekdayMin(wd),
                 initialMax: weekdayMax(wd),
