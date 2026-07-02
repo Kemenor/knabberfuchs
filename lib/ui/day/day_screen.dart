@@ -837,9 +837,12 @@ class _EntryTile extends ConsumerWidget {
         color: Theme.of(context).colorScheme.errorContainer,
         child: const Icon(Symbols.delete_rounded),
       ),
-      onDismissed: (_) async {
+      // The diary stream redraws the list, so delete here and return false
+      // rather than letting Dismissible remove a row the stream already rebuilt.
+      confirmDismiss: (_) async {
         await ref.read(diaryRepositoryProvider).deleteEntry(view.id);
         await ref.read(dbProvider).pruneEmptyGroups(day);
+        return false;
       },
       child: ListTile(
         dense: true,
