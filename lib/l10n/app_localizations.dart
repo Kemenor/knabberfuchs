@@ -480,6 +480,12 @@ abstract class AppLocalizations {
   /// **'Split across days'**
   String get mealMenuSplit;
 
+  /// Meal overflow menu: move this meal's entries into another meal of the day
+  ///
+  /// In en, this message translates to:
+  /// **'Merge into another meal'**
+  String get mealMenuMerge;
+
   /// Meal overflow menu: scale all amounts by a percentage
   ///
   /// In en, this message translates to:
@@ -882,6 +888,24 @@ abstract class AppLocalizations {
   /// **'{store} sync on — today pushed.'**
   String healthSyncOn(String store);
 
+  /// Settings row: wipe and re-push everything to the health store
+  ///
+  /// In en, this message translates to:
+  /// **'Resync all days'**
+  String get settingsHealthResync;
+
+  /// Subtitle of the resync-all settings row
+  ///
+  /// In en, this message translates to:
+  /// **'Clear this app\'s data in {store}, then write the whole diary again'**
+  String settingsHealthResyncSub(String store);
+
+  /// Snackbar after a full health resync finished
+  ///
+  /// In en, this message translates to:
+  /// **'Resynced to {store}.'**
+  String healthResyncDone(String store);
+
   /// Snackbar when exporting a backup fails
   ///
   /// In en, this message translates to:
@@ -1187,6 +1211,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New food'**
   String get foodFormTitle;
+
+  /// App-bar title of the food form when editing an existing custom food
+  ///
+  /// In en, this message translates to:
+  /// **'Edit food'**
+  String get foodFormEditTitle;
 
   /// Label of the optional barcode field in the food form
   ///
@@ -2015,6 +2045,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Split into {n} days'**
   String splitInto(String n);
+
+  /// Title of the merge-meal sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Merge \"{name}\" into…'**
+  String mergeTitle(String name);
+
+  /// Explainer in the merge-meal sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Move everything in this meal into another meal of the day. This meal is removed.'**
+  String get mergeDescription;
+
+  /// Shown in the merge-meal sheet when the day has no other meal to merge into
+  ///
+  /// In en, this message translates to:
+  /// **'No other meals on this day.'**
+  String get mergeNoOtherMeals;
+
+  /// Snackbar after merging a meal into another
+  ///
+  /// In en, this message translates to:
+  /// **'Merged into \"{name}\".'**
+  String mergedInto(String name);
 
   /// Title of the crop screen for nutrition-table photos
   ///
