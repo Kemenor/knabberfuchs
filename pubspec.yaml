@@ -67,7 +67,7 @@ dependencies:
   url_launcher: ^6.3.2
   package_info_plus: ^8.0.0
   device_info_plus: ^12.1.0
-  image_picker: ^1.2.2
+  image_picker: ^1.2.3
   crop_your_image: ^2.0.0
   image: ^4.9.1
   tflite_flutter: ^0.12.1
