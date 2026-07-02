@@ -102,7 +102,7 @@ class _ScaleSheetState extends ConsumerState<_ScaleSheet> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: _factor == 1.0 ? null : _apply,
+                onPressed: (_factor == 1.0 || _saving) ? null : _apply,
                 child: Text(l10n.scaleMealApply('$_pct')),
               ),
             ),
@@ -112,16 +112,24 @@ class _ScaleSheetState extends ConsumerState<_ScaleSheet> {
     );
   }
 
+  bool _saving = false;
+
   Future<void> _apply() async {
+    if (_saving) return; // guard against a double-tap before the sheet pops
+    setState(() => _saving = true);
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
     final pct = '$_pct';
-    await ref
-        .read(diaryRepositoryProvider)
-        .scaleGroup(groupId: widget.group.group.id, factor: _factor);
-    if (mounted) Navigator.of(context).pop();
-    messenger.showAutoSnackBar(
-      SnackBar(content: Text(l10n.scaleMealDone(pct))),
-    );
+    try {
+      await ref
+          .read(diaryRepositoryProvider)
+          .scaleGroup(groupId: widget.group.group.id, factor: _factor);
+      if (mounted) Navigator.of(context).pop();
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.scaleMealDone(pct))),
+      );
+    } catch (_) {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 }

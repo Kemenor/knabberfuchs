@@ -37,8 +37,13 @@ Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (_) => Center(
-      child: CircularProgressIndicator(semanticsLabel: l10n.a11yAnalysing),
+    // canPop:false blocks the hardware back button too, so the matching
+    // navigator.pop() always closes this dialog, not the screen beneath it.
+    builder: (_) => PopScope(
+      canPop: false,
+      child: Center(
+        child: CircularProgressIndicator(semanticsLabel: l10n.a11yAnalysing),
+      ),
     ),
   );
   final ocr = ref.read(ocrServiceProvider);
@@ -62,6 +67,10 @@ Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
 }
 
 class _Item {
+  static int _nextId = 0;
+
+  /// Stable widget-key identity — list indexes shift when a row is dismissed.
+  final int id = _nextId++;
   final OcrIngredient parsed;
   Food? matched;
   double? gramsOverride;
@@ -227,7 +236,10 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     if (g != null && mounted) setState(() => _items[i].gramsOverride = g);
   }
 
+  bool _saving = false;
+
   Future<void> _saveRecipe() async {
+    if (_saving) return; // guard against a double-tap before the screen pops
     final ready = _ready;
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
@@ -235,27 +247,34 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       messenger.showAutoSnackBar(SnackBar(content: Text(l10n.ocrNeedMatch)));
       return;
     }
-    await ref
-        .read(recipeRepositoryProvider)
-        .create(
-          name: _name.text.trim().isEmpty
-              ? l10n.ocrDefaultMealName
-              : _name.text.trim(),
-          servings: 1,
-          items: [
-            for (final it in ready)
-              RecipeShareItem(
-                name: it.matched!.name,
-                grams: _grams(it)!,
-                kcal100: it.matched!.kcal100,
-                protein100: it.matched!.protein100,
-                carb100: it.matched!.carb100,
-                fat100: it.matched!.fat100,
-              ),
-          ],
-        );
-    if (mounted) Navigator.of(context).pop();
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.ocrSavedToRecipes)));
+    setState(() => _saving = true);
+    try {
+      await ref
+          .read(recipeRepositoryProvider)
+          .create(
+            name: _name.text.trim().isEmpty
+                ? l10n.ocrDefaultMealName
+                : _name.text.trim(),
+            servings: 1,
+            items: [
+              for (final it in ready)
+                RecipeShareItem(
+                  name: it.matched!.name,
+                  grams: _grams(it)!,
+                  kcal100: it.matched!.kcal100,
+                  protein100: it.matched!.protein100,
+                  carb100: it.matched!.carb100,
+                  fat100: it.matched!.fat100,
+                ),
+            ],
+          );
+      if (mounted) Navigator.of(context).pop();
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.ocrSavedToRecipes)),
+      );
+    } catch (_) {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   Future<void> _logToDay() async {
@@ -323,7 +342,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: _saveRecipe,
+                  onPressed: _saving ? null : _saveRecipe,
                   child: Text(l10n.ocrSaveAsRecipe),
                 ),
               ),
@@ -396,12 +415,12 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final it = _items[i];
     final n = _nutrition(it);
     final amountLabel = it.parsed.unit != null
-        ? '${gramsStr(it.parsed.amount)} ${it.parsed.unit!.label}'
+        ? '${gramsStr(it.parsed.amount)} ${it.parsed.unit!.localizedLabel(l10n)}'
         : '${gramsStr(it.parsed.amount)} ${it.parsed.rawUnit}';
     final g = _grams(it);
 
     return Dismissible(
-      key: ValueKey('ocr-$i-${it.parsed.name}'),
+      key: ValueKey('ocr-${it.id}'),
       background: Container(
         color: theme.colorScheme.primaryContainer,
         alignment: Alignment.centerLeft,

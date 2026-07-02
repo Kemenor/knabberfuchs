@@ -65,13 +65,24 @@ Future<bool> startRecognizeFoodFlow(
     // photo before sending. Dismissing the sheet cancels the whole flow.
     final hint = await _askGeminiHint(context, bytes);
     if (hint == null || !context.mounted) return false;
+    // Cancel pops the dialog itself and raises this flag; the request keeps
+    // running, but its late result must then be discarded without touching the
+    // navigator — the pop below would otherwise take whatever route is on top.
+    var cancelled = false;
     showDialog(
       context: context,
       barrierDismissible: false,
       // canPop:false blocks the hardware back button too, so the matching
       // navigator.pop() always closes this dialog, not the screen beneath it.
-      builder: (_) =>
-          const PopScope(canPop: false, child: _GeminiLoadingDialog()),
+      builder: (dialogCtx) => PopScope(
+        canPop: false,
+        child: _GeminiLoadingDialog(
+          onCancel: () {
+            cancelled = true;
+            Navigator.of(dialogCtx).pop();
+          },
+        ),
+      ),
     );
     GeminiFoodResult? r;
     try {
@@ -84,6 +95,7 @@ Future<bool> startRecognizeFoodFlow(
             description: hint,
           );
     } catch (_) {}
+    if (cancelled) return false;
     if (context.mounted) navigator.pop();
     if (!context.mounted) return false;
     if (r != null) {
@@ -258,8 +270,11 @@ class _GeminiHintSheetState extends State<_GeminiHintSheet> {
 /// Loading dialog shown while polling Gemini. Cycles through reassuring status
 /// lines so a slow request doesn't look frozen, and after ~13 s adds a "Gemini
 /// is busy" note. The model fallback (preferred → 2.5) is transparent.
+/// [onCancel] must both dismiss this dialog and abort the flow — the request
+/// itself can't be cancelled, only its result ignored.
 class _GeminiLoadingDialog extends StatefulWidget {
-  const _GeminiLoadingDialog();
+  final VoidCallback onCancel;
+  const _GeminiLoadingDialog({required this.onCancel});
 
   @override
   State<_GeminiLoadingDialog> createState() => _GeminiLoadingDialogState();
@@ -325,6 +340,11 @@ class _GeminiLoadingDialogState extends State<_GeminiLoadingDialog> {
                   ),
                 ),
               ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: widget.onCancel,
+              child: Text(l10n.actionCancel),
+            ),
           ],
         ),
       ),
@@ -365,7 +385,7 @@ class _GuessSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Text(l10n.recognizeLooksLike, style: theme.textTheme.titleMedium),
+            Text(l10n.recognizeLooksLike, style: theme.textTheme.titleLarge),
             const SizedBox(height: 8),
             for (final g in guesses)
               ListTile(
