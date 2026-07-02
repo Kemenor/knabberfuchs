@@ -1,6 +1,6 @@
 # Knabberfuchs — project guide for Claude
 
-Ad-free, no-subscription, **serverless** Android calorie tracker (Flutter/Dart).
+Ad-free, no-subscription, **serverless** Android + iOS calorie tracker (Flutter/Dart).
 Local-first (drift/SQLite), Riverpod, Material 3, four locales (en/de/fr/it).
 Product plan & backlog: `PLAN.md`.
 
@@ -18,12 +18,18 @@ distrobox enter flutter -- bash -lc 'flutter <cmd>'
   the key into `app_de/fr/it.arb`. `generate: true` regenerates `AppLocalizations`
   on build, or run `flutter gen-l10n`. Config: `l10n.yaml`.
 - **Run on device/emulator:** `flutter run` (emulator restart needs `-gpu host`).
-- **Release flow:** bump `version:` in `pubspec.yaml` (`x.y.z+buildNumber`) → add a
-  one-line changelog at `fastlane/metadata/android/<locale>/changelogs/<buildNumber>.txt`
-  for all four locales → `flutter build appbundle --release` →
-  `python3 tool/play_upload_aab.py <track>` (track is the first positional arg,
-  e.g. `internal`; the AAB path is hardcoded in the script). App is still in
-  closed testing.
+- **Release flow (CI, the normal path):** bump `version:` in `pubspec.yaml`
+  (`x.y.z+buildNumber`) → add a one-line changelog at
+  `fastlane/metadata/android/<locale>/changelogs/<buildNumber>.txt` for all four
+  locales → push a `vX.Y.Z` tag (must match pubspec — CI asserts it). The tag
+  triggers `.github/workflows/android.yml` (analyze+test gate → signed AAB →
+  *completed* release on both Play closed-testing tracks) and `ios.yml`
+  (analyze+test gate → TestFlight). Manual fallback:
+  `flutter build appbundle --release` → `python3 tool/play_upload_aab.py <track>`
+  (track(s) as positional args, e.g. `internal`; AAB path hardcoded in the
+  script). Status: Android in Play closed testing; iOS **live on the App Store**.
+  The CI Flutter version is single-sourced in `.fvmrc` (all workflows read it via
+  `flutter-version-file`); bump it together with the goldens (see `test.yml`).
 - **Secrets:** keep the app keyless by default; never commit API keys. Keystore,
   `key.properties`, `play-store-key.json` are gitignored.
 
@@ -33,9 +39,11 @@ Conform new/changed UI to these:
 
 - **FABs:** main action = `FloatingActionButton.extended` (icon + label) in the
   bottom-right with a **unique `heroTag`**. A secondary action sits **smaller, to
-  its left** in a `Row(mainAxisSize: .min)`. Save = `Icons.check`+`actionSave`,
-  Scan = `Icons.qr_code_scanner`+`scanBarcode`, Add = `Icons.add`.
-- **Menus:** row overflow = `PopupMenuButton` (⋮, `Icons.more_vert` size 20).
+  its left** in a `Row(mainAxisSize: .min)`. Save = `Symbols.check_rounded`+`actionSave`,
+  Scan = `Symbols.qr_code_scanner_rounded`+`scanBarcode`, Add = `Symbols.add_rounded`.
+- **Icons:** Material Symbols Rounded via `material_symbols_icons` —
+  `Symbols.<name>_rounded`, never `Icons.*`.
+- **Menus:** row overflow = `PopupMenuButton` (⋮, `Symbols.more_vert_rounded` size 20).
   A menu of distinct actions = a **bottom sheet of labelled `ListTile`s** (icon +
   title + subtitle), *not* bare FABs or app-bar icons.
 - **Sheets:** input sheets use `isScrollControlled: true` + `showDragHandle: true`,
