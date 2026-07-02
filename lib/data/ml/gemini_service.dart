@@ -74,7 +74,9 @@ class GeminiService {
     String? preferredModel,
     String? description,
   }) async {
-    final b64 = base64Encode(_downscaleJpeg(bytes));
+    // Decode/resize/encode of a full camera photo takes ~1 s — off the UI
+    // isolate so the progress dialog keeps animating.
+    final b64 = base64Encode(await compute(_downscaleJpeg, bytes));
     final models = <String>{preferredModel ?? fallbackModel, fallbackModel};
     // An optional user hint disambiguates an ambiguous photo (the user knows
     // it's a calzone, or homemade with extra cheese). Still anchored on the
@@ -113,13 +115,18 @@ class GeminiService {
     // a fresh client. On any failure (503/timeout/error/non-200) move to the
     // next model; exhausting them returns null → the on-device classifier.
     for (final model in models) {
-      final uri = Uri.parse('$_base/$model:generateContent?key=$apiKey');
+      final uri = Uri.parse('$_base/$model:generateContent');
       final client = _injected ?? http.Client();
       try {
+        // The key travels in a header, not the query string, so it never
+        // shows up in a stringified URI (exception messages, logs).
         final resp = await client
             .post(
               uri,
-              headers: {'Content-Type': 'application/json'},
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey,
+              },
               body: body,
             )
             .timeout(const Duration(seconds: 30));
@@ -134,7 +141,8 @@ class GeminiService {
         debugPrint('[gemini] $model timeout — next model');
         continue;
       } catch (e) {
-        debugPrint('[gemini] $model error: $e — next model');
+        // Log only the exception type: http exceptions embed the full URI.
+        debugPrint('[gemini] $model error: ${e.runtimeType} — next model');
         continue;
       } finally {
         if (_injected == null) client.close();
@@ -143,26 +151,27 @@ class GeminiService {
     return null;
   }
 
-  /// Shrink the photo (longest side ≤ 768 px, JPEG q85) to keep the upload
-  /// small and fast — plenty of detail for recognition.
-  Uint8List _downscaleJpeg(Uint8List bytes) {
-    final decoded = img.decodeImage(bytes);
-    if (decoded == null) return bytes;
-    var im = decoded;
-    final maxSide = decoded.width >= decoded.height
-        ? decoded.width
-        : decoded.height;
-    if (maxSide > 768) {
-      im = decoded.width >= decoded.height
-          ? img.copyResize(decoded, width: 768)
-          : img.copyResize(decoded, height: 768);
-    }
-    return img.encodeJpg(im, quality: 85);
-  }
-
   /// Request clients are created and closed per call; only an injected client
   /// (owned by the caller) would need closing, and the caller handles that.
   void dispose() {}
+}
+
+/// Shrink the photo (longest side ≤ 768 px, JPEG q85) to keep the upload
+/// small and fast — plenty of detail for recognition. Top-level so [compute]
+/// can run it in a worker isolate.
+Uint8List _downscaleJpeg(Uint8List bytes) {
+  final decoded = img.decodeImage(bytes);
+  if (decoded == null) return bytes;
+  var im = decoded;
+  final maxSide = decoded.width >= decoded.height
+      ? decoded.width
+      : decoded.height;
+  if (maxSide > 768) {
+    im = decoded.width >= decoded.height
+        ? img.copyResize(decoded, width: 768)
+        : img.copyResize(decoded, height: 768);
+  }
+  return img.encodeJpg(im, quality: 85);
 }
 
 /// Parse Gemini's `generateContent` response into a [GeminiFoodResult].

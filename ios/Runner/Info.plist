@@ -14,6 +14,13 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>de</string>
+		<string>fr</string>
+		<string>it</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>calorie_tracker</string>
 	<key>CFBundlePackageType</key>
@@ -72,6 +79,8 @@
 	<string>Knabberfuchs reads calories and macros from Apple Health to keep your tracking in sync.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Knabberfuchs saves the calories and macros you log to Apple Health.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Knabberfuchs uses photos you choose to recognize meals and read nutrition labels so you can log food quickly.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

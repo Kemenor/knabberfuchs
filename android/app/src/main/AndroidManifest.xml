@@ -4,8 +4,8 @@
     <!-- Barcode scanning -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
-    <!-- Health Connect: write logged nutrition (opt-in) -->
-    <uses-permission android:name="android.permission.health.READ_NUTRITION"/>
+    <!-- Health Connect: write logged nutrition (opt-in). Write-only — deleting
+         our own records by time range needs no read grant. -->
     <uses-permission android:name="android.permission.health.WRITE_NUTRITION"/>
 
     <application
