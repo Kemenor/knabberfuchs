@@ -103,21 +103,24 @@ class RecipeRepository {
     if (totalG <= 0 || grams <= 0) return;
     final factor =
         grams / totalG; // fraction of the whole recipe in this portion
-    for (final item in share.items) {
-      final g = item.grams * factor;
-      if (g <= 0) continue;
-      await diary.logSnapshot(
-        name: item.name,
-        kcal100: item.kcal100,
-        protein100: item.protein100,
-        carb100: item.carb100,
-        fat100: item.fat100,
-        grams: g,
-        meal: meal,
-        day: day,
-        groupId: groupId,
-      );
-    }
+    // One transaction so an interruption can't leave a partial meal group.
+    await db.transaction(() async {
+      for (final item in share.items) {
+        final g = item.grams * factor;
+        if (g <= 0) continue;
+        await diary.logSnapshot(
+          name: item.name,
+          kcal100: item.kcal100,
+          protein100: item.protein100,
+          carb100: item.carb100,
+          fat100: item.fat100,
+          grams: g,
+          meal: meal,
+          day: day,
+          groupId: groupId,
+        );
+      }
+    });
   }
 
   /// Convenience: grams for one of [servings] equal portions.

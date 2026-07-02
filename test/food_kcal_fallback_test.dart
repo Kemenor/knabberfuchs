@@ -10,9 +10,9 @@ void main() {
     });
 
     test('whole-word match: "egg" does not fire on "eggplant"', () {
-      // eggplant should fall through to the vegetable category, not egg (155).
-      final eggplant = portionForLabel('eggplant parmesan');
-      expect(eggplant?.kcal100, isNot(155));
+      // No category keyword whole-word-matches "eggplant parmesan", so the
+      // lookup returns null instead of the egg category (155 kcal/100 g).
+      expect(portionForLabel('eggplant parmesan'), isNull);
       // a real egg dish still matches the egg category.
       expect(portionForLabel('scrambled eggs')?.kcal100, 155);
     });
@@ -33,7 +33,9 @@ void main() {
 
     test('kcal computes from grams and density', () {
       final p = portionForLabel('cheeseburger')!;
-      expect(p.kcal, (p.kcal100 * p.grams / 100).round());
+      expect(p.grams, 250);
+      expect(p.kcal100, 250);
+      expect(p.kcal, 625); // 250 kcal/100 g * 250 g
     });
   });
 }
