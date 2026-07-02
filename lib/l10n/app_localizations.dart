@@ -942,6 +942,36 @@ abstract class AppLocalizations {
   /// **'Resynced to {store}.'**
   String healthResyncDone(String store);
 
+  /// Settings switch: read active energy and shift the daily kcal target by it
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust budget by activity'**
+  String get settingsHealthEnergyRead;
+
+  /// Subtitle of the activity-adjustment switch
+  ///
+  /// In en, this message translates to:
+  /// **'Add your active burn from {store} to the daily calorie target'**
+  String settingsHealthEnergyReadSub(String store);
+
+  /// Snackbar after enabling the activity budget adjustment
+  ///
+  /// In en, this message translates to:
+  /// **'Activity adjustment on.'**
+  String get healthEnergyReadOn;
+
+  /// Day-card line explaining the target shift by burned energy
+  ///
+  /// In en, this message translates to:
+  /// **'+{kcal} kcal from activity'**
+  String activityBonus(String kcal);
+
+  /// Muted note on the Trends tab when the activity adjustment is enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Target band doesn\'t include activity adjustments.'**
+  String get trendsActivityNote;
+
   /// Snackbar when exporting a backup fails
   ///
   /// In en, this message translates to:
