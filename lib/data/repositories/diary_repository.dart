@@ -24,22 +24,24 @@ class DiaryRepository {
     int? groupId,
     String? displayName,
   }) async {
-    await db.addEntry(
-      EntriesCompanion.insert(
-        day: day,
-        mealType: meal,
-        groupId: Value(groupId),
-        grams: grams,
-        foodId: Value(food.id),
-        sName: displayName ?? food.name,
-        sKcal100: food.kcal100,
-        sProtein100: Value(food.protein100),
-        sCarb100: Value(food.carb100),
-        sFat100: Value(food.fat100),
-        sMicrosJson: Value(food.microsJson),
-      ),
-    );
-    await db.bumpFoodUsage(food.id);
+    await db.transaction(() async {
+      await db.addEntry(
+        EntriesCompanion.insert(
+          day: day,
+          mealType: meal,
+          groupId: Value(groupId),
+          grams: grams,
+          foodId: Value(food.id),
+          sName: displayName ?? food.name,
+          sKcal100: food.kcal100,
+          sProtein100: Value(food.protein100),
+          sCarb100: Value(food.carb100),
+          sFat100: Value(food.fat100),
+          sMicrosJson: Value(food.microsJson),
+        ),
+      );
+      await db.bumpFoodUsage(food.id);
+    });
   }
 
   /// Log a raw snapshot (used by recipes / imported items with no catalog row).
