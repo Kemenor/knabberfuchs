@@ -24,7 +24,32 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Same analyze + test suite as test.yml: a v* tag on a red or never-tested
+  # commit must not reach TestFlight. Runs on Linux — cheaper than macOS, and
+  # the canonical golden platform.
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version-file: .fvmrc
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
   testflight:
+    needs: test
     # macOS 26 image → Xcode 26 (iOS 26 SDK). device_info_plus 12.4.0 references
     # NSProcessInfo.isiOSAppOnVision, which only exists in the iOS 26 SDK; the
     # older macos-15 default (Xcode 16) fails to compile it. macos-latest still
@@ -34,14 +59,25 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Verify tag matches pubspec version
+        if: github.ref_type == 'tag'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          PUBSPEC=$(grep -m1 '^version:' pubspec.yaml | awk '{print $2}')
+          if [ "${TAG#v}" != "${PUBSPEC%%+*}" ]; then
+            echo "::error::Tag $TAG does not match pubspec.yaml version: $PUBSPEC — bump pubspec (and the four changelogs) before tagging."
+            exit 1
+          fi
+
       - name: Select latest Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: latest-stable
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: "3.44.4"
+          flutter-version-file: .fvmrc
           channel: stable
           cache: true
 

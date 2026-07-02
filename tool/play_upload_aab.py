@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Upload the release AAB to a Play track (default: internal) and create a
-release with localized notes from the fastlane changelogs. Commits the edit.
+"""Upload the release AAB once, assign it to one or more Play tracks
+(default: internal) as a *completed* release with localized notes from the
+fastlane changelogs, and commit the edit.
 
-    python3 tool/play_upload_aab.py [track]
+    python3 tool/play_upload_aab.py [track ...]
 
-The app stays in Draft until you publish in the Console; for an internal track
-this just stages the release for your internal testers.
+Nothing stays in Draft and there is no publish step in the Console afterwards:
+committing a 'completed' release rolls the build out to that track's testers
+right away (production would go fully live, subject to Play review). The
+commit passes changesNotSentForReview=True where the API allows it, falling
+back to a plain commit otherwise.
 """
 import os
 import socket
