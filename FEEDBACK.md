@@ -145,14 +145,17 @@ tracks tester-driven changes specifically.
     swipe grammar of the diary/recipes lists; a future custom-only "My foods" screen
     would be the right home for swipes.
 
-- ⏳ **Make tracked nutrients switchable, starting with fiber** — decided 2026-07-02:
-  do the tester's bigger ask (user-configurable target list), **not** a fiber bolt-on,
-  so saturates and future nutrients ride the same mechanism. Queued as **PLAN.md
-  Phase 15 — Configurable tracked nutrients** (design sketch and code pointers there).
+- ✅ **Make tracked nutrients switchable, starting with fiber** — BUILT 2026-07-02
+  (on main, ships with the Phase 16 release). Implemented as the tester's bigger ask:
+  a **Tracked nutrients** chip row atop Settings → Targets toggles fiber, saturated
+  fat, sugar and salt (and P/C/F; kcal fixed). Each enabled nutrient gets the full
+  min/max default + per-weekday target block, a Day-card bar (rows wrap by 3), and a
+  Trends chip. Data: schema v12 + snapshot micros write-through + best-effort history
+  backfill — details in **PLAN.md Phase 15**.
 
-- ⏳ **Split fat into saturated vs. unsaturated in the overview/trends** — decided
-  2026-07-02: same mechanism as the fiber ask; folded into **PLAN.md Phase 15**
-  (saturated fat becomes one of the configurable tracked nutrients).
+- ✅ **Split fat into saturated vs. unsaturated in the overview/trends** — BUILT
+  2026-07-02 as part of the same mechanism: saturated fat is one of the configurable
+  tracked nutrients (enable its chip → targets, Day-card bar, Trends series).
 
 - 🚫 **Daily hint/recommendation for targets** — DEFERRED indefinitely 2026-07-02.
   The tester flagged the nagging risk themselves; static "most adults aim for ~X"
