@@ -94,7 +94,7 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icon/cutefox.png"
-  adaptive_icon_background: "#5F8A34"
+  adaptive_icon_background: "#1FA85D"
   adaptive_icon_foreground: "assets/icon/cutefox_fg.png"
   min_sdk_android: 26
 
