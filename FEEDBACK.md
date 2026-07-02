@@ -2,7 +2,7 @@
 
 Running log of feedback from closed testing, with implementation notes and status.
 Same conventions as `PLAN.md`: `-` bullets led by an emoji status marker
-(✅ done · 🔨 in progress · ⏳ queued · 📝 needs decision) + a **bold title**, with
+(✅ done · 🔨 in progress · ⏳ queued · 📝 needs decision · 🚫 deferred) + a **bold title**, with
 file/path references. Product backlog & architecture stay in `PLAN.md`; this file
 tracks tester-driven changes specifically.
 
@@ -131,67 +131,43 @@ tracks tester-driven changes specifically.
 
 ## Feedback (2026-07-01)
 
-- 📝 **Edit a custom food** — no decision yet. Once a custom food is created there's no
-  way to go back and fix/update it — only create-new exists today.
-  - `lib/ui/food/food_form_screen.dart:24-30` (`FoodFormScreen` ctor takes only `barcode`,
-    no edit mode), `lib/data/repositories/food_repository.dart:154` (`createFood(...)`
-    only, no `updateFood`), `lib/ui/food/food_search_list.dart:208,234-246` (tile tap
-    picks/logs the food, no edit affordance).
-  - **📝 decision:** where does edit live — a long-press/overflow menu on the food list
-    tile, or tucked under Settings as the tester suggested? Leaning: overflow menu on the
-    food tile (consistent with `PopupMenuButton` convention in `DESIGN_SYSTEM.md`), since
-    Settings is a poor discovery path for a per-food action.
+- ✅ **Edit a custom food** — DONE 2026-07-02. Custom-food tiles in the search list get a
+  ⋮ overflow with **Edit** (decided over the tester's Settings suggestion — Settings is a
+  poor discovery path for a per-food action), opening the food form pre-filled
+  (`FoodFormScreen(initial:)`, incl. the g/ml basis) and saving in place via
+  `FoodRepository.updateFood` → `updateFoodById` (keyed by id, so barcode edits update the
+  row instead of upserting a duplicate). Diary entries keep their logged snapshots by
+  design. Tests in `test/food_update_test.dart`.
 
-- 📝 **Make tracked nutrients switchable, starting with fiber** — no decision yet. Fiber
-  is captured per-food (`fiber100`, `lib/data/db/tables.dart:41`) but isn't part of the
-  target/goals system, so it never surfaces as something a user can track against.
-  - `lib/domain/day_summary.dart:56` — `enum TargetMetric { kcal, protein, carb, fat }`,
-    no fiber. `lib/data/db/tables.dart:121-124` (Targets table) has no fiber columns.
-    `lib/ui/settings/targets_screen.dart:66-104` wires protein/carb/fat rows only.
-  - Tester's framing: rather than just bolting on fiber, make the whole target list
-    **user-configurable** (pick which nutrients you care about tracking), not a fixed
-    kcal/P/C/F set.
-  - **📝 decision:** minimal fix (add fiber as a 5th fixed `TargetMetric`) vs. the bigger
-    ask (a settings toggle list for which nutrients get a target row at all). Latter is
-    more work but is what was actually requested and generalizes to future nutrients.
+- ⏳ **Make tracked nutrients switchable, starting with fiber** — decided 2026-07-02:
+  do the tester's bigger ask (user-configurable target list), **not** a fiber bolt-on,
+  so saturates and future nutrients ride the same mechanism. Queued as **PLAN.md
+  Phase 15 — Configurable tracked nutrients** (design sketch and code pointers there).
 
-- 📝 **Split fat into saturated vs. unsaturated in the overview/trends** — no decision
-  yet. Saturated fat is captured per-food (`satFat100`, `tables.dart:42`) but only folds
-  into the total fat number downstream — never aggregated/shown separately.
-  - `lib/ui/day/day_screen.dart:396` (`_macro(context, TargetMetric.fat, ...)` — one
-    aggregate number), `:618` (`fat100: e.entry.sFat100` aggregation point),
-    `lib/domain/day_summary.dart:18`. `lib/ui/trends/trends_screen.dart` reuses the same
-    `TargetMetric` enum, so no saturates series exists for the chart either.
-  - Same shape as the fiber ask: needs `TargetMetric` (or a parallel concept) extended to
-    carry a saturates split, plus Day-card and Trends UI to show it.
+- ⏳ **Split fat into saturated vs. unsaturated in the overview/trends** — decided
+  2026-07-02: same mechanism as the fiber ask; folded into **PLAN.md Phase 15**
+  (saturated fat becomes one of the configurable tracked nutrients).
 
-- 📝 **Daily hint/recommendation for targets** — no decision yet. Tester flagged the
-  nagging risk themselves — a proactive daily recommendation prompt could feel pushy, so
-  lean towards a passive **hint in the Targets settings screen** instead (e.g. "most
-  adults aim for ~X g protein/day") rather than a runtime nudge.
-  - `lib/ui/settings/targets_screen.dart:16` (`TargetsScreen`), per-metric blocks at
-    `:64-104`, `_MetricTargets`/`_TargetRow` widgets at `:117,197` — a subtitle/hint text
-    would slot in per metric block or once near the top of the screen.
-  - **📝 decision:** static hint copy per metric vs. no hint at all (defer). No agreement
-    yet on wording or whether it's worth the l10n surface (×4 locales) for a "maybe
-    nagging" feature.
+- 🚫 **Daily hint/recommendation for targets** — DEFERRED indefinitely 2026-07-02.
+  The tester flagged the nagging risk themselves; static "most adults aim for ~X"
+  copy is reference info with real drawbacks: dietary reference values differ across
+  our four-country audience (invites "says who?"), and it costs 4-locale l10n surface
+  for a feature that may read as pushy. Revisit only if testers ask again.
 
-- 📝 **Health Connect: full resync / clear-data-for-days button** — no decision yet.
-  Sync today is automatic push-only with no manual control beyond the on/off switch.
-  - `lib/data/health/health_service.dart:8` ("write-only... no-op until enabled"),
-    trigger is `ref.listen(selectedDayEntriesProvider, ...)` in
-    `lib/ui/day/day_screen.dart:59-65` (fires on entry changes only — no manual trigger).
-    `lib/ui/settings/settings_screen.dart:112-127` — only a `SwitchListTile` exists.
-    `deleteAll()` (`health_service.dart:111-121`) wipes everything and is only invoked
-    when the feature is toggled off — no per-day granularity.
-  - Tester wants: a **"resync"/"full sync" button** to push all days again, plus a way to
-    **clear synced data for specific days** and re-push them (useful after fixing a
-    logging mistake that already synced wrong numbers to Health Connect).
-  - **📝 decision:** scope of a first pass — global "resync everything" button only, or
-    also per-day clear+resync (needs a day picker / range picker UI)?
+- ✅ **Health Connect: full resync button** — DONE 2026-07-02 (first pass: global
+  resync only; per-day clear+resync deferred until someone actually needs it — it
+  requires a range-picker UI). Settings → Health section gains **"Resync all days"**
+  (visible when sync is on): `HealthService.resyncAll` wipes everything the app ever
+  wrote (`deleteAll`) and re-pushes the whole diary, so days whose entries were since
+  edited or deleted end up matching exactly — the fix for "a wrong number already
+  synced".
 
-- 📝 **Read calories burned from Health Connect (adjust the daily budget by exercise)**
-  — no decision yet. A tester sent a screenshot of Health Connect's Android developer
+- ⏳ **Read calories burned from Health Connect (adjust the daily budget by exercise)**
+  — decided 2026-07-02: worth doing, but it's the biggest item here (new read
+  permissions, query layer, target math, active-vs-TDEE UX). Queued as **PLAN.md
+  Phase 16 — Health Connect energy read-back** (design sketch there); opt-in via a
+  separate toggle since it's a new permission grant. Original research notes kept
+  below for the build. A tester sent a screenshot of Health Connect's Android developer
   docs listing three record types: `ActiveCaloriesBurnedRecord` (energy burned by
   workouts/activity, excludes BMR), `TotalCaloriesBurnedRecord` (active + BMR, i.e.
   TDEE for the window), and `BasalMetabolicRateRecord` (resting energy cost as a
@@ -216,18 +192,11 @@ tracks tester-driven changes specifically.
     from the existing write-sync switch, since it's a new read-permission grant) or
     folds into the current Health Connect setting.
 
-- 📝 **Merge two meal groups into one** — no decision yet. There's already a per-meal
-  overflow menu with scale and **split** actions, but no inverse "merge" action.
-  - `lib/ui/day/day_screen.dart:518-550` — `PopupMenuButton` per meal group with
-    `edit` / `scale` (`showScaleMealSheet`, `lib/ui/day/scale_meal_sheet.dart:12`) /
-    `split` (`showSplitMealSheet`, `lib/ui/day/split_meal_sheet.dart:14`) / `recipe` /
-    `delete`. Groups are ad-hoc (`GroupView`, keyed by `group.id`,
-    `lib/ui/day/day_screen.dart:454,462-463`), not fixed slots — a tester can end up
-    with e.g. two separate "Snack" groups on the same day and no way to combine them.
-  - `deleteEntryGroup` (`lib/data/repositories/diary_repository.dart:134`) already
-    removes a group + its entries — a merge would look like: move all entries from
-    group B into group A, then delete group B the same way `split` breaks one group's
-    entries out into a second (`split_meal_sheet.dart`), just in reverse.
-  - **📝 decision:** how does the user pick which two groups to merge — a "merge into…"
-    entry in the overflow menu that opens a picker of the day's other groups, or a
-    drag-and-drop/long-press gesture on the day list?
+- ✅ **Merge two meal groups into one** — DONE 2026-07-02. Decided for the overflow
+  entry over drag-and-drop (more discoverable, matches the existing ⋮ conventions):
+  the per-meal menu gains **"Merge into another meal"**, opening a picker sheet of the
+  day's other groups (`lib/ui/day/merge_meal_sheet.dart`, each with its subtotal kcal
+  so two same-named "Snack" groups stay distinguishable). `DiaryRepository.mergeGroups`
+  is the inverse of split: entries move to the end of the target (adopting its day and
+  meal type), then the emptied source group is deleted. Tests in
+  `test/diary_mutations_test.dart`.
