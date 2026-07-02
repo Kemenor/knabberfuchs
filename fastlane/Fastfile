@@ -17,9 +17,16 @@ platform :android do
   desc "Push store listing text + screenshots only (no binary) as a draft"
   lane :listing do
     upload_to_play_store(
+      # supply anchors ANY metadata edit to a release on the target track;
+      # the default (production) has none while the app is in closed
+      # testing, which aborts with the misleading "version code ''" error.
+      # The listing itself is app-wide — the anchor track doesn't matter.
+      track: "alpha",
       skip_upload_apk: true,
       skip_upload_aab: true,
-      skip_upload_changelogs: false,
+      # Changelogs attach to releases and ship with the AAB via the v-tag
+      # flow; uploading them here would target the anchor release instead.
+      skip_upload_changelogs: true,
       changes_not_sent_for_review: true,
     )
   end
