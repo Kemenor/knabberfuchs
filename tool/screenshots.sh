@@ -29,10 +29,12 @@ case "$PLATFORM" in
     ;;
   ios)
     command -v xcrun >/dev/null || { echo "✗ ios capture needs macOS"; exit 1; }
-    DEVICE=${DEVICE:-$(xcrun simctl list devices booted | grep -oE '[0-9A-F-]{36}' | head -1)}
+    # `|| true`: grep exits 1 on no match, which set -euo pipefail would turn
+    # into a silent script death before the boot-fallback below can run.
+    DEVICE=${DEVICE:-$(xcrun simctl list devices booted | grep -oE '[0-9A-F-]{36}' | head -1 || true)}
     if [ -z "${DEVICE:-}" ]; then
       DEVICE=$(xcrun simctl list devices available | grep -E 'iPhone .* Pro Max' \
-        | tail -1 | grep -oE '[0-9A-F-]{36}')
+        | tail -1 | grep -oE '[0-9A-F-]{36}' || true)
       [ -n "$DEVICE" ] || { echo "✗ no iPhone Pro Max simulator available"; exit 1; }
       echo "→ booting simulator $DEVICE"
       xcrun simctl boot "$DEVICE"
