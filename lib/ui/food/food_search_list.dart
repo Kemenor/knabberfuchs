@@ -116,10 +116,12 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
   }
 
   List<Food> get _merged {
-    final seen = <int>{};
+    // Same identity key as FoodRepository.searchLocal: pack results all carry
+    // the synthetic id 0, so deduping on raw ids would collapse them into one.
+    final seen = <String>{};
     final out = <Food>[];
     for (final f in [..._local, ..._online]) {
-      if (seen.add(f.id)) out.add(f);
+      if (seen.add(f.barcode ?? 'id:${f.id}:${f.name}')) out.add(f);
     }
     return out;
   }
@@ -191,7 +193,7 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
               ? _EmptyState(query: _query, onCreate: widget.onCreateCustom)
               : ListView.separated(
                   // Bottom inset so the last row clears a floating action button.
-                  padding: const EdgeInsets.only(bottom: 88),
+                  padding: const EdgeInsets.only(bottom: 96),
                   itemCount:
                       results.length + (widget.onCreateCustom != null ? 1 : 0),
                   separatorBuilder: (_, _) => const Divider(height: 1),

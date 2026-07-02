@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../data/db/database.dart';
+import '../../data/offline/offline_pack_service.dart';
 import '../../domain/offline_manifest.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
@@ -24,6 +25,7 @@ class OfflineRegionsScreen extends ConsumerStatefulWidget {
 
 class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
   final Map<String, double> _progress = {};
+  final Map<String, CancellationToken> _cancels = {};
   final _searchCtrl = TextEditingController();
   String _query = '';
 
@@ -40,7 +42,11 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
   Future<void> _download(OfflineManifest m, RegionInfo r) async {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
-    setState(() => _progress[r.code] = 0);
+    final cancelToken = CancellationToken();
+    setState(() {
+      _progress[r.code] = 0;
+      _cancels[r.code] = cancelToken;
+    });
     try {
       await ref
           .read(offlinePackServiceProvider)
@@ -50,16 +56,24 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
             onProgress: (p) {
               if (mounted) setState(() => _progress[r.code] = p);
             },
+            cancelToken: cancelToken,
           );
       messenger.showAutoSnackBar(
         SnackBar(content: Text(l10n.regionDownloaded(r.name))),
       );
+    } on InstallCancelledException {
+      // User aborted — the vanishing progress ring is feedback enough.
     } catch (e) {
       messenger.showAutoSnackBar(
         SnackBar(content: Text(l10n.regionDownloadFailed('$e'))),
       );
     } finally {
-      if (mounted) setState(() => _progress.remove(r.code));
+      if (mounted) {
+        setState(() {
+          _progress.remove(r.code);
+          _cancels.remove(r.code);
+        });
+      }
     }
   }
 
@@ -177,6 +191,7 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
                               installed: installed[r.code],
                               progress: _progress[r.code],
                               onDownload: () => _download(manifest, r),
+                              onCancel: () => _cancels[r.code]?.cancel(),
                               onRemove: () => _remove(r.code, r.name),
                             ),
                           const Divider(),
@@ -203,6 +218,7 @@ class _RegionTile extends StatelessWidget {
   final InstalledPack? installed;
   final double? progress;
   final VoidCallback onDownload;
+  final VoidCallback onCancel;
   final VoidCallback onRemove;
 
   const _RegionTile({
@@ -210,6 +226,7 @@ class _RegionTile extends StatelessWidget {
     required this.installed,
     required this.progress,
     required this.onDownload,
+    required this.onCancel,
     required this.onRemove,
   });
 
@@ -226,12 +243,22 @@ class _RegionTile extends StatelessWidget {
 
     Widget trailing;
     if (progress != null) {
-      trailing = SizedBox(
-        width: 40,
-        height: 40,
-        child: CircularProgressIndicator(
-          value: progress == 0 ? null : progress,
-          strokeWidth: 3,
+      trailing = IconButton(
+        tooltip: l10n.actionCancel,
+        onPressed: onCancel,
+        icon: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(
+                value: progress == 0 ? null : progress,
+                strokeWidth: 3,
+              ),
+            ),
+            const Icon(Symbols.close_rounded, size: 14),
+          ],
         ),
       );
     } else if (!isInstalled) {

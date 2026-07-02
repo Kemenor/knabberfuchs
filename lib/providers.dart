@@ -56,7 +56,9 @@ final installedPacksProvider = StreamProvider<List<InstalledPack>>(
   (ref) => ref.watch(dbProvider).watchInstalledPacks(),
 );
 
-final offlineManifestProvider = FutureProvider<OfflineManifest>(
+/// autoDispose: a stalled fetch is dropped when the screen is left, so
+/// re-entering retries instead of reviving a permanent spinner.
+final offlineManifestProvider = FutureProvider.autoDispose<OfflineManifest>(
   (ref) => ref.watch(offlinePackServiceProvider).fetchManifest(),
 );
 
@@ -179,6 +181,11 @@ class ActiveGroupNotifier extends Notifier<int?> {
   static const _atKey = 'activeGroupAt';
   static const timeout = Duration(minutes: 15);
 
+  /// Injectable for deterministic tests (same pattern as `TokenBucket`).
+  ActiveGroupNotifier({DateTime Function()? now}) : _now = now ?? DateTime.now;
+
+  final DateTime Function() _now;
+
   AppDatabase get _db => ref.read(dbProvider);
 
   @override
@@ -199,7 +206,7 @@ class ActiveGroupNotifier extends Notifier<int?> {
 
   Future<bool> _expired() async {
     final at = int.tryParse(await _db.getSetting(_atKey) ?? '') ?? 0;
-    return DateTime.now().millisecondsSinceEpoch - at > timeout.inMilliseconds;
+    return _now().millisecondsSinceEpoch - at > timeout.inMilliseconds;
   }
 
   /// Active group for [day], creating a time-named one if none is active (or it
@@ -213,7 +220,7 @@ class ActiveGroupNotifier extends Notifier<int?> {
         return current;
       }
     }
-    final now = DateTime.now();
+    final now = _now();
     final settings = {
       for (final s in await _db.watchAllSettings().first) s.key: s.value,
     };
@@ -248,7 +255,7 @@ class ActiveGroupNotifier extends Notifier<int?> {
 
   Future<void> _touch(int id) async {
     await _db.setSetting(_idKey, '$id');
-    await _db.setSetting(_atKey, '${DateTime.now().millisecondsSinceEpoch}');
+    await _db.setSetting(_atKey, '${_now().millisecondsSinceEpoch}');
   }
 
   Future<void> _clear() async {
@@ -441,7 +448,14 @@ class TrendWindow {
 
   /// True when this is the latest period (so "newer" navigation is disabled).
   bool get isCurrent => mode != TrendMode.custom && offset == 0;
-  int get days => end.difference(start).inDays + 1;
+
+  /// Count via UTC midnights: a local-time difference across a DST change is
+  /// not a whole number of 24 h days.
+  int get days =>
+      DateTime.utc(end.year, end.month, end.day)
+          .difference(DateTime.utc(start.year, start.month, start.day))
+          .inDays +
+      1;
 }
 
 class TrendRangeNotifier extends Notifier<TrendWindow> {
@@ -469,12 +483,13 @@ class TrendRangeNotifier extends Notifier<TrendWindow> {
     if (s != null && e != null) _savedCustom = (start: s, end: e);
   }
 
-  /// A week/month window [offset] whole periods before today.
+  /// A week/month window [offset] whole periods before today. Calendar
+  /// arithmetic (not Duration) so DST-length days can't shift the window.
   TrendWindow preset(TrendMode mode, int offset) {
     final today = DayKey.parse(DayKey.today());
     final len = mode == TrendMode.month ? 30 : 7;
-    final end = today.subtract(Duration(days: len * offset));
-    final start = end.subtract(Duration(days: len - 1));
+    final end = DateTime(today.year, today.month, today.day - len * offset);
+    final start = DateTime(end.year, end.month, end.day - (len - 1));
     return TrendWindow(mode, offset, start, end);
   }
 
