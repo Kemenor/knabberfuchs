@@ -171,12 +171,13 @@ tracks tester-driven changes specifically.
   edited or deleted end up matching exactly — the fix for "a wrong number already
   synced".
 
-- ⏳ **Read calories burned from Health Connect (adjust the daily budget by exercise)**
-  — decided 2026-07-02: worth doing, but it's the biggest item here (new read
-  permissions, query layer, target math, active-vs-TDEE UX). Queued as **PLAN.md
-  Phase 16 — Health Connect energy read-back** (design sketch there); opt-in via a
-  separate toggle since it's a new permission grant. Original research notes kept
-  below for the build. A tester sent a screenshot of Health Connect's Android developer
+- ✅ **Read calories burned from Health Connect (adjust the daily budget by exercise)**
+  — BUILT 2026-07-02 (ships with the Phase 15 release; design + decisions in
+  **PLAN.md Phase 16**). Opt-in "Adjust budget by activity" switch (separate read
+  grant): the day's active burn shifts the whole kcal band — remaining/over, bar and
+  status move with it, explained by a "⚡ +N kcal from activity" line. Active-only
+  add-on (no TDEE/BMR double-counting); Trends notes that its band stays static.
+  Original research notes kept below. A tester sent a screenshot of Health Connect's Android developer
   docs listing three record types: `ActiveCaloriesBurnedRecord` (energy burned by
   workouts/activity, excludes BMR), `TotalCaloriesBurnedRecord` (active + BMR, i.e.
   TDEE for the window), and `BasalMetabolicRateRecord` (resting energy cost as a
