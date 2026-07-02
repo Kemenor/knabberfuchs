@@ -194,4 +194,44 @@ void main() {
       expect(t.max, 300);
     });
   });
+
+  group('shiftTarget (activity adjustment)', () {
+    test('moves BOTH bounds by the burned amount', () {
+      final t = shiftTarget(const CalorieTarget(1600, 1900), 320);
+      expect(t.min, 1920);
+      expect(t.max, 2220);
+    });
+
+    test('null bounds stay null; zero/negative burn is a no-op', () {
+      final t = shiftTarget(const CalorieTarget(null, 1900), 320);
+      expect(t.min, isNull);
+      expect(t.max, 2220);
+      expect(shiftTarget(const CalorieTarget(1600, 1900), 0).min, 1600);
+      expect(shiftTarget(const CalorieTarget(1600, 1900), -50).max, 1900);
+    });
+
+    test('status is computed against the shifted band', () {
+      // 2 000 kcal eaten: over a static 1 900 max, but in range once a
+      // 320 kcal run shifts the band ("eat back your exercise").
+      const eaten = 2000.0;
+      const static_ = CalorieTarget(1600, 1900);
+      expect(statusFor(eaten, static_), TargetStatus.over);
+      expect(
+        statusFor(eaten, shiftTarget(static_, 320)),
+        TargetStatus.inRange,
+      );
+    });
+
+    test('an unmoved min would lie on training days — the shift fixes it', () {
+      // 1 700 eaten, min 1 600: "minimum reached" statically, but after a
+      // 500 kcal session the shifted min (2 100) correctly reads under.
+      const eaten = 1700.0;
+      const static_ = CalorieTarget(1600, null);
+      expect(statusFor(eaten, static_), TargetStatus.inRange);
+      expect(
+        statusFor(eaten, shiftTarget(static_, 500)),
+        TargetStatus.under,
+      );
+    });
+  });
 }

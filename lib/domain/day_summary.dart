@@ -121,12 +121,18 @@ class DaySummary {
   /// (not named fields) so new tracked nutrients don't grow the constructor.
   final Map<TargetMetric, CalorieTarget> metricTargets;
 
+  /// Active energy burned this day (kcal) read from the health store.
+  /// [kcalMin]/[kcalMax] arrive ALREADY shifted by it — this field only
+  /// feeds the "+N kcal from activity" explanation line. 0 = no adjustment.
+  final double activityKcal;
+
   DaySummary({
     required this.day,
     required this.entries,
     this.kcalMin,
     this.kcalMax,
     this.metricTargets = const {},
+    this.activityKcal = 0,
   });
 
   Nutrition get total => Nutrition.sum(entries.map((e) => e.nutrition));
@@ -155,6 +161,17 @@ class DaySummary {
   double? barFractionFor(TargetMetric m) =>
       targetBarFraction(valueFor(m), targetFor(m));
 }
+
+/// Shift a target band up by [activity] burned kcal ("eat back your
+/// exercise", active-only add-on — grilled 2026-07-02). BOTH bounds move so
+/// a hard training day raises the minimum too; an unmoved min would read
+/// "minimum reached" while underfueled.
+CalorieTarget shiftTarget(CalorieTarget t, double activity) => activity <= 0
+    ? t
+    : CalorieTarget(
+        t.min == null ? null : t.min! + activity,
+        t.max == null ? null : t.max! + activity,
+      );
 
 /// Where [kcal] sits relative to a [target] (single source of truth shared by
 /// the day screen and the trends charts).

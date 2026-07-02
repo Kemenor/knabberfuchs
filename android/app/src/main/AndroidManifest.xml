@@ -7,6 +7,9 @@
     <!-- Health Connect: write logged nutrition (opt-in). Write-only — deleting
          our own records by time range needs no read grant. -->
     <uses-permission android:name="android.permission.health.WRITE_NUTRITION"/>
+    <!-- Activity budget adjustment (Phase 16, separate opt-in): read-only
+         active energy for the "eat back your exercise" target shift. -->
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED"/>
 
     <application
         android:label="Knabberfuchs"

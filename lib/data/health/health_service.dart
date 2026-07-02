@@ -15,6 +15,10 @@ class HealthService {
   /// Cached opt-in flag (mirrors the 'healthSync' setting).
   bool enabled = false;
 
+  /// Cached opt-in flag for the energy read-back (mirrors the
+  /// 'healthEnergyRead' setting) — a separate grant from write-sync.
+  bool energyReadEnabled = false;
+
   // iOS HealthKit's umbrella NUTRITION type expands the permission sheet to ~40
   // dietary sub-types (every vitamin/mineral), even though we only ever write
   // energy + macros. So on iOS request exactly those four. Health Connect
@@ -62,9 +66,52 @@ class HealthService {
     return _health.requestAuthorization(_types, permissions: _perms);
   }
 
+  /// The energy read-back reads only active energy (never TOTAL/BMR — the
+  /// static target already encodes maintenance; grilled 2026-07-02).
+  static const _energyTypes = [h.HealthDataType.ACTIVE_ENERGY_BURNED];
+
+  /// Prompt for active-energy read access. Returns true if granted.
+  Future<bool> requestEnergyReadPermission() async {
+    await _ensureConfigured();
+    return _health.requestAuthorization(
+      _energyTypes,
+      permissions: const [h.HealthDataAccess.READ],
+    );
+  }
+
   Future<void> refreshEnabled(AppDatabase db) async {
     enabled = (await db.getSetting('healthSync')) == 'true';
-    if (enabled) await _ensureConfigured();
+    energyReadEnabled = (await db.getSetting('healthEnergyRead')) == 'true';
+    if (enabled || energyReadEnabled) await _ensureConfigured();
+  }
+
+  /// Active energy burned on [day] in kcal, via the platform aggregate API —
+  /// Health Connect / HealthKit dedupe multi-source (phone + watch) records
+  /// through their own priority system, so never sum raw records here.
+  /// Returns 0 on any failure (feature off, permission revoked, store
+  /// missing, no data) — callers then show the plain static target.
+  Future<double> activeEnergyFor(String day) async {
+    if (!energyReadEnabled) return 0;
+    await _ensureConfigured();
+    final d = DateTime.parse(day);
+    final start = DateTime(d.year, d.month, d.day);
+    // Next calendar midnight, not +24 h (DST; same as syncDay's window).
+    final end = DateTime(d.year, d.month, d.day + 1);
+    try {
+      final points = await _health.getHealthAggregateDataFromTypes(
+        types: _energyTypes,
+        startDate: start,
+        endDate: end,
+      );
+      var sum = 0.0;
+      for (final p in points) {
+        final v = p.value;
+        if (v is h.NumericHealthValue) sum += v.numericValue.toDouble();
+      }
+      return sum > 0 ? sum : 0;
+    } catch (_) {
+      return 0; // revoked / unavailable / platform quirk — static target
+    }
   }
 
   /// Re-sync one day: delete our nutrition records for that day, then write the
