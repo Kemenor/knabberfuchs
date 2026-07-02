@@ -25,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -127,6 +127,41 @@ class AppDatabase extends _$AppDatabase {
         await customStatement('ALTER TABLE targets DROP COLUMN protein');
         await customStatement('ALTER TABLE targets DROP COLUMN carb');
         await customStatement('ALTER TABLE targets DROP COLUMN fat');
+      }
+      if (from < 12) {
+        // Phase 15: configurable tracked nutrients — target bounds for
+        // fiber/satFat/sugar/salt, same shape as the v11 macro columns.
+        await m.addColumn(targets, targets.fiberMin);
+        await m.addColumn(targets, targets.fiberMax);
+        await m.addColumn(targets, targets.satFatMin);
+        await m.addColumn(targets, targets.satFatMax);
+        await m.addColumn(targets, targets.sugarMin);
+        await m.addColumn(targets, targets.sugarMax);
+        await m.addColumn(targets, targets.saltMin);
+        await m.addColumn(targets, targets.saltMax);
+        // Best-effort history backfill (grilled 2026-07-02): entries never
+        // snapshotted fiber/satFat/sugar/salt before v12, so entries that
+        // still link to a catalog food adopt the food's CURRENT per-100g
+        // values — explicitly a heuristic (foods are editable; foodId is only
+        // set-null on delete). json_patch keeps any existing micros keys.
+        // Snapshot-only entries (quick-add, recipes, imports) stay as logged.
+        await customStatement('''
+          UPDATE entries SET s_micros_json = json_patch(
+            COALESCE(s_micros_json, '{}'),
+            (SELECT json_patch(json_patch(json_patch(
+                CASE WHEN f.fiber100 IS NOT NULL
+                  THEN json_object('fiber', f.fiber100) ELSE '{}' END,
+                CASE WHEN f.sat_fat100 IS NOT NULL
+                  THEN json_object('satFat', f.sat_fat100) ELSE '{}' END),
+                CASE WHEN f.sugar100 IS NOT NULL
+                  THEN json_object('sugar', f.sugar100) ELSE '{}' END),
+                CASE WHEN f.salt_g100 IS NOT NULL
+                  THEN json_object('salt', f.salt_g100) ELSE '{}' END)
+             FROM foods f WHERE f.id = entries.food_id)
+          )
+          WHERE food_id IS NOT NULL
+            AND EXISTS (SELECT 1 FROM foods f WHERE f.id = entries.food_id)
+        ''');
       }
     },
     beforeOpen: (details) async {
@@ -366,14 +401,34 @@ class AppDatabase extends _$AppDatabase {
   /// Live per-day totals for kcal *and* each macro within [startDay, endDay]
   /// (inclusive). Each is the snapshot per-100 g scaled by grams; only days with
   /// entries are returned. Lets the trends chart swap which metric it plots.
-  Stream<List<({String day, double kcal, double protein, double carb, double fat})>>
+  Stream<
+    List<
+      ({
+        String day,
+        double kcal,
+        double protein,
+        double carb,
+        double fat,
+        double fiber,
+        double satFat,
+        double sugar,
+        double salt,
+      })
+    >
+  >
   watchDailyTotals(String startDay, String endDay) {
     return customSelect(
       'SELECT day, '
       'SUM(s_kcal100 * grams / 100.0) AS kcal, '
       'SUM(s_protein100 * grams / 100.0) AS protein, '
       'SUM(s_carb100 * grams / 100.0) AS carb, '
-      'SUM(s_fat100 * grams / 100.0) AS fat '
+      'SUM(s_fat100 * grams / 100.0) AS fat, '
+      // The tracked micros ride the JSON snapshot blob (json1 ships in the
+      // bundled sqlite3); absent keys count 0 like an unlogged day.
+      "SUM(COALESCE(json_extract(s_micros_json, '\$.fiber'), 0) * grams / 100.0) AS fiber, "
+      "SUM(COALESCE(json_extract(s_micros_json, '\$.satFat'), 0) * grams / 100.0) AS sat_fat, "
+      "SUM(COALESCE(json_extract(s_micros_json, '\$.sugar'), 0) * grams / 100.0) AS sugar, "
+      "SUM(COALESCE(json_extract(s_micros_json, '\$.salt'), 0) * grams / 100.0) AS salt "
       'FROM entries WHERE day >= ? AND day <= ? GROUP BY day ORDER BY day',
       variables: [Variable.withString(startDay), Variable.withString(endDay)],
       readsFrom: {entries},
@@ -386,6 +441,10 @@ class AppDatabase extends _$AppDatabase {
               protein: r.readNullable<double>('protein') ?? 0,
               carb: r.readNullable<double>('carb') ?? 0,
               fat: r.readNullable<double>('fat') ?? 0,
+              fiber: r.readNullable<double>('fiber') ?? 0,
+              satFat: r.readNullable<double>('sat_fat') ?? 0,
+              sugar: r.readNullable<double>('sugar') ?? 0,
+              salt: r.readNullable<double>('salt') ?? 0,
             ),
           )
           .toList(),

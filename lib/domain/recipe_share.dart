@@ -13,6 +13,11 @@ class RecipeShareItem {
   final double? carb100;
   final double? fat100;
 
+  /// Per-100g tracked nutrients + open micros (fiber/satFat/sugar/salt keys —
+  /// see `snapshotMicros100`). Optional in the share payload; decoders that
+  /// predate it ignore the key.
+  final Map<String, double>? micros100;
+
   const RecipeShareItem({
     required this.name,
     required this.grams,
@@ -20,6 +25,7 @@ class RecipeShareItem {
     this.protein100,
     this.carb100,
     this.fat100,
+    this.micros100,
   });
 
   Nutrition get nutrition => Nutrition.fromPer100g(
@@ -27,6 +33,7 @@ class RecipeShareItem {
     protein100: protein100,
     carb100: carb100,
     fat100: fat100,
+    micros100: micros100,
     grams: grams,
   );
 }
@@ -51,6 +58,7 @@ class RecipeShare {
       protein: t.protein / s,
       carb: t.carb / s,
       fat: t.fat / s,
+      micros: t.micros.map((k, v) => MapEntry(k, v / s)),
     );
   }
 
@@ -76,6 +84,8 @@ class RecipeCodec {
             if (i.protein100 != null) 'p': i.protein100,
             if (i.carb100 != null) 'c': i.carb100,
             if (i.fat100 != null) 'f': i.fat100,
+            if (i.micros100 != null && i.micros100!.isNotEmpty)
+              'm': i.micros100,
           },
       ],
     };
@@ -103,6 +113,11 @@ class RecipeCodec {
             protein100: d(raw['p']),
             carb100: d(raw['c']),
             fat100: d(raw['f']),
+            micros100: raw['m'] is Map
+                ? (raw['m'] as Map).map(
+                    (k, v) => MapEntry(k.toString(), (v as num).toDouble()),
+                  )
+                : null,
           ),
         );
       }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:calorie_tracker/data/db/database.dart';
 import 'package:calorie_tracker/domain/enums.dart';
+import 'package:calorie_tracker/domain/nutrition.dart' show decodeMicros;
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -235,9 +236,9 @@ void main() {
     expect(await d.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
   }
 
-  Future<void> expectSchemaVersion11(AppDatabase d) async {
+  Future<void> expectSchemaVersionLatest(AppDatabase d) async {
     final row = await d.customSelect('PRAGMA user_version').getSingle();
-    expect(row.read<int>('user_version'), 11);
+    expect(row.read<int>('user_version'), 12);
   }
 
   test('v1 -> latest: kcal target carries into kcal_max, usda layer purged', () async {
@@ -330,7 +331,7 @@ void main() {
     expect((await d.targetForWeekday(2))!.proteinMin, 120);
 
     await expectFkIntegrity(d);
-    await expectSchemaVersion11(d);
+    await expectSchemaVersionLatest(d);
   });
 
   test('v6 -> latest: usda purge + enum renumbering keep semantics', () async {
@@ -387,7 +388,7 @@ void main() {
     expect(dayEntries[1].foodId, 4);
 
     await expectFkIntegrity(d);
-    await expectSchemaVersion11(d);
+    await expectSchemaVersionLatest(d);
   });
 
   test('v7 -> latest: devices that went through v7 lose nothing', () async {
@@ -439,7 +440,7 @@ void main() {
     expect(entry.grams, 120);
 
     await expectFkIntegrity(d);
-    await expectSchemaVersion11(d);
+    await expectSchemaVersionLatest(d);
   });
 
   test('v10 -> latest: DROP COLUMN keeps kcal targets and food data', () async {
@@ -517,6 +518,68 @@ void main() {
     expect(entry.grams, 350);
 
     await expectFkIntegrity(d);
-    await expectSchemaVersion11(d);
+    await expectSchemaVersionLatest(d);
+  });
+
+  test('v11 -> v12: target columns added, tracked micros backfilled', () async {
+    final d = openFixture(11, _schemaV10(), (raw) {
+      // Reproduce the v11 shape exactly as m.addColumn left it.
+      for (final c in [
+        'protein_min', 'protein_max', 'carb_min', 'carb_max',
+        'fat_min', 'fat_max', // v11 macro bounds
+      ]) {
+        raw.execute('ALTER TABLE targets ADD COLUMN $c REAL NULL');
+      }
+      raw.execute('INSERT INTO targets (weekday, kcal_min, protein_min) '
+          'VALUES (0, 1800, 120)');
+      // A food rich in tracked nutrients, one with only fiber, plus entries:
+      // linked to each, one snapshot-only, one whose micros blob has a key.
+      raw.execute(
+        'INSERT INTO foods (id, source, name, kcal100, fiber100, sugar100, '
+        'sat_fat100, salt_g100) VALUES '
+        "(1, 1, 'Vollkornbrot', 220, 7.5, 2.1, 0.4, 1.2), "
+        "(2, 1, 'Apfel', 52, 2.4, NULL, NULL, NULL)",
+      );
+      raw.execute(
+        "INSERT INTO entries (day, meal_type, food_id, grams, s_name, "
+        "s_kcal100, s_micros_json) VALUES "
+        "('2026-06-30', 0, 1, 80, 'Vollkornbrot', 220, NULL), "
+        "('2026-06-30', 0, 2, 150, 'Apfel', 52, '{\"iron\": 0.3}'), "
+        "('2026-06-30', 1, NULL, 200, 'Quick add', 150, NULL)",
+      );
+    });
+
+    // Targets: new columns exist, old data intact, new bounds writable.
+    final cols = await columnsOf(d, 'targets');
+    expect(
+      cols,
+      containsAll([
+        'fiber_min', 'fiber_max', 'sat_fat_min', 'sat_fat_max',
+        'sugar_min', 'sugar_max', 'salt_min', 'salt_max',
+      ]),
+    );
+    final monday = await d.targetForWeekday(0);
+    expect(monday!.kcalMin, 1800);
+    expect(monday.proteinMin, 120);
+    expect(monday.fiberMin, isNull);
+
+    // Backfill: the linked entries adopt the food's tracked nutrients…
+    final entries = await d.watchDay('2026-06-30').first;
+    final brot = entries.firstWhere((e) => e.sName == 'Vollkornbrot');
+    expect(decodeMicros(brot.sMicrosJson), {
+      'fiber': 7.5,
+      'sugar': 2.1,
+      'satFat': 0.4,
+      'salt': 1.2,
+    });
+    // …null food columns add no keys, and existing micros keys survive.
+    final apfel = entries.firstWhere((e) => e.sName == 'Apfel');
+    expect(decodeMicros(apfel.sMicrosJson), {'iron': 0.3, 'fiber': 2.4});
+    // Snapshot-only entries are untouched (nothing to backfill from).
+    final quick = entries.firstWhere((e) => e.sName == 'Quick add');
+    expect(quick.sMicrosJson, isNull);
+
+    await expectFkIntegrity(d);
+    await expectSchemaVersionLatest(d);
   });
 }

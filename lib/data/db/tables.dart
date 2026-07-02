@@ -124,6 +124,16 @@ class Targets extends Table {
   RealColumn get carbMax => real().nullable()();
   RealColumn get fatMin => real().nullable()();
   RealColumn get fatMax => real().nullable()();
+  // Phase 15 (v12): the configurable tracked nutrients — same min/max shape
+  // as the v11 macro columns. All grams (salt as g, not sodium).
+  RealColumn get fiberMin => real().nullable()();
+  RealColumn get fiberMax => real().nullable()();
+  RealColumn get satFatMin => real().nullable()();
+  RealColumn get satFatMax => real().nullable()();
+  RealColumn get sugarMin => real().nullable()();
+  RealColumn get sugarMax => real().nullable()();
+  RealColumn get saltMin => real().nullable()();
+  RealColumn get saltMax => real().nullable()();
 
   @override
   Set<Column> get primaryKey => {weekday};

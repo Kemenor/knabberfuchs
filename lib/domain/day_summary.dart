@@ -51,9 +51,32 @@ class CalorieTarget {
   bool get isEmpty => min == null && max == null;
 }
 
-/// The four trackable metrics that can carry a target. Calories are in kcal;
-/// the macros are in grams.
-enum TargetMetric { kcal, protein, carb, fat }
+/// The trackable metrics that can carry a target. Calories are in kcal; all
+/// others are in grams. kcal/protein/carb/fat live as typed entry-snapshot
+/// columns; fiber/satFat/sugar/salt ride the `sMicrosJson` blob keyed by the
+/// enum name (see [snapshotMicros100]).
+enum TargetMetric { kcal, protein, carb, fat, fiber, satFat, sugar, salt }
+
+/// The nutrients beyond kcal/P/C/F that became trackable in Phase 15.
+const microMetrics = [
+  TargetMetric.fiber,
+  TargetMetric.satFat,
+  TargetMetric.sugar,
+  TargetMetric.salt,
+];
+
+/// The per-100g micros blob written into every entry/recipe-item snapshot:
+/// whatever open micros the food already carries, plus the tracked nutrients
+/// from their typed food columns. Always written in full — the user's enabled
+/// set only gates display, so enabling a nutrient later has data from today
+/// backward.
+Map<String, double> snapshotMicros100(Food f) => {
+  ...decodeMicros(f.microsJson),
+  if (f.fiber100 != null) TargetMetric.fiber.name: f.fiber100!,
+  if (f.satFat100 != null) TargetMetric.satFat.name: f.satFat100!,
+  if (f.sugar100 != null) TargetMetric.sugar.name: f.sugar100!,
+  if (f.saltG100 != null) TargetMetric.salt.name: f.saltG100!,
+};
 
 /// The day's total for [m], pulled from an already-summed [Nutrition].
 double metricValue(Nutrition n, TargetMetric m) => switch (m) {
@@ -61,6 +84,9 @@ double metricValue(Nutrition n, TargetMetric m) => switch (m) {
   TargetMetric.protein => n.protein,
   TargetMetric.carb => n.carb,
   TargetMetric.fat => n.fat,
+  // Micro-backed metrics: absent from old entries reads as 0, same as an
+  // unlogged day.
+  _ => n.micros[m.name] ?? 0,
 };
 
 /// A [Target] row's (min, max) for [m] — null row or null bound both read null.
@@ -69,6 +95,10 @@ double metricValue(Nutrition n, TargetMetric m) => switch (m) {
   TargetMetric.protein => (t?.proteinMin, t?.proteinMax),
   TargetMetric.carb => (t?.carbMin, t?.carbMax),
   TargetMetric.fat => (t?.fatMin, t?.fatMax),
+  TargetMetric.fiber => (t?.fiberMin, t?.fiberMax),
+  TargetMetric.satFat => (t?.satFatMin, t?.satFatMax),
+  TargetMetric.sugar => (t?.sugarMin, t?.sugarMax),
+  TargetMetric.salt => (t?.saltMin, t?.saltMax),
 };
 
 /// Fill fraction 0..1 for a metric's progress bar, or null when the metric has
@@ -86,18 +116,17 @@ class DaySummary {
   final List<EntryView> entries;
   final double? kcalMin;
   final double? kcalMax;
-  final CalorieTarget proteinTarget;
-  final CalorieTarget carbTarget;
-  final CalorieTarget fatTarget;
+
+  /// Resolved bounds per non-kcal metric; an absent key = no target. A map
+  /// (not named fields) so new tracked nutrients don't grow the constructor.
+  final Map<TargetMetric, CalorieTarget> metricTargets;
 
   DaySummary({
     required this.day,
     required this.entries,
     this.kcalMin,
     this.kcalMax,
-    this.proteinTarget = const CalorieTarget(null, null),
-    this.carbTarget = const CalorieTarget(null, null),
-    this.fatTarget = const CalorieTarget(null, null),
+    this.metricTargets = const {},
   });
 
   Nutrition get total => Nutrition.sum(entries.map((e) => e.nutrition));
@@ -114,12 +143,9 @@ class DaySummary {
       statusFor(total.kcal, CalorieTarget(kcalMin, kcalMax));
 
   /// The resolved target for any metric (kcal pulled from kcalMin/kcalMax).
-  CalorieTarget targetFor(TargetMetric m) => switch (m) {
-    TargetMetric.kcal => CalorieTarget(kcalMin, kcalMax),
-    TargetMetric.protein => proteinTarget,
-    TargetMetric.carb => carbTarget,
-    TargetMetric.fat => fatTarget,
-  };
+  CalorieTarget targetFor(TargetMetric m) => m == TargetMetric.kcal
+      ? CalorieTarget(kcalMin, kcalMax)
+      : metricTargets[m] ?? const CalorieTarget(null, null);
 
   double valueFor(TargetMetric m) => metricValue(total, m);
   TargetStatus statusForMetric(TargetMetric m) =>

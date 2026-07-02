@@ -6,6 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/format.dart';
 import '../../data/db/database.dart';
+import '../../domain/day_summary.dart' show snapshotMicros100;
 import '../../domain/nutrition.dart';
 import '../../domain/food_name.dart';
 import '../../domain/recipe_share.dart';
@@ -87,6 +88,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
           protein100: food.protein100,
           carb100: food.carb100,
           fat100: food.fat100,
+          micros100: snapshotMicros100(food),
         ),
       );
     });
@@ -113,6 +115,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
         protein100: item.protein100,
         carb100: item.carb100,
         fat100: item.fat100,
+        micros100: item.micros100,
       );
     });
   }
