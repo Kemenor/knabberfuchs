@@ -507,6 +507,43 @@ Strategy:
     → P5 icons → P6 fonts + picker → P7 icon retheme → P8 store/landing → P9 ship → P10 checkfuchs
     migrates onto the package. Regenerate the 29 goldens per visual phase.
 
+- **Phase 15 — Configurable tracked nutrients:** 📋 PLANNED (from tester feedback
+  2026-07-01; supersedes the "just add fiber" and "split saturated fat" asks — see
+  `FEEDBACK.md`). Make the set of nutrients with target rows **user-configurable**
+  instead of the fixed kcal/P/C/F list, so fiber, saturated fat, and future nutrients
+  (sugar, salt) become entries in that list rather than one-off bolt-ons.
+  - **Today:** `TargetMetric {kcal, protein, carb, fat}` (`lib/domain/day_summary.dart:56`)
+    is hardcoded through the Targets table (`lib/data/db/tables.dart:121-124`,
+    min/max column pairs per metric), the Targets settings screen
+    (`lib/ui/settings/targets_screen.dart`), the Day-card bars, and the Trends
+    metric switcher. Fiber/saturates are already captured per food
+    (`fiber100`/`satFat100`) and snapshotted per entry — only the target/display
+    layer is missing.
+  - **Sketch:** extend `TargetMetric` with the new nutrients; a Settings toggle list
+    ("Tracked nutrients", kcal always on, P/C/F on by default) stored as a setting;
+    Targets screen, Day card, and Trends render only the enabled metrics. Schema:
+    new min/max column pairs (fiber, satFat) — same shape as the macro columns added
+    in v11, plus backup export/restore coverage.
+  - **Watch out:** Day-card space with 6+ bars (collapse to the enabled set), Trends
+    swatch colors for new metrics, entry snapshots already carry fiber/satFat only
+    via `sMicrosJson`/columns — verify aggregation paths before wiring UI.
+
+- **Phase 16 — Health Connect energy read-back ("eat back your exercise"):**
+  📋 PLANNED (from tester feedback 2026-07-01, see `FEEDBACK.md`). Read burned
+  calories from the health store and reflect them in the daily kcal budget, the way
+  MyFitnessPal/Lose It/Cronometer do.
+  - **Today:** `HealthService` is write-only (`lib/data/health/health_service.dart`);
+    the kcal target is a static per-weekday min/max.
+  - **Sketch:** opt-in **separate toggle** (new read-permission grant, distinct from
+    the write-sync switch); read `ACTIVE_ENERGY_BURNED` (+ optionally
+    `TOTAL_CALORIES_BURNED`/`BASAL_ENERGY_BURNED`, all already in the `health` pkg)
+    for the viewed day; Day card shows "+N kcal from activity" and shifts the
+    remaining/over calculation. **Open decision** (settle at build time): active-only
+    add-on to the static target (simpler, default) vs. full TDEE replacing it.
+  - **Watch out:** double-counting BMR (never add TOTAL on top of a target that
+    already assumes resting burn); iOS parity via HealthKit active energy; days with
+    no wearable data must fall back to the plain static target.
+
 ## Phase 5 design — Offline OFF regional packs (planned 2026-06-17)
 
 **Decisions:** build on **GitHub Actions** → host on **Hugging Face** dataset; **per-country**
