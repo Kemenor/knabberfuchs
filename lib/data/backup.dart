@@ -11,8 +11,9 @@ import 'db/database.dart';
 /// replaces the legacy target `kcal` field with `kcalMin`/`kcalMax`. Fields
 /// added later within v2 restore to null/defaults when absent, so the version
 /// is unchanged: per-macro target bounds (`proteinMin/Max`, `carbMin/Max`,
-/// `fatMin/Max`) and the custom-food `barcode`/`externalId`/`densityGPerMl`/
-/// `usageCount`/`lastUsedAt` columns.
+/// `fatMin/Max`), the Phase-15 nutrient bounds (`fiberMin/Max`,
+/// `satFatMin/Max`, `sugarMin/Max`, `saltMin/Max`) and the custom-food
+/// `barcode`/`externalId`/`densityGPerMl`/`usageCount`/`lastUsedAt` columns.
 const backupSchemaVersion = 2;
 
 /// Thrown when a backup was written by a newer app version than this build
@@ -151,6 +152,14 @@ Future<Map<String, dynamic>> buildBackupMap(
           'carbMax': t.carbMax,
           'fatMin': t.fatMin,
           'fatMax': t.fatMax,
+          'fiberMin': t.fiberMin,
+          'fiberMax': t.fiberMax,
+          'satFatMin': t.satFatMin,
+          'satFatMax': t.satFatMax,
+          'sugarMin': t.sugarMin,
+          'sugarMax': t.sugarMax,
+          'saltMin': t.saltMin,
+          'saltMax': t.saltMax,
         },
     ],
     'settings': {
@@ -340,6 +349,14 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
               carbMax: _bound(m, 'carbMax'),
               fatMin: _bound(m, 'fatMin'),
               fatMax: _bound(m, 'fatMax'),
+              fiberMin: _bound(m, 'fiberMin'),
+              fiberMax: _bound(m, 'fiberMax'),
+              satFatMin: _bound(m, 'satFatMin'),
+              satFatMax: _bound(m, 'satFatMax'),
+              sugarMin: _bound(m, 'sugarMin'),
+              sugarMax: _bound(m, 'sugarMax'),
+              saltMin: _bound(m, 'saltMin'),
+              saltMax: _bound(m, 'saltMax'),
             ),
           );
     }
