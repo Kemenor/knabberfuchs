@@ -10,6 +10,7 @@ import '../../domain/enums.dart';
 import '../../domain/food_name.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import 'food_form_screen.dart';
 
 /// Reusable food search: instant local cache results as you type, plus a
 /// 600 ms-debounced online OFF search (never per keystroke). Calls [onPick]
@@ -115,6 +116,15 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
     }
   }
 
+  /// Open the food form pre-filled to update this custom food, then refresh
+  /// the list so the edited values show right away.
+  Future<void> _editFood(Food food) async {
+    final updated = await Navigator.of(context).push<Food>(
+      MaterialPageRoute(builder: (_) => FoodFormScreen(initial: food)),
+    );
+    if (updated != null && mounted) _runLocal(_query);
+  }
+
   List<Food> get _merged {
     // Same identity key as FoodRepository.searchLocal: pack results all carry
     // the synthetic id 0, so deduping on raw ids would collapse them into one.
@@ -205,9 +215,15 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
                         onTap: widget.onCreateCustom,
                       );
                     }
+                    final food = results[i];
                     return _FoodTile(
-                      food: results[i],
-                      onTap: () => widget.onPick(results[i]),
+                      food: food,
+                      onTap: () => widget.onPick(food),
+                      // Only persisted custom foods are editable (pack rows
+                      // carry the synthetic id 0 until first use).
+                      onEdit: food.source == FoodSource.custom && food.id != 0
+                          ? () => _editFood(food)
+                          : null,
                     );
                   },
                 ),
@@ -220,7 +236,8 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
 class _FoodTile extends StatelessWidget {
   final Food food;
   final VoidCallback onTap;
-  const _FoodTile({required this.food, required this.onTap});
+  final VoidCallback? onEdit;
+  const _FoodTile({required this.food, required this.onTap, this.onEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -240,10 +257,23 @@ class _FoodTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(parts.join(' · ')),
-      trailing: Text(
-        l10n.kcalPer100Short(kcalStr(food.kcal100)),
-        textAlign: TextAlign.right,
-        style: Theme.of(context).textTheme.bodySmall,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            l10n.kcalPer100Short(kcalStr(food.kcal100)),
+            textAlign: TextAlign.right,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          if (onEdit != null)
+            PopupMenuButton<String>(
+              icon: const Icon(Symbols.more_vert_rounded, size: 20),
+              onSelected: (_) => onEdit!(),
+              itemBuilder: (_) => [
+                PopupMenuItem(value: 'edit', child: Text(l10n.actionEdit)),
+              ],
+            ),
+        ],
       ),
       onTap: onTap,
     );

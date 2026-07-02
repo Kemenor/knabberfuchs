@@ -153,6 +153,12 @@ class AppDatabase extends _$AppDatabase {
   Future<Food?> foodById(int id) =>
       (select(foods)..where((f) => f.id.equals(id))).getSingleOrNull();
 
+  /// Overwrite an existing food row in place (edit-custom-food). Keyed by id,
+  /// unlike [upsertFood]'s (source, externalId) conflict target, so clearing or
+  /// changing the barcode updates this row instead of inserting a new one.
+  Future<void> updateFoodById(int id, FoodsCompanion food) =>
+      (update(foods)..where((f) => f.id.equals(id))).write(food);
+
   Future<Food?> foodByExternal(FoodSource source, String externalId) =>
       (select(foods)..where(
             (f) =>

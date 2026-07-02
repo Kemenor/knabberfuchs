@@ -20,35 +20,42 @@ import 'image_source_sheet.dart';
 /// Create a saved food: one full nutrition form for everything. The barcode is
 /// just an optional field (type it, or tap the icon to scan one) — with a value
 /// the food is re-scannable. Pass [barcode] to pre-fill it (e.g. from a
-/// not-found scan). Pops the [Food].
+/// not-found scan), or [initial] to edit an existing custom food in place
+/// (diary entries keep their logged snapshots). Pops the [Food].
 class FoodFormScreen extends ConsumerStatefulWidget {
   final String? barcode;
-  const FoodFormScreen({super.key, this.barcode});
+  final Food? initial;
+  const FoodFormScreen({super.key, this.barcode, this.initial});
 
   @override
   ConsumerState<FoodFormScreen> createState() => _FoodFormScreenState();
 }
 
 class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
-  late final _barcode = TextEditingController(text: widget.barcode ?? '');
-  final _name = TextEditingController();
-  final _brand = TextEditingController();
-  final _serving = TextEditingController();
-  final _kcal = TextEditingController();
-  final _protein = TextEditingController();
-  final _carb = TextEditingController();
-  final _fat = TextEditingController();
-  final _fiber = TextEditingController();
-  final _sugar = TextEditingController();
-  final _satfat = TextEditingController();
-  final _salt = TextEditingController();
+  late final _barcode = TextEditingController(
+    text: widget.initial?.barcode ?? widget.barcode ?? '',
+  );
+  late final _name = TextEditingController(text: widget.initial?.name ?? '');
+  late final _brand = TextEditingController(text: widget.initial?.brand ?? '');
+  late final _serving = _valueController(widget.initial?.servingG);
+  late final _kcal = _valueController(widget.initial?.kcal100);
+  late final _protein = _valueController(widget.initial?.protein100);
+  late final _carb = _valueController(widget.initial?.carb100);
+  late final _fat = _valueController(widget.initial?.fat100);
+  late final _fiber = _valueController(widget.initial?.fiber100);
+  late final _sugar = _valueController(widget.initial?.sugar100);
+  late final _satfat = _valueController(widget.initial?.satFat100);
+  late final _salt = _valueController(widget.initial?.saltG100);
   bool _ocrBusy = false;
+
+  static TextEditingController _valueController(double? v) =>
+      TextEditingController(text: v == null ? '' : gramsStr(v));
 
   /// Whether this food is measured by volume (ml) rather than weight (g). When
   /// true the serving and "per 100" basis read in ml and we store a 1 g/ml
   /// density so the log sheet offers ml. Per-100 values map 1:1 to the per-100g
   /// storage basis at 1 g/ml; an editable density is a future enhancement.
-  bool _isLiquid = false;
+  late bool _isLiquid = widget.initial?.densityGPerMl != null;
 
   String get _baseUnit => _isLiquid ? 'ml' : 'g';
 
@@ -163,26 +170,45 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     setState(() => _saving = true);
     try {
       final barcode = _barcode.text.trim();
-      final food = await ref
-          .read(foodRepositoryProvider)
-          .createFood(
-            barcode: barcode.isEmpty ? null : barcode,
-            name: name,
-            brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
-            kcal100: kcal,
-            protein100: _val(_protein),
-            carb100: _val(_carb),
-            fat100: _val(_fat),
-            fiber100: _val(_fiber),
-            sugar100: _val(_sugar),
-            satFat100: _val(_satfat),
-            saltG100: _val(_salt),
-            servingG: _val(_serving),
-            // At 1 g/ml the entered per-100ml / serving-ml values equal the
-            // per-100g / grams storage basis, so we store them as-is and just
-            // record the density so the log sheet measures this food in ml.
-            densityGPerMl: _isLiquid ? 1.0 : null,
-          );
+      final repo = ref.read(foodRepositoryProvider);
+      final initial = widget.initial;
+      // At 1 g/ml the entered per-100ml / serving-ml values equal the
+      // per-100g / grams storage basis, so we store them as-is and just
+      // record the density so the log sheet measures this food in ml.
+      final density = _isLiquid ? (initial?.densityGPerMl ?? 1.0) : null;
+      final food = initial != null
+          ? await repo.updateFood(
+              initial.id,
+              barcode: barcode.isEmpty ? null : barcode,
+              name: name,
+              brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
+              kcal100: kcal,
+              protein100: _val(_protein),
+              carb100: _val(_carb),
+              fat100: _val(_fat),
+              fiber100: _val(_fiber),
+              sugar100: _val(_sugar),
+              satFat100: _val(_satfat),
+              saltG100: _val(_salt),
+              servingG: _val(_serving),
+              servingLabel: initial.servingLabel,
+              densityGPerMl: density,
+            )
+          : await repo.createFood(
+              barcode: barcode.isEmpty ? null : barcode,
+              name: name,
+              brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
+              kcal100: kcal,
+              protein100: _val(_protein),
+              carb100: _val(_carb),
+              fat100: _val(_fat),
+              fiber100: _val(_fiber),
+              sugar100: _val(_sugar),
+              satFat100: _val(_satfat),
+              saltG100: _val(_salt),
+              servingG: _val(_serving),
+              densityGPerMl: density,
+            );
       if (mounted) Navigator.of(context).pop(food);
     } catch (e) {
       messenger.showAutoSnackBar(
@@ -197,7 +223,11 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.foodFormTitle)),
+      appBar: AppBar(
+        title: Text(
+          widget.initial == null ? l10n.foodFormTitle : l10n.foodFormEditTitle,
+        ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'foodSaveFab',
         onPressed: _saving ? null : _save,
