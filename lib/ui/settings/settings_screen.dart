@@ -121,7 +121,8 @@ class SettingsScreen extends ConsumerWidget {
                     value: healthSync,
                     onChanged: (v) => _toggleHealthSync(context, ref, v),
                   ),
-                  if (healthSync)
+                  if (healthSync) ...[
+                    const _HealthResyncTile(),
                     ListTile(
                       contentPadding: _cardRowPadding,
                       leading: const Icon(Symbols.info_rounded),
@@ -129,6 +130,7 @@ class SettingsScreen extends ConsumerWidget {
                       title: Text(l10n.settingsHealthTimeNote),
                       subtitle: Text(l10n.settingsHealthTimeNoteSub),
                     ),
+                  ],
                 ],
               ),
               _SectionHeader(l10n.settingsDataBackup),
@@ -185,6 +187,57 @@ class SettingsScreen extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// "Resync all days": wipe everything this app wrote to the health store and
+/// re-push the whole diary — the recovery path when synced numbers went stale
+/// (edited history, restored backup). Kept as its own stateful tile so the
+/// spinner/disabled state doesn't need state in the parent ConsumerWidget.
+class _HealthResyncTile extends ConsumerStatefulWidget {
+  const _HealthResyncTile();
+
+  @override
+  ConsumerState<_HealthResyncTile> createState() => _HealthResyncTileState();
+}
+
+class _HealthResyncTileState extends ConsumerState<_HealthResyncTile> {
+  bool _busy = false;
+
+  Future<void> _resync() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
+    try {
+      await ref
+          .read(healthServiceProvider)
+          .resyncAll(ref.read(dbProvider));
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.healthResyncDone(_healthStore()))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListTile(
+      contentPadding: _cardRowPadding,
+      leading: _busy
+          ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Symbols.sync_rounded),
+      title: Text(l10n.settingsHealthResync),
+      subtitle: Text(l10n.settingsHealthResyncSub(_healthStore())),
+      enabled: !_busy,
+      onTap: _resync,
     );
   }
 }
