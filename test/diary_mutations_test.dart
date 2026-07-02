@@ -86,6 +86,69 @@ void main() {
     });
   });
 
+  group('mergeGroups', () {
+    test('moves entries after the target\'s own and deletes the source', () async {
+      final gid = await seedGroup();
+      final target = await db.createEntryGroup('2026-06-17', 'Lunch');
+      await db.addEntry(
+        EntriesCompanion.insert(
+          day: '2026-06-17',
+          mealType: MealType.lunch,
+          groupId: Value(target),
+          grams: 200,
+          sName: 'Salad',
+          sKcal100: 40,
+          sortIndex: const Value(3),
+        ),
+      );
+
+      await repo.mergeGroups(fromGroupId: gid, toGroupId: target);
+
+      // Source group is gone; nothing cascaded away.
+      expect(await db.entryGroupById(gid), isNull);
+      final items = await db.entriesForGroup(target);
+      expect(items.map((e) => e.sName), ['Salad', 'Beans', 'Beef']);
+      // Moved entries append after the target's max sortIndex, adopt its
+      // meal type, and keep their nutrition.
+      expect(items.map((e) => e.sortIndex), [3, 4, 5]);
+      expect(items.map((e) => e.mealType).toSet(), {MealType.lunch});
+      expect(
+        items.firstWhere((e) => e.sName == 'Beef').grams,
+        600,
+      );
+
+      // The ungrouped entry is untouched.
+      final honey = (await db.allEntries()).firstWhere(
+        (e) => e.sName == 'Honey',
+      );
+      expect(honey.groupId, isNull);
+    });
+
+    test('re-files entries onto the target\'s day when it differs', () async {
+      final gid = await seedGroup();
+      final target = await db.createEntryGroup('2026-06-18', 'Leftovers');
+
+      await repo.mergeGroups(fromGroupId: gid, toGroupId: target);
+
+      final items = await db.entriesForGroup(target);
+      expect(items, hasLength(2));
+      for (final e in items) {
+        expect(e.day, '2026-06-18');
+        // An empty target has no meal type to adopt; the source's stays.
+        expect(e.mealType, MealType.dinner);
+      }
+    });
+
+    test('merging into itself or a missing group is a no-op', () async {
+      final gid = await seedGroup();
+      await repo.mergeGroups(fromGroupId: gid, toGroupId: gid);
+      await repo.mergeGroups(fromGroupId: gid, toGroupId: 9999);
+
+      expect(await db.entryGroupById(gid), isNotNull);
+      expect(await db.entriesForGroup(gid), hasLength(2));
+    });
+  });
+
   group('editEntryGroup', () {
     test('renames, re-files onto the new day and spreads entry times', () async {
       final gid = await seedGroup();

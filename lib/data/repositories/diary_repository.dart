@@ -136,4 +136,35 @@ class DiaryRepository {
       await db.deleteEntryGroup(groupId); // removes the original + its entries
     });
   }
+
+  /// Merge one meal group into another (the inverse of split): every entry of
+  /// [fromGroupId] moves to the end of [toGroupId] — re-filed onto the target's
+  /// day and meal so the day view stays consistent — then the emptied source
+  /// group is deleted. Entry times are untouched.
+  Future<void> mergeGroups({
+    required int fromGroupId,
+    required int toGroupId,
+  }) async {
+    if (fromGroupId == toGroupId) return;
+    final target = await db.entryGroupById(toGroupId);
+    if (target == null) return;
+    final existing = await db.entriesForGroup(toGroupId);
+    final moved = await db.entriesForGroup(fromGroupId);
+    var next = existing.isEmpty
+        ? 0
+        : existing.map((e) => e.sortIndex).reduce((a, b) => a > b ? a : b) + 1;
+    await db.transaction(() async {
+      for (final e in moved) {
+        await db.updateEntry(
+          e.copyWith(
+            groupId: Value(toGroupId),
+            day: target.day,
+            mealType: existing.isEmpty ? e.mealType : existing.first.mealType,
+            sortIndex: next++,
+          ),
+        );
+      }
+      await db.deleteEntryGroup(fromGroupId);
+    });
+  }
 }
