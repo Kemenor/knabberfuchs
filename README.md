@@ -60,4 +60,4 @@ Architecture, data model, and the phased roadmap are in [`PLAN.md`](./PLAN.md).
 
 ## License
 
-TBD
+[Apache-2.0](./LICENSE) — Copyright 2026 Thomas Kunkel.
