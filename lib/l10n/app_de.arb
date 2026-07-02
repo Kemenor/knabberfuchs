@@ -73,6 +73,7 @@
 
   "mealMenuEdit": "Mahlzeit bearbeiten",
   "mealMenuSplit": "Auf mehrere Tage aufteilen",
+  "mealMenuMerge": "Mit anderer Mahlzeit zusammenführen",
   "mealMenuScale": "Mahlzeit skalieren",
   "scaleMealApply": "Auf {pct}% skalieren",
   "scaleMealDone": "Mahlzeit auf {pct}% skaliert",
@@ -151,6 +152,9 @@
   "healthUnavailable": "{store} ist auf diesem Gerät nicht verfügbar.",
   "healthNoPermission": "{store}-Berechtigung wurde nicht erteilt.",
   "healthSyncOn": "{store}-Synchronisierung aktiv — heute übertragen.",
+  "settingsHealthResync": "Alle Tage neu synchronisieren",
+  "settingsHealthResyncSub": "Daten dieser App in {store} löschen und das ganze Tagebuch neu schreiben",
+  "healthResyncDone": "Neu mit {store} synchronisiert.",
 
   "backupExportFailed": "Export fehlgeschlagen: {error}",
   "backupFileType": "Backup",
@@ -207,6 +211,7 @@
   "captureScanAi": "Mahlzeit mit KI scannen",
   "captureScanAiSub": "Fotografiere ein Gericht — wir schätzen es und die Kalorien",
   "foodFormTitle": "Neues Lebensmittel",
+  "foodFormEditTitle": "Lebensmittel bearbeiten",
   "barcodeField": "Barcode (optional)",
   "settingsAi": "KI-Erkennung",
   "aiKeyDesc": "Fotos werden standardmäßig auf deinem Gerät erkannt. Füge einen Google-Gemini-API-Schlüssel hinzu für genauere Ergebnisse und Portionsschätzungen. Dein Foto wird dann an Google gesendet. Geminis kostenloser Tarif reicht für den privaten Gebrauch; wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen. Im kostenlosen Tarif kann Google deine Fotos zur Verbesserung seiner Modelle verwenden.",
@@ -359,6 +364,11 @@
   "splitDescription": "Teile diese Mahlzeit in gleiche Portionen, eine pro Tag. Das Original wird ersetzt.",
   "splitKcalEach": "je {kcal} kcal",
   "splitInto": "Auf {n} Tage aufteilen",
+
+  "mergeTitle": "\"{name}\" zusammenführen mit…",
+  "mergeDescription": "Verschiebe alles aus dieser Mahlzeit in eine andere Mahlzeit des Tages. Diese Mahlzeit wird entfernt.",
+  "mergeNoOtherMeals": "Keine weiteren Mahlzeiten an diesem Tag.",
+  "mergedInto": "Zusammengeführt mit \"{name}\".",
 
   "cropTitle": "Auf die Tabelle zuschneiden",
   "cropDone": "Fertig",

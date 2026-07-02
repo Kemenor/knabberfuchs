@@ -214,6 +214,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get mealMenuSplit => 'Auf mehrere Tage aufteilen';
 
   @override
+  String get mealMenuMerge => 'Mit anderer Mahlzeit zusammenführen';
+
+  @override
   String get mealMenuScale => 'Mahlzeit skalieren';
 
   @override
@@ -468,6 +471,19 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get settingsHealthResync => 'Alle Tage neu synchronisieren';
+
+  @override
+  String settingsHealthResyncSub(String store) {
+    return 'Daten dieser App in $store löschen und das ganze Tagebuch neu schreiben';
+  }
+
+  @override
+  String healthResyncDone(String store) {
+    return 'Neu mit $store synchronisiert.';
+  }
+
+  @override
   String backupExportFailed(String error) {
     return 'Export fehlgeschlagen: $error';
   }
@@ -644,6 +660,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get foodFormTitle => 'Neues Lebensmittel';
+
+  @override
+  String get foodFormEditTitle => 'Lebensmittel bearbeiten';
 
   @override
   String get barcodeField => 'Barcode (optional)';
@@ -1130,6 +1149,23 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String splitInto(String n) {
     return 'Auf $n Tage aufteilen';
+  }
+
+  @override
+  String mergeTitle(String name) {
+    return '\"$name\" zusammenführen mit…';
+  }
+
+  @override
+  String get mergeDescription =>
+      'Verschiebe alles aus dieser Mahlzeit in eine andere Mahlzeit des Tages. Diese Mahlzeit wird entfernt.';
+
+  @override
+  String get mergeNoOtherMeals => 'Keine weiteren Mahlzeiten an diesem Tag.';
+
+  @override
+  String mergedInto(String name) {
+    return 'Zusammengeführt mit \"$name\".';
   }
 
   @override

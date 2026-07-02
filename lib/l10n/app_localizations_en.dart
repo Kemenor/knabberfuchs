@@ -214,6 +214,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealMenuSplit => 'Split across days';
 
   @override
+  String get mealMenuMerge => 'Merge into another meal';
+
+  @override
   String get mealMenuScale => 'Scale meal';
 
   @override
@@ -466,6 +469,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsHealthResync => 'Resync all days';
+
+  @override
+  String settingsHealthResyncSub(String store) {
+    return 'Clear this app\'s data in $store, then write the whole diary again';
+  }
+
+  @override
+  String healthResyncDone(String store) {
+    return 'Resynced to $store.';
+  }
+
+  @override
   String backupExportFailed(String error) {
     return 'Export failed: $error';
   }
@@ -643,6 +659,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get foodFormTitle => 'New food';
+
+  @override
+  String get foodFormEditTitle => 'Edit food';
 
   @override
   String get barcodeField => 'Barcode (optional)';
@@ -1127,6 +1146,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String splitInto(String n) {
     return 'Split into $n days';
+  }
+
+  @override
+  String mergeTitle(String name) {
+    return 'Merge \"$name\" into…';
+  }
+
+  @override
+  String get mergeDescription =>
+      'Move everything in this meal into another meal of the day. This meal is removed.';
+
+  @override
+  String get mergeNoOtherMeals => 'No other meals on this day.';
+
+  @override
+  String mergedInto(String name) {
+    return 'Merged into \"$name\".';
   }
 
   @override

@@ -73,6 +73,7 @@
 
   "mealMenuEdit": "Modifier le repas",
   "mealMenuSplit": "Répartir sur plusieurs jours",
+  "mealMenuMerge": "Fusionner avec un autre repas",
   "mealMenuScale": "Mettre le repas à l'échelle",
   "scaleMealApply": "Mettre à {pct}%",
   "scaleMealDone": "Repas mis à {pct}%",
@@ -151,6 +152,9 @@
   "healthUnavailable": "{store} n'est pas disponible sur cet appareil.",
   "healthNoPermission": "L'autorisation {store} n'a pas été accordée.",
   "healthSyncOn": "Synchronisation {store} activée — aujourd'hui envoyé.",
+  "settingsHealthResync": "Resynchroniser tous les jours",
+  "settingsHealthResyncSub": "Effacer les données de cette app dans {store}, puis réécrire tout le journal",
+  "healthResyncDone": "Resynchronisé avec {store}.",
 
   "backupExportFailed": "Échec de l'export : {error}",
   "backupFileType": "Sauvegarde",
@@ -207,6 +211,7 @@
   "captureScanAi": "Scanner un repas avec l'IA",
   "captureScanAiSub": "Photographiez un plat — on devine le plat et les calories",
   "foodFormTitle": "Nouvel aliment",
+  "foodFormEditTitle": "Modifier l'aliment",
   "barcodeField": "Code-barres (facultatif)",
   "settingsAi": "Reconnaissance par IA",
   "aiKeyDesc": "Les photos sont reconnues sur votre téléphone par défaut. Ajoutez une clé API Google Gemini pour des résultats plus précis et des estimations de portions. Votre photo est alors envoyée à Google. L'offre gratuite de Gemini suffit pour un usage personnel ; si vous avez activé la facturation sur votre compte Google, une utilisation intensive peut entraîner des frais. Dans l'offre gratuite, Google peut utiliser vos photos pour améliorer ses modèles.",
@@ -359,6 +364,11 @@
   "splitDescription": "Divisez ce repas en portions égales, une par jour. L'original est remplacé.",
   "splitKcalEach": "{kcal} kcal chacune",
   "splitInto": "Répartir sur {n} jours",
+
+  "mergeTitle": "Fusionner \"{name}\" avec…",
+  "mergeDescription": "Déplacez tout le contenu de ce repas dans un autre repas du jour. Ce repas est supprimé.",
+  "mergeNoOtherMeals": "Aucun autre repas ce jour-là.",
+  "mergedInto": "Fusionné avec \"{name}\".",
 
   "cropTitle": "Recadrer sur le tableau",
   "cropDone": "Terminé",

@@ -73,6 +73,7 @@
 
   "mealMenuEdit": "Modifica pasto",
   "mealMenuSplit": "Distribuisci su più giorni",
+  "mealMenuMerge": "Unisci a un altro pasto",
   "mealMenuScale": "Ridimensiona pasto",
   "scaleMealApply": "Ridimensiona al {pct}%",
   "scaleMealDone": "Pasto ridimensionato al {pct}%",
@@ -151,6 +152,9 @@
   "healthUnavailable": "{store} non è disponibile su questo dispositivo.",
   "healthNoPermission": "L'autorizzazione a {store} non è stata concessa.",
   "healthSyncOn": "Sincronizzazione {store} attiva — oggi inviato.",
+  "settingsHealthResync": "Risincronizza tutti i giorni",
+  "settingsHealthResyncSub": "Cancella i dati di questa app in {store} e riscrivi l'intero diario",
+  "healthResyncDone": "Risincronizzato con {store}.",
 
   "backupExportFailed": "Esportazione non riuscita: {error}",
   "backupFileType": "Backup",
@@ -207,6 +211,7 @@
   "captureScanAi": "Scansiona un pasto con l'IA",
   "captureScanAiSub": "Fotografa un piatto — indoviniamo piatto e calorie",
   "foodFormTitle": "Nuovo alimento",
+  "foodFormEditTitle": "Modifica alimento",
   "barcodeField": "Codice a barre (facoltativo)",
   "settingsAi": "Riconoscimento IA",
   "aiKeyDesc": "Le foto vengono riconosciute sul telefono per impostazione predefinita. Aggiungi una chiave API Google Gemini per risultati più precisi e stime delle porzioni. La foto viene quindi inviata a Google. Il piano gratuito di Gemini è sufficiente per l'uso personale; se hai attivato la fatturazione sul tuo account Google, un uso intenso può comportare costi. Nel piano gratuito Google può usare le tue foto per migliorare i propri modelli.",
@@ -359,6 +364,11 @@
   "splitDescription": "Dividi questo pasto in porzioni uguali, una al giorno. L'originale viene sostituito.",
   "splitKcalEach": "{kcal} kcal ciascuna",
   "splitInto": "Distribuisci su {n} giorni",
+
+  "mergeTitle": "Unisci \"{name}\" a…",
+  "mergeDescription": "Sposta tutto il contenuto di questo pasto in un altro pasto della giornata. Questo pasto viene rimosso.",
+  "mergeNoOtherMeals": "Nessun altro pasto in questo giorno.",
+  "mergedInto": "Unito a \"{name}\".",
 
   "cropTitle": "Ritaglia sulla tabella",
   "cropDone": "Fatto",

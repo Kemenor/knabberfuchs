@@ -214,6 +214,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get mealMenuSplit => 'Distribuisci su più giorni';
 
   @override
+  String get mealMenuMerge => 'Unisci a un altro pasto';
+
+  @override
   String get mealMenuScale => 'Ridimensiona pasto';
 
   @override
@@ -468,6 +471,19 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get settingsHealthResync => 'Risincronizza tutti i giorni';
+
+  @override
+  String settingsHealthResyncSub(String store) {
+    return 'Cancella i dati di questa app in $store e riscrivi l\'intero diario';
+  }
+
+  @override
+  String healthResyncDone(String store) {
+    return 'Risincronizzato con $store.';
+  }
+
+  @override
   String backupExportFailed(String error) {
     return 'Esportazione non riuscita: $error';
   }
@@ -645,6 +661,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get foodFormTitle => 'Nuovo alimento';
+
+  @override
+  String get foodFormEditTitle => 'Modifica alimento';
 
   @override
   String get barcodeField => 'Codice a barre (facoltativo)';
@@ -1133,6 +1152,23 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String splitInto(String n) {
     return 'Distribuisci su $n giorni';
+  }
+
+  @override
+  String mergeTitle(String name) {
+    return 'Unisci \"$name\" a…';
+  }
+
+  @override
+  String get mergeDescription =>
+      'Sposta tutto il contenuto di questo pasto in un altro pasto della giornata. Questo pasto viene rimosso.';
+
+  @override
+  String get mergeNoOtherMeals => 'Nessun altro pasto in questo giorno.';
+
+  @override
+  String mergedInto(String name) {
+    return 'Unito a \"$name\".';
   }
 
   @override
