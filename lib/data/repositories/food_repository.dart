@@ -190,6 +190,49 @@ class FoodRepository {
     return (await db.foodById(id))!;
   }
 
+  /// Overwrite an existing custom food. Same field set as [createFood];
+  /// nullable values are written explicitly so a cleared field really clears.
+  /// Diary entries are untouched — they log per-100g snapshots by design.
+  Future<Food> updateFood(
+    int id, {
+    String? barcode,
+    required String name,
+    String? brand,
+    required double kcal100,
+    double? protein100,
+    double? carb100,
+    double? fat100,
+    double? fiber100,
+    double? sugar100,
+    double? satFat100,
+    double? saltG100,
+    double? servingG,
+    String? servingLabel,
+    double? densityGPerMl,
+  }) async {
+    await db.updateFoodById(
+      id,
+      FoodsCompanion(
+        externalId: Value(barcode),
+        barcode: Value(barcode),
+        name: Value(name),
+        brand: Value(brand),
+        kcal100: Value(kcal100),
+        protein100: Value(protein100),
+        carb100: Value(carb100),
+        fat100: Value(fat100),
+        fiber100: Value(fiber100),
+        sugar100: Value(sugar100),
+        satFat100: Value(satFat100),
+        saltG100: Value(saltG100),
+        servingG: Value(servingG),
+        servingLabel: Value(servingLabel),
+        densityGPerMl: Value(densityGPerMl),
+      ),
+    );
+    return (await db.foodById(id))!;
+  }
+
   Future<void> toggleFavorite(Food food) =>
       db.setFavorite(food.id, !food.isFavorite);
 }
