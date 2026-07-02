@@ -64,7 +64,9 @@ for L in "${LOCALES[@]}"; do
       DEST="fastlane/metadata/android/$D/images/phoneScreenshots"
       mkdir -p "$DEST"
       rm -f "$DEST"/*.png
-      cp "screenshots/$L"/*.png "$DEST/"   # NN_name.png — supply orders by name
+      # Google Play caps phone screenshots at 8 — take the first 8 by the
+      # NN_ ordering; scenes 9+ are App-Store-only bonuses.
+      ls "screenshots/$L"/*.png | sort | head -8 | xargs -I{} cp {} "$DEST/"
       ;;
     ios)
       case "$L" in en) D=en-US;; de) D=de-DE;; fr) D=fr-FR;; it) D=it;; *) D=$L;; esac

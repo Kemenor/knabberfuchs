@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value;
@@ -11,13 +10,12 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:calorie_tracker/app.dart';
 import 'package:calorie_tracker/core/date_x.dart';
 import 'package:calorie_tracker/data/db/database.dart';
+import 'package:calorie_tracker/data/health/health_service.dart';
 import 'package:calorie_tracker/domain/enums.dart';
+import 'package:calorie_tracker/domain/nutrition.dart' show encodeMicros;
 import 'package:calorie_tracker/l10n/app_localizations.dart';
 import 'package:calorie_tracker/providers.dart';
-import 'package:calorie_tracker/ui/food/recognize_food_flow.dart';
 import 'package:calorie_tracker/ui/home_shell.dart';
-
-import 'meal_fixture.dart';
 
 /// Generates App Store screenshots, one locale per run. Pass the locale with
 /// `--dart-define=LOCALE=<en|de|fr|it>` (defaults to en):
@@ -95,21 +93,23 @@ void main() {
   String tr(String k) => strings[k]![loc] ?? strings[k]!['en']!;
 
   // Representative day — translated foods organised into named meal groups.
+  // 'fib'/'sf' feed the Phase-15 micros snapshot so the Fibre / Sat. fat tiles
+  // on the Day card show real values.
   final meals = <Map<String, dynamic>>[
     {
       'group': tr('breakfast'), 'meal': MealType.breakfast,
       'foods': [
-        {'k': 'greekYogurt', 'g': 150.0, 'kcal': 59.0, 'p': 10.0, 'c': 3.6, 'f': 0.4},
-        {'k': 'granola', 'g': 45.0, 'kcal': 471.0, 'p': 10.0, 'c': 64.0, 'f': 20.0},
-        {'k': 'blueberries', 'g': 80.0, 'kcal': 57.0, 'p': 0.7, 'c': 14.0, 'f': 0.3},
-        {'k': 'coffeeMilk', 'g': 200.0, 'kcal': 20.0, 'p': 1.0, 'c': 2.0, 'f': 1.0},
+        {'k': 'greekYogurt', 'g': 150.0, 'kcal': 59.0, 'p': 10.0, 'c': 3.6, 'f': 0.4, 'sf': 0.3},
+        {'k': 'granola', 'g': 45.0, 'kcal': 471.0, 'p': 10.0, 'c': 64.0, 'f': 20.0, 'fib': 8.0, 'sf': 4.0},
+        {'k': 'blueberries', 'g': 80.0, 'kcal': 57.0, 'p': 0.7, 'c': 14.0, 'f': 0.3, 'fib': 2.4},
+        {'k': 'coffeeMilk', 'g': 200.0, 'kcal': 20.0, 'p': 1.0, 'c': 2.0, 'f': 1.0, 'sf': 0.6},
       ],
     },
     {
       'group': tr('lunch'), 'meal': MealType.lunch,
       'foods': [
-        {'k': 'chickenBreast', 'g': 180.0, 'kcal': 165.0, 'p': 31.0, 'c': 0.0, 'f': 3.6},
-        {'k': 'basmatiRice', 'g': 180.0, 'kcal': 130.0, 'p': 2.7, 'c': 28.0, 'f': 0.3},
+        {'k': 'chickenBreast', 'g': 180.0, 'kcal': 165.0, 'p': 31.0, 'c': 0.0, 'f': 3.6, 'sf': 1.0},
+        {'k': 'basmatiRice', 'g': 180.0, 'kcal': 130.0, 'p': 2.7, 'c': 28.0, 'f': 0.3, 'fib': 0.4, 'sf': 0.1},
       ],
     },
   ];
@@ -128,10 +128,10 @@ void main() {
     tester.platformDispatcher.localeTestValue = Locale(loc);
 
     final container = ProviderContainer(overrides: [
-      // Feed the on-device classifier a bundled meal photo instead of the
-      // native picker, so the "recognise" screenshot is fully automated.
-      mealImagePickerProvider
-          .overrideWithValue((_) async => base64Decode(mealJpegBase64)),
+      // Staged activity burn for the ⚡ shot — the real service would need a
+      // health store with data; the value only flows once the
+      // healthEnergyRead setting flips on (scene 10).
+      healthServiceProvider.overrideWithValue(_FakeBurnHealthService()),
     ]);
     await tester.pumpWidget(
       UncontrolledProviderScope(container: container, child: const CalorieApp()),
@@ -139,6 +139,17 @@ void main() {
 
     final db = container.read(dbProvider);
     await db.setSetting('appLocale', loc);
+    // Marketing state: a kcal band (Day bar + Trends target band) and the
+    // Phase-15 nutrients enabled — fiber as a floor, sat fat as a ceiling —
+    // so the Day card and Targets screen show the configurable tracking.
+    await db.setSetting('defaultKcalMin', '1800');
+    await db.setSetting('defaultKcalMax', '2200');
+    await db.setSetting(
+      'trackedNutrients',
+      '["protein","carb","fat","fiber","satFat"]',
+    );
+    await db.setSetting('defaultFiberMin', '30');
+    await db.setSetting('defaultSatFatMax', '20');
 
     // Wait out the first-run splash (Swiss food import); its spinner never
     // settles, so pump in a loop until HomeShell appears.
@@ -163,6 +174,10 @@ void main() {
           sProtein100: Value(f['p'] as double),
           sCarb100: Value(f['c'] as double),
           sFat100: Value(f['f'] as double),
+          sMicrosJson: Value(encodeMicros({
+            if (f['fib'] != null) 'fiber': f['fib'] as double,
+            if (f['sf'] != null) 'satFat': f['sf'] as double,
+          })),
           sortIndex: Value(i),
           groupId: Value(gid),
         ));
@@ -289,20 +304,12 @@ void main() {
       return tapText(text);
     }
 
-    // Pump until a label shows up (e.g. a sheet that's still animating in or a
-    // classifier result that hasn't resolved). Returns false if it never does.
-    Future<bool> waitText(String text, {int tries = 40}) async {
-      for (var i = 0; i < tries; i++) {
-        if (find.text(text).evaluate().isNotEmpty) return true;
-        await tester.pump(const Duration(milliseconds: 100));
-      }
-      return false;
-    }
+    // The marketing set (decided 2026-07-02): 10 ordered scenes; Google Play
+    // takes the first 8 (its cap), the App Store all 10. Each step pops back
+    // to the bare tab shell first so a leftover route can't bleed into the
+    // next shot.
 
-    // The marketing set. Each step pops back to the bare tab shell first so a
-    // leftover route can't bleed into the next shot.
-
-    // 1. Day hero (meal-grouped)
+    // 1. Day hero (meal groups, kcal band, wrapped metric tiles incl. Fibre)
     await popToHome();
     await tab(0);
     await shot('01_day');
@@ -328,62 +335,69 @@ void main() {
       await shot('03_search');
     } catch (_) {}
 
-    // 4. Recipes list
-    try {
-      await popToHome();
-      await tab(1);
-      await shot('04_recipes');
-    } catch (_) {}
-
-    // 5. A recipe, broken into its ingredients
-    try {
-      await popToHome();
-      await tab(1);
-      if (await tapText(tr('recipeBowl'))) await shot('05_recipe');
-    } catch (_) {}
-
-    // 6. Offline regions (Settings → Offline regions)
+    // 4. Targets — the tracked-nutrients chips + per-metric bounds (Phase 15)
     try {
       await popToHome();
       await openSettings();
-      if (await tapRow(l10n().settingsOfflineRegions)) await shot('06_regions');
+      if (await tapRow(l10n().settingsTargets)) await shot('04_targets');
     } catch (_) {}
 
-    // 7. Language — the collapsible "App language" tile near the top of Settings
-    // (Appearance section). Scroll up to it, then tap to expand the picker.
-    try {
-      await popToHome();
-      await openSettings();
-      for (var i = 0; i < 40; i++) {
-        if (find.text(l10n().settingsLanguage).evaluate().isNotEmpty) break;
-        await tester.drag(find.byType(Scrollable).first, const Offset(0, 300));
-        await tester.pump(const Duration(milliseconds: 80));
-      }
-      if (await tapText(l10n().settingsLanguage)) await shot('07_language');
-    } catch (_) {}
-
-    // 8. Trends — the calorie/macro history chart added in the redesign.
+    // 5. Trends — the history chart with the target band + metric chips
     try {
       await popToHome();
       await tab(2);
-      await shot('08_trends');
+      await shot('05_trends');
     } catch (_) {}
 
-    // 9. Recognise a meal — the injected photo drives the on-device classifier;
-    // capture the guess sheet ("Looks like…" + ranked dishes). The capture sheet
-    // can be mid-animation when we reach for it, so wait for the item and retry
-    // a couple of times rather than racing it.
+    // 6. Recipes list
     try {
-      for (var attempt = 0; attempt < 3; attempt++) {
-        await popToHome();
-        await tab(0);
-        await tapFab('dayCapture');
-        if (!await waitText(l10n().captureScanAi)) continue;
-        if (!await tapText(l10n().captureScanAi)) continue;
-        final got = await waitText(l10n().recognizeLooksLike, tries: 80);
-        await shot('09_recognize');
-        if (got) break;
-      }
+      await popToHome();
+      await tab(1);
+      await shot('06_recipes');
+    } catch (_) {}
+
+    // 7. Day in dark mode — first-class dark theme
+    try {
+      await popToHome();
+      await db.setSetting('appThemeMode', 'dark');
+      await tab(0);
+      await settle(tester);
+      await shot('07_darkday');
+      await db.setSetting('appThemeMode', 'light');
+      await settle(tester);
+    } catch (_) {}
+
+    // 8. Offline regions (Settings → Offline regions) — last Play slot: the
+    // works-offline / no-account ethos shot.
+    try {
+      await popToHome();
+      await openSettings();
+      if (await tapRow(l10n().settingsOfflineRegions)) await shot('08_regions');
+    } catch (_) {}
+
+    // 9. A recipe, broken into its ingredients (iOS-only slot)
+    try {
+      await popToHome();
+      await tab(1);
+      if (await tapText(tr('recipeBowl'))) await shot('09_recipe');
+    } catch (_) {}
+
+    // 10. Day with the ⚡ activity adjustment (iOS-only slot) — flipping the
+    // setting routes the staged 320 kcal burn into the shifted band.
+    try {
+      await popToHome();
+      await db.setSetting('healthEnergyRead', 'true');
+      await tab(0);
+      await settle(tester);
+      await shot('10_activity');
+      await db.setSetting('healthEnergyRead', 'false');
     } catch (_) {}
   });
+}
+
+/// Stands in for the real [HealthService] during the screenshot run: reports
+/// a plausible training-day burn without needing a populated health store.
+class _FakeBurnHealthService extends HealthService {
+  @override
+  Future<double> activeEnergyFor(String day) async => 320;
 }
