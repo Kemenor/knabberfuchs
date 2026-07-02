@@ -1218,6 +1218,12 @@ abstract class AppLocalizations {
   /// **'Edit food'**
   String get foodFormEditTitle;
 
+  /// Confirmation dialog title before deleting a custom food; logged history keeps its snapshots
+  ///
+  /// In en, this message translates to:
+  /// **'Delete “{name}”?'**
+  String foodDeleteConfirm(String name);
+
   /// Label of the optional barcode field in the food form
   ///
   /// In en, this message translates to:

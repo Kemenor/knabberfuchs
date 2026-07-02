@@ -398,6 +398,8 @@
   "@foodFormTitle": { "description": "Title of the new-food form" },
   "foodFormEditTitle": "Edit food",
   "@foodFormEditTitle": { "description": "App-bar title of the food form when editing an existing custom food" },
+  "foodDeleteConfirm": "Delete “{name}”?",
+  "@foodDeleteConfirm": { "description": "Confirmation dialog title before deleting a custom food; logged history keeps its snapshots", "placeholders": { "name": { "type": "String" } } },
   "barcodeField": "Barcode (optional)",
   "@barcodeField": { "description": "Label of the optional barcode field in the food form" },
   "settingsAi": "AI recognition",

@@ -159,6 +159,12 @@ class AppDatabase extends _$AppDatabase {
   Future<void> updateFoodById(int id, FoodsCompanion food) =>
       (update(foods)..where((f) => f.id.equals(id))).write(food);
 
+  /// Delete a food row. History is safe by schema: entries keep their
+  /// snapshots (foodId is set-null), recipe items never reference foods, and
+  /// OCR name-mappings cascade away with the food.
+  Future<void> deleteFoodById(int id) =>
+      (delete(foods)..where((f) => f.id.equals(id))).go();
+
   Future<Food?> foodByExternal(FoodSource source, String externalId) =>
       (select(foods)..where(
             (f) =>

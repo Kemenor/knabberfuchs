@@ -233,6 +233,10 @@ class FoodRepository {
     return (await db.foodById(id))!;
   }
 
+  /// Delete a custom food (see [AppDatabase.deleteFoodById] for why diary and
+  /// recipe history are untouched).
+  Future<void> deleteFood(int id) => db.deleteFoodById(id);
+
   Future<void> toggleFavorite(Food food) =>
       db.setFavorite(food.id, !food.isFavorite);
 }
