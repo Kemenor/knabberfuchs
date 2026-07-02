@@ -667,6 +667,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get foodFormEditTitle => 'Modifier l\'aliment';
 
   @override
+  String foodDeleteConfirm(String name) {
+    return 'Supprimer « $name » ?';
+  }
+
+  @override
   String get barcodeField => 'Code-barres (facultatif)';
 
   @override
