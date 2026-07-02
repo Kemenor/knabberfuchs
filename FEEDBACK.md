@@ -129,6 +129,18 @@ tracks tester-driven changes specifically.
   - first-class **dark mode**, including a fix for dark-mode header icons that rendered
     near-invisible. (Redesign commit series `896fb1b`…`d13ef7a`.)
 
+## Product questions (2026-07-02)
+
+- 📝 **Remove on-device photo recognition entirely?** — no decision yet. Feedback on
+  the local model is mediocre (weak on drinks/portions even after the a7eb950
+  improvements), and it was deliberately dropped from the store screenshot set for
+  that reason (2026-07-02). Options: (a) keep as-is (keyless default, manage
+  expectations), (b) remove local → photo feature exists only with a user Gemini key
+  (tension: "keyless by default" ethos and the feature vanishing for keyless users),
+  (c) keep local but stop pre-selling it anywhere. Deserves its own grill — touches
+  ethos, the 21 MB bundled model (APK size win if removed), `food_classifier.dart`,
+  and the capture UX copy.
+
 ## Feedback (2026-07-01)
 
 - ✅ **Edit a custom food** — DONE 2026-07-02. Custom-food tiles in the search list get a
