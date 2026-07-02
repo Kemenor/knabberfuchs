@@ -64,27 +64,27 @@ application to components is app-level*).
   FloatingActionButton.extended(
     heroTag: 'dayAddFood',
     onPressed: ...,
-    icon: const Icon(Icons.add),
+    icon: const Icon(Symbols.add_rounded),
     label: Text(l10n.dayAddFood),
   )
   ```
 
-  Live: `day_screen.dart:110-115`.
+  Live: `day_screen.dart:119-124`.
 
 - **Secondary action sits to the LEFT of the primary, smaller**, via a
   `Row(mainAxisSize: MainAxisSize.min)` with a `SizedBox(width: 12)` gap. On Day,
-  the small `Icons.bolt` capture FAB (`.small`, tooltip only) precedes the
-  extended "Add food" primary. Live: `day_screen.dart:100-117`.
+  the small `Symbols.bolt_rounded` capture FAB (`.small`, tooltip only) precedes
+  the extended "Add food" primary. Live: `day_screen.dart:112-125`.
 
 - **Reuse the established verbs verbatim:**
-  - Save → `Icons.check` + `l10n.actionSave` (`food_form_screen.dart:154`,
-    `recipe_edit_screen.dart:151`)
-  - Scan → `Icons.qr_code_scanner` + `l10n.scanBarcode`
-    (`add_food_screen.dart:81`, `food_picker_screen.dart:58`)
-  - Add/create → `Icons.add` (`day_screen.dart:110`, `recipes_screen.dart:213`)
+  - Save → `Symbols.check_rounded` + `l10n.actionSave` (`food_form_screen.dart:201`,
+    `recipe_edit_screen.dart:171`)
+  - Scan → `Symbols.qr_code_scanner_rounded` + `l10n.scanBarcode`
+    (`food_picker_screen.dart:69`)
+  - Add/create → `Symbols.add_rounded` (`day_screen.dart:122`, `recipes_screen.dart:251`)
 
 - Give list/form bodies bottom padding so the FAB never overlaps the last item:
-  `EdgeInsets.only(bottom: 96)` for lists (`day_screen.dart:247`), `88` for form
+  `EdgeInsets.only(bottom: 96)` for lists (`day_screen.dart:268`), `88` for form
   `ListView`s (`food_form_screen.dart`).
 
 - **Don't** ship a bare unlabeled FAB for a multi-purpose entry point, and
@@ -95,17 +95,17 @@ application to components is app-level*).
 ## 3. Menus & swipe actions
 
 - **Inline overflow menu on a row → `PopupMenuButton<String>`** with
-  `icon: Icon(Icons.more_vert, size: 20)`, text-only items (no leading icons),
-  labels from l10n. The only one is the meal-group header; item order is
-  **Edit, Scale, Split, Save as recipe, Delete**. Live: `day_screen.dart:417-444`.
+  `icon: Icon(Symbols.more_vert_rounded, size: 20)`, text-only items (no leading
+  icons), labels from l10n. The only one is the meal-group header; item order is
+  **Edit, Scale, Split, Save as recipe, Delete**. Live: `day_screen.dart:518-545`.
 
 - **A menu of distinct actions (not a row overflow) → a bottom sheet of labelled
   `ListTile`s, not a popup.** Each tile has a `leading` icon, `title`, and
-  `subtitle`. Used by the Day capture menu (`day_screen.dart:122-162`) and the
-  Recipes create menu (`recipes_screen.dart:82-131`).
+  `subtitle`. Used by the Day capture menu (`day_screen.dart:131`) and the
+  Recipes create menu (`recipes_screen.dart:95`).
 
   > **Don't** revert to bare FABs + unlabeled app-bar icons for multi-action
-  > entry points — this was a deliberate shift (`recipes_screen.dart:80-81`).
+  > entry points — this was a deliberate shift (`recipes_screen.dart:95`).
 
 - **AppBar actions** that are few and obvious → trailing `IconButton`s with
   `tooltip`s (Recipe Detail: edit / share / delete), not a ⋮ menu
@@ -113,11 +113,11 @@ application to components is app-level*).
 
 - **Swipe (`Dismissible`) color language is fixed:**
   - Destructive (delete) → `direction: endToStart` (swipe-left), background
-    `colorScheme.errorContainer`, right-aligned `Icons.delete_outline`.
-    Live: `day_screen.dart:677-689`.
+    `colorScheme.errorContainer`, right-aligned `Symbols.delete_rounded`.
+    Live: `day_screen.dart:831-845`.
   - Positive (e.g. log a portion) → `startToEnd` (swipe-right), background
-    `colorScheme.primaryContainer`, left-aligned `Icons.event_available`.
-    Live: `recipes_screen.dart:156-197`.
+    `colorScheme.primaryContainer`, left-aligned `Symbols.event_available_rounded`.
+    Live: `recipes_screen.dart:176-197`.
   - Use a stable key like `ValueKey('entry-$id')`. Where a stream redraws the
     list, `confirmDismiss` returns `false` after handling.
 
@@ -257,28 +257,35 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
 
 ## 9. Theme
 
-- **Single source: `lib/core/theme.dart` → `buildTheme(Brightness)`**, wired in
-  `app.dart:24-25` (light + dark).
-- Material 3 (`useMaterial3: true`). Color scheme:
-  `ColorScheme.fromSeed(seedColor: const Color(0xFF43A047) /* green */, …)` — a
-  fresh green for a food/health feel (`theme.dart:5-8`).
-- `AppBarTheme`: `surface` background, transparent surface tint,
-  `centerTitle: true`.
+- **Single source: `lib/core/theme.dart` → `buildTheme(Brightness, {font})`**,
+  wired in `app.dart:48-49` (light + dark, with the user-selected
+  `FuchsbauFont`). It delegates to the shared fuchsbau package's
+  `fuchsbauTheme()` (§0) — Material 3, the **pinned tangerine triad** (primary
+  fox orange · secondary indigo · tertiary emerald), Figtree — replacing the old
+  accidental-green `ColorScheme.fromSeed` seed. Component theming (AppBar,
+  cards, shapes) is owned by fuchsbau; don't restyle it locally.
+- knabberfuchs layers exactly one deviation on top: **the action FAB is emerald**
+  (`tertiary`/`onTertiary` via `copyWith`, `theme.dart:18-23`; rationale in §0).
+  Record any new deviation in §0 with a pointer back to fuchsbau.
 - **Typography roles** (`Theme.of(context).textTheme`):
-  - `displaySmall` (bold) — the big day kcal number (`day_screen.dart:300`)
-  - `headlineSmall` (bold) — live kcal totals in sheets (`log_food_sheet.dart:248`)
+  - `displaySmall` (bold) — the big day kcal number (`day_screen.dart:330`)
+  - `headlineSmall` (bold) — live kcal totals in sheets (`log_food_sheet.dart:291`)
   - `titleLarge` — sheet titles
   - `titleMedium` — unit labels, macro values, subtotals
   - `titleSmall` — section/group headers (settings sections add
     `.copyWith(color: colorScheme.primary)`)
   - `bodySmall` / `bodyMedium` — helper / secondary text
 - **Muted text → `colorScheme.outline`** (source labels, help text)
-  (`quick_add_sheet.dart:203-207`).
-- **Status color semantics** (`core/status_color.dart`), mapped onto the triad:
-  **under = `secondary` (indigo, focus — working toward it), in-range =
-  `tertiary` (emerald, achieved), over = amber** (`FuchsbauStatusColors.amber`,
-  the one calm nudge), none = `outline`. Fuchsbau ethos: *status is information,
-  never punishment; red is for destruction only* — no `error`/red in status.
+  (`quick_add_sheet.dart:226-233`).
+- **Status color semantics** (`core/status_color.dart:14-23`), mapped onto the
+  triad: **under = `secondary` (indigo, focus — working toward it), in-range =
+  `tertiary` (emerald, achieved), over = amber**
+  (`FuchsbauStatusColors.of(context).amber`, the one calm nudge), none =
+  `outline`. Fuchsbau ethos: *status is information, never punishment; red is
+  for destruction only* — no `error`/red in status.
+- **Status as small text uses `statusTextColor`** (`status_color.dart:29-38`):
+  darker AA (≥4.5:1) shades in light mode; the bright `statusColor` is for
+  bars/dots/icons only.
 - **Container color language:** destructive = `errorContainer`/`onErrorContainer`;
   positive = `primaryContainer`/`onPrimaryContainer`.
 
@@ -301,9 +308,20 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   > after (`recipes_screen.dart:22-24`).
 
 - **Loading:** inline `Center(child: CircularProgressIndicator())` for
-  `AsyncValue.loading`; a full `showDialog(barrierDismissible: false)` overlay for
-  blocking async (AI calls) (`recognize_food_flow.dart:84` on-device, `:50`
-  Gemini).
+  `AsyncValue.loading`; a full `showDialog(barrierDismissible: false)` overlay,
+  wrapped in `PopScope(canPop: false)` so hardware back can't pop the route
+  beneath, for blocking async (AI calls) (`recognize_food_flow.dart:130`
+  on-device, `:72` Gemini).
+- **Cancellable blocking modal** (long network-bound calls): the blocking dialog
+  carries a `TextButton` labelled `l10n.actionCancel` that pops via *its own*
+  dialog context and raises a `cancelled` flag; the awaiting flow then discards
+  the late result and must not touch the navigator again
+  (`recognize_food_flow.dart:71-99`).
+- **In-progress download with cancel:** the row's trailing `IconButton`
+  (`tooltip: l10n.actionCancel`) stacks a 32×32 `CircularProgressIndicator`
+  (determinate; indeterminate while progress is 0) over a small
+  `Symbols.close_rounded` (size 14) — tapping the ring cancels
+  (`offline_regions_screen.dart:246-263`).
 - **Error:** `AsyncValue.error` branches render
   `Center(child: Text(l10n.genericError('$e')))`.
 - **Confirmation:** `AlertDialog` with Cancel(`TextButton`) → confirm(`FilledButton`).
@@ -334,17 +352,20 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
 
 ## 12. Icons
 
-- **Material `Icons.*` only** — no custom icon font/assets. Outlined variants for
-  list/secondary contexts; filled for selected/emphasis.
-- **Load-bearing icons (reuse, don't invent synonyms):** `Icons.add`
-  (add/create/FAB), `Icons.delete_outline` (delete/swipe),
-  `Icons.qr_code_scanner` (scan), `Icons.check` (save),
-  `Icons.bolt` (quick-add/capture), `Icons.event_available` (log a portion),
-  `Icons.document_scanner_outlined` (OCR-from-list), `Icons.more_vert` (size 20,
-  the only overflow icon).
-- `Icons.auto_awesome` (14px, `colorScheme.outline`) marks **AI-sourced data**
-  (`quick_add_sheet.dart:202-204`). `Icons.restaurant_menu` is the splash/brand
-  glyph.
+- **Material Symbols Rounded only**, via the `material_symbols_icons` package
+  (`import 'package:material_symbols_icons/symbols.dart'`) — the fuchsbau family
+  icon set (§0). Always `Symbols.<name>_rounded`; **never `Icons.*`** (zero
+  usages left in `lib/`) and no custom icon font/assets.
+- **Load-bearing icons (reuse, don't invent synonyms):** `Symbols.add_rounded`
+  (add/create/FAB), `Symbols.delete_rounded` (delete/swipe),
+  `Symbols.qr_code_scanner_rounded` (scan), `Symbols.check_rounded`
+  (save / finish meal), `Symbols.bolt_rounded` (quick-add/capture),
+  `Symbols.event_available_rounded` (log a portion),
+  `Symbols.document_scanner_rounded` (OCR-from-list),
+  `Symbols.more_vert_rounded` (size 20, the only overflow icon).
+- `Symbols.auto_awesome_rounded` (14px, `colorScheme.outline`) marks
+  **AI-sourced data** (`quick_add_sheet.dart:222-227`).
+  `Symbols.restaurant_menu_rounded` is the splash/brand glyph (`app.dart:85`).
 
 ---
 
