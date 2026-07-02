@@ -17,7 +17,9 @@ cd "$(dirname "$0")/.."
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 [ "$BRANCH" = "main" ] || { echo "✗ on '$BRANCH', releases cut from main"; exit 1; }
-[ -z "$(git status --porcelain)" ] || { echo "✗ working tree not clean"; exit 1; }
+# Tracked changes only (-uno): untracked scratch (e.g. design/) can't reach
+# the release commit — the script stages nothing but pubspec.yaml.
+[ -z "$(git status --porcelain -uno)" ] || { echo "✗ working tree has uncommitted tracked changes"; exit 1; }
 
 git fetch -q origin main
 [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] \
