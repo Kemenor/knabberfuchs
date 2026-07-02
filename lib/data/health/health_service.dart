@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:health/health.dart' as h;
 
 import '../../domain/enums.dart';
+import '../../domain/nutrition.dart' show decodeMicros;
 import '../db/database.dart';
 
 /// Write-only Health Connect sync: pushes each day's logged nutrition (calories
@@ -96,6 +97,9 @@ class HealthService {
         }
         if (!endT.isBefore(upper)) endT = upper;
         final startT = endT.subtract(const Duration(minutes: 1));
+        final micros = decodeMicros(e.sMicrosJson);
+        double? micro(String key) =>
+            micros[key] == null ? null : micros[key]! * factor;
         await _health.writeMeal(
           mealType: _mealType(e.mealType),
           startTime: startT,
@@ -105,6 +109,12 @@ class HealthService {
           protein: e.sProtein100 == null ? null : e.sProtein100! * factor,
           carbohydrates: e.sCarb100 == null ? null : e.sCarb100! * factor,
           fatTotal: e.sFat100 == null ? null : e.sFat100! * factor,
+          // Phase 15 tracked nutrients, when the snapshot has them. The
+          // stores take sodium, not salt: g sodium = g salt / 2.5.
+          fiber: micro('fiber'),
+          fatSaturated: micro('satFat'),
+          sugar: micro('sugar'),
+          sodium: micro('salt') == null ? null : micro('salt')! / 2.5,
         );
       }
     } catch (_) {
