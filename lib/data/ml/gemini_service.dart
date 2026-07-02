@@ -68,11 +68,16 @@ class GeminiService {
   /// Tries [preferredModel] first, then [fallbackModel] (skipped if the same)
   /// on a 503/timeout/transient failure, before the caller falls back to the
   /// on-device classifier. Each model gets one 30 s try with a fresh client.
+  ///
+  /// [isCancelled] is polled before every upload: an in-flight request can't
+  /// be aborted (http's close() lets it finish), but a cancel must at least
+  /// stop the photo from being re-sent to the next model.
   Future<GeminiFoodResult?> recognizeFood(
     Uint8List bytes,
     String apiKey, {
     String? preferredModel,
     String? description,
+    bool Function()? isCancelled,
   }) async {
     // Decode/resize/encode of a full camera photo takes ~1 s — off the UI
     // isolate so the progress dialog keeps animating.
@@ -115,6 +120,7 @@ class GeminiService {
     // a fresh client. On any failure (503/timeout/error/non-200) move to the
     // next model; exhausting them returns null → the on-device classifier.
     for (final model in models) {
+      if (isCancelled?.call() ?? false) return null;
       final uri = Uri.parse('$_base/$model:generateContent');
       final client = _injected ?? http.Client();
       try {
