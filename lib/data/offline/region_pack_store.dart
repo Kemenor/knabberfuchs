@@ -9,18 +9,24 @@ import '../db/database.dart';
 /// FoodRepository.ensurePersisted before logging.
 class RegionPackStore {
   final Map<String, Database> _open = {};
+  final Map<String, String> _paths = {};
 
-  /// Sync the open handles to [codeToPath] (closing removed packs, opening new).
+  /// Sync the open handles to [codeToPath] (closing removed packs, opening
+  /// new). Pack files are versioned, so an update arrives as a *new path* for
+  /// an existing code: the stale handle must be closed and reopened, never
+  /// kept serving the old file.
   void setPacks(Map<String, String> codeToPath) {
     for (final code in _open.keys.toList()) {
-      if (!codeToPath.containsKey(code)) {
+      if (codeToPath[code] != _paths[code]) {
         _open.remove(code)?.close();
+        _paths.remove(code);
       }
     }
     for (final entry in codeToPath.entries) {
       if (_open.containsKey(entry.key)) continue;
       try {
         _open[entry.key] = sqlite3.open(entry.value, mode: OpenMode.readOnly);
+        _paths[entry.key] = entry.value;
       } catch (_) {
         // corrupt/missing file — skip
       }
@@ -108,5 +114,6 @@ class RegionPackStore {
       db.close();
     }
     _open.clear();
+    _paths.clear();
   }
 }
