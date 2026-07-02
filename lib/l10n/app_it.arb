@@ -158,6 +158,7 @@
   "backupReplaceBody": "L'importazione sostituirà le voci attuali, gli alimenti personalizzati, le ricette, gli obiettivi e le impostazioni con il contenuto del backup.",
   "backupRestored": "Backup ripristinato.",
   "backupImportFailed": "Importazione non riuscita: {error}",
+  "backupImportNewerVersion": "Questo backup è stato creato da una versione più recente dell'app. Aggiorna l'app e riprova l'importazione.",
 
   "amountLabel": "Quantità",
   "editEntryTitle": "Modifica voce",

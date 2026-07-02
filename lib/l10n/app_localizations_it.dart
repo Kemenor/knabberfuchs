@@ -491,6 +491,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get backupImportNewerVersion =>
+      'Questo backup è stato creato da una versione più recente dell\'app. Aggiorna l\'app e riprova l\'importazione.';
+
+  @override
   String get amountLabel => 'Quantità';
 
   @override
