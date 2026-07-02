@@ -7,16 +7,23 @@ name: Test · analyze + flutter test
 # is skipped (see test/flutter_test_config.dart) — so devs on Windows/macOS stay
 # green and this job is the source of truth.
 #
-# IMPORTANT: flutter-version must match the engine the committed goldens were
-# generated with (the dev distrobox — currently 3.44.4). When you bump Flutter,
-# regenerate the goldens on Linux (`flutter test --update-goldens test/golden`)
-# in the same version and bump it here (and in ios.yml, kept in lockstep).
+# IMPORTANT: the Flutter version must match the engine the committed goldens
+# were generated with (the dev distrobox — currently 3.44.4). It is
+# single-sourced in .fvmrc, which all four workflows read via
+# flutter-version-file. When you bump Flutter, regenerate the goldens on Linux
+# (`flutter test --update-goldens test/golden`) in the same version and bump
+# .fvmrc.
 
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+
+# A newer push to the same branch/PR supersedes the in-flight run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -25,9 +32,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: "3.44.4"
+          flutter-version-file: .fvmrc
           channel: stable
           cache: true
 
@@ -39,6 +46,14 @@ jobs:
 
       - name: Test
         run: flutter test
+
+      # The runner is on UTC (no DST), so day-math regressions around DST
+      # transitions are invisible above. Re-run just the date tests in a zone
+      # that actually transitions; cheap (reuses the warm build).
+      - name: Test date math under a DST timezone
+        run: flutter test test/date_x_test.dart test/day_trends_test.dart
+        env:
+          TZ: Europe/Zurich
 
       - name: Upload golden failure diffs
         if: failure()
