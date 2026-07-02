@@ -1,3 +1,5 @@
+import 'dart:convert' show jsonDecode, jsonEncode;
+
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -306,6 +308,42 @@ final targetsProvider = StreamProvider<List<Target>>(
   (ref) => ref.watch(dbProvider).watchTargets(),
 );
 
+/// The historical default when the 'trackedNutrients' setting is absent —
+/// exactly the pre-Phase-15 fixed set, so existing users see zero change.
+const defaultTrackedNutrients = {
+  TargetMetric.protein,
+  TargetMetric.carb,
+  TargetMetric.fat,
+};
+
+/// The user's enabled tracked nutrients beyond the always-on kcal (a JSON
+/// list of [TargetMetric] names in the 'trackedNutrients' setting). Disabling
+/// a nutrient only hides it — its target bounds stay in the DB.
+final trackedNutrientsProvider = StreamProvider<Set<TargetMetric>>((ref) {
+  return ref.watch(dbProvider).watchSetting('trackedNutrients').map((v) {
+    if (v == null) return defaultTrackedNutrients;
+    try {
+      final byName = TargetMetric.values.asNameMap();
+      return {
+        for (final n in (jsonDecode(v) as List))
+          if (byName[n.toString()] case final m? when m != TargetMetric.kcal) m,
+      };
+    } catch (_) {
+      return defaultTrackedNutrients;
+    }
+  });
+});
+
+/// Persist the enabled set (canonical enum order, kcal never stored).
+Future<void> setTrackedNutrients(AppDatabase db, Set<TargetMetric> enabled) =>
+    db.setSetting(
+      'trackedNutrients',
+      jsonEncode([
+        for (final m in TargetMetric.values)
+          if (m != TargetMetric.kcal && enabled.contains(m)) m.name,
+      ]),
+    );
+
 /// The `default<Metric>Min` settings key for a metric (e.g. protein →
 /// defaultProteinMin, satFat → defaultSatFatMin). kcal uses the historical
 /// defaultKcalMin/Max keys read by [defaultMinProvider]/[defaultMaxProvider].
@@ -548,7 +586,14 @@ final selectedTrendMetricProvider =
 final trendsProvider = StreamProvider<List<DayTrend>>((ref) {
   final db = ref.watch(dbProvider);
   final w = ref.watch(trendRangeProvider);
-  final metric = ref.watch(selectedTrendMetricProvider);
+  final selected = ref.watch(selectedTrendMetricProvider);
+  final tracked =
+      ref.watch(trackedNutrientsProvider).asData?.value ??
+      defaultTrackedNutrients;
+  // Same disabled-metric → kcal fallback the Trends chips apply.
+  final metric = selected == TargetMetric.kcal || tracked.contains(selected)
+      ? selected
+      : TargetMetric.kcal;
   final targets = ref.watch(targetsProvider).asData?.value ?? const [];
   final defaultMin = ref.watch(defaultMinProvider).asData?.value;
   final defaultMax = ref.watch(defaultMaxProvider).asData?.value;

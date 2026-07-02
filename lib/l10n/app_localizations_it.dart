@@ -339,6 +339,25 @@ class AppLocalizationsIt extends AppLocalizations {
   String get metricCalories => 'Calorie';
 
   @override
+  String get metricFiber => 'Fibre';
+
+  @override
+  String get metricSatFat => 'Grassi saturi';
+
+  @override
+  String get metricSugar => 'Zuccheri';
+
+  @override
+  String get metricSalt => 'Sale';
+
+  @override
+  String get settingsTrackedNutrients => 'Nutrienti monitorati';
+
+  @override
+  String get settingsTrackedNutrientsSub =>
+      'Scegli cosa riceve un obiettivo e compare sulla scheda del giorno e nelle tendenze. Le calorie sono sempre attive; disattivando un nutriente i valori restano salvati.';
+
+  @override
   String get settingsTargetsHelp =>
       'Imposta un minimo, un massimo o entrambi. Un minimo aiuta se devi assicurarti di mangiare abbastanza. Lascia vuoto per usare il valore predefinito.';
 

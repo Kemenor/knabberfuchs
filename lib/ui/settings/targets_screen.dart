@@ -5,14 +5,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/metric_labels.dart';
 import '../../data/db/database.dart';
 import '../../domain/day_summary.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 
-/// Settings → Targets. Metric-first: Calories, Protein, Carbohydrates, Fat —
-/// each with an always-visible app-wide default Min/Max and an independently
-/// expandable per-weekday breakdown. Every bound is optional.
+/// A weekday-override write for one bound of one metric (kcal has its own
+/// setting-backed defaults, so this only covers the Targets-table columns).
+TargetsCompanion _weekdayCompanion(TargetMetric m, bool isMax, double? v) {
+  final val = Value(v);
+  return switch ((m, isMax)) {
+    (TargetMetric.kcal, false) => TargetsCompanion(kcalMin: val),
+    (TargetMetric.kcal, true) => TargetsCompanion(kcalMax: val),
+    (TargetMetric.protein, false) => TargetsCompanion(proteinMin: val),
+    (TargetMetric.protein, true) => TargetsCompanion(proteinMax: val),
+    (TargetMetric.carb, false) => TargetsCompanion(carbMin: val),
+    (TargetMetric.carb, true) => TargetsCompanion(carbMax: val),
+    (TargetMetric.fat, false) => TargetsCompanion(fatMin: val),
+    (TargetMetric.fat, true) => TargetsCompanion(fatMax: val),
+    (TargetMetric.fiber, false) => TargetsCompanion(fiberMin: val),
+    (TargetMetric.fiber, true) => TargetsCompanion(fiberMax: val),
+    (TargetMetric.satFat, false) => TargetsCompanion(satFatMin: val),
+    (TargetMetric.satFat, true) => TargetsCompanion(satFatMax: val),
+    (TargetMetric.sugar, false) => TargetsCompanion(sugarMin: val),
+    (TargetMetric.sugar, true) => TargetsCompanion(sugarMax: val),
+    (TargetMetric.salt, false) => TargetsCompanion(saltMin: val),
+    (TargetMetric.salt, true) => TargetsCompanion(saltMax: val),
+  };
+}
+
+/// Settings → Targets. A "Tracked nutrients" chip row picks which nutrients
+/// are on (kcal is fixed; toggling off hides the block but keeps its bounds),
+/// then one block per enabled metric: an always-visible app-wide default
+/// Min/Max and an independently expandable per-weekday breakdown. Every bound
+/// is optional.
 class TargetsScreen extends ConsumerWidget {
   const TargetsScreen({super.key});
 
@@ -25,6 +52,9 @@ class TargetsScreen extends ConsumerWidget {
     final defaultMax = ref.watch(defaultMaxProvider).asData?.value;
     final macroDefaults =
         ref.watch(macroDefaultsProvider).asData?.value ?? const {};
+    final tracked =
+        ref.watch(trackedNutrientsProvider).asData?.value ??
+        defaultTrackedNutrients;
     CalorieTarget md(TargetMetric m) =>
         macroDefaults[m] ?? const CalorieTarget(null, null);
 
@@ -35,74 +65,77 @@ class TargetsScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text(l10n.genericError('$e'))),
         data: (targets) {
           Target rowFor(int wd) => targets.firstWhere((t) => t.weekday == wd);
-          // Default-setting writer for a macro metric (kcal uses its own keys).
-          void setMacroDefault(String key, double? v) =>
-              db.setSetting(key, v?.toStringAsFixed(0));
           return ListView(
             padding: const EdgeInsets.only(bottom: 24),
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Text(
+                  l10n.settingsTrackedNutrients,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                child: Text(
+                  l10n.settingsTrackedNutrientsSub,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    for (final m in TargetMetric.values)
+                      if (m != TargetMetric.kcal)
+                        FilterChip(
+                          label: Text(metricLabel(l10n, m)),
+                          selected: tracked.contains(m),
+                          onSelected: (on) => setTrackedNutrients(db, {
+                            ...tracked.where((t) => t != m),
+                            if (on) m,
+                          }),
+                        ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                 child: Text(l10n.settingsTargetsHelp),
               ),
-              _MetricTargets(
-                title: '${l10n.metricCalories} (${l10n.unitKcal})',
-                keyPrefix: 'kcal',
-                defaultMin: defaultMin,
-                defaultMax: defaultMax,
-                weekdayMin: (wd) => rowFor(wd).kcalMin,
-                weekdayMax: (wd) => rowFor(wd).kcalMax,
-                onDefaultMin: (v) =>
-                    db.setSetting('defaultKcalMin', v?.toStringAsFixed(0)),
-                onDefaultMax: (v) =>
-                    db.setSetting('defaultKcalMax', v?.toStringAsFixed(0)),
-                onWeekdayMin: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(kcalMin: Value(v))),
-                onWeekdayMax: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(kcalMax: Value(v))),
-              ),
-              _MetricTargets(
-                title: '${l10n.macroProtein} (g)',
-                keyPrefix: 'protein',
-                defaultMin: md(TargetMetric.protein).min,
-                defaultMax: md(TargetMetric.protein).max,
-                weekdayMin: (wd) => rowFor(wd).proteinMin,
-                weekdayMax: (wd) => rowFor(wd).proteinMax,
-                onDefaultMin: (v) => setMacroDefault('defaultProteinMin', v),
-                onDefaultMax: (v) => setMacroDefault('defaultProteinMax', v),
-                onWeekdayMin: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(proteinMin: Value(v))),
-                onWeekdayMax: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(proteinMax: Value(v))),
-              ),
-              _MetricTargets(
-                title: '${l10n.macroCarbs} (g)',
-                keyPrefix: 'carb',
-                defaultMin: md(TargetMetric.carb).min,
-                defaultMax: md(TargetMetric.carb).max,
-                weekdayMin: (wd) => rowFor(wd).carbMin,
-                weekdayMax: (wd) => rowFor(wd).carbMax,
-                onDefaultMin: (v) => setMacroDefault('defaultCarbMin', v),
-                onDefaultMax: (v) => setMacroDefault('defaultCarbMax', v),
-                onWeekdayMin: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(carbMin: Value(v))),
-                onWeekdayMax: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(carbMax: Value(v))),
-              ),
-              _MetricTargets(
-                title: '${l10n.macroFat} (g)',
-                keyPrefix: 'fat',
-                defaultMin: md(TargetMetric.fat).min,
-                defaultMax: md(TargetMetric.fat).max,
-                weekdayMin: (wd) => rowFor(wd).fatMin,
-                weekdayMax: (wd) => rowFor(wd).fatMax,
-                onDefaultMin: (v) => setMacroDefault('defaultFatMin', v),
-                onDefaultMax: (v) => setMacroDefault('defaultFatMax', v),
-                onWeekdayMin: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(fatMin: Value(v))),
-                onWeekdayMax: (wd, v) =>
-                    db.setTarget(wd, TargetsCompanion(fatMax: Value(v))),
-              ),
+              // kcal first (always on), then the enabled nutrients.
+              for (final m in TargetMetric.values)
+                if (m == TargetMetric.kcal || tracked.contains(m))
+                  _MetricTargets(
+                    title: m == TargetMetric.kcal
+                        ? '${l10n.metricCalories} (${l10n.unitKcal})'
+                        : '${metricLabel(l10n, m)} (g)',
+                    keyPrefix: m.name,
+                    defaultMin: m == TargetMetric.kcal
+                        ? defaultMin
+                        : md(m).min,
+                    defaultMax: m == TargetMetric.kcal
+                        ? defaultMax
+                        : md(m).max,
+                    weekdayMin: (wd) => targetRowBounds(rowFor(wd), m).$1,
+                    weekdayMax: (wd) => targetRowBounds(rowFor(wd), m).$2,
+                    onDefaultMin: (v) => db.setSetting(
+                      defaultSettingKey(m, max: false),
+                      v?.toStringAsFixed(0),
+                    ),
+                    onDefaultMax: (v) => db.setSetting(
+                      defaultSettingKey(m, max: true),
+                      v?.toStringAsFixed(0),
+                    ),
+                    onWeekdayMin: (wd, v) =>
+                        db.setTarget(wd, _weekdayCompanion(m, false, v)),
+                    onWeekdayMax: (wd, v) =>
+                        db.setTarget(wd, _weekdayCompanion(m, true, v)),
+                  ),
             ],
           );
         },
