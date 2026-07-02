@@ -12,12 +12,27 @@ extension AutoDismissSnackBar on ScaffoldMessengerState {
   ///   is active Flutter keeps SnackBars open so they can be read — we don't
   ///   force-close on those users; everyone else gets the normal auto-dismiss.
   ///
-  /// Callers only ever set `content`, so reconstructing the SnackBar with a
-  /// wrapped content (preserving its duration) is lossless here.
+  /// The SnackBar is reconstructed only because `content` must be wrapped in
+  /// the live region; every other field is passed through unchanged.
   void showAutoSnackBar(SnackBar snackBar) {
     final accessible = SnackBar(
       content: Semantics(liveRegion: true, child: snackBar.content),
+      backgroundColor: snackBar.backgroundColor,
+      elevation: snackBar.elevation,
+      margin: snackBar.margin,
+      padding: snackBar.padding,
+      width: snackBar.width,
+      shape: snackBar.shape,
+      behavior: snackBar.behavior,
+      action: snackBar.action,
+      actionOverflowThreshold: snackBar.actionOverflowThreshold,
+      showCloseIcon: snackBar.showCloseIcon,
+      closeIconColor: snackBar.closeIconColor,
       duration: snackBar.duration,
+      animation: snackBar.animation,
+      onVisible: snackBar.onVisible,
+      dismissDirection: snackBar.dismissDirection,
+      clipBehavior: snackBar.clipBehavior,
     );
     final controller = showSnackBar(accessible);
     final atActive = WidgetsBinding
