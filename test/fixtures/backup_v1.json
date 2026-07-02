@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": 1750000000000,
+  "entries": [
+    {
+      "id": 1,
+      "day": "2025-06-15",
+      "mealType": 0,
+      "grams": 250.0,
+      "sName": "Spaghetti",
+      "sKcal100": 158.0,
+      "sProtein100": 5.8,
+      "sCarb100": 30.9,
+      "sFat100": 0.9,
+      "sMicrosJson": null,
+      "sortIndex": 0,
+      "createdAt": 1750000000000
+    }
+  ],
+  "customFoods": [
+    {
+      "id": 1,
+      "name": "Oat cookie",
+      "brand": "Homemade",
+      "servingG": 25.0,
+      "servingLabel": "1 cookie",
+      "kcal100": 450.0,
+      "protein100": 7.0,
+      "carb100": 60.0,
+      "fat100": 18.0,
+      "fiber100": null,
+      "sugar100": 22.0,
+      "satFat100": null,
+      "sodiumMg100": null,
+      "saltG100": null,
+      "microsJson": null,
+      "isFavorite": true
+    }
+  ],
+  "recipes": [
+    { "id": 1, "name": "Muesli", "servings": 2.0, "note": null }
+  ],
+  "recipeItems": [
+    {
+      "id": 1,
+      "recipeId": 1,
+      "sName": "Oats",
+      "grams": 80.0,
+      "sKcal100": 370.0,
+      "sProtein100": 13.0,
+      "sCarb100": 60.0,
+      "sFat100": 7.0,
+      "sMicrosJson": null,
+      "sortIndex": 0
+    }
+  ],
+  "targets": [
+    { "weekday": 0, "kcal": 2000.0 },
+    { "weekday": 1, "kcal": null }
+  ],
+  "settings": {
+    "defaultKcalTarget": "2100",
+    "groupByMeal": "true"
+  }
+}

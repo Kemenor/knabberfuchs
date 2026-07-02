@@ -8,15 +8,29 @@ import 'db/database.dart';
 
 /// Backup schema version, carried in the manifest so future versions can
 /// migrate an older export on import. v2 adds entryGroups + entry.groupId and
-/// replaces the legacy target `kcal` field with `kcalMin`/`kcalMax`. Per-macro
-/// target bounds (`proteinMin/Max`, `carbMin/Max`, `fatMin/Max`) were added
-/// later within v2 and restore null when absent, so the version is unchanged.
+/// replaces the legacy target `kcal` field with `kcalMin`/`kcalMax`. Fields
+/// added later within v2 restore to null/defaults when absent, so the version
+/// is unchanged: per-macro target bounds (`proteinMin/Max`, `carbMin/Max`,
+/// `fatMin/Max`) and the custom-food `barcode`/`externalId`/`densityGPerMl`/
+/// `usageCount`/`lastUsedAt` columns.
 const backupSchemaVersion = 2;
+
+/// Settings that hold credentials (currently the Gemini API key; see
+/// `geminiKeySetting` in providers.dart). The backup ZIP is unencrypted and
+/// goes through the share sheet, so these are stripped from the export, never
+/// imported, and preserved on-device across a restore.
+const _credentialSettingKeys = {'geminiApiKey'};
 
 int _ms(DateTime d) => d.millisecondsSinceEpoch;
 DateTime _dt(Object? v) =>
     DateTime.fromMillisecondsSinceEpoch((v as num?)?.toInt() ?? 0);
 double? _d(Object? v) => v == null ? null : (v as num).toDouble();
+
+/// A target bound read from a backup: an *absent* key stays [Value.absent] so
+/// restoring an older export never null-overwrites bounds it predates, while
+/// a present-but-null key still restores as "no target set".
+Value<double?> _bound(Map<dynamic, dynamic> t, String key) =>
+    t.containsKey(key) ? Value(_d(t[key])) : const Value.absent();
 
 // ---------------- Export ----------------
 
@@ -88,8 +102,11 @@ Future<Map<String, dynamic>> buildBackupMap(
           'id': f.id,
           'name': f.name,
           'brand': f.brand,
+          'barcode': f.barcode,
+          'externalId': f.externalId,
           'servingG': f.servingG,
           'servingLabel': f.servingLabel,
+          'densityGPerMl': f.densityGPerMl,
           'kcal100': f.kcal100,
           'protein100': f.protein100,
           'carb100': f.carb100,
@@ -101,6 +118,8 @@ Future<Map<String, dynamic>> buildBackupMap(
           'saltG100': f.saltG100,
           'microsJson': f.microsJson,
           'isFavorite': f.isFavorite,
+          'usageCount': f.usageCount,
+          'lastUsedAt': f.lastUsedAt == null ? null : _ms(f.lastUsedAt!),
         },
     ],
     'recipes': [
@@ -122,7 +141,10 @@ Future<Map<String, dynamic>> buildBackupMap(
           'fatMax': t.fatMax,
         },
     ],
-    'settings': {for (final s in settings) s.key: s.value},
+    'settings': {
+      for (final s in settings)
+        if (!_credentialSettingKeys.contains(s.key)) s.key: s.value,
+    },
   };
 }
 
@@ -165,7 +187,18 @@ String buildEntriesCsv(List<Entry> entries) {
 /// Replace all user data with the contents of a backup map. Cached OFF/USDA
 /// foods are left untouched; restored entries have their food link cleared
 /// (snapshots preserve nutrition), avoiding dangling references.
+///
+/// Honors the map's `schemaVersion`: v1 exports are migrated on the fly
+/// (mirroring the DB v2 migration), and an export written by a *newer* app is
+/// rejected with a [FormatException] before anything is touched.
 Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
+  final version = (map['schemaVersion'] as num?)?.toInt() ?? 1;
+  if (version > backupSchemaVersion) {
+    throw FormatException(
+      'Backup schema version $version is newer than this app supports '
+      '(max $backupSchemaVersion). Update the app, then import again.',
+    );
+  }
   await db.transaction(() async {
     await db.delete(db.entries).go();
     await db.delete(db.entryGroups).go();
@@ -174,19 +207,26 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
     await (db.delete(
       db.foods,
     )..where((f) => f.source.equalsValue(FoodSource.custom))).go();
-    await db.delete(db.settings).go();
+    await (db.delete(
+      db.settings,
+    )..where((s) => s.key.isNotIn(_credentialSettingKeys))).go();
 
+    // No explicit id: the foods table keeps its seed/OFF-cache rows, so the
+    // exported id may already be taken. Nothing in the backup references
+    // custom-food ids (entries drop foodId), so autoincrement is safe.
     for (final f in (map['customFoods'] as List? ?? const [])) {
       await db
           .into(db.foods)
           .insert(
             FoodsCompanion(
-              id: Value((f['id'] as num).toInt()),
               source: const Value(FoodSource.custom),
+              externalId: Value(f['externalId'] as String?),
+              barcode: Value(f['barcode'] as String?),
               name: Value(f['name'] as String),
               brand: Value(f['brand'] as String?),
               servingG: Value(_d(f['servingG'])),
               servingLabel: Value(f['servingLabel'] as String?),
+              densityGPerMl: Value(_d(f['densityGPerMl'])),
               kcal100: Value(_d(f['kcal100']) ?? 0),
               protein100: Value(_d(f['protein100'])),
               carb100: Value(_d(f['carb100'])),
@@ -198,6 +238,10 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
               saltG100: Value(_d(f['saltG100'])),
               microsJson: Value(f['microsJson'] as String?),
               isFavorite: Value((f['isFavorite'] as bool?) ?? false),
+              usageCount: Value((f['usageCount'] as num?)?.toInt() ?? 0),
+              lastUsedAt: Value(
+                f['lastUsedAt'] == null ? null : _dt(f['lastUsedAt']),
+              ),
             ),
           );
     }
@@ -271,30 +315,37 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
     }
 
     for (final t in (map['targets'] as List? ?? const [])) {
+      final m = t as Map;
       await db
           .into(db.targets)
           .insertOnConflictUpdate(
             TargetsCompanion(
-              weekday: Value((t['weekday'] as num).toInt()),
-              kcalMin: Value(_d(t['kcalMin'])),
-              kcalMax: Value(_d(t['kcalMax'])),
-              proteinMin: Value(_d(t['proteinMin'])),
-              proteinMax: Value(_d(t['proteinMax'])),
-              carbMin: Value(_d(t['carbMin'])),
-              carbMax: Value(_d(t['carbMax'])),
-              fatMin: Value(_d(t['fatMin'])),
-              fatMax: Value(_d(t['fatMax'])),
+              weekday: Value((m['weekday'] as num).toInt()),
+              kcalMin: _bound(m, 'kcalMin'),
+              // v1 carried a single `kcal` target; the DB v2 migration turned
+              // it into the upper bound.
+              kcalMax: _bound(m, version < 2 ? 'kcal' : 'kcalMax'),
+              proteinMin: _bound(m, 'proteinMin'),
+              proteinMax: _bound(m, 'proteinMax'),
+              carbMin: _bound(m, 'carbMin'),
+              carbMax: _bound(m, 'carbMax'),
+              fatMin: _bound(m, 'fatMin'),
+              fatMax: _bound(m, 'fatMax'),
             ),
           );
     }
 
     final settings = (map['settings'] as Map?) ?? const {};
     for (final entry in settings.entries) {
+      var key = entry.key.toString();
+      // Mirror the DB v2 migration's settings-key rename.
+      if (version < 2 && key == 'defaultKcalTarget') key = 'defaultKcalMax';
+      if (_credentialSettingKeys.contains(key)) continue;
       await db
           .into(db.settings)
           .insert(
             SettingsCompanion.insert(
-              key: entry.key.toString(),
+              key: key,
               value: Value(entry.value as String?),
             ),
           );
