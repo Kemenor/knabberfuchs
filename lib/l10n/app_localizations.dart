@@ -132,109 +132,109 @@ abstract class AppLocalizations {
   /// **'Trends'**
   String get navTrends;
 
-  /// No description provided for @settingsDisplay.
+  /// Settings section header for display options
   ///
   /// In en, this message translates to:
   /// **'Display'**
   String get settingsDisplay;
 
-  /// No description provided for @settingsAppearance.
+  /// Settings section header: theme, typeface and language
   ///
   /// In en, this message translates to:
   /// **'Appearance'**
   String get settingsAppearance;
 
-  /// No description provided for @settingsTracking.
+  /// Settings section header for tracking options like the Trends tab
   ///
   /// In en, this message translates to:
   /// **'Tracking'**
   String get settingsTracking;
 
-  /// No description provided for @settingsShowTrends.
+  /// Settings toggle title that shows/hides the Trends tab
   ///
   /// In en, this message translates to:
   /// **'Show Trends tab'**
   String get settingsShowTrends;
 
-  /// No description provided for @settingsShowTrendsSub.
+  /// Subtitle under the Show Trends toggle
   ///
   /// In en, this message translates to:
   /// **'Add a tab with weekly and monthly calorie charts'**
   String get settingsShowTrendsSub;
 
-  /// No description provided for @trendsWeek.
+  /// Trends period chip: weekly view
   ///
   /// In en, this message translates to:
   /// **'Week'**
   String get trendsWeek;
 
-  /// No description provided for @trendsMonth.
+  /// Trends period chip: monthly view
   ///
   /// In en, this message translates to:
   /// **'Month'**
   String get trendsMonth;
 
-  /// No description provided for @trendsCustom.
+  /// Trends period chip: custom date range (keep short)
   ///
   /// In en, this message translates to:
   /// **'Custom'**
   String get trendsCustom;
 
-  /// No description provided for @trendsWeeklyAvg.
+  /// Trends chart title for the weekly-average view
   ///
   /// In en, this message translates to:
   /// **'Weekly average'**
   String get trendsWeeklyAvg;
 
-  /// No description provided for @trendsMonthlyAvg.
+  /// Trends chart title for the monthly-average view
   ///
   /// In en, this message translates to:
   /// **'Monthly average'**
   String get trendsMonthlyAvg;
 
-  /// No description provided for @trendsAvgPerDay.
+  /// Trends stat label: average calories per day in the period
   ///
   /// In en, this message translates to:
   /// **'Average / day'**
   String get trendsAvgPerDay;
 
-  /// No description provided for @trendsDaysInTarget.
+  /// Trends stat label: how many days stayed within the calorie target
   ///
   /// In en, this message translates to:
   /// **'Days in target'**
   String get trendsDaysInTarget;
 
-  /// No description provided for @trendsEmpty.
+  /// Empty state on the Trends screen
   ///
   /// In en, this message translates to:
   /// **'No entries yet for this range. Log some food to see your trends.'**
   String get trendsEmpty;
 
-  /// No description provided for @actionSave.
+  /// Generic save button label
   ///
   /// In en, this message translates to:
   /// **'Save'**
   String get actionSave;
 
-  /// No description provided for @actionCancel.
+  /// Generic cancel button label
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get actionCancel;
 
-  /// No description provided for @actionDelete.
+  /// Generic delete button label
   ///
   /// In en, this message translates to:
   /// **'Delete'**
   String get actionDelete;
 
-  /// No description provided for @actionAdd.
+  /// Generic add button label
   ///
   /// In en, this message translates to:
   /// **'Add'**
   String get actionAdd;
 
-  /// No description provided for @actionImport.
+  /// Confirm button of the import-backup dialog
   ///
   /// In en, this message translates to:
   /// **'Import'**
@@ -246,49 +246,49 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get settingsSectionLanguage;
 
-  /// No description provided for @settingsTheme.
+  /// Settings row title for the light/dark theme picker
   ///
   /// In en, this message translates to:
   /// **'Theme'**
   String get settingsTheme;
 
-  /// No description provided for @themeSystem.
+  /// Theme option: follow the system light/dark setting
   ///
   /// In en, this message translates to:
   /// **'System'**
   String get themeSystem;
 
-  /// No description provided for @themeLight.
+  /// Theme option: always light
   ///
   /// In en, this message translates to:
   /// **'Light'**
   String get themeLight;
 
-  /// No description provided for @themeDark.
+  /// Theme option: always dark
   ///
   /// In en, this message translates to:
   /// **'Dark'**
   String get themeDark;
 
-  /// No description provided for @settingsTypeface.
+  /// Settings row title for the font picker
   ///
   /// In en, this message translates to:
   /// **'Typeface'**
   String get settingsTypeface;
 
-  /// No description provided for @typefaceDefault.
+  /// Typeface option: the standard app font
   ///
   /// In en, this message translates to:
   /// **'Default'**
   String get typefaceDefault;
 
-  /// No description provided for @typefaceLowVision.
+  /// Typeface option: a high-legibility font for low vision
   ///
   /// In en, this message translates to:
   /// **'Low-vision legibility'**
   String get typefaceLowVision;
 
-  /// No description provided for @typefaceDyslexia.
+  /// Typeface option: a dyslexia-friendly font
   ///
   /// In en, this message translates to:
   /// **'Dyslexia'**
@@ -306,25 +306,25 @@ abstract class AppLocalizations {
   /// **'System default'**
   String get languageSystem;
 
-  /// No description provided for @languageEnglish.
+  /// Language picker option; endonym, shown in its own language (do not translate)
   ///
   /// In en, this message translates to:
   /// **'English'**
   String get languageEnglish;
 
-  /// No description provided for @languageGerman.
+  /// Language picker option; endonym, shown in its own language (do not translate)
   ///
   /// In en, this message translates to:
   /// **'Deutsch'**
   String get languageGerman;
 
-  /// No description provided for @languageFrench.
+  /// Language picker option; endonym, shown in its own language (do not translate)
   ///
   /// In en, this message translates to:
   /// **'Français'**
   String get languageFrench;
 
-  /// No description provided for @languageItalian.
+  /// Language picker option; endonym, shown in its own language (do not translate)
   ///
   /// In en, this message translates to:
   /// **'Italiano'**
@@ -336,43 +336,43 @@ abstract class AppLocalizations {
   /// **'Languages other than English have been machine-translated and may read awkwardly.'**
   String get languageMachineNote;
 
-  /// No description provided for @dateToday.
+  /// Relative date label for the current day
   ///
   /// In en, this message translates to:
   /// **'Today'**
   String get dateToday;
 
-  /// No description provided for @dateYesterday.
+  /// Relative date label for the previous day
   ///
   /// In en, this message translates to:
   /// **'Yesterday'**
   String get dateYesterday;
 
-  /// No description provided for @dateTomorrow.
+  /// Relative date label for the next day
   ///
   /// In en, this message translates to:
   /// **'Tomorrow'**
   String get dateTomorrow;
 
-  /// No description provided for @dayPreviousDay.
+  /// Tooltip of the previous-day arrow on the Day screen
   ///
   /// In en, this message translates to:
   /// **'Previous day'**
   String get dayPreviousDay;
 
-  /// No description provided for @dayNextDay.
+  /// Tooltip of the next-day arrow on the Day screen
   ///
   /// In en, this message translates to:
   /// **'Next day'**
   String get dayNextDay;
 
-  /// No description provided for @dayAddFood.
+  /// Main FAB label on the Day screen; also the title of the add-food screen and log sheet
   ///
   /// In en, this message translates to:
   /// **'Add food'**
   String get dayAddFood;
 
-  /// No description provided for @dayMealFromList.
+  /// Menu entry: build a meal by photographing a printed ingredient list
   ///
   /// In en, this message translates to:
   /// **'Meal from an ingredient list'**
@@ -384,247 +384,265 @@ abstract class AppLocalizations {
   /// **'Tap + to start a meal.\nEverything you add flows into it until you tap ✓ (or 15 min pass).'**
   String get dayEmptyHint;
 
-  /// No description provided for @unitKcal.
+  /// Kilocalorie unit symbol (usually not translated)
   ///
   /// In en, this message translates to:
   /// **'kcal'**
   String get unitKcal;
 
-  /// No description provided for @macroProtein.
+  /// Teaspoon unit label on the amount field and unit chips (abbreviate if customary)
+  ///
+  /// In en, this message translates to:
+  /// **'tsp'**
+  String get unitTsp;
+
+  /// Tablespoon unit label on the amount field and unit chips (abbreviate if customary)
+  ///
+  /// In en, this message translates to:
+  /// **'tbsp'**
+  String get unitTbsp;
+
+  /// Cup volume-unit label on the amount field and unit chips
+  ///
+  /// In en, this message translates to:
+  /// **'cup'**
+  String get unitCup;
+
+  /// Macronutrient label: protein
   ///
   /// In en, this message translates to:
   /// **'Protein'**
   String get macroProtein;
 
-  /// No description provided for @macroCarbs.
+  /// Macronutrient label: carbohydrates (keep short)
   ///
   /// In en, this message translates to:
   /// **'Carbs'**
   String get macroCarbs;
 
-  /// No description provided for @macroFat.
+  /// Macronutrient label: fat
   ///
   /// In en, this message translates to:
   /// **'Fat'**
   String get macroFat;
 
-  /// No description provided for @targetOver.
+  /// Day header status: kcal above the maximum target
   ///
   /// In en, this message translates to:
   /// **'{kcal} over'**
   String targetOver(String kcal);
 
-  /// No description provided for @targetToGo.
+  /// Day header status: kcal still needed to reach the minimum target
   ///
   /// In en, this message translates to:
   /// **'{kcal} to go'**
   String targetToGo(String kcal);
 
-  /// No description provided for @targetLeft.
+  /// Day header status: kcal left until the maximum target
   ///
   /// In en, this message translates to:
   /// **'{kcal} left'**
   String targetLeft(String kcal);
 
-  /// No description provided for @targetMinReached.
+  /// Day header status once the minimum-calorie target is met
   ///
   /// In en, this message translates to:
   /// **'minimum reached'**
   String get targetMinReached;
 
-  /// No description provided for @targetRangeBoth.
+  /// Day header target line when both a minimum and a maximum are set
   ///
   /// In en, this message translates to:
   /// **'Target {min}–{max} kcal'**
   String targetRangeBoth(String min, String max);
 
-  /// No description provided for @targetRangeMax.
+  /// Day header target line when only a maximum is set
   ///
   /// In en, this message translates to:
   /// **'Target {max} kcal'**
   String targetRangeMax(String max);
 
-  /// No description provided for @targetRangeMin.
+  /// Day header target line when only a minimum is set
   ///
   /// In en, this message translates to:
   /// **'Minimum {min} kcal'**
   String targetRangeMin(String min);
 
-  /// No description provided for @mealMenuEdit.
+  /// Meal overflow menu: edit the meal's name, type and time
   ///
   /// In en, this message translates to:
   /// **'Edit meal'**
   String get mealMenuEdit;
 
-  /// No description provided for @mealMenuSplit.
+  /// Meal overflow menu: split the meal into portions over several days
   ///
   /// In en, this message translates to:
   /// **'Split across days'**
   String get mealMenuSplit;
 
-  /// No description provided for @mealMenuScale.
+  /// Meal overflow menu: scale all amounts by a percentage
   ///
   /// In en, this message translates to:
   /// **'Scale meal'**
   String get mealMenuScale;
 
-  /// No description provided for @scaleMealApply.
+  /// Confirm button in the scale-meal sheet
   ///
   /// In en, this message translates to:
   /// **'Scale to {pct}%'**
   String scaleMealApply(String pct);
 
-  /// No description provided for @scaleMealDone.
+  /// Snackbar after a meal was scaled
   ///
   /// In en, this message translates to:
   /// **'Meal scaled to {pct}%'**
   String scaleMealDone(String pct);
 
-  /// No description provided for @mealMenuSaveRecipe.
+  /// Meal overflow menu: save the meal as a recipe
   ///
   /// In en, this message translates to:
   /// **'Save as recipe'**
   String get mealMenuSaveRecipe;
 
-  /// No description provided for @mealMenuDelete.
+  /// Meal overflow menu: delete the meal and its entries
   ///
   /// In en, this message translates to:
   /// **'Delete meal'**
   String get mealMenuDelete;
 
-  /// No description provided for @mealFinish.
+  /// Tooltip of the ✓ button that closes the currently running meal
   ///
   /// In en, this message translates to:
   /// **'Finish meal'**
   String get mealFinish;
 
-  /// No description provided for @mealAddTo.
+  /// Tooltip of the + button that adds more food to an existing meal
   ///
   /// In en, this message translates to:
   /// **'Add to this meal'**
   String get mealAddTo;
 
-  /// No description provided for @mealCollapse.
+  /// Tooltip to collapse an expanded meal card
   ///
   /// In en, this message translates to:
   /// **'Collapse meal'**
   String get mealCollapse;
 
-  /// No description provided for @mealExpand.
+  /// Tooltip to expand a collapsed meal card
   ///
   /// In en, this message translates to:
   /// **'Expand meal'**
   String get mealExpand;
 
-  /// No description provided for @mealSavedToRecipes.
+  /// Snackbar after saving a meal as a recipe
   ///
   /// In en, this message translates to:
   /// **'Saved \"{name}\" to recipes'**
   String mealSavedToRecipes(String name);
 
-  /// No description provided for @editMealTitle.
+  /// Title of the edit-meal sheet
   ///
   /// In en, this message translates to:
   /// **'Edit meal'**
   String get editMealTitle;
 
-  /// No description provided for @editMealName.
+  /// Label of the meal-name field in the edit-meal sheet
   ///
   /// In en, this message translates to:
   /// **'Name'**
   String get editMealName;
 
-  /// No description provided for @editMealType.
+  /// Label above the meal-type chips (breakfast/lunch/…) in the edit-meal sheet
   ///
   /// In en, this message translates to:
   /// **'Meal type'**
   String get editMealType;
 
-  /// No description provided for @editMealWhen.
+  /// Label above the date/time row in the edit-meal sheet
   ///
   /// In en, this message translates to:
   /// **'When'**
   String get editMealWhen;
 
-  /// No description provided for @recipeDeleteConfirm.
+  /// Confirmation dialog title before deleting a recipe
   ///
   /// In en, this message translates to:
   /// **'Delete “{name}”?'**
   String recipeDeleteConfirm(String name);
 
-  /// No description provided for @recipesTitle.
+  /// Title of the Recipes screen
   ///
   /// In en, this message translates to:
   /// **'Recipes'**
   String get recipesTitle;
 
-  /// No description provided for @recipesEmpty.
+  /// Empty state on the Recipes screen
   ///
   /// In en, this message translates to:
   /// **'No recipes yet.\nCreate one to reuse meals, share them, or batch-cook and split across days.'**
   String get recipesEmpty;
 
-  /// No description provided for @recipeNew.
+  /// FAB label to create a new recipe
   ///
   /// In en, this message translates to:
   /// **'New recipe'**
   String get recipeNew;
 
-  /// No description provided for @recipeServings.
+  /// How many servings a recipe makes, shown on recipe cards; the count can be fractional
   ///
   /// In en, this message translates to:
-  /// **'{count} servings'**
-  String recipeServings(String count);
+  /// **'{count, plural, one{{count} serving} other{{count} servings}}'**
+  String recipeServings(num count);
 
-  /// No description provided for @recipeImported.
+  /// Snackbar after importing a shared recipe
   ///
   /// In en, this message translates to:
   /// **'Imported \"{name}\"'**
   String recipeImported(String name);
 
-  /// No description provided for @qrNotRecipe.
+  /// Error when a scanned QR code or pasted text is not a valid recipe
   ///
   /// In en, this message translates to:
   /// **'That\'s not a valid recipe.'**
   String get qrNotRecipe;
 
-  /// No description provided for @createBuildManually.
+  /// New-recipe sheet option: add ingredients one by one
   ///
   /// In en, this message translates to:
   /// **'Build manually'**
   String get createBuildManually;
 
-  /// No description provided for @createBuildManuallySub.
+  /// Subtitle under the build-manually option
   ///
   /// In en, this message translates to:
   /// **'Add ingredients one by one'**
   String get createBuildManuallySub;
 
-  /// No description provided for @createFromList.
+  /// New-recipe sheet option: photograph a printed ingredient list
   ///
   /// In en, this message translates to:
   /// **'From an ingredient list'**
   String get createFromList;
 
-  /// No description provided for @createFromListSub.
+  /// Subtitle under the from-an-ingredient-list option
   ///
   /// In en, this message translates to:
   /// **'Photograph a printed list — save it or log it as a meal'**
   String get createFromListSub;
 
-  /// No description provided for @createFromQr.
+  /// New-recipe sheet option: import a recipe shared as a QR code
   ///
   /// In en, this message translates to:
   /// **'Import from QR code'**
   String get createFromQr;
 
-  /// No description provided for @createFromQrSub.
+  /// Subtitle under the import-from-QR option
   ///
   /// In en, this message translates to:
   /// **'Scan a shared recipe'**
   String get createFromQrSub;
 
-  /// No description provided for @genericError.
+  /// Generic error message with the underlying error appended
   ///
   /// In en, this message translates to:
   /// **'Error: {error}'**
@@ -636,7 +654,7 @@ abstract class AppLocalizations {
   /// **'Couldn\'t open the link'**
   String get couldNotOpenLink;
 
-  /// No description provided for @settingsTargets.
+  /// Settings tile title that opens the Targets screen
   ///
   /// In en, this message translates to:
   /// **'Targets'**
@@ -654,13 +672,13 @@ abstract class AppLocalizations {
   /// **'Calories'**
   String get metricCalories;
 
-  /// No description provided for @settingsTargetsHelp.
+  /// Explainer text at the top of the Targets screen
   ///
   /// In en, this message translates to:
   /// **'Set a minimum, a maximum, or both. A minimum helps if you need to make sure you eat enough. Leave blank to use the default.'**
   String get settingsTargetsHelp;
 
-  /// No description provided for @settingsTargetDefault.
+  /// Label of the default (non-customized) daily target row
   ///
   /// In en, this message translates to:
   /// **'Default'**
@@ -678,1189 +696,1195 @@ abstract class AppLocalizations {
   /// **'max'**
   String get settingsTargetMax;
 
-  /// No description provided for @settingsCustomizePerDay.
+  /// Toggle title to set different targets per weekday
   ///
   /// In en, this message translates to:
   /// **'Customize per day'**
   String get settingsCustomizePerDay;
 
-  /// No description provided for @settingsCustomizePerDaySub.
+  /// Subtitle under the customize-per-day toggle
   ///
   /// In en, this message translates to:
   /// **'Training days and weekends can differ'**
   String get settingsCustomizePerDaySub;
 
-  /// No description provided for @settingsLogging.
+  /// Settings section header for logging behavior
   ///
   /// In en, this message translates to:
   /// **'Logging'**
   String get settingsLogging;
 
-  /// No description provided for @settingsMealTimes.
+  /// Settings tile title for configuring the meal-time windows
   ///
   /// In en, this message translates to:
   /// **'Meal times'**
   String get settingsMealTimes;
 
-  /// No description provided for @settingsMealTimesSub.
+  /// Subtitle under the meal-times tile
   ///
   /// In en, this message translates to:
   /// **'Names each meal by the time you log it'**
   String get settingsMealTimesSub;
 
-  /// No description provided for @settingsMealTimesHelp.
+  /// Explainer text on the meal-times settings screen
   ///
   /// In en, this message translates to:
   /// **'A new meal is named after the window its first item falls in (e.g. \"Breakfast 08:23\"). Anything outside these windows is a snack. You can always rename a meal.'**
   String get settingsMealTimesHelp;
 
-  /// No description provided for @settingsFoodData.
+  /// Settings section header for food-database options
   ///
   /// In en, this message translates to:
   /// **'Food data'**
   String get settingsFoodData;
 
-  /// No description provided for @settingsOfflineRegions.
+  /// Settings tile title that opens the offline-regions screen
   ///
   /// In en, this message translates to:
   /// **'Offline regions'**
   String get settingsOfflineRegions;
 
-  /// No description provided for @settingsOfflineRegionsSub.
+  /// Subtitle under the offline-regions tile
   ///
   /// In en, this message translates to:
   /// **'Download country product databases for offline search'**
   String get settingsOfflineRegionsSub;
 
-  /// No description provided for @settingsHealthConnect.
+  /// Settings section header: just the platform health store's name (e.g. Health Connect)
   ///
   /// In en, this message translates to:
   /// **'{store}'**
   String settingsHealthConnect(String store);
 
-  /// No description provided for @settingsHealthSync.
+  /// Toggle title to sync logged nutrition to the platform health store
   ///
   /// In en, this message translates to:
   /// **'Sync to {store}'**
   String settingsHealthSync(String store);
 
-  /// No description provided for @settingsHealthSyncSub.
+  /// Subtitle under the health-sync toggle
   ///
   /// In en, this message translates to:
   /// **'Write logged calories & macros to {store}'**
   String settingsHealthSyncSub(String store);
 
-  /// No description provided for @settingsHealthTimeNote.
+  /// Info row title: entries sync with their logged timestamp
   ///
   /// In en, this message translates to:
   /// **'Entries sync at the time you logged them'**
   String get settingsHealthTimeNote;
 
-  /// No description provided for @settingsHealthTimeNoteSub.
+  /// Subtitle explaining how to change a synced entry's time
   ///
   /// In en, this message translates to:
   /// **'Back-date a meal from its ⋮ menu to change its time.'**
   String get settingsHealthTimeNoteSub;
 
-  /// No description provided for @settingsDataBackup.
+  /// Settings section header for backup and restore
   ///
   /// In en, this message translates to:
   /// **'Data & backup'**
   String get settingsDataBackup;
 
-  /// No description provided for @settingsExport.
+  /// Settings tile title to export a backup
   ///
   /// In en, this message translates to:
   /// **'Export backup'**
   String get settingsExport;
 
-  /// No description provided for @settingsExportSub.
+  /// Subtitle under the export-backup tile
   ///
   /// In en, this message translates to:
   /// **'Share a .zip (JSON + CSV)'**
   String get settingsExportSub;
 
-  /// No description provided for @settingsImport.
+  /// Settings tile title to import a backup
   ///
   /// In en, this message translates to:
   /// **'Import backup'**
   String get settingsImport;
 
-  /// No description provided for @settingsImportSub.
+  /// Subtitle under the import-backup tile
   ///
   /// In en, this message translates to:
   /// **'Restore from a .zip (replaces all data)'**
   String get settingsImportSub;
 
-  /// No description provided for @settingsAbout.
+  /// Settings section header for the about block
   ///
   /// In en, this message translates to:
   /// **'About'**
   String get settingsAbout;
 
-  /// No description provided for @settingsContactDev.
+  /// Settings tile title to email the developer
   ///
   /// In en, this message translates to:
   /// **'Contact the developer'**
   String get settingsContactDev;
 
-  /// No description provided for @settingsContactDevSub.
+  /// Subtitle under the contact-the-developer tile
   ///
   /// In en, this message translates to:
   /// **'Email feedback or a bug report (adds app & device info)'**
   String get settingsContactDevSub;
 
-  /// No description provided for @settingsContactDevNoApp.
+  /// Snackbar when no email app is installed
   ///
   /// In en, this message translates to:
   /// **'No email app found. Write to {email}'**
   String settingsContactDevNoApp(String email);
 
-  /// No description provided for @settingsAboutBody.
+  /// About text with data-source and license attributions
   ///
   /// In en, this message translates to:
   /// **'Ad-free, no subscriptions. Food data from Open Food Facts (© Open Food Facts contributors, ODbL) and the Swiss Food Composition Database (Federal Food Safety and Veterinary Office, FSVO). Portion sizes informed by USDA FoodData Central (public domain). On-device photo recognition uses Google\'s AIY food_V1 model (Apache 2.0). Tap “View licenses” for open-source components.'**
   String get settingsAboutBody;
 
-  /// No description provided for @offThanksTitle.
+  /// Title of the Open Food Facts thank-you card in Settings
   ///
   /// In en, this message translates to:
   /// **'Thanks to Open Food Facts'**
   String get offThanksTitle;
 
-  /// No description provided for @offThanksBody.
+  /// Body of the Open Food Facts thank-you card
   ///
   /// In en, this message translates to:
   /// **'Knabberfuchs is built on Open Food Facts — a free, open, crowdsourced food database kept alive by volunteers around the world. Without their work, this app simply would not exist.\n\nIf Knabberfuchs is useful to you, please consider supporting them.'**
   String get offThanksBody;
 
-  /// No description provided for @offDonate.
+  /// Button that opens the Open Food Facts donation page
   ///
   /// In en, this message translates to:
   /// **'Donate to Open Food Facts'**
   String get offDonate;
 
-  /// No description provided for @healthSyncOff.
+  /// Snackbar when health sync is turned off
   ///
   /// In en, this message translates to:
   /// **'{store} sync turned off.'**
   String healthSyncOff(String store);
 
-  /// No description provided for @healthUnavailable.
+  /// Snackbar when the platform health store is missing on this device
   ///
   /// In en, this message translates to:
   /// **'{store} is not available on this device.'**
   String healthUnavailable(String store);
 
-  /// No description provided for @healthNoPermission.
+  /// Snackbar when the health-store permission was denied
   ///
   /// In en, this message translates to:
   /// **'{store} permission was not granted.'**
   String healthNoPermission(String store);
 
-  /// No description provided for @healthSyncOn.
+  /// Snackbar when health sync was enabled and today's entries were pushed
   ///
   /// In en, this message translates to:
   /// **'{store} sync on — today pushed.'**
   String healthSyncOn(String store);
 
-  /// No description provided for @backupExportFailed.
+  /// Snackbar when exporting a backup fails
   ///
   /// In en, this message translates to:
   /// **'Export failed: {error}'**
   String backupExportFailed(String error);
 
-  /// No description provided for @backupReplaceTitle.
+  /// File-type filter name shown in the system file picker when choosing a backup .zip
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backupFileType;
+
+  /// Confirmation dialog title before importing a backup
   ///
   /// In en, this message translates to:
   /// **'Replace all data?'**
   String get backupReplaceTitle;
 
-  /// No description provided for @backupReplaceBody.
+  /// Confirmation dialog body warning that importing replaces all data
   ///
   /// In en, this message translates to:
   /// **'Importing will replace your current entries, custom foods, recipes, targets, and settings with the backup contents.'**
   String get backupReplaceBody;
 
-  /// No description provided for @backupRestored.
+  /// Snackbar after a backup was restored
   ///
   /// In en, this message translates to:
   /// **'Backup restored.'**
   String get backupRestored;
 
-  /// No description provided for @backupImportFailed.
+  /// Snackbar when importing a backup fails
   ///
   /// In en, this message translates to:
   /// **'Import failed: {error}'**
   String backupImportFailed(String error);
 
-  /// No description provided for @amountLabel.
+  /// Label of the amount input in the log-food sheet; also the sheet title when only picking an amount
   ///
   /// In en, this message translates to:
   /// **'Amount'**
   String get amountLabel;
 
-  /// No description provided for @editEntryTitle.
+  /// Title of the edit-diary-entry sheet
   ///
   /// In en, this message translates to:
   /// **'Edit entry'**
   String get editEntryTitle;
 
-  /// No description provided for @kcalPer100.
+  /// Calorie-density line in the log-food sheet
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal / 100 g'**
   String kcalPer100(String kcal);
 
-  /// No description provided for @volumeApprox.
+  /// Grams estimate under the unit chips when the food's density is unknown
   ///
   /// In en, this message translates to:
   /// **'≈ {grams} g (assumes ~1 g/ml)'**
   String volumeApprox(String grams);
 
-  /// No description provided for @volumeDensity.
+  /// Grams estimate under the unit chips using the food's known density
   ///
   /// In en, this message translates to:
   /// **'≈ {grams} g · {density} g/ml'**
   String volumeDensity(String grams, String density);
 
-  /// No description provided for @oneServing.
+  /// Quick-pick chip for one serving when only a serving weight is known
   ///
   /// In en, this message translates to:
   /// **'1 serving ({grams} g)'**
   String oneServing(String grams);
 
-  /// No description provided for @portionChip.
+  /// Quick-pick chip for one natural portion, e.g. '1 medium · 300 g'
   ///
   /// In en, this message translates to:
   /// **'1 {unit} · {grams} g'**
   String portionChip(String unit, String grams);
 
-  /// No description provided for @portionUnitPiece.
+  /// Natural-portion unit: one piece of a food
   ///
   /// In en, this message translates to:
   /// **'piece'**
   String get portionUnitPiece;
 
-  /// No description provided for @portionUnitSmall.
+  /// Natural-portion size: a small specimen (e.g. '1 small · 90 g')
   ///
   /// In en, this message translates to:
   /// **'small'**
   String get portionUnitSmall;
 
-  /// No description provided for @portionUnitMedium.
+  /// Natural-portion size: a medium specimen (e.g. '1 medium · 120 g')
   ///
   /// In en, this message translates to:
   /// **'medium'**
   String get portionUnitMedium;
 
-  /// No description provided for @portionUnitLarge.
+  /// Natural-portion size: a large specimen (e.g. '1 large · 150 g')
   ///
   /// In en, this message translates to:
   /// **'large'**
   String get portionUnitLarge;
 
-  /// No description provided for @portionUnitSlice.
+  /// Natural-portion unit: one slice (bread, cheese, …)
   ///
   /// In en, this message translates to:
   /// **'slice'**
   String get portionUnitSlice;
 
-  /// No description provided for @portionUnitClove.
+  /// Natural-portion unit: one clove (garlic)
   ///
   /// In en, this message translates to:
   /// **'clove'**
   String get portionUnitClove;
 
-  /// No description provided for @portionUnitStalk.
+  /// Natural-portion unit: one stalk (celery, rhubarb, …)
   ///
   /// In en, this message translates to:
   /// **'stalk'**
   String get portionUnitStalk;
 
-  /// No description provided for @portionUnitHandful.
+  /// Natural-portion unit: one handful (nuts, berries, …)
   ///
   /// In en, this message translates to:
   /// **'handful'**
   String get portionUnitHandful;
 
-  /// No description provided for @portionUnitCob.
+  /// Natural-portion unit: one cob (corn)
   ///
   /// In en, this message translates to:
   /// **'cob'**
   String get portionUnitCob;
 
-  /// No description provided for @searchFoodsHint.
+  /// Placeholder in the food search field
   ///
   /// In en, this message translates to:
   /// **'Search foods…'**
   String get searchFoodsHint;
 
-  /// No description provided for @searchRecentlyUsed.
+  /// Section header above recently logged foods in the search list
   ///
   /// In en, this message translates to:
   /// **'Recently used'**
   String get searchRecentlyUsed;
 
-  /// No description provided for @createCustomFood.
+  /// List action that opens the custom-food form
   ///
   /// In en, this message translates to:
   /// **'Create custom food'**
   String get createCustomFood;
 
-  /// No description provided for @searchEmptyPrompt.
+  /// Empty state of the food search screen
   ///
   /// In en, this message translates to:
   /// **'Search for a food, scan a barcode,\nor create your own.'**
   String get searchEmptyPrompt;
 
-  /// No description provided for @searchNoMatches.
+  /// Shown when a food search returns no results
   ///
   /// In en, this message translates to:
   /// **'No matches for \"{query}\".'**
   String searchNoMatches(String query);
 
-  /// No description provided for @kcalPer100Short.
+  /// Two-line trailing text on food search rows: kcal per 100 g
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal\n/100 g'**
   String kcalPer100Short(String kcal);
 
-  /// No description provided for @sourceOff.
+  /// Food source badge: Open Food Facts (brand; do not translate)
   ///
   /// In en, this message translates to:
   /// **'Open Food Facts'**
   String get sourceOff;
 
-  /// No description provided for @sourceUsda.
+  /// Food source badge: USDA (brand; do not translate)
   ///
   /// In en, this message translates to:
   /// **'USDA'**
   String get sourceUsda;
 
-  /// No description provided for @sourceCustom.
+  /// Food source badge: a food the user created
   ///
   /// In en, this message translates to:
   /// **'Custom'**
   String get sourceCustom;
 
-  /// No description provided for @sourceSwiss.
+  /// Food source badge: the Swiss Food Composition Database (keep short)
   ///
   /// In en, this message translates to:
   /// **'Swiss DB'**
   String get sourceSwiss;
 
-  /// No description provided for @sourceContributed.
+  /// Food source badge: a product the user submitted
   ///
   /// In en, this message translates to:
   /// **'Added by you'**
   String get sourceContributed;
 
-  /// No description provided for @quickAdd.
+  /// List action to log a food with just a name and calories
   ///
   /// In en, this message translates to:
   /// **'Quick add'**
   String get quickAdd;
 
-  /// No description provided for @quickAddNamed.
+  /// Quick-add list action including the search text as the name
   ///
   /// In en, this message translates to:
   /// **'Quick add \"{name}\"'**
   String quickAddNamed(String name);
 
-  /// No description provided for @quickAddSubtitle.
+  /// Subtitle under the quick-add action
   ///
   /// In en, this message translates to:
   /// **'Log just a name and calories'**
   String get quickAddSubtitle;
 
-  /// No description provided for @quickAddName.
+  /// Label of the name field in the quick-add sheet
   ///
   /// In en, this message translates to:
   /// **'Name'**
   String get quickAddName;
 
-  /// No description provided for @quickAddCalories.
+  /// Label of the calories field in the quick-add sheet
   ///
   /// In en, this message translates to:
   /// **'Calories'**
   String get quickAddCalories;
 
-  /// No description provided for @quickAddWeight.
+  /// Label of the optional weight field in the quick-add sheet
   ///
   /// In en, this message translates to:
   /// **'Weight'**
   String get quickAddWeight;
 
-  /// No description provided for @quickAddMacros.
+  /// Expander that reveals the optional macro fields in the quick-add sheet
   ///
   /// In en, this message translates to:
   /// **'Add macros (optional)'**
   String get quickAddMacros;
 
-  /// No description provided for @recognizeTooltip.
+  /// Tooltip of the photo-recognition action
   ///
   /// In en, this message translates to:
   /// **'Recognize from photo'**
   String get recognizeTooltip;
 
-  /// No description provided for @recognizeTakePhoto.
+  /// Image source option: take a photo with the camera
   ///
   /// In en, this message translates to:
   /// **'Take a photo'**
   String get recognizeTakePhoto;
 
-  /// No description provided for @recognizeLooksLike.
+  /// Header above the photo-recognition guesses
   ///
   /// In en, this message translates to:
   /// **'Looks like…'**
   String get recognizeLooksLike;
 
-  /// No description provided for @recognizeNoneManual.
+  /// Option to reject all recognition guesses and enter the food manually
   ///
   /// In en, this message translates to:
   /// **'None of these — enter manually'**
   String get recognizeNoneManual;
 
-  /// No description provided for @recognizeNoGuess.
+  /// Shown when photo recognition produced no usable guess
   ///
   /// In en, this message translates to:
   /// **'Couldn\'t recognize the food. Add it manually.'**
   String get recognizeNoGuess;
 
-  /// No description provided for @recognizeGeminiNudge.
+  /// Hint suggesting a Gemini API key for better photo recognition
   ///
   /// In en, this message translates to:
   /// **'Tip: add a free Gemini key in Settings for better results — including drinks the on-device model can\'t recognize.'**
   String get recognizeGeminiNudge;
 
-  /// No description provided for @dayCaptureTooltip.
+  /// Tooltip of the camera action on the Day screen
   ///
   /// In en, this message translates to:
   /// **'Add from a photo'**
   String get dayCaptureTooltip;
 
-  /// No description provided for @captureScanAi.
+  /// Capture menu entry: recognize a meal photo with AI
   ///
   /// In en, this message translates to:
   /// **'Scan a meal with AI'**
   String get captureScanAi;
 
-  /// No description provided for @captureScanAiSub.
+  /// Subtitle under the scan-a-meal-with-AI entry
   ///
   /// In en, this message translates to:
   /// **'Photograph a dish — we\'ll guess it and the calories'**
   String get captureScanAiSub;
 
-  /// No description provided for @foodFormTitle.
+  /// Title of the new-food form
   ///
   /// In en, this message translates to:
   /// **'New food'**
   String get foodFormTitle;
 
-  /// No description provided for @barcodeField.
+  /// Label of the optional barcode field in the food form
   ///
   /// In en, this message translates to:
   /// **'Barcode (optional)'**
   String get barcodeField;
 
-  /// No description provided for @settingsAi.
+  /// Settings section header for AI photo recognition
   ///
   /// In en, this message translates to:
   /// **'AI recognition'**
   String get settingsAi;
 
-  /// No description provided for @aiKeyDesc.
+  /// Explainer for the Gemini API key setting, including the privacy implications
   ///
   /// In en, this message translates to:
   /// **'Meal photos are recognised on your phone by default. Add a Google Gemini API key for sharper results and portion estimates. Your photo is then sent to Google. Gemini\'s free tier is plenty for personal use; if you\'ve enabled billing on your Google account, heavy use may incur charges. On the free tier, Google may use your photos to improve their models.'**
   String get aiKeyDesc;
 
-  /// No description provided for @aiKeyLabel.
+  /// Label of the Gemini API key field
   ///
   /// In en, this message translates to:
   /// **'Gemini API key'**
   String get aiKeyLabel;
 
-  /// No description provided for @aiKeyGet.
+  /// Link that opens the page for obtaining a Gemini API key
   ///
   /// In en, this message translates to:
   /// **'Get an API key'**
   String get aiKeyGet;
 
-  /// No description provided for @aiModelLabel.
+  /// Label of the AI model picker
   ///
   /// In en, this message translates to:
   /// **'AI model'**
   String get aiModelLabel;
 
-  /// No description provided for @aiModelReliable.
+  /// AI model option: Gemini 2.5 Flash (model name stays as is)
   ///
   /// In en, this message translates to:
   /// **'Gemini 2.5 Flash — reliable'**
   String get aiModelReliable;
 
-  /// No description provided for @aiModelAccurate.
+  /// AI model option: Gemini 3.5 Flash (model name stays as is)
   ///
   /// In en, this message translates to:
   /// **'Gemini 3.5 Flash — sharper, often busy'**
   String get aiModelAccurate;
 
-  /// No description provided for @aiModelNote.
+  /// Note under the model picker explaining the fallback chain
   ///
   /// In en, this message translates to:
   /// **'If your choice is busy it falls back to 2.5 Flash, then on-device.'**
   String get aiModelNote;
 
-  /// No description provided for @aiOnDeviceOnlyTitle.
+  /// Toggle title: never upload photos, always use the on-device model
   ///
   /// In en, this message translates to:
   /// **'Always recognise on-device'**
   String get aiOnDeviceOnlyTitle;
 
-  /// No description provided for @aiOnDeviceOnlySubtitle.
+  /// Subtitle under the always-on-device toggle
   ///
   /// In en, this message translates to:
   /// **'Never upload photos to Gemini — use the on-device model for every scan.'**
   String get aiOnDeviceOnlySubtitle;
 
-  /// No description provided for @recognizeByGemini.
+  /// Attribution badge on results estimated by Gemini
   ///
   /// In en, this message translates to:
   /// **'Estimated by Gemini'**
   String get recognizeByGemini;
 
-  /// No description provided for @geminiHintTitle.
+  /// Title of the optional meal-description step before a Gemini scan
   ///
   /// In en, this message translates to:
   /// **'Describe the meal (optional)'**
   String get geminiHintTitle;
 
-  /// No description provided for @geminiHintLabel.
+  /// Label of the optional hint text field for a Gemini scan
   ///
   /// In en, this message translates to:
   /// **'Add a hint'**
   String get geminiHintLabel;
 
-  /// No description provided for @geminiHintExample.
+  /// Example placeholder in the Gemini hint field
   ///
   /// In en, this message translates to:
   /// **'e.g. homemade lasagne, large portion'**
   String get geminiHintExample;
 
-  /// No description provided for @geminiHintEstimate.
+  /// Button that starts the Gemini estimate
   ///
   /// In en, this message translates to:
   /// **'Estimate'**
   String get geminiHintEstimate;
 
-  /// No description provided for @a11yPreviousPeriod.
+  /// Accessibility label of the previous-period arrow on the Trends screen
   ///
   /// In en, this message translates to:
   /// **'Previous period'**
   String get a11yPreviousPeriod;
 
-  /// No description provided for @a11yNextPeriod.
+  /// Accessibility label of the next-period arrow on the Trends screen
   ///
   /// In en, this message translates to:
   /// **'Next period'**
   String get a11yNextPeriod;
 
-  /// No description provided for @a11yClearSearch.
+  /// Accessibility label of the clear (×) button in the search field
   ///
   /// In en, this message translates to:
   /// **'Clear search'**
   String get a11yClearSearch;
 
-  /// No description provided for @a11yShowApiKey.
+  /// Accessibility label of the button that reveals the API key
   ///
   /// In en, this message translates to:
   /// **'Show key'**
   String get a11yShowApiKey;
 
-  /// No description provided for @a11yHideApiKey.
+  /// Accessibility label of the button that hides the API key
   ///
   /// In en, this message translates to:
   /// **'Hide key'**
   String get a11yHideApiKey;
 
-  /// No description provided for @a11yRemoveIngredient.
+  /// Accessibility label of the remove button on an ingredient row
   ///
   /// In en, this message translates to:
   /// **'Remove ingredient'**
   String get a11yRemoveIngredient;
 
-  /// No description provided for @a11yDecrease.
+  /// Accessibility label of a stepper's decrease (−) button
   ///
   /// In en, this message translates to:
   /// **'Decrease'**
   String get a11yDecrease;
 
-  /// No description provided for @a11yIncrease.
+  /// Accessibility label of a stepper's increase (+) button
   ///
   /// In en, this message translates to:
   /// **'Increase'**
   String get a11yIncrease;
 
-  /// No description provided for @a11yAnalysing.
+  /// Accessibility label of the busy spinner while a photo is analysed
   ///
   /// In en, this message translates to:
   /// **'Analysing…'**
   String get a11yAnalysing;
 
-  /// No description provided for @a11yChangeDate.
+  /// Accessibility label of the date button on the Day screen
   ///
   /// In en, this message translates to:
   /// **'Change date'**
   String get a11yChangeDate;
 
-  /// No description provided for @a11ySelectedPhoto.
+  /// Accessibility description of the chosen meal photo
   ///
   /// In en, this message translates to:
   /// **'Selected meal photo'**
   String get a11ySelectedPhoto;
 
-  /// No description provided for @a11yTrendsChart.
+  /// Accessibility description of the trends chart
   ///
   /// In en, this message translates to:
   /// **'Trend chart for the selected period'**
   String get a11yTrendsChart;
 
-  /// No description provided for @a11yQrCode.
+  /// Accessibility description of the recipe-share QR code
   ///
   /// In en, this message translates to:
   /// **'QR code for recipe {name}'**
   String a11yQrCode(String name);
 
-  /// No description provided for @recognizeByOnDevice.
+  /// Attribution badge on results estimated by the on-device model
   ///
   /// In en, this message translates to:
   /// **'Estimated on-device'**
   String get recognizeByOnDevice;
 
-  /// No description provided for @geminiFailed.
+  /// Snackbar when Gemini was unreachable and the on-device model was used instead
   ///
   /// In en, this message translates to:
   /// **'Couldn\'t reach Gemini — used on-device recognition.'**
   String get geminiFailed;
 
-  /// No description provided for @geminiThinking1.
+  /// Rotating status line while waiting for Gemini (1/6)
   ///
   /// In en, this message translates to:
   /// **'Asking Gemini for calories…'**
   String get geminiThinking1;
 
-  /// No description provided for @geminiThinking2.
+  /// Rotating status line while waiting for Gemini (2/6)
   ///
   /// In en, this message translates to:
   /// **'Estimating calories from your photo…'**
   String get geminiThinking2;
 
-  /// No description provided for @geminiThinking3.
+  /// Rotating status line while waiting for Gemini (3/6)
   ///
   /// In en, this message translates to:
   /// **'Identifying the dish…'**
   String get geminiThinking3;
 
-  /// No description provided for @geminiThinking4.
+  /// Rotating status line while waiting for Gemini (4/6)
   ///
   /// In en, this message translates to:
   /// **'Working out the portion size…'**
   String get geminiThinking4;
 
-  /// No description provided for @geminiThinking5.
+  /// Rotating status line while waiting for Gemini (5/6)
   ///
   /// In en, this message translates to:
   /// **'Reading the plate…'**
   String get geminiThinking5;
 
-  /// No description provided for @geminiThinking6.
+  /// Rotating status line while waiting for Gemini (6/6)
   ///
   /// In en, this message translates to:
   /// **'Crunching the numbers…'**
   String get geminiThinking6;
 
-  /// No description provided for @geminiSlow.
+  /// Status line when a Gemini request takes unusually long
   ///
   /// In en, this message translates to:
   /// **'Gemini\'s a bit busy — hang on…'**
   String get geminiSlow;
 
-  /// No description provided for @geminiRetrying.
+  /// Status line while retrying a busy Gemini server
   ///
   /// In en, this message translates to:
   /// **'Server busy — retrying (attempt {n})…'**
   String geminiRetrying(int n);
 
-  /// No description provided for @scanBarcode.
+  /// FAB label that opens the barcode scanner
   ///
   /// In en, this message translates to:
   /// **'Scan barcode'**
   String get scanBarcode;
 
-  /// No description provided for @selectFood.
+  /// Title of the food-picker screen
   ///
   /// In en, this message translates to:
   /// **'Select food'**
   String get selectFood;
 
-  /// No description provided for @addIngredient.
+  /// Button label to add an ingredient to a recipe
   ///
   /// In en, this message translates to:
   /// **'Add ingredient'**
   String get addIngredient;
 
-  /// No description provided for @ingredients.
+  /// Section header for a recipe's ingredient list
   ///
   /// In en, this message translates to:
   /// **'Ingredients'**
   String get ingredients;
 
-  /// No description provided for @actionEdit.
+  /// Generic edit action label/tooltip
   ///
   /// In en, this message translates to:
   /// **'Edit'**
   String get actionEdit;
 
-  /// No description provided for @actionShare.
+  /// Generic share action label/tooltip
   ///
   /// In en, this message translates to:
   /// **'Share'**
   String get actionShare;
 
-  /// No description provided for @actionSet.
+  /// Confirm button in small set-a-value dialogs
   ///
   /// In en, this message translates to:
   /// **'Set'**
   String get actionSet;
 
-  /// No description provided for @kcalValue.
+  /// A calorie value with its unit
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal'**
   String kcalValue(String kcal);
 
-  /// No description provided for @gramsValue.
+  /// A gram value with its unit
   ///
   /// In en, this message translates to:
   /// **'{grams} g'**
   String gramsValue(String grams);
 
-  /// No description provided for @gramsKcal.
+  /// Ingredient row summary: grams and calories
   ///
   /// In en, this message translates to:
   /// **'{grams} g · {kcal} kcal'**
   String gramsKcal(String grams, String kcal);
 
-  /// No description provided for @kcalTotal.
+  /// Total-calories line in the recipe editor
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal total'**
   String kcalTotal(String kcal);
 
-  /// No description provided for @loggedTo.
+  /// Snackbar after logging food to a day
   ///
   /// In en, this message translates to:
   /// **'Logged to {day}'**
   String loggedTo(String day);
 
-  /// No description provided for @recipeEdit.
+  /// Title of the recipe editor when editing an existing recipe
   ///
   /// In en, this message translates to:
   /// **'Edit recipe'**
   String get recipeEdit;
 
-  /// No description provided for @recipeNeedName.
+  /// Validation message when saving a recipe without a name
   ///
   /// In en, this message translates to:
   /// **'Give the recipe a name.'**
   String get recipeNeedName;
 
-  /// No description provided for @recipeNeedIngredient.
+  /// Validation message when saving a recipe without ingredients
   ///
   /// In en, this message translates to:
   /// **'Add at least one ingredient.'**
   String get recipeNeedIngredient;
 
-  /// No description provided for @recipeName.
+  /// Label of the recipe-name field
   ///
   /// In en, this message translates to:
   /// **'Recipe name'**
   String get recipeName;
 
-  /// No description provided for @recipeServingsField.
+  /// Label of the servings field in the recipe editor
   ///
   /// In en, this message translates to:
   /// **'Servings (portions this makes)'**
   String get recipeServingsField;
 
-  /// No description provided for @recipeLogPortion.
+  /// FAB on the recipe detail screen: log a portion to a diary day
   ///
   /// In en, this message translates to:
   /// **'Log portion to a day'**
   String get recipeLogPortion;
 
-  /// No description provided for @recipeWhole.
+  /// Caption next to the whole-recipe calorie total
   ///
   /// In en, this message translates to:
   /// **'Whole recipe'**
   String get recipeWhole;
 
-  /// No description provided for @recipePerServing.
+  /// Caption next to the per-serving calories; count is the servings the recipe makes
   ///
   /// In en, this message translates to:
   /// **'Per serving ({count})'**
   String recipePerServing(String count);
 
-  /// No description provided for @recipeLogPortionTitle.
+  /// Title of the log-a-portion sheet
   ///
   /// In en, this message translates to:
   /// **'Log a portion'**
   String get recipeLogPortionTitle;
 
-  /// No description provided for @recipePortions.
+  /// Label of the portions stepper in the log-portion and split sheets
   ///
   /// In en, this message translates to:
   /// **'Portions'**
   String get recipePortions;
 
-  /// No description provided for @recipeLogToDay.
+  /// Confirm button in the log-portion sheet, showing the target day
   ///
   /// In en, this message translates to:
   /// **'Log to {day}'**
   String recipeLogToDay(String day);
 
-  /// No description provided for @shareTitle.
+  /// Title of the recipe share screen
   ///
   /// In en, this message translates to:
   /// **'Share \"{name}\"'**
   String shareTitle(String name);
 
-  /// No description provided for @shareScanHint.
+  /// Hint under the QR code on the share screen
   ///
   /// In en, this message translates to:
   /// **'Scan this in another phone’s \"Import from QR\".'**
   String get shareScanHint;
 
-  /// No description provided for @shareAsImage.
+  /// Button to share the recipe QR code as an image
   ///
   /// In en, this message translates to:
   /// **'Share image'**
   String get shareAsImage;
 
-  /// No description provided for @createFromText.
+  /// New-recipe sheet option: paste a recipe code received as text
   ///
   /// In en, this message translates to:
   /// **'Import from text'**
   String get createFromText;
 
-  /// No description provided for @createFromTextSub.
+  /// Subtitle under the import-from-text option
   ///
   /// In en, this message translates to:
   /// **'Paste a recipe you received'**
   String get createFromTextSub;
 
-  /// No description provided for @importTextTitle.
+  /// Title of the paste-recipe dialog
   ///
   /// In en, this message translates to:
   /// **'Paste recipe'**
   String get importTextTitle;
 
-  /// No description provided for @importTextHint.
+  /// Placeholder in the paste-recipe text field
   ///
   /// In en, this message translates to:
   /// **'Recipe code…'**
   String get importTextHint;
 
-  /// No description provided for @shareAsText.
+  /// Button to share the recipe as encoded text
   ///
   /// In en, this message translates to:
   /// **'Share as text'**
   String get shareAsText;
 
-  /// No description provided for @shareMeta.
+  /// Summary line under the share QR code: ingredient count, servings, and encoded payload size
   ///
   /// In en, this message translates to:
-  /// **'{ingredients} ingredients · {servings} servings · {bytes} bytes'**
-  String shareMeta(String ingredients, String servings, String bytes);
+  /// **'{ingredients, plural, one{{ingredients} ingredient} other{{ingredients} ingredients}} · {servings, plural, one{{servings} serving} other{{servings} servings}} · {bytes} bytes'**
+  String shareMeta(int ingredients, num servings, String bytes);
 
-  /// No description provided for @shareSubject.
+  /// Share-sheet subject line for a shared recipe
   ///
   /// In en, this message translates to:
   /// **'Recipe: {name}'**
   String shareSubject(String name);
 
-  /// No description provided for @ocrNoIngredients.
+  /// Snackbar when OCR found no ingredients in the photos
   ///
   /// In en, this message translates to:
   /// **'No ingredients found in those images.'**
   String get ocrNoIngredients;
 
-  /// No description provided for @ocrDefaultMealName.
+  /// Default name for a meal created from a photographed ingredient list
   ///
   /// In en, this message translates to:
   /// **'Meal from photo'**
   String get ocrDefaultMealName;
 
-  /// No description provided for @ocrNeedMatch.
+  /// Validation message: at least one OCR ingredient must be matched to a food
   ///
   /// In en, this message translates to:
   /// **'Match at least one ingredient first.'**
   String get ocrNeedMatch;
 
-  /// No description provided for @ocrSavedToRecipes.
+  /// Snackbar after saving the OCR meal as a recipe
   ///
   /// In en, this message translates to:
   /// **'Saved to recipes'**
   String get ocrSavedToRecipes;
 
-  /// No description provided for @ocrReviewTitle.
+  /// Title of the OCR review screen
   ///
   /// In en, this message translates to:
   /// **'Review meal'**
   String get ocrReviewTitle;
 
-  /// No description provided for @ocrSaveAsRecipe.
+  /// Action on the OCR review screen: save the meal as a recipe
   ///
   /// In en, this message translates to:
   /// **'Save as recipe'**
   String get ocrSaveAsRecipe;
 
-  /// No description provided for @ocrLogToDay.
+  /// Action on the OCR review screen: log the meal to a diary day
   ///
   /// In en, this message translates to:
   /// **'Log to day'**
   String get ocrLogToDay;
 
-  /// No description provided for @ocrMealName.
+  /// Label of the meal-name field on the OCR review screen
   ///
   /// In en, this message translates to:
   /// **'Meal name'**
   String get ocrMealName;
 
-  /// No description provided for @ocrMatched.
+  /// Progress line: how many OCR ingredients are matched to foods
   ///
   /// In en, this message translates to:
   /// **'{matched} / {total} matched'**
   String ocrMatched(String matched, String total);
 
-  /// No description provided for @ocrSwipeHint.
+  /// Hint explaining the swipe gestures on the OCR review list
   ///
   /// In en, this message translates to:
   /// **'Swipe → to pick a food, ← to remove.'**
   String get ocrSwipeHint;
 
-  /// No description provided for @ocrFromSource.
+  /// Subtitle of a matched OCR row: parsed amount and the matched food's name
   ///
   /// In en, this message translates to:
   /// **'{amount} · from \"{name}\"'**
   String ocrFromSource(String amount, String name);
 
-  /// No description provided for @ocrPickHintSub.
+  /// Subtitle of an unmatched OCR row prompting to pick a food
   ///
   /// In en, this message translates to:
   /// **'{amount} · swipe → to pick a food'**
   String ocrPickHintSub(String amount);
 
-  /// No description provided for @kcalGrams.
+  /// Two-line trailing text on OCR review rows: calories and grams
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal\n{grams} g'**
   String kcalGrams(String kcal, String grams);
 
-  /// No description provided for @ocrSetGrams.
+  /// Tiny button on an OCR row to type the grams directly (keep very short)
   ///
   /// In en, this message translates to:
   /// **'set g'**
   String get ocrSetGrams;
 
-  /// No description provided for @kcalDotGrams.
+  /// One-line calories-and-grams summary
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal · {grams} g'**
   String kcalDotGrams(String kcal, String grams);
 
-  /// No description provided for @macroPcf.
+  /// Compact nutrition line; P/C/F are one-letter macro abbreviations — localize the letters
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal · P {protein}  C {carb}  F {fat}'**
   String macroPcf(String kcal, String protein, String carb, String fat);
 
-  /// No description provided for @manualTitle.
+  /// Title of the custom-food form
   ///
   /// In en, this message translates to:
   /// **'Custom food'**
   String get manualTitle;
 
-  /// No description provided for @manualNameRequired.
+  /// Label of the required name field (* marks required)
   ///
   /// In en, this message translates to:
   /// **'Name *'**
   String get manualNameRequired;
 
-  /// No description provided for @manualBrandOptional.
+  /// Label of the optional brand field
   ///
   /// In en, this message translates to:
   /// **'Brand (optional)'**
   String get manualBrandOptional;
 
-  /// No description provided for @manualPer100.
+  /// Section header: nutrition values are entered per 100 g
   ///
   /// In en, this message translates to:
   /// **'Per 100 g'**
   String get manualPer100;
 
-  /// No description provided for @manualCalories.
+  /// Label of the required calories field (* marks required)
   ///
   /// In en, this message translates to:
   /// **'Calories (kcal) *'**
   String get manualCalories;
 
-  /// No description provided for @manualProtein.
+  /// Label of the protein field, in grams
   ///
   /// In en, this message translates to:
   /// **'Protein (g)'**
   String get manualProtein;
 
-  /// No description provided for @manualCarbs.
+  /// Label of the carbohydrates field, in grams
   ///
   /// In en, this message translates to:
   /// **'Carbs (g)'**
   String get manualCarbs;
 
-  /// No description provided for @manualFat.
+  /// Label of the fat field, in grams
   ///
   /// In en, this message translates to:
   /// **'Fat (g)'**
   String get manualFat;
 
-  /// No description provided for @manualServing.
+  /// Label of the optional serving-size field, in grams
   ///
   /// In en, this message translates to:
   /// **'Serving size (g, optional)'**
   String get manualServing;
 
-  /// No description provided for @manualSaveFood.
+  /// Submit button of the custom-food form
   ///
   /// In en, this message translates to:
   /// **'Save food'**
   String get manualSaveFood;
 
-  /// No description provided for @manualRequired.
+  /// Validation error under an empty required field
   ///
   /// In en, this message translates to:
   /// **'Required'**
   String get manualRequired;
 
-  /// No description provided for @manualInvalidNumber.
+  /// Validation error for a value that isn't a valid number
   ///
   /// In en, this message translates to:
   /// **'Invalid number'**
   String get manualInvalidNumber;
 
-  /// No description provided for @addProductTitle.
+  /// Title of the add-product screen shown after scanning an unknown barcode
   ///
   /// In en, this message translates to:
   /// **'Add product'**
   String get addProductTitle;
 
-  /// No description provided for @addPhotoOfTable.
+  /// Action: photograph the product's nutrition table
   ///
   /// In en, this message translates to:
   /// **'Take a photo of the nutrition table'**
   String get addPhotoOfTable;
 
-  /// No description provided for @addChooseGallery.
+  /// Action: pick the nutrition-table photo from the gallery
   ///
   /// In en, this message translates to:
   /// **'Choose from gallery'**
   String get addChooseGallery;
 
-  /// No description provided for @addNameEnergyRequired.
+  /// Validation message on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'A name and energy (kcal/100 g) are required.'**
   String get addNameEnergyRequired;
 
-  /// No description provided for @addBarcodeLabel.
+  /// Read-only barcode line on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Barcode {code}'**
   String addBarcodeLabel(String code);
 
-  /// No description provided for @addProductName.
+  /// Label of the product-name field
   ///
   /// In en, this message translates to:
   /// **'Product name'**
   String get addProductName;
 
-  /// No description provided for @addServingSize.
+  /// Label of the serving-size field on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Serving size'**
   String get addServingSize;
 
-  /// No description provided for @addNutritionPer100.
+  /// Section header: nutrition values per 100 g
   ///
   /// In en, this message translates to:
   /// **'Nutrition per 100 g'**
   String get addNutritionPer100;
 
-  /// No description provided for @addNutritionPer100Ml.
+  /// Section header: nutrition values per 100 ml, for liquids
   ///
   /// In en, this message translates to:
   /// **'Nutrition per 100 ml'**
   String get addNutritionPer100Ml;
 
-  /// No description provided for @addScanLabel.
+  /// Button that OCRs the photographed nutrition label
   ///
   /// In en, this message translates to:
   /// **'Scan label'**
   String get addScanLabel;
 
-  /// No description provided for @addEnergy.
+  /// Label of the energy field on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Energy'**
   String get addEnergy;
 
-  /// No description provided for @addProtein.
+  /// Label of the protein field on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Protein'**
   String get addProtein;
 
-  /// No description provided for @addCarbohydrate.
+  /// Label of the carbohydrate field on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Carbohydrate'**
   String get addCarbohydrate;
 
-  /// No description provided for @addFat.
+  /// Label of the fat field on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Fat'**
   String get addFat;
 
-  /// No description provided for @addSugars.
+  /// Sub-field label 'of which sugars', as printed on EU nutrition labels
   ///
   /// In en, this message translates to:
   /// **'of which sugars'**
   String get addSugars;
 
-  /// No description provided for @addSaturates.
+  /// Sub-field label 'of which saturates', as printed on EU nutrition labels
   ///
   /// In en, this message translates to:
   /// **'of which saturates'**
   String get addSaturates;
 
-  /// No description provided for @addFibre.
+  /// Label of the fibre field on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Fibre'**
   String get addFibre;
 
-  /// No description provided for @addSalt.
+  /// Label of the salt field on the add-product screen
   ///
   /// In en, this message translates to:
   /// **'Salt'**
@@ -1884,55 +1908,55 @@ abstract class AppLocalizations {
   /// **'Open in Open Food Facts'**
   String get offContributeAction;
 
-  /// No description provided for @addFilledFromLabel.
+  /// Info banner after OCR pre-filled the nutrition fields
   ///
   /// In en, this message translates to:
   /// **'Filled from the label — please check the values.'**
   String get addFilledFromLabel;
 
-  /// No description provided for @addCouldntRead.
+  /// Error banner when the nutrition-label OCR failed
   ///
   /// In en, this message translates to:
   /// **'Couldn\'t read the table. Enter the values manually.'**
   String get addCouldntRead;
 
-  /// No description provided for @backupShareSubject.
+  /// Share-sheet subject line for an exported backup file
   ///
   /// In en, this message translates to:
   /// **'Knabberfuchs backup'**
   String get backupShareSubject;
 
-  /// No description provided for @scanRecipeQr.
+  /// Title of the recipe QR scanner screen
   ///
   /// In en, this message translates to:
   /// **'Scan recipe QR'**
   String get scanRecipeQr;
 
-  /// No description provided for @splashPreparing.
+  /// Splash-screen status while the food database is being seeded
   ///
   /// In en, this message translates to:
   /// **'Preparing food database…'**
   String get splashPreparing;
 
-  /// No description provided for @scanEnterBarcode.
+  /// Title of the manual barcode entry dialog
   ///
   /// In en, this message translates to:
   /// **'Enter barcode'**
   String get scanEnterBarcode;
 
-  /// No description provided for @scanExampleHint.
+  /// Example-barcode placeholder in the manual entry field
   ///
   /// In en, this message translates to:
   /// **'e.g. 3017620422003'**
   String get scanExampleHint;
 
-  /// No description provided for @scanLookUp.
+  /// Confirm button of the manual barcode dialog
   ///
   /// In en, this message translates to:
   /// **'Look up'**
   String get scanLookUp;
 
-  /// No description provided for @scanEnterManually.
+  /// Action to type the barcode instead of scanning it
   ///
   /// In en, this message translates to:
   /// **'Enter manually'**
@@ -1944,151 +1968,151 @@ abstract class AppLocalizations {
   /// **'Toggle flash'**
   String get scanTorch;
 
-  /// No description provided for @scanCameraOnlyDevice.
+  /// Shown on emulators/desktops where camera scanning is unavailable
   ///
   /// In en, this message translates to:
   /// **'Camera scanning is only available on a device.'**
   String get scanCameraOnlyDevice;
 
-  /// No description provided for @scanCameraFailed.
+  /// Error when the camera fails to start
   ///
   /// In en, this message translates to:
   /// **'Couldn\'t start the camera.'**
   String get scanCameraFailed;
 
-  /// No description provided for @scanEnterManuallyButton.
+  /// Fallback button to type the barcode when the camera fails
   ///
   /// In en, this message translates to:
   /// **'Enter barcode manually'**
   String get scanEnterManuallyButton;
 
-  /// No description provided for @splitTitle.
+  /// Title of the split-meal sheet
   ///
   /// In en, this message translates to:
   /// **'Split \"{name}\"'**
   String splitTitle(String name);
 
-  /// No description provided for @splitDescription.
+  /// Explainer in the split-meal sheet
   ///
   /// In en, this message translates to:
   /// **'Divide this meal into equal portions, one per day. The original is replaced.'**
   String get splitDescription;
 
-  /// No description provided for @splitKcalEach.
+  /// Per-portion calories in the split-meal sheet
   ///
   /// In en, this message translates to:
   /// **'{kcal} kcal each'**
   String splitKcalEach(String kcal);
 
-  /// No description provided for @splitInto.
+  /// Confirm button of the split-meal sheet; also the snackbar after splitting
   ///
   /// In en, this message translates to:
   /// **'Split into {n} days'**
   String splitInto(String n);
 
-  /// No description provided for @cropTitle.
+  /// Title of the crop screen for nutrition-table photos
   ///
   /// In en, this message translates to:
   /// **'Crop to the table'**
   String get cropTitle;
 
-  /// No description provided for @cropDone.
+  /// Confirm button on the crop screen
   ///
   /// In en, this message translates to:
   /// **'Done'**
   String get cropDone;
 
-  /// No description provided for @offlineReminderText.
+  /// Snackbar nudging the user to download an offline region pack
   ///
   /// In en, this message translates to:
   /// **'Looked up online — download your region for faster, offline scans.'**
   String get offlineReminderText;
 
-  /// No description provided for @offlineReminderAction.
+  /// Snackbar action that opens the offline-regions screen (keep short)
   ///
   /// In en, this message translates to:
   /// **'Regions'**
   String get offlineReminderAction;
 
-  /// No description provided for @regionDownloaded.
+  /// Snackbar after a region pack finished downloading
   ///
   /// In en, this message translates to:
   /// **'{name} downloaded'**
   String regionDownloaded(String name);
 
-  /// No description provided for @regionDownloadFailed.
+  /// Snackbar when a region pack download fails
   ///
   /// In en, this message translates to:
   /// **'Download failed: {error}'**
   String regionDownloadFailed(String error);
 
-  /// No description provided for @regionRemoved.
+  /// Snackbar after removing a region pack
   ///
   /// In en, this message translates to:
   /// **'{name} removed'**
   String regionRemoved(String name);
 
-  /// No description provided for @regionLoadError.
+  /// Error when the list of available regions can't be fetched
   ///
   /// In en, this message translates to:
   /// **'Could not load the region list.'**
   String get regionLoadError;
 
-  /// No description provided for @actionRetry.
+  /// Generic retry button label
   ///
   /// In en, this message translates to:
   /// **'Retry'**
   String get actionRetry;
 
-  /// No description provided for @regionIntro.
+  /// Intro text on the offline-regions screen
   ///
   /// In en, this message translates to:
   /// **'Download a country to search its packaged products offline. You can download several.'**
   String get regionIntro;
 
-  /// No description provided for @regionSearchHint.
+  /// Placeholder in the country search field
   ///
   /// In en, this message translates to:
   /// **'Search countries'**
   String get regionSearchHint;
 
-  /// No description provided for @regionNoMatch.
+  /// Shown when no country matches the search
   ///
   /// In en, this message translates to:
   /// **'No countries match \"{query}\".'**
   String regionNoMatch(String query);
 
-  /// No description provided for @regionTooltipDownload.
+  /// Tooltip of a region row's download button
   ///
   /// In en, this message translates to:
   /// **'Download'**
   String get regionTooltipDownload;
 
-  /// No description provided for @regionTooltipRemove.
+  /// Tooltip of a region row's remove button
   ///
   /// In en, this message translates to:
   /// **'Remove'**
   String get regionTooltipRemove;
 
-  /// No description provided for @regionUpdate.
+  /// Button to update an installed region pack
   ///
   /// In en, this message translates to:
   /// **'Update'**
   String get regionUpdate;
 
-  /// No description provided for @regionSubtitle.
+  /// Region row subtitle: product count in thousands and download size
   ///
   /// In en, this message translates to:
   /// **'{products}k products · {size} download'**
   String regionSubtitle(String products, String size);
 
-  /// No description provided for @regionSubtitleInstalled.
+  /// Region row subtitle suffix when the pack is installed
   ///
   /// In en, this message translates to:
   /// **'{base} · installed'**
   String regionSubtitleInstalled(String base);
 
-  /// No description provided for @regionSubtitleUpdatable.
+  /// Region row subtitle suffix when an update is available
   ///
   /// In en, this message translates to:
   /// **'{base} · update available'**
