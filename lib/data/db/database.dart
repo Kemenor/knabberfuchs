@@ -79,6 +79,23 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(foods, foods.searchText);
       }
       if (from < 8) {
+        // The v7 Swiss-FCDB switch purged the bundled USDA rows in the seeder
+        // (not in the migration), so a device jumping here from <=6 still
+        // holds them — as old-numbering source 1, which the renumbering below
+        // would relabel as `custom`. Delete them first (a no-op for devices
+        // that went through v7, where the seeder already removed them). FK
+        // enforcement is off during migrations, so apply the declared
+        // referential actions by hand: entries.food_id is SET NULL,
+        // ocr_mappings.food_id is CASCADE.
+        await customStatement(
+          'UPDATE entries SET food_id = NULL WHERE food_id IN '
+          '(SELECT id FROM foods WHERE source = 1)',
+        );
+        await customStatement(
+          'DELETE FROM ocr_mappings WHERE food_id IN '
+          '(SELECT id FROM foods WHERE source = 1)',
+        );
+        await customStatement('DELETE FROM foods WHERE source = 1');
         // FoodSource dropped the now-dead `usda` and `userContributed`
         // values, so stored indices shift: old {off:0, usda:1, custom:2,
         // userContributed:3, swissFcdb:4} -> new {off:0, custom:1,
