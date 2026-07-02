@@ -560,9 +560,12 @@ Strategy:
     locales) + goldens (default state unchanged ⇒ existing goldens should hold).
 
 - **Phase 16 — Health Connect energy read-back ("eat back your exercise"):**
-  📋 PLANNED, grilled 2026-07-02 (from tester feedback 2026-07-01, see `FEEDBACK.md`).
-  Read burned calories from the health store and reflect them in the daily kcal
-  budget. **Ships together with Phase 15** in one feature release.
+  ✅ BUILT 2026-07-02 (commits `ac0f776`…`42105ed`; grilled the same day — from
+  tester feedback 2026-07-01, see `FEEDBACK.md`). Burned calories from the health
+  store shift the daily kcal budget. **On main, NOT yet released — ships together
+  with Phase 15** in one feature release. Emulator-verified toggle/UI; the real
+  data path (watch → HC → shifted budget) still needs a physical-device +
+  **TestFlight** pass before the release is cut.
   - **Today:** `HealthService` is write-only (`lib/data/health/health_service.dart`);
     the kcal target is a static per-weekday min/max resolved in `daySummaryProvider`
     (`lib/providers.dart:403` — the single injection seam for the adjustment).
