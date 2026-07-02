@@ -1,3 +1,4 @@
+import 'package:calorie_tracker/core/date_x.dart';
 import 'package:calorie_tracker/data/db/database.dart';
 import 'package:calorie_tracker/domain/day_summary.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,6 +27,43 @@ void main() {
     expect(trends[2].kcal, 2500);
     // No targets configured anywhere -> status none.
     expect(trends.every((t) => t.status == TargetStatus.none), isTrue);
+  });
+
+  test('buildDayTrends yields each calendar day exactly once across DST', () {
+    // Meaningful under TZ=Europe/Zurich (CI runs this file with it): Mar 29 is
+    // a 23 h day, Oct 25 a 25 h day. Duration-based stepping would skip or
+    // duplicate the transition day and drop the last day of the range.
+    final spring = buildDayTrends(
+      DateTime(2026, 3, 28),
+      DateTime(2026, 3, 31),
+      {'2026-03-29': 1800},
+      const [],
+      null,
+      null,
+    );
+    expect(spring.map((t) => DayKey.of(t.date)), [
+      '2026-03-28',
+      '2026-03-29',
+      '2026-03-30',
+      '2026-03-31',
+    ]);
+    expect(spring[1].kcal, 1800);
+
+    final fall = buildDayTrends(
+      DateTime(2026, 10, 24),
+      DateTime(2026, 10, 27),
+      {'2026-10-25': 2100},
+      const [],
+      null,
+      null,
+    );
+    expect(fall.map((t) => DayKey.of(t.date)), [
+      '2026-10-24',
+      '2026-10-25',
+      '2026-10-26',
+      '2026-10-27',
+    ]);
+    expect(fall[1].kcal, 2100);
   });
 
   test('resolves the default target and classifies status per day', () {

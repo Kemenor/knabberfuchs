@@ -181,7 +181,8 @@ List<DayTrend> buildMetricDayTrends(
         status: statusFor(value, target),
       ),
     );
-    d = d.add(const Duration(days: 1));
+    // Calendar step, not Duration: a 25 h DST day would repeat, a 23 h one skip.
+    d = DateTime(d.year, d.month, d.day + 1);
   }
   return out;
 }
