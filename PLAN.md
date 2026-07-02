@@ -578,23 +578,26 @@ Strategy:
     - **Read via the platform aggregate API** (`getHealthAggregateDataFromTypes`,
       verified present in health 13.3.1): HC/HealthKit dedupe multi-source
       (phone+watch) active energy through their own priority system — never sum raw
-      records in Dart. *(provisional)*
+      records in Dart.
     - **Ephemeral, no persistence:** a per-day FutureProvider reads on demand
       (viewed-day change / app resume) and caches in memory; the health store stays
-      the single source of truth. No DB table, no backup surface. *(provisional)*
+      the single source of truth. No DB table, no backup surface.
     - **Day screen only in v1:** Trends keeps the static target line (range-reading
-      90 days of HC per chart open is not a v1 cost); adjusted-target-in-Trends is a
-      follow-up. *(provisional)*
+      90 days of HC per chart open is not a v1 cost). Two obligations from this
+      (decided 2026-07-02): (a) **adjusted-target-in-Trends is recorded future work**
+      — see the follow-ups list below; (b) when the feature is enabled, the Trends
+      tab shows an **info note** that the target band does not include activity
+      adjustments (small muted line or info chip near the chart; l10n ×4).
     - **UI:** Day card shows a small "+N kcal activity" line under the target status;
       the remaining/over math and kcal bar denominator use the adjusted bounds — the
-      shift is always explained, never silent. *(provisional)*
+      shift is always explained, never silent.
     - **Settings:** second `SwitchListTile` in the Health card ("Adjust budget by
       activity"), requesting the ACTIVE_ENERGY_BURNED **read** grant on enable —
       separate from the write-sync toggle since it's a new permission. Permission
       revoked later → silent fallback to the static target (same swallow-errors
-      pattern as `syncDay`). *(provisional)*
+      pattern as `syncDay`).
     - **iOS parity in the same release** (HealthKit active energy via the same
-      plugin call; verify on TestFlight). *(provisional)*
+      plugin call; verify on TestFlight).
   - **Watch out:** days with no wearable data must read as the plain static target
     (aggregate returns 0/empty → no adjustment line); the adjustment must never make
     Health-sync writes feed back into the budget (we write nutrition, read energy —
@@ -602,8 +605,11 @@ Strategy:
   - **Build sequence:** H1 `HealthService.activeEnergyFor(day)` via aggregate API +
     permission plumbing → H2 settings toggle + read grant flow → H3
     `daySummaryProvider` adjustment + DaySummary carries the activity kcal → H4 Day
-    card "+N activity" line + adjusted bar → H5 l10n ×4 → H6 emulator + TestFlight
-    verification with a fake HC writer.
+    card "+N activity" line + adjusted bar + Trends info note → H5 l10n ×4 → H6
+    emulator + TestFlight verification with a fake HC writer.
+  - **Follow-ups (explicitly out of v1):** adjusted target band in **Trends**
+    (per-day range aggregate + caching); eat-back **percentage** setting; **TDEE
+    mode** replacing the static target.
 
 ## Phase 5 design — Offline OFF regional packs (planned 2026-06-17)
 
