@@ -678,6 +678,42 @@ abstract class AppLocalizations {
   /// **'Calories'**
   String get metricCalories;
 
+  /// Standalone label for the fiber metric (targets, day card, trends chips)
+  ///
+  /// In en, this message translates to:
+  /// **'Fibre'**
+  String get metricFiber;
+
+  /// Standalone SHORT label for the saturated-fat metric (targets, day card, trends chips)
+  ///
+  /// In en, this message translates to:
+  /// **'Sat. fat'**
+  String get metricSatFat;
+
+  /// Standalone label for the sugar metric (targets, day card, trends chips)
+  ///
+  /// In en, this message translates to:
+  /// **'Sugar'**
+  String get metricSugar;
+
+  /// Standalone label for the salt metric (targets, day card, trends chips)
+  ///
+  /// In en, this message translates to:
+  /// **'Salt'**
+  String get metricSalt;
+
+  /// Header above the nutrient toggle chips on the Targets screen
+  ///
+  /// In en, this message translates to:
+  /// **'Tracked nutrients'**
+  String get settingsTrackedNutrients;
+
+  /// Explainer under the tracked-nutrients header
+  ///
+  /// In en, this message translates to:
+  /// **'Choose what gets a target and shows on the Day card and Trends. Calories are always on; switching one off keeps its values.'**
+  String get settingsTrackedNutrientsSub;
+
   /// Explainer text at the top of the Targets screen
   ///
   /// In en, this message translates to:

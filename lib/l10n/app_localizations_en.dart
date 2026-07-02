@@ -339,6 +339,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricCalories => 'Calories';
 
   @override
+  String get metricFiber => 'Fibre';
+
+  @override
+  String get metricSatFat => 'Sat. fat';
+
+  @override
+  String get metricSugar => 'Sugar';
+
+  @override
+  String get metricSalt => 'Salt';
+
+  @override
+  String get settingsTrackedNutrients => 'Tracked nutrients';
+
+  @override
+  String get settingsTrackedNutrientsSub =>
+      'Choose what gets a target and shows on the Day card and Trends. Calories are always on; switching one off keeps its values.';
+
+  @override
   String get settingsTargetsHelp =>
       'Set a minimum, a maximum, or both. A minimum helps if you need to make sure you eat enough. Leave blank to use the default.';
 
