@@ -918,6 +918,12 @@ abstract class AppLocalizations {
   /// **'Import failed: {error}'**
   String backupImportFailed(String error);
 
+  /// Snackbar when the backup file's schema version is newer than this app supports
+  ///
+  /// In en, this message translates to:
+  /// **'This backup was created by a newer app version. Update the app, then try importing again.'**
+  String get backupImportNewerVersion;
+
   /// Label of the amount input in the log-food sheet; also the sheet title when only picking an amount
   ///
   /// In en, this message translates to:
