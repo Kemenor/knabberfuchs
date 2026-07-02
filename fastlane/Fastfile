@@ -97,6 +97,26 @@ platform :ios do
     )
   end
 
+  desc "Submit an uploaded TestFlight build for App Store review (auto-release on approval)"
+  lane :release do |options|
+    UI.user_error!("Pass version:x.y.z build:N (the TestFlight build to submit)") unless options[:version] && options[:build]
+    upload_to_app_store(
+      api_key: asc_key,
+      app_version: options[:version],
+      build_number: options[:build].to_s,
+      metadata_path: "fastlane/metadata/ios", # release_notes.txt ×4 = the What's New
+      skip_binary_upload: true,   # the build is already on TestFlight
+      skip_screenshots: true,     # screenshots go via the `screenshots` lane
+      submit_for_review: true,
+      automatic_release: true,    # goes live when Apple approves (decided 2026-07-02)
+      force: true,
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+      # Encryption is answered by ITSAppUsesNonExemptEncryption in Info.plist.
+      submission_information: { add_id_info_uses_idfa: false },
+    )
+  end
+
   desc "Validate the App Store metadata locally — no upload"
   lane :validate do
     upload_to_app_store(

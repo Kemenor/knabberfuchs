@@ -15,8 +15,12 @@ name: Test · analyze + flutter test
 # .fvmrc.
 
 on:
+  # Every branch push runs the full suite incl. goldens — they're deterministic
+  # on this runner and take seconds, so branches learn about golden breakage
+  # immediately, not at merge. (A same-repo PR branch runs twice, push + PR;
+  # accepted for a public repo with free minutes.)
   push:
-    branches: [main]
+    branches: ["**"]
   pull_request:
   workflow_dispatch:
 
