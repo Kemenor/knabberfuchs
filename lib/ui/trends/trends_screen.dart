@@ -66,6 +66,18 @@ class TrendsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            // With the activity budget adjustment on, the Day screen's target
+            // moves per day — this band doesn't (v1 limitation, see PLAN
+            // Phase 16 follow-ups). Say so instead of quietly disagreeing.
+            if (ref.watch(healthEnergyReadProvider).asData?.value ?? false) ...[
+              const SizedBox(height: 4),
+              Text(
+                l10n.trendsActivityNote,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            ],
             const SizedBox(height: 8),
             SegmentedButton<TrendMode>(
               showSelectedIcon: false,

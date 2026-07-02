@@ -376,6 +376,32 @@ class _SummaryCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall,
               ),
             ],
+            // The budget shift is always explained, never silent: when the
+            // health store reports an active burn, say so right under the
+            // (already shifted) target line.
+            if (summary.activityKcal > 0) ...[
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Symbols.bolt_rounded,
+                    size: 16,
+                    color: theme.colorScheme.outline,
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      l10n.activityBonus(kcalStr(summary.activityKcal)),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.outline,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 12),
             _MacroRow(summary: summary),
           ],

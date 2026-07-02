@@ -30,6 +30,8 @@ class SettingsScreen extends ConsumerWidget {
     final targetsAsync = ref.watch(targetsProvider);
     final healthSync =
         ref.watch(healthSyncEnabledProvider).asData?.value ?? false;
+    final energyRead =
+        ref.watch(healthEnergyReadProvider).asData?.value ?? false;
 
     final l10nTop = AppLocalizations.of(context);
     return Scaffold(
@@ -120,6 +122,18 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: Text(l10n.settingsHealthSyncSub(_healthStore())),
                     value: healthSync,
                     onChanged: (v) => _toggleHealthSync(context, ref, v),
+                  ),
+                  // Independent of write-sync: reading burned energy is a
+                  // separate permission grant and a separate decision.
+                  SwitchListTile(
+                    contentPadding: _cardRowPadding,
+                    secondary: const Icon(Symbols.bolt_rounded),
+                    title: Text(l10n.settingsHealthEnergyRead),
+                    subtitle: Text(
+                      l10n.settingsHealthEnergyReadSub(_healthStore()),
+                    ),
+                    value: energyRead,
+                    onChanged: (v) => _toggleEnergyRead(context, ref, v),
                   ),
                   if (healthSync) ...[
                     const _HealthResyncTile(),
@@ -240,6 +254,45 @@ class _HealthResyncTileState extends ConsumerState<_HealthResyncTile> {
       onTap: _resync,
     );
   }
+}
+
+/// Enable/disable the activity budget adjustment ("eat back your exercise").
+/// Enabling requests the ACTIVE_ENERGY_BURNED read grant; a later revocation
+/// silently falls back to the static target (activeEnergyFor returns 0).
+Future<void> _toggleEnergyRead(
+  BuildContext context,
+  WidgetRef ref,
+  bool value,
+) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final l10n = AppLocalizations.of(context);
+  final db = ref.read(dbProvider);
+  final health = ref.read(healthServiceProvider);
+
+  if (!value) {
+    await db.setSetting('healthEnergyRead', 'false');
+    await health.refreshEnabled(db);
+    return;
+  }
+
+  if (!await health.isAvailable()) {
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.healthUnavailable(_healthStore()))),
+    );
+    return;
+  }
+  final granted = await health.requestEnergyReadPermission();
+  if (!granted) {
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.healthNoPermission(_healthStore()))),
+    );
+    return;
+  }
+  await db.setSetting('healthEnergyRead', 'true');
+  await health.refreshEnabled(db);
+  messenger.showAutoSnackBar(
+    SnackBar(content: Text(l10n.healthEnergyReadOn)),
+  );
 }
 
 Future<void> _toggleHealthSync(
