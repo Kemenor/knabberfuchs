@@ -227,15 +227,7 @@ class RecipesScreen extends ConsumerWidget {
                             child: ListTile(
                               leading: const Icon(Symbols.menu_book_rounded),
                               title: Text(r.name),
-                              subtitle: Text(
-                                l10n.recipeServings(
-                                  r.servings.toStringAsFixed(
-                                    r.servings == r.servings.roundToDouble()
-                                        ? 0
-                                        : 1,
-                                  ),
-                                ),
-                              ),
+                              subtitle: Text(l10n.recipeServings(r.servings)),
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) => RecipeDetailScreen(recipe: r),

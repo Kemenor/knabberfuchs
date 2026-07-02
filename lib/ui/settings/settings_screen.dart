@@ -243,7 +243,7 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   final file = await openFile(
     acceptedTypeGroups: [
-      const XTypeGroup(label: 'Backup', extensions: ['zip']),
+      XTypeGroup(label: l10n.backupFileType, extensions: const ['zip']),
     ],
   );
   if (file == null || !context.mounted) return;

@@ -112,7 +112,7 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
       MaterialPageRoute(builder: (_) => CropScreen(image: bytes)),
     );
     if (cropped == null || !mounted) return;
-    final processed = preprocessLabelImage(cropped);
+    final processed = await preprocessLabelImage(cropped);
     final path = '${(await getTemporaryDirectory()).path}/label_ocr.jpg';
     await File(path).writeAsBytes(processed, flush: true);
 

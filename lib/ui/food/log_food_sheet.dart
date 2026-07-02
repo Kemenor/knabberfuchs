@@ -273,7 +273,7 @@ class _LogSheetState extends State<_LogSheet> {
                     ],
                     decoration: InputDecoration(
                       labelText: l10n.amountLabel,
-                      suffixText: _unit.label,
+                      suffixText: _unit.localizedLabel(l10n),
                       border: const OutlineInputBorder(),
                     ),
                     onChanged: (_) => setState(() {}),
@@ -305,7 +305,7 @@ class _LogSheetState extends State<_LogSheet> {
               children: [
                 for (final u in AmountUnit.values)
                   ChoiceChip(
-                    label: Text(u.label),
+                    label: Text(u.localizedLabel(l10n)),
                     selected: _unit == u,
                     onSelected: (_) => setState(() {
                       _unit = u;
@@ -360,7 +360,7 @@ class _LogSheetState extends State<_LogSheet> {
                   ),
                 for (final c in _unit.quickAmounts)
                   ActionChip(
-                    label: Text('${gramsStr(c)} ${_unit.label}'),
+                    label: Text('${gramsStr(c)} ${_unit.localizedLabel(l10n)}'),
                     onPressed: () => _setAmount(c),
                   ),
               ],
