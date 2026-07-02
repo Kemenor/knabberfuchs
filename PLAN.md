@@ -507,12 +507,12 @@ Strategy:
     → P5 icons → P6 fonts + picker → P7 icon retheme → P8 store/landing → P9 ship → P10 checkfuchs
     migrates onto the package. Regenerate the 29 goldens per visual phase.
 
-- **Phase 15 — Configurable tracked nutrients:** 📋 PLANNED, grilled 2026-07-02 (from
-  tester feedback 2026-07-01; supersedes the "just add fiber" and "split saturated
-  fat" asks — see `FEEDBACK.md`). Make the set of nutrients with target rows
-  **user-configurable** instead of the fixed kcal/P/C/F list. **Do NOT release alone**
-  — hold on main and ship together with the Phase 16 Health Connect work in one
-  feature release.
+- **Phase 15 — Configurable tracked nutrients:** ✅ BUILT 2026-07-02 (commits
+  `aa7c023`…`bbf9e48`; grilled the same day — from tester feedback 2026-07-01,
+  superseding the "just add fiber" and "split saturated fat" asks, see
+  `FEEDBACK.md`). The set of nutrients with target rows is **user-configurable**
+  instead of the fixed kcal/P/C/F list. **On main, NOT yet released** — ships
+  together with the Phase 16 Health Connect work in one feature release.
   - **Key discovery (2026-07-02):** entries snapshot only `sKcal/sProtein/sCarb/sFat`;
     `sMicrosJson` exists on entries AND recipe items but **nothing ever writes it**
     (OFF import sets foods.microsJson null). Fiber/satFat/sugar/salt exist on Foods
