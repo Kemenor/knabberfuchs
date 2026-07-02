@@ -115,6 +115,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
     final processed = await preprocessLabelImage(cropped);
     final path = '${(await getTemporaryDirectory()).path}/label_ocr.jpg';
     await File(path).writeAsBytes(processed, flush: true);
+    // preprocessLabelImage is ~1 s of isolate work with no busy indicator yet,
+    // so the screen can realistically be popped during it.
+    if (!mounted) return;
 
     setState(() => _ocrBusy = true);
     try {
