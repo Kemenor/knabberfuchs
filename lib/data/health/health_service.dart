@@ -118,6 +118,22 @@ class HealthService {
     await syncDay(day, entries);
   }
 
+  /// Full resync: wipe everything this app ever wrote, then re-push every day
+  /// that has entries. The wipe (rather than per-day delete+rewrite alone)
+  /// also clears days whose entries were since deleted, so the health store
+  /// ends up matching the diary exactly — the fix for "a wrong number already
+  /// synced" without needing per-day granularity.
+  Future<void> resyncAll(AppDatabase db) async {
+    await deleteAll();
+    final byDay = <String, List<Entry>>{};
+    for (final e in await db.allEntries()) {
+      byDay.putIfAbsent(e.day, () => []).add(e);
+    }
+    for (final entry in byDay.entries) {
+      await syncDay(entry.key, entry.value);
+    }
+  }
+
   /// Remove everything we ever wrote (used when turning the feature off).
   Future<void> deleteAll() async {
     await _ensureConfigured();
