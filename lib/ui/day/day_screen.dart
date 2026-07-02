@@ -20,6 +20,7 @@ import '../food/log_food_sheet.dart';
 import '../food/quick_add_sheet.dart';
 import '../food/recognize_food_flow.dart';
 import '../recipes/ocr_meal_screen.dart';
+import 'merge_meal_sheet.dart';
 import 'scale_meal_sheet.dart';
 import 'split_meal_sheet.dart';
 
@@ -525,6 +526,8 @@ class _GroupSection extends ConsumerWidget {
                       showScaleMealSheet(context, group);
                     case 'split':
                       showSplitMealSheet(context, group);
+                    case 'merge':
+                      showMergeMealSheet(context, group);
                     case 'recipe':
                       _saveAsRecipe(context, ref);
                     case 'delete':
@@ -540,6 +543,10 @@ class _GroupSection extends ConsumerWidget {
                   PopupMenuItem(
                     value: 'split',
                     child: Text(l10n.mealMenuSplit),
+                  ),
+                  PopupMenuItem(
+                    value: 'merge',
+                    child: Text(l10n.mealMenuMerge),
                   ),
                   PopupMenuItem(
                     value: 'recipe',
