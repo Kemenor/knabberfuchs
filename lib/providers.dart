@@ -444,6 +444,25 @@ final homeTabProvider = NotifierProvider<HomeTabNotifier, int>(
   HomeTabNotifier.new,
 );
 
+/// Whether the activity budget adjustment is on ('healthEnergyRead' setting).
+final healthEnergyReadProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('healthEnergyRead')
+      .map((v) => v == 'true'),
+);
+
+/// Active energy burned on the viewed day, read fresh from the health store
+/// (ephemeral — the store is the single source of truth; grilled 2026-07-02).
+/// Re-reads on day change and toggle change. 0 = no adjustment (feature off,
+/// permission revoked, store unavailable, or simply no data yet).
+final activeEnergyProvider = FutureProvider<double>((ref) async {
+  final day = ref.watch(selectedDayProvider);
+  final on = ref.watch(healthEnergyReadProvider).asData?.value ?? false;
+  if (!on) return 0;
+  return ref.read(healthServiceProvider).activeEnergyFor(day);
+});
+
 final daySummaryProvider = StreamProvider<DaySummary>((ref) {
   final db = ref.watch(dbProvider);
   final day = ref.watch(selectedDayProvider);
@@ -452,8 +471,13 @@ final daySummaryProvider = StreamProvider<DaySummary>((ref) {
   final defaultMax = ref.watch(defaultMaxProvider).asData?.value;
   final macroDefaults =
       ref.watch(macroDefaultsProvider).asData?.value ?? const {};
+  final activity = ref.watch(activeEnergyProvider).asData?.value ?? 0;
   final wd = DayKey.weekdayIndex(day);
-  final target = resolveTarget(targets, defaultMin, defaultMax, wd);
+  // "Eat back your exercise": the whole kcal band shifts by the active burn.
+  final target = shiftTarget(
+    resolveTarget(targets, defaultMin, defaultMax, wd),
+    activity,
+  );
   CalorieTarget macro(TargetMetric m) => resolveMetricTarget(
     targets,
     m,
@@ -473,6 +497,7 @@ final daySummaryProvider = StreamProvider<DaySummary>((ref) {
             for (final m in TargetMetric.values)
               if (m != TargetMetric.kcal) m: macro(m),
           },
+          activityKcal: activity,
         ),
       );
 });
