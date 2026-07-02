@@ -560,20 +560,50 @@ Strategy:
     locales) + goldens (default state unchanged ⇒ existing goldens should hold).
 
 - **Phase 16 — Health Connect energy read-back ("eat back your exercise"):**
-  📋 PLANNED (from tester feedback 2026-07-01, see `FEEDBACK.md`). Read burned
-  calories from the health store and reflect them in the daily kcal budget, the way
-  MyFitnessPal/Lose It/Cronometer do.
+  📋 PLANNED, grilled 2026-07-02 (from tester feedback 2026-07-01, see `FEEDBACK.md`).
+  Read burned calories from the health store and reflect them in the daily kcal
+  budget. **Ships together with Phase 15** in one feature release.
   - **Today:** `HealthService` is write-only (`lib/data/health/health_service.dart`);
-    the kcal target is a static per-weekday min/max.
-  - **Sketch:** opt-in **separate toggle** (new read-permission grant, distinct from
-    the write-sync switch); read `ACTIVE_ENERGY_BURNED` (+ optionally
-    `TOTAL_CALORIES_BURNED`/`BASAL_ENERGY_BURNED`, all already in the `health` pkg)
-    for the viewed day; Day card shows "+N kcal from activity" and shifts the
-    remaining/over calculation. **Open decision** (settle at build time): active-only
-    add-on to the static target (simpler, default) vs. full TDEE replacing it.
-  - **Watch out:** double-counting BMR (never add TOTAL on top of a target that
-    already assumes resting burn); iOS parity via HealthKit active energy; days with
-    no wearable data must fall back to the plain static target.
+    the kcal target is a static per-weekday min/max resolved in `daySummaryProvider`
+    (`lib/providers.dart:403` — the single injection seam for the adjustment).
+  - **Decisions (grilled 2026-07-02):**
+    - **Energy model: active-only add-on.** `remaining = static target +
+      ACTIVE_ENERGY_BURNED − eaten`. The hand-set target keeps encoding maintenance;
+      only deliberate activity shifts it. No TOTAL/BMR reads in v1 (kills the
+      BMR-double-count trap by construction); TDEE mode stays a someday-option.
+    - **Both bounds shift:** the whole min/max band moves up by the burned amount —
+      an unmoved min would show "minimum reached" on underfueled training days.
+      Status colors work unchanged on the shifted band.
+    - **100% eat-back**, no percentage setting in v1 (easy follow-up if asked).
+    - **Read via the platform aggregate API** (`getHealthAggregateDataFromTypes`,
+      verified present in health 13.3.1): HC/HealthKit dedupe multi-source
+      (phone+watch) active energy through their own priority system — never sum raw
+      records in Dart. *(provisional)*
+    - **Ephemeral, no persistence:** a per-day FutureProvider reads on demand
+      (viewed-day change / app resume) and caches in memory; the health store stays
+      the single source of truth. No DB table, no backup surface. *(provisional)*
+    - **Day screen only in v1:** Trends keeps the static target line (range-reading
+      90 days of HC per chart open is not a v1 cost); adjusted-target-in-Trends is a
+      follow-up. *(provisional)*
+    - **UI:** Day card shows a small "+N kcal activity" line under the target status;
+      the remaining/over math and kcal bar denominator use the adjusted bounds — the
+      shift is always explained, never silent. *(provisional)*
+    - **Settings:** second `SwitchListTile` in the Health card ("Adjust budget by
+      activity"), requesting the ACTIVE_ENERGY_BURNED **read** grant on enable —
+      separate from the write-sync toggle since it's a new permission. Permission
+      revoked later → silent fallback to the static target (same swallow-errors
+      pattern as `syncDay`). *(provisional)*
+    - **iOS parity in the same release** (HealthKit active energy via the same
+      plugin call; verify on TestFlight). *(provisional)*
+  - **Watch out:** days with no wearable data must read as the plain static target
+    (aggregate returns 0/empty → no adjustment line); the adjustment must never make
+    Health-sync writes feed back into the budget (we write nutrition, read energy —
+    disjoint types, but keep it that way).
+  - **Build sequence:** H1 `HealthService.activeEnergyFor(day)` via aggregate API +
+    permission plumbing → H2 settings toggle + read grant flow → H3
+    `daySummaryProvider` adjustment + DaySummary carries the activity kcal → H4 Day
+    card "+N activity" line + adjusted bar → H5 l10n ×4 → H6 emulator + TestFlight
+    verification with a fake HC writer.
 
 ## Phase 5 design — Offline OFF regional packs (planned 2026-06-17)
 
