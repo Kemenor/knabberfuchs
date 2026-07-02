@@ -65,9 +65,11 @@ Future<bool> startRecognizeFoodFlow(
     // photo before sending. Dismissing the sheet cancels the whole flow.
     final hint = await _askGeminiHint(context, bytes);
     if (hint == null || !context.mounted) return false;
-    // Cancel pops the dialog itself and raises this flag; the request keeps
-    // running, but its late result must then be discarded without touching the
-    // navigator — the pop below would otherwise take whatever route is on top.
+    // Cancel pops the dialog itself and raises this flag; an in-flight request
+    // can't be aborted, but the service polls the flag so the photo is never
+    // re-sent to the fallback model, and the late result must be discarded
+    // without touching the navigator — the pop below would otherwise take
+    // whatever route is on top.
     var cancelled = false;
     showDialog(
       context: context,
@@ -93,6 +95,7 @@ Future<bool> startRecognizeFoodFlow(
             geminiKey.trim(),
             preferredModel: preferredModel,
             description: hint,
+            isCancelled: () => cancelled,
           );
     } catch (_) {}
     if (cancelled) return false;
