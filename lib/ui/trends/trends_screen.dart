@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/format.dart';
+import '../../core/metric_labels.dart';
 import '../../core/status_color.dart';
 import '../../domain/day_summary.dart';
 import '../../l10n/app_localizations.dart';
@@ -21,7 +22,16 @@ class TrendsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final window = ref.watch(trendRangeProvider);
-    final metric = ref.watch(selectedTrendMetricProvider);
+    final tracked =
+        ref.watch(trackedNutrientsProvider).asData?.value ??
+        defaultTrackedNutrients;
+    // A selection whose nutrient was since disabled falls back to kcal (the
+    // provider applies the same coercion to the charted series).
+    final selected = ref.watch(selectedTrendMetricProvider);
+    final metric =
+        selected == TargetMetric.kcal || tracked.contains(selected)
+        ? selected
+        : TargetMetric.kcal;
     final trendsAsync = ref.watch(trendsProvider);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navTrends)),
@@ -30,29 +40,31 @@ class TrendsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SegmentedButton<TargetMetric>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(
-                  value: TargetMetric.kcal,
-                  label: Text(l10n.unitKcal),
-                ),
-                ButtonSegment(
-                  value: TargetMetric.protein,
-                  label: Text(l10n.macroProtein),
-                ),
-                ButtonSegment(
-                  value: TargetMetric.carb,
-                  label: Text(l10n.macroCarbs),
-                ),
-                ButtonSegment(
-                  value: TargetMetric.fat,
-                  label: Text(l10n.macroFat),
-                ),
-              ],
-              selected: {metric},
-              onSelectionChanged: (s) =>
-                  ref.read(selectedTrendMetricProvider.notifier).set(s.first),
+            // Scrollable single-select chips: kcal + the enabled nutrients.
+            // (Replaced the 4-slot SegmentedButton when the metric list became
+            // user-configurable — Phase 15.)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final m in TargetMetric.values)
+                    if (m == TargetMetric.kcal || tracked.contains(m))
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(
+                            m == TargetMetric.kcal
+                                ? l10n.unitKcal
+                                : metricLabel(l10n, m),
+                          ),
+                          selected: metric == m,
+                          onSelected: (_) => ref
+                              .read(selectedTrendMetricProvider.notifier)
+                              .set(m),
+                        ),
+                      ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             SegmentedButton<TrendMode>(
@@ -342,10 +354,14 @@ class _Chart extends StatelessWidget {
       (m, t) => (t.target.max ?? 0) > m ? (t.target.max ?? 0) : m,
     );
     final rawMax = maxValue > maxTarget ? maxValue : maxTarget;
-    // Floor so an empty/low chart isn't degenerate — kcal sits in the thousands,
-    // macros in the tens.
+    // Floor so an empty/low chart isn't degenerate — kcal sits in the
+    // thousands, macros in the tens, salt in single grams.
     final topY = rawMax <= 0
-        ? (metric == TargetMetric.kcal ? 100.0 : 50.0)
+        ? switch (metric) {
+            TargetMetric.kcal => 100.0,
+            TargetMetric.salt => 5.0,
+            _ => 50.0,
+          }
         : rawMax * 1.15;
     final interval = _niceInterval(topY);
 

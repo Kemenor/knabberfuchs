@@ -74,6 +74,11 @@ void main() {
       overrides: [
         trendsProvider.overrideWith((ref) => Stream.value(trends)),
         trendRangeProvider.overrideWith(() => _FixedRange(window)),
+        // The chip row reads the enabled set; without this override it would
+        // reach the real dbProvider (path_provider) inside a widget test.
+        trackedNutrientsProvider.overrideWith(
+          (ref) => Stream.value(defaultTrackedNutrients),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
