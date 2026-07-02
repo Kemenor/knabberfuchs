@@ -507,26 +507,57 @@ Strategy:
     → P5 icons → P6 fonts + picker → P7 icon retheme → P8 store/landing → P9 ship → P10 checkfuchs
     migrates onto the package. Regenerate the 29 goldens per visual phase.
 
-- **Phase 15 — Configurable tracked nutrients:** 📋 PLANNED (from tester feedback
-  2026-07-01; supersedes the "just add fiber" and "split saturated fat" asks — see
-  `FEEDBACK.md`). Make the set of nutrients with target rows **user-configurable**
-  instead of the fixed kcal/P/C/F list, so fiber, saturated fat, and future nutrients
-  (sugar, salt) become entries in that list rather than one-off bolt-ons.
-  - **Today:** `TargetMetric {kcal, protein, carb, fat}` (`lib/domain/day_summary.dart:56`)
-    is hardcoded through the Targets table (`lib/data/db/tables.dart:121-124`,
-    min/max column pairs per metric), the Targets settings screen
-    (`lib/ui/settings/targets_screen.dart`), the Day-card bars, and the Trends
-    metric switcher. Fiber/saturates are already captured per food
-    (`fiber100`/`satFat100`) and snapshotted per entry — only the target/display
-    layer is missing.
-  - **Sketch:** extend `TargetMetric` with the new nutrients; a Settings toggle list
-    ("Tracked nutrients", kcal always on, P/C/F on by default) stored as a setting;
-    Targets screen, Day card, and Trends render only the enabled metrics. Schema:
-    new min/max column pairs (fiber, satFat) — same shape as the macro columns added
-    in v11, plus backup export/restore coverage.
-  - **Watch out:** Day-card space with 6+ bars (collapse to the enabled set), Trends
-    swatch colors for new metrics, entry snapshots already carry fiber/satFat only
-    via `sMicrosJson`/columns — verify aggregation paths before wiring UI.
+- **Phase 15 — Configurable tracked nutrients:** 📋 PLANNED, grilled 2026-07-02 (from
+  tester feedback 2026-07-01; supersedes the "just add fiber" and "split saturated
+  fat" asks — see `FEEDBACK.md`). Make the set of nutrients with target rows
+  **user-configurable** instead of the fixed kcal/P/C/F list. **Do NOT release alone**
+  — hold on main and ship together with the Phase 16 Health Connect work in one
+  feature release.
+  - **Key discovery (2026-07-02):** entries snapshot only `sKcal/sProtein/sCarb/sFat`;
+    `sMicrosJson` exists on entries AND recipe items but **nothing ever writes it**
+    (OFF import sets foods.microsJson null). Fiber/satFat/sugar/salt exist on Foods
+    (Swiss DB fills them) but are in **zero logged entries** — the snapshot path and
+    history are the real work, not the enum.
+  - **Decisions (grilled 2026-07-02):**
+    - **Nutrient set:** all four the schema knows — **fiber, satFat, sugar, salt**
+      (sodium stays internal; salt covers it for users).
+    - **Toggle scope:** P/C/F can be disabled; **kcal is fixed**. Default =
+      `["protein","carb","fat"]` → existing users see zero change.
+    - **Snapshots via micros blob:** at log time copy the food's
+      fiber/satFat/sugar/salt per-100g into `sMicrosJson` (`encodeMicros`) — same for
+      recipe items. **Always write all available nutrients** regardless of the enabled
+      set (display-only toggle). `Nutrition.micros` aggregation + codec already exist
+      and are tested; `metricValue` reads `n.micros['fiber'] ?? 0`. No Entries schema
+      change.
+    - **History:** **best-effort backfill** in the v12 migration — entries with a
+      surviving `foodId` get micros copied from the food's current values (explicitly
+      a heuristic; foodId is set-null only on food delete). Snapshot-only entries
+      (quick-add, recipes, imports) stay empty — same as today.
+    - **Targets schema:** column pairs like the v11 macros — `fiberMin/Max`,
+      `satFatMin/Max`, `sugarMin/Max`, `saltMin/Max` (8 nullable `ALTER TABLE ADD
+      COLUMN`s, additive) + matching `default<X>Min/Max` settings keys. DB **v12**;
+      backup schema **stays v2** (absent-safe `_bound` restore, documented convention).
+    - **Enabled set:** single settings key `trackedNutrients` = JSON list of enum
+      names (kcal implicit). Absent key → P/C/F default. Round-trips via the existing
+      settings backup.
+    - **Disable = hide only:** bounds persist in the DB; re-enabling restores them.
+      No confirm dialog, no data loss.
+    - **UI:** toggle chips at the **top of the Targets screen** (metric blocks below
+      appear/disappear live); Day card **wraps metric bars into rows of 3** (same
+      `_macro` widget, card grows for track-everything users, unchanged for P/C/F);
+      Trends swaps the 4-slot `SegmentedButton` for a **horizontally scrollable
+      single-select chip row** of kcal + enabled metrics (disabled selection falls
+      back to kcal).
+    - **Floor vs ceiling nutrients need no new status model:** min-only bounds
+      (fiber) read under→indigo / reached→emerald; max-only bounds (satFat, sugar,
+      salt) read below→emerald / over→amber — existing `statusFor` semantics.
+    - **Health Connect:** pass the new nutrients through `writeMeal` (it has named
+      params for fiber/sugar/sodium/satFat) so the synced record matches the diary.
+  - **Build sequence:** S1 micros write-through at log/recipe paths + `metricValue`
+    over micros → S2 v12 migration (8 target columns + backfill) + migration-test
+    harness case → S3 enabled-set provider + Targets-screen chips → S4 Day-card wrap
+    → S5 Trends chips → S6 HC pass-through → S7 l10n (4 nutrients × labels ×4
+    locales) + goldens (default state unchanged ⇒ existing goldens should hold).
 
 - **Phase 16 — Health Connect energy read-back ("eat back your exercise"):**
   📋 PLANNED (from tester feedback 2026-07-01, see `FEEDBACK.md`). Read burned
