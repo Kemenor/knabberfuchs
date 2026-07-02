@@ -19,7 +19,9 @@ recipe sharing, ZIP backup/restore.
   - **Bar gating, unified across all four metrics:** a metric draws a progress bar when *either*
     bound is set; denominator = `max` if set else `min` (a floor fills toward the min — the
     dominant macro case, e.g. protein ≥120 g). kcal adopts this too (its min-only case now grows
-    a bar). Status via shared `statusFor` (under=`tertiary` / in-range=`primary` / over=`error`).
+    a bar). Status via shared `statusFor`; colours as shipped after the fuchsbau redesign
+    (`core/status_color.dart`): under=`secondary` (indigo) / in-range=`tertiary` (emerald) /
+    over=amber / none=`outline` — no red in status.
   - **Day card: NO toggle** — shows everything at once. kcal headline unchanged; the P/C/F row
     keeps its compact horizontal 3-up but each macro *with a target* gains a thin under-bar and a
     status-colored gram value. Targetless macros stay plain text, so a calorie-only card is
@@ -458,8 +460,14 @@ Strategy:
     P32/C105/F28). The on-device path stays the keyless default.
   - **Caveat:** calorie-from-photo is inherently rough → always framed as an *estimate to confirm*.
 
-- **Phase 14 — Design-system migration (fuchsbau):** 🚧 IN PROGRESS (planned + grilled
-  2026-06-28). Re-skin knabberfuchs onto the shared **fuchsbau** design system (tangerine
+- **Phase 14 — Design-system migration (fuchsbau):** ✅ DONE (shipped 2026-06-28 as
+  1.1.0+32, "fuchsbau redesign + AI text hint"; polish through 1.1.2+34). As shipped, the
+  status-colour mapping refined the "over AND under → amber" decision below: **under →
+  indigo (`secondary`, focus), in-range → emerald (`tertiary`), over → amber, none →
+  `outline`** (`core/status_color.dart`; commit `5ca9bfe`), plus AA `statusTextColor`
+  variants for status-as-text from the a11y sweep. The emerald action FAB is a recorded
+  knabberfuchs deviation (DESIGN_SYSTEM.md §0). Original plan: re-skin knabberfuchs onto
+  the shared **fuchsbau** design system (tangerine
   triad, Figtree + accessibility font picker, Material Symbols Rounded, rounding/spacing
   tokens, "red = destruction only"). knabberfuchs is the **validation consumer** of a new
   shared `fuchsbau` Flutter package; checkfuchs migrates onto it afterwards. No feature,
