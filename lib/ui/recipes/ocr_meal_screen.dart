@@ -10,6 +10,7 @@ import '../../core/format.dart';
 import '../../core/snackbar.dart';
 import '../../data/db/database.dart';
 import '../../domain/meal_times.dart';
+import '../../domain/day_summary.dart' show snapshotMicros100;
 import '../../domain/nutrition.dart';
 import '../../domain/ocr_ingredient.dart';
 import '../../domain/recipe_share.dart';
@@ -265,6 +266,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
                   protein100: it.matched!.protein100,
                   carb100: it.matched!.carb100,
                   fat100: it.matched!.fat100,
+                  micros100: snapshotMicros100(it.matched!),
                 ),
             ],
           );

@@ -306,23 +306,29 @@ final targetsProvider = StreamProvider<List<Target>>(
   (ref) => ref.watch(dbProvider).watchTargets(),
 );
 
-/// App-wide default macro target bounds (the `default<Macro>Min/Max` settings).
-/// kcal defaults stay in [defaultMinProvider] / [defaultMaxProvider].
+/// The `default<Metric>Min` settings key for a metric (e.g. protein →
+/// defaultProteinMin, satFat → defaultSatFatMin). kcal uses the historical
+/// defaultKcalMin/Max keys read by [defaultMinProvider]/[defaultMaxProvider].
+String defaultSettingKey(TargetMetric m, {required bool max}) {
+  final cap = m.name[0].toUpperCase() + m.name.substring(1);
+  return 'default$cap${max ? 'Max' : 'Min'}';
+}
+
+/// App-wide default target bounds for every non-kcal metric (the
+/// `default<Metric>Min/Max` settings). kcal defaults stay in
+/// [defaultMinProvider] / [defaultMaxProvider].
 final macroDefaultsProvider =
     StreamProvider<Map<TargetMetric, CalorieTarget>>((ref) {
       return ref.watch(dbProvider).watchAllSettings().map((rows) {
         final s = {for (final r in rows) r.key: r.value};
         double? n(String k) => s[k] == null ? null : double.tryParse(s[k]!);
         return {
-          TargetMetric.protein: CalorieTarget(
-            n('defaultProteinMin'),
-            n('defaultProteinMax'),
-          ),
-          TargetMetric.carb: CalorieTarget(
-            n('defaultCarbMin'),
-            n('defaultCarbMax'),
-          ),
-          TargetMetric.fat: CalorieTarget(n('defaultFatMin'), n('defaultFatMax')),
+          for (final m in TargetMetric.values)
+            if (m != TargetMetric.kcal)
+              m: CalorieTarget(
+                n(defaultSettingKey(m, max: false)),
+                n(defaultSettingKey(m, max: true)),
+              ),
         };
       });
     });
@@ -425,9 +431,10 @@ final daySummaryProvider = StreamProvider<DaySummary>((ref) {
           entries: entries.map(EntryView.new).toList(),
           kcalMin: target.min,
           kcalMax: target.max,
-          proteinTarget: macro(TargetMetric.protein),
-          carbTarget: macro(TargetMetric.carb),
-          fatTarget: macro(TargetMetric.fat),
+          metricTargets: {
+            for (final m in TargetMetric.values)
+              if (m != TargetMetric.kcal) m: macro(m),
+          },
         ),
       );
 });
@@ -551,12 +558,27 @@ final trendsProvider = StreamProvider<List<DayTrend>>((ref) {
       ? CalorieTarget(defaultMin, defaultMax)
       : (macroDefaults[metric] ?? const CalorieTarget(null, null));
   double pick(
-    ({String day, double kcal, double protein, double carb, double fat}) r,
+    ({
+      String day,
+      double kcal,
+      double protein,
+      double carb,
+      double fat,
+      double fiber,
+      double satFat,
+      double sugar,
+      double salt,
+    })
+    r,
   ) => switch (metric) {
     TargetMetric.kcal => r.kcal,
     TargetMetric.protein => r.protein,
     TargetMetric.carb => r.carb,
     TargetMetric.fat => r.fat,
+    TargetMetric.fiber => r.fiber,
+    TargetMetric.satFat => r.satFat,
+    TargetMetric.sugar => r.sugar,
+    TargetMetric.salt => r.salt,
   };
   return db
       .watchDailyTotals(DayKey.of(w.start), DayKey.of(w.end))

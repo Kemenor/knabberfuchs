@@ -1,6 +1,8 @@
 import 'package:calorie_tracker/data/db/database.dart';
 import 'package:calorie_tracker/data/repositories/diary_repository.dart';
+import 'package:calorie_tracker/domain/day_summary.dart' show EntryView;
 import 'package:calorie_tracker/domain/enums.dart';
+import 'package:calorie_tracker/domain/nutrition.dart' show decodeMicros;
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -50,6 +52,40 @@ void main() {
     );
     return gid;
   }
+
+  group('logFood snapshot', () {
+    test('writes the tracked nutrients into the micros blob', () async {
+      final id = await db.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.custom,
+          name: 'Vollkornbrot',
+          kcal100: 220,
+          fiber100: const Value(7.5),
+          satFat100: const Value(0.4),
+          sugar100: const Value(2.1),
+          saltG100: const Value(1.2),
+        ),
+      );
+      final food = (await db.foodById(id))!;
+      await repo.logFood(
+        food: food,
+        grams: 80,
+        meal: MealType.breakfast,
+        day: '2026-07-02',
+      );
+
+      final entry = (await db.watchDay('2026-07-02').first).single;
+      expect(decodeMicros(entry.sMicrosJson), {
+        'fiber': 7.5,
+        'satFat': 0.4,
+        'sugar': 2.1,
+        'salt': 1.2,
+      });
+      // Aggregation scales by grams like the macros (80 g of 7.5 g/100g).
+      final n = EntryView(entry).nutrition;
+      expect(n.micros['fiber'], closeTo(6.0, 1e-9));
+    });
+  });
 
   group('scaleGroup', () {
     test('multiplies grams of every group entry, snapshots unchanged', () async {

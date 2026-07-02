@@ -169,7 +169,7 @@ void main() {
       final s = DaySummary(
         day: '2026-06-17',
         entries: entries,
-        proteinTarget: const CalorieTarget(20, null),
+        metricTargets: const {TargetMetric.protein: CalorieTarget(20, null)},
       );
       expect(s.valueFor(TargetMetric.protein), closeTo(10, 1e-9));
       expect(s.statusForMetric(TargetMetric.protein), TargetStatus.under);

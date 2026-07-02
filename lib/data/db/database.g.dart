@@ -2743,6 +2743,94 @@ class $TargetsTable extends Targets with TableInfo<$TargetsTable, Target> {
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _fiberMinMeta = const VerificationMeta(
+    'fiberMin',
+  );
+  @override
+  late final GeneratedColumn<double> fiberMin = GeneratedColumn<double>(
+    'fiber_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fiberMaxMeta = const VerificationMeta(
+    'fiberMax',
+  );
+  @override
+  late final GeneratedColumn<double> fiberMax = GeneratedColumn<double>(
+    'fiber_max',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _satFatMinMeta = const VerificationMeta(
+    'satFatMin',
+  );
+  @override
+  late final GeneratedColumn<double> satFatMin = GeneratedColumn<double>(
+    'sat_fat_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _satFatMaxMeta = const VerificationMeta(
+    'satFatMax',
+  );
+  @override
+  late final GeneratedColumn<double> satFatMax = GeneratedColumn<double>(
+    'sat_fat_max',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sugarMinMeta = const VerificationMeta(
+    'sugarMin',
+  );
+  @override
+  late final GeneratedColumn<double> sugarMin = GeneratedColumn<double>(
+    'sugar_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sugarMaxMeta = const VerificationMeta(
+    'sugarMax',
+  );
+  @override
+  late final GeneratedColumn<double> sugarMax = GeneratedColumn<double>(
+    'sugar_max',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _saltMinMeta = const VerificationMeta(
+    'saltMin',
+  );
+  @override
+  late final GeneratedColumn<double> saltMin = GeneratedColumn<double>(
+    'salt_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _saltMaxMeta = const VerificationMeta(
+    'saltMax',
+  );
+  @override
+  late final GeneratedColumn<double> saltMax = GeneratedColumn<double>(
+    'salt_max',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     weekday,
@@ -2754,6 +2842,14 @@ class $TargetsTable extends Targets with TableInfo<$TargetsTable, Target> {
     carbMax,
     fatMin,
     fatMax,
+    fiberMin,
+    fiberMax,
+    satFatMin,
+    satFatMax,
+    sugarMin,
+    sugarMax,
+    saltMin,
+    saltMax,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2821,6 +2917,54 @@ class $TargetsTable extends Targets with TableInfo<$TargetsTable, Target> {
         fatMax.isAcceptableOrUnknown(data['fat_max']!, _fatMaxMeta),
       );
     }
+    if (data.containsKey('fiber_min')) {
+      context.handle(
+        _fiberMinMeta,
+        fiberMin.isAcceptableOrUnknown(data['fiber_min']!, _fiberMinMeta),
+      );
+    }
+    if (data.containsKey('fiber_max')) {
+      context.handle(
+        _fiberMaxMeta,
+        fiberMax.isAcceptableOrUnknown(data['fiber_max']!, _fiberMaxMeta),
+      );
+    }
+    if (data.containsKey('sat_fat_min')) {
+      context.handle(
+        _satFatMinMeta,
+        satFatMin.isAcceptableOrUnknown(data['sat_fat_min']!, _satFatMinMeta),
+      );
+    }
+    if (data.containsKey('sat_fat_max')) {
+      context.handle(
+        _satFatMaxMeta,
+        satFatMax.isAcceptableOrUnknown(data['sat_fat_max']!, _satFatMaxMeta),
+      );
+    }
+    if (data.containsKey('sugar_min')) {
+      context.handle(
+        _sugarMinMeta,
+        sugarMin.isAcceptableOrUnknown(data['sugar_min']!, _sugarMinMeta),
+      );
+    }
+    if (data.containsKey('sugar_max')) {
+      context.handle(
+        _sugarMaxMeta,
+        sugarMax.isAcceptableOrUnknown(data['sugar_max']!, _sugarMaxMeta),
+      );
+    }
+    if (data.containsKey('salt_min')) {
+      context.handle(
+        _saltMinMeta,
+        saltMin.isAcceptableOrUnknown(data['salt_min']!, _saltMinMeta),
+      );
+    }
+    if (data.containsKey('salt_max')) {
+      context.handle(
+        _saltMaxMeta,
+        saltMax.isAcceptableOrUnknown(data['salt_max']!, _saltMaxMeta),
+      );
+    }
     return context;
   }
 
@@ -2866,6 +3010,38 @@ class $TargetsTable extends Targets with TableInfo<$TargetsTable, Target> {
         DriftSqlType.double,
         data['${effectivePrefix}fat_max'],
       ),
+      fiberMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fiber_min'],
+      ),
+      fiberMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fiber_max'],
+      ),
+      satFatMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sat_fat_min'],
+      ),
+      satFatMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sat_fat_max'],
+      ),
+      sugarMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sugar_min'],
+      ),
+      sugarMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sugar_max'],
+      ),
+      saltMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}salt_min'],
+      ),
+      saltMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}salt_max'],
+      ),
     );
   }
 
@@ -2885,6 +3061,14 @@ class Target extends DataClass implements Insertable<Target> {
   final double? carbMax;
   final double? fatMin;
   final double? fatMax;
+  final double? fiberMin;
+  final double? fiberMax;
+  final double? satFatMin;
+  final double? satFatMax;
+  final double? sugarMin;
+  final double? sugarMax;
+  final double? saltMin;
+  final double? saltMax;
   const Target({
     required this.weekday,
     this.kcalMin,
@@ -2895,6 +3079,14 @@ class Target extends DataClass implements Insertable<Target> {
     this.carbMax,
     this.fatMin,
     this.fatMax,
+    this.fiberMin,
+    this.fiberMax,
+    this.satFatMin,
+    this.satFatMax,
+    this.sugarMin,
+    this.sugarMax,
+    this.saltMin,
+    this.saltMax,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2923,6 +3115,30 @@ class Target extends DataClass implements Insertable<Target> {
     }
     if (!nullToAbsent || fatMax != null) {
       map['fat_max'] = Variable<double>(fatMax);
+    }
+    if (!nullToAbsent || fiberMin != null) {
+      map['fiber_min'] = Variable<double>(fiberMin);
+    }
+    if (!nullToAbsent || fiberMax != null) {
+      map['fiber_max'] = Variable<double>(fiberMax);
+    }
+    if (!nullToAbsent || satFatMin != null) {
+      map['sat_fat_min'] = Variable<double>(satFatMin);
+    }
+    if (!nullToAbsent || satFatMax != null) {
+      map['sat_fat_max'] = Variable<double>(satFatMax);
+    }
+    if (!nullToAbsent || sugarMin != null) {
+      map['sugar_min'] = Variable<double>(sugarMin);
+    }
+    if (!nullToAbsent || sugarMax != null) {
+      map['sugar_max'] = Variable<double>(sugarMax);
+    }
+    if (!nullToAbsent || saltMin != null) {
+      map['salt_min'] = Variable<double>(saltMin);
+    }
+    if (!nullToAbsent || saltMax != null) {
+      map['salt_max'] = Variable<double>(saltMax);
     }
     return map;
   }
@@ -2954,6 +3170,30 @@ class Target extends DataClass implements Insertable<Target> {
       fatMax: fatMax == null && nullToAbsent
           ? const Value.absent()
           : Value(fatMax),
+      fiberMin: fiberMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fiberMin),
+      fiberMax: fiberMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fiberMax),
+      satFatMin: satFatMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(satFatMin),
+      satFatMax: satFatMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(satFatMax),
+      sugarMin: sugarMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sugarMin),
+      sugarMax: sugarMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sugarMax),
+      saltMin: saltMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(saltMin),
+      saltMax: saltMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(saltMax),
     );
   }
 
@@ -2972,6 +3212,14 @@ class Target extends DataClass implements Insertable<Target> {
       carbMax: serializer.fromJson<double?>(json['carbMax']),
       fatMin: serializer.fromJson<double?>(json['fatMin']),
       fatMax: serializer.fromJson<double?>(json['fatMax']),
+      fiberMin: serializer.fromJson<double?>(json['fiberMin']),
+      fiberMax: serializer.fromJson<double?>(json['fiberMax']),
+      satFatMin: serializer.fromJson<double?>(json['satFatMin']),
+      satFatMax: serializer.fromJson<double?>(json['satFatMax']),
+      sugarMin: serializer.fromJson<double?>(json['sugarMin']),
+      sugarMax: serializer.fromJson<double?>(json['sugarMax']),
+      saltMin: serializer.fromJson<double?>(json['saltMin']),
+      saltMax: serializer.fromJson<double?>(json['saltMax']),
     );
   }
   @override
@@ -2987,6 +3235,14 @@ class Target extends DataClass implements Insertable<Target> {
       'carbMax': serializer.toJson<double?>(carbMax),
       'fatMin': serializer.toJson<double?>(fatMin),
       'fatMax': serializer.toJson<double?>(fatMax),
+      'fiberMin': serializer.toJson<double?>(fiberMin),
+      'fiberMax': serializer.toJson<double?>(fiberMax),
+      'satFatMin': serializer.toJson<double?>(satFatMin),
+      'satFatMax': serializer.toJson<double?>(satFatMax),
+      'sugarMin': serializer.toJson<double?>(sugarMin),
+      'sugarMax': serializer.toJson<double?>(sugarMax),
+      'saltMin': serializer.toJson<double?>(saltMin),
+      'saltMax': serializer.toJson<double?>(saltMax),
     };
   }
 
@@ -3000,6 +3256,14 @@ class Target extends DataClass implements Insertable<Target> {
     Value<double?> carbMax = const Value.absent(),
     Value<double?> fatMin = const Value.absent(),
     Value<double?> fatMax = const Value.absent(),
+    Value<double?> fiberMin = const Value.absent(),
+    Value<double?> fiberMax = const Value.absent(),
+    Value<double?> satFatMin = const Value.absent(),
+    Value<double?> satFatMax = const Value.absent(),
+    Value<double?> sugarMin = const Value.absent(),
+    Value<double?> sugarMax = const Value.absent(),
+    Value<double?> saltMin = const Value.absent(),
+    Value<double?> saltMax = const Value.absent(),
   }) => Target(
     weekday: weekday ?? this.weekday,
     kcalMin: kcalMin.present ? kcalMin.value : this.kcalMin,
@@ -3010,6 +3274,14 @@ class Target extends DataClass implements Insertable<Target> {
     carbMax: carbMax.present ? carbMax.value : this.carbMax,
     fatMin: fatMin.present ? fatMin.value : this.fatMin,
     fatMax: fatMax.present ? fatMax.value : this.fatMax,
+    fiberMin: fiberMin.present ? fiberMin.value : this.fiberMin,
+    fiberMax: fiberMax.present ? fiberMax.value : this.fiberMax,
+    satFatMin: satFatMin.present ? satFatMin.value : this.satFatMin,
+    satFatMax: satFatMax.present ? satFatMax.value : this.satFatMax,
+    sugarMin: sugarMin.present ? sugarMin.value : this.sugarMin,
+    sugarMax: sugarMax.present ? sugarMax.value : this.sugarMax,
+    saltMin: saltMin.present ? saltMin.value : this.saltMin,
+    saltMax: saltMax.present ? saltMax.value : this.saltMax,
   );
   Target copyWithCompanion(TargetsCompanion data) {
     return Target(
@@ -3026,6 +3298,14 @@ class Target extends DataClass implements Insertable<Target> {
       carbMax: data.carbMax.present ? data.carbMax.value : this.carbMax,
       fatMin: data.fatMin.present ? data.fatMin.value : this.fatMin,
       fatMax: data.fatMax.present ? data.fatMax.value : this.fatMax,
+      fiberMin: data.fiberMin.present ? data.fiberMin.value : this.fiberMin,
+      fiberMax: data.fiberMax.present ? data.fiberMax.value : this.fiberMax,
+      satFatMin: data.satFatMin.present ? data.satFatMin.value : this.satFatMin,
+      satFatMax: data.satFatMax.present ? data.satFatMax.value : this.satFatMax,
+      sugarMin: data.sugarMin.present ? data.sugarMin.value : this.sugarMin,
+      sugarMax: data.sugarMax.present ? data.sugarMax.value : this.sugarMax,
+      saltMin: data.saltMin.present ? data.saltMin.value : this.saltMin,
+      saltMax: data.saltMax.present ? data.saltMax.value : this.saltMax,
     );
   }
 
@@ -3040,7 +3320,15 @@ class Target extends DataClass implements Insertable<Target> {
           ..write('carbMin: $carbMin, ')
           ..write('carbMax: $carbMax, ')
           ..write('fatMin: $fatMin, ')
-          ..write('fatMax: $fatMax')
+          ..write('fatMax: $fatMax, ')
+          ..write('fiberMin: $fiberMin, ')
+          ..write('fiberMax: $fiberMax, ')
+          ..write('satFatMin: $satFatMin, ')
+          ..write('satFatMax: $satFatMax, ')
+          ..write('sugarMin: $sugarMin, ')
+          ..write('sugarMax: $sugarMax, ')
+          ..write('saltMin: $saltMin, ')
+          ..write('saltMax: $saltMax')
           ..write(')'))
         .toString();
   }
@@ -3056,6 +3344,14 @@ class Target extends DataClass implements Insertable<Target> {
     carbMax,
     fatMin,
     fatMax,
+    fiberMin,
+    fiberMax,
+    satFatMin,
+    satFatMax,
+    sugarMin,
+    sugarMax,
+    saltMin,
+    saltMax,
   );
   @override
   bool operator ==(Object other) =>
@@ -3069,7 +3365,15 @@ class Target extends DataClass implements Insertable<Target> {
           other.carbMin == this.carbMin &&
           other.carbMax == this.carbMax &&
           other.fatMin == this.fatMin &&
-          other.fatMax == this.fatMax);
+          other.fatMax == this.fatMax &&
+          other.fiberMin == this.fiberMin &&
+          other.fiberMax == this.fiberMax &&
+          other.satFatMin == this.satFatMin &&
+          other.satFatMax == this.satFatMax &&
+          other.sugarMin == this.sugarMin &&
+          other.sugarMax == this.sugarMax &&
+          other.saltMin == this.saltMin &&
+          other.saltMax == this.saltMax);
 }
 
 class TargetsCompanion extends UpdateCompanion<Target> {
@@ -3082,6 +3386,14 @@ class TargetsCompanion extends UpdateCompanion<Target> {
   final Value<double?> carbMax;
   final Value<double?> fatMin;
   final Value<double?> fatMax;
+  final Value<double?> fiberMin;
+  final Value<double?> fiberMax;
+  final Value<double?> satFatMin;
+  final Value<double?> satFatMax;
+  final Value<double?> sugarMin;
+  final Value<double?> sugarMax;
+  final Value<double?> saltMin;
+  final Value<double?> saltMax;
   const TargetsCompanion({
     this.weekday = const Value.absent(),
     this.kcalMin = const Value.absent(),
@@ -3092,6 +3404,14 @@ class TargetsCompanion extends UpdateCompanion<Target> {
     this.carbMax = const Value.absent(),
     this.fatMin = const Value.absent(),
     this.fatMax = const Value.absent(),
+    this.fiberMin = const Value.absent(),
+    this.fiberMax = const Value.absent(),
+    this.satFatMin = const Value.absent(),
+    this.satFatMax = const Value.absent(),
+    this.sugarMin = const Value.absent(),
+    this.sugarMax = const Value.absent(),
+    this.saltMin = const Value.absent(),
+    this.saltMax = const Value.absent(),
   });
   TargetsCompanion.insert({
     this.weekday = const Value.absent(),
@@ -3103,6 +3423,14 @@ class TargetsCompanion extends UpdateCompanion<Target> {
     this.carbMax = const Value.absent(),
     this.fatMin = const Value.absent(),
     this.fatMax = const Value.absent(),
+    this.fiberMin = const Value.absent(),
+    this.fiberMax = const Value.absent(),
+    this.satFatMin = const Value.absent(),
+    this.satFatMax = const Value.absent(),
+    this.sugarMin = const Value.absent(),
+    this.sugarMax = const Value.absent(),
+    this.saltMin = const Value.absent(),
+    this.saltMax = const Value.absent(),
   });
   static Insertable<Target> custom({
     Expression<int>? weekday,
@@ -3114,6 +3442,14 @@ class TargetsCompanion extends UpdateCompanion<Target> {
     Expression<double>? carbMax,
     Expression<double>? fatMin,
     Expression<double>? fatMax,
+    Expression<double>? fiberMin,
+    Expression<double>? fiberMax,
+    Expression<double>? satFatMin,
+    Expression<double>? satFatMax,
+    Expression<double>? sugarMin,
+    Expression<double>? sugarMax,
+    Expression<double>? saltMin,
+    Expression<double>? saltMax,
   }) {
     return RawValuesInsertable({
       if (weekday != null) 'weekday': weekday,
@@ -3125,6 +3461,14 @@ class TargetsCompanion extends UpdateCompanion<Target> {
       if (carbMax != null) 'carb_max': carbMax,
       if (fatMin != null) 'fat_min': fatMin,
       if (fatMax != null) 'fat_max': fatMax,
+      if (fiberMin != null) 'fiber_min': fiberMin,
+      if (fiberMax != null) 'fiber_max': fiberMax,
+      if (satFatMin != null) 'sat_fat_min': satFatMin,
+      if (satFatMax != null) 'sat_fat_max': satFatMax,
+      if (sugarMin != null) 'sugar_min': sugarMin,
+      if (sugarMax != null) 'sugar_max': sugarMax,
+      if (saltMin != null) 'salt_min': saltMin,
+      if (saltMax != null) 'salt_max': saltMax,
     });
   }
 
@@ -3138,6 +3482,14 @@ class TargetsCompanion extends UpdateCompanion<Target> {
     Value<double?>? carbMax,
     Value<double?>? fatMin,
     Value<double?>? fatMax,
+    Value<double?>? fiberMin,
+    Value<double?>? fiberMax,
+    Value<double?>? satFatMin,
+    Value<double?>? satFatMax,
+    Value<double?>? sugarMin,
+    Value<double?>? sugarMax,
+    Value<double?>? saltMin,
+    Value<double?>? saltMax,
   }) {
     return TargetsCompanion(
       weekday: weekday ?? this.weekday,
@@ -3149,6 +3501,14 @@ class TargetsCompanion extends UpdateCompanion<Target> {
       carbMax: carbMax ?? this.carbMax,
       fatMin: fatMin ?? this.fatMin,
       fatMax: fatMax ?? this.fatMax,
+      fiberMin: fiberMin ?? this.fiberMin,
+      fiberMax: fiberMax ?? this.fiberMax,
+      satFatMin: satFatMin ?? this.satFatMin,
+      satFatMax: satFatMax ?? this.satFatMax,
+      sugarMin: sugarMin ?? this.sugarMin,
+      sugarMax: sugarMax ?? this.sugarMax,
+      saltMin: saltMin ?? this.saltMin,
+      saltMax: saltMax ?? this.saltMax,
     );
   }
 
@@ -3182,6 +3542,30 @@ class TargetsCompanion extends UpdateCompanion<Target> {
     if (fatMax.present) {
       map['fat_max'] = Variable<double>(fatMax.value);
     }
+    if (fiberMin.present) {
+      map['fiber_min'] = Variable<double>(fiberMin.value);
+    }
+    if (fiberMax.present) {
+      map['fiber_max'] = Variable<double>(fiberMax.value);
+    }
+    if (satFatMin.present) {
+      map['sat_fat_min'] = Variable<double>(satFatMin.value);
+    }
+    if (satFatMax.present) {
+      map['sat_fat_max'] = Variable<double>(satFatMax.value);
+    }
+    if (sugarMin.present) {
+      map['sugar_min'] = Variable<double>(sugarMin.value);
+    }
+    if (sugarMax.present) {
+      map['sugar_max'] = Variable<double>(sugarMax.value);
+    }
+    if (saltMin.present) {
+      map['salt_min'] = Variable<double>(saltMin.value);
+    }
+    if (saltMax.present) {
+      map['salt_max'] = Variable<double>(saltMax.value);
+    }
     return map;
   }
 
@@ -3196,7 +3580,15 @@ class TargetsCompanion extends UpdateCompanion<Target> {
           ..write('carbMin: $carbMin, ')
           ..write('carbMax: $carbMax, ')
           ..write('fatMin: $fatMin, ')
-          ..write('fatMax: $fatMax')
+          ..write('fatMax: $fatMax, ')
+          ..write('fiberMin: $fiberMin, ')
+          ..write('fiberMax: $fiberMax, ')
+          ..write('satFatMin: $satFatMin, ')
+          ..write('satFatMax: $satFatMax, ')
+          ..write('sugarMin: $sugarMin, ')
+          ..write('sugarMax: $sugarMax, ')
+          ..write('saltMin: $saltMin, ')
+          ..write('saltMax: $saltMax')
           ..write(')'))
         .toString();
   }
@@ -6811,6 +7203,14 @@ typedef $$TargetsTableCreateCompanionBuilder =
       Value<double?> carbMax,
       Value<double?> fatMin,
       Value<double?> fatMax,
+      Value<double?> fiberMin,
+      Value<double?> fiberMax,
+      Value<double?> satFatMin,
+      Value<double?> satFatMax,
+      Value<double?> sugarMin,
+      Value<double?> sugarMax,
+      Value<double?> saltMin,
+      Value<double?> saltMax,
     });
 typedef $$TargetsTableUpdateCompanionBuilder =
     TargetsCompanion Function({
@@ -6823,6 +7223,14 @@ typedef $$TargetsTableUpdateCompanionBuilder =
       Value<double?> carbMax,
       Value<double?> fatMin,
       Value<double?> fatMax,
+      Value<double?> fiberMin,
+      Value<double?> fiberMax,
+      Value<double?> satFatMin,
+      Value<double?> satFatMax,
+      Value<double?> sugarMin,
+      Value<double?> sugarMax,
+      Value<double?> saltMin,
+      Value<double?> saltMax,
     });
 
 class $$TargetsTableFilterComposer
@@ -6876,6 +7284,46 @@ class $$TargetsTableFilterComposer
 
   ColumnFilters<double> get fatMax => $composableBuilder(
     column: $table.fatMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get fiberMin => $composableBuilder(
+    column: $table.fiberMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get fiberMax => $composableBuilder(
+    column: $table.fiberMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get satFatMin => $composableBuilder(
+    column: $table.satFatMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get satFatMax => $composableBuilder(
+    column: $table.satFatMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get sugarMin => $composableBuilder(
+    column: $table.sugarMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get sugarMax => $composableBuilder(
+    column: $table.sugarMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get saltMin => $composableBuilder(
+    column: $table.saltMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get saltMax => $composableBuilder(
+    column: $table.saltMax,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6933,6 +7381,46 @@ class $$TargetsTableOrderingComposer
     column: $table.fatMax,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get fiberMin => $composableBuilder(
+    column: $table.fiberMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get fiberMax => $composableBuilder(
+    column: $table.fiberMax,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get satFatMin => $composableBuilder(
+    column: $table.satFatMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get satFatMax => $composableBuilder(
+    column: $table.satFatMax,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get sugarMin => $composableBuilder(
+    column: $table.sugarMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get sugarMax => $composableBuilder(
+    column: $table.sugarMax,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get saltMin => $composableBuilder(
+    column: $table.saltMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get saltMax => $composableBuilder(
+    column: $table.saltMax,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TargetsTableAnnotationComposer
@@ -6974,6 +7462,30 @@ class $$TargetsTableAnnotationComposer
 
   GeneratedColumn<double> get fatMax =>
       $composableBuilder(column: $table.fatMax, builder: (column) => column);
+
+  GeneratedColumn<double> get fiberMin =>
+      $composableBuilder(column: $table.fiberMin, builder: (column) => column);
+
+  GeneratedColumn<double> get fiberMax =>
+      $composableBuilder(column: $table.fiberMax, builder: (column) => column);
+
+  GeneratedColumn<double> get satFatMin =>
+      $composableBuilder(column: $table.satFatMin, builder: (column) => column);
+
+  GeneratedColumn<double> get satFatMax =>
+      $composableBuilder(column: $table.satFatMax, builder: (column) => column);
+
+  GeneratedColumn<double> get sugarMin =>
+      $composableBuilder(column: $table.sugarMin, builder: (column) => column);
+
+  GeneratedColumn<double> get sugarMax =>
+      $composableBuilder(column: $table.sugarMax, builder: (column) => column);
+
+  GeneratedColumn<double> get saltMin =>
+      $composableBuilder(column: $table.saltMin, builder: (column) => column);
+
+  GeneratedColumn<double> get saltMax =>
+      $composableBuilder(column: $table.saltMax, builder: (column) => column);
 }
 
 class $$TargetsTableTableManager
@@ -7013,6 +7525,14 @@ class $$TargetsTableTableManager
                 Value<double?> carbMax = const Value.absent(),
                 Value<double?> fatMin = const Value.absent(),
                 Value<double?> fatMax = const Value.absent(),
+                Value<double?> fiberMin = const Value.absent(),
+                Value<double?> fiberMax = const Value.absent(),
+                Value<double?> satFatMin = const Value.absent(),
+                Value<double?> satFatMax = const Value.absent(),
+                Value<double?> sugarMin = const Value.absent(),
+                Value<double?> sugarMax = const Value.absent(),
+                Value<double?> saltMin = const Value.absent(),
+                Value<double?> saltMax = const Value.absent(),
               }) => TargetsCompanion(
                 weekday: weekday,
                 kcalMin: kcalMin,
@@ -7023,6 +7543,14 @@ class $$TargetsTableTableManager
                 carbMax: carbMax,
                 fatMin: fatMin,
                 fatMax: fatMax,
+                fiberMin: fiberMin,
+                fiberMax: fiberMax,
+                satFatMin: satFatMin,
+                satFatMax: satFatMax,
+                sugarMin: sugarMin,
+                sugarMax: sugarMax,
+                saltMin: saltMin,
+                saltMax: saltMax,
               ),
           createCompanionCallback:
               ({
@@ -7035,6 +7563,14 @@ class $$TargetsTableTableManager
                 Value<double?> carbMax = const Value.absent(),
                 Value<double?> fatMin = const Value.absent(),
                 Value<double?> fatMax = const Value.absent(),
+                Value<double?> fiberMin = const Value.absent(),
+                Value<double?> fiberMax = const Value.absent(),
+                Value<double?> satFatMin = const Value.absent(),
+                Value<double?> satFatMax = const Value.absent(),
+                Value<double?> sugarMin = const Value.absent(),
+                Value<double?> sugarMax = const Value.absent(),
+                Value<double?> saltMin = const Value.absent(),
+                Value<double?> saltMax = const Value.absent(),
               }) => TargetsCompanion.insert(
                 weekday: weekday,
                 kcalMin: kcalMin,
@@ -7045,6 +7581,14 @@ class $$TargetsTableTableManager
                 carbMax: carbMax,
                 fatMin: fatMin,
                 fatMax: fatMax,
+                fiberMin: fiberMin,
+                fiberMax: fiberMax,
+                satFatMin: satFatMin,
+                satFatMax: satFatMax,
+                sugarMin: sugarMin,
+                sugarMax: sugarMax,
+                saltMin: saltMin,
+                saltMax: saltMax,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

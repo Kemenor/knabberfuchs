@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/enums.dart';
+import '../../domain/nutrition.dart' show decodeMicros, encodeMicros;
 import '../../domain/recipe_share.dart';
 import '../db/database.dart';
 import 'diary_repository.dart';
@@ -32,6 +33,7 @@ class RecipeRepository {
           protein100: i.sProtein100,
           carb100: i.sCarb100,
           fat100: i.sFat100,
+          micros100: decodeMicros(i.sMicrosJson),
         ),
     ],
   );
@@ -53,6 +55,7 @@ class RecipeRepository {
             sProtein100: Value(items[idx].protein100),
             sCarb100: Value(items[idx].carb100),
             sFat100: Value(items[idx].fat100),
+            sMicrosJson: Value(encodeMicros(items[idx].micros100 ?? const {})),
             sortIndex: Value(idx),
           ),
       ],
@@ -78,6 +81,7 @@ class RecipeRepository {
             sProtein100: Value(items[idx].protein100),
             sCarb100: Value(items[idx].carb100),
             sFat100: Value(items[idx].fat100),
+            sMicrosJson: Value(encodeMicros(items[idx].micros100 ?? const {})),
             sortIndex: Value(idx),
           ),
       ],
@@ -114,6 +118,7 @@ class RecipeRepository {
           protein100: item.protein100,
           carb100: item.carb100,
           fat100: item.fat100,
+          microsJson: encodeMicros(item.micros100 ?? const {}),
           grams: g,
           meal: meal,
           day: day,

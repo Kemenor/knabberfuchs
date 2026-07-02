@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/day_summary.dart' show snapshotMicros100;
 import '../../domain/enums.dart';
+import '../../domain/nutrition.dart' show encodeMicros;
 import '../db/database.dart';
 
 /// Reads/writes the daily diary. Every log captures a per-100g nutrition
@@ -37,7 +39,10 @@ class DiaryRepository {
           sProtein100: Value(food.protein100),
           sCarb100: Value(food.carb100),
           sFat100: Value(food.fat100),
-          sMicrosJson: Value(food.microsJson),
+          // Open micros + the tracked nutrients (fiber/satFat/sugar/salt)
+          // from the food's typed columns — snapshotted like the macros so
+          // later food edits never rewrite history.
+          sMicrosJson: Value(encodeMicros(snapshotMicros100(food))),
         ),
       );
       await db.bumpFoodUsage(food.id);

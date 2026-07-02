@@ -9,6 +9,7 @@ import '../../core/food_icon.dart';
 import '../../core/format.dart';
 import '../../core/status_color.dart';
 import '../../domain/day_summary.dart';
+import '../../domain/nutrition.dart' show decodeMicros;
 import '../../domain/enums.dart';
 import '../../domain/meal_type_i18n.dart';
 import '../../domain/meal_times.dart';
@@ -623,6 +624,7 @@ class _GroupSection extends ConsumerWidget {
                 protein100: e.entry.sProtein100,
                 carb100: e.entry.sCarb100,
                 fat100: e.entry.sFat100,
+                micros100: decodeMicros(e.entry.sMicrosJson),
               ),
           ],
         );
