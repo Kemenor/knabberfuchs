@@ -1,6 +1,25 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:calorie_tracker/data/db/database.dart';
 import 'package:calorie_tracker/data/sources/swiss_seed.dart';
 import 'package:calorie_tracker/domain/enums.dart';
+import 'package:drift/native.dart';
+import 'package:flutter/services.dart' show CachingAssetBundle;
 import 'package:flutter_test/flutter_test.dart';
+
+/// Serves the real on-disk asset the way release builds can: as a ByteData
+/// *view* at a nonzero offset into a larger buffer (with trailing bytes). This
+/// reproduces the once-shipped regression where ignoring offset/length handed
+/// gzip trailing garbage and seeding silently failed.
+class _OffsetFileBundle extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) async {
+    final bytes = File(key).readAsBytesSync();
+    final padded = Uint8List(bytes.length + 32)..setAll(16, bytes);
+    return ByteData.view(padded.buffer, 16, bytes.length);
+  }
+}
 
 void main() {
   group('parseSwissCsv', () {
@@ -67,6 +86,38 @@ void main() {
       expect(f.kcal100.value, 0);
       expect(f.protein100.value, isNull);
       expect(f.fiber100.value, isNull);
+    });
+  });
+
+  group('seedSwissIfNeeded (real asset)', () {
+    late AppDatabase db;
+
+    setUp(() => db = AppDatabase(NativeDatabase.memory()));
+    tearDown(() => db.close());
+
+    test('imports the full bundled dataset from an offset ByteData view',
+        () async {
+      final imported = await seedSwissIfNeeded(db, bundle: _OffsetFileBundle());
+      expect(imported, 1190);
+
+      final foods = await db.select(db.foods).get();
+      expect(foods.length, 1190);
+      expect(foods.every((f) => f.source == FoodSource.swissFcdb), isTrue);
+
+      // A known row survives the whole pipeline (gzip -> CSV -> insert).
+      final almond = foods.singleWhere((f) => f.externalId == '273');
+      expect(almond.name, 'Almond');
+      expect(almond.nameDe, 'Mandel');
+      expect(almond.nameIt, 'Mandorle');
+      expect(almond.kcal100, 624);
+      expect(almond.fat100, 52.1);
+      expect(almond.servingG, 30);
+      expect(almond.servingLabel, 'handful');
+      expect(almond.sodiumMg100, isNull);
+
+      // Idempotent within a dataset version: a second call is a no-op.
+      expect(await seedSwissIfNeeded(db, bundle: _OffsetFileBundle()), 0);
+      expect((await db.select(db.foods).get()).length, 1190);
     });
   });
 }

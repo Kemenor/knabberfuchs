@@ -12,7 +12,7 @@ const _assetPath = 'assets/swiss_foods.csv.gz';
 const _versionKey = 'swissDatasetVersion';
 
 /// Bump whenever assets/swiss_foods.csv.gz changes so existing installs
-/// re-import. v5: ~290 foods with portions/densities (curate+verify pass).
+/// re-import. v5: ~1190 foods with portions/densities (curate+verify pass).
 /// v4: liquid densities + more portions. v3: portions. v2: Italian names.
 const swissDatasetVersion = '5';
 
