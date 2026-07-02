@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/support_email.dart';
+import '../../data/backup.dart';
 import '../../domain/enums.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/meal_type_i18n.dart';
@@ -270,6 +271,10 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
   try {
     await ref.read(backupServiceProvider).restoreFromZip(file.path);
     messenger.showAutoSnackBar(SnackBar(content: Text(l10n.backupRestored)));
+  } on BackupVersionException {
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.backupImportNewerVersion)),
+    );
   } catch (e) {
     messenger.showAutoSnackBar(
       SnackBar(content: Text(l10n.backupImportFailed('$e'))),

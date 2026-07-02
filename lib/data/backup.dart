@@ -15,6 +15,18 @@ import 'db/database.dart';
 /// `usageCount`/`lastUsedAt` columns.
 const backupSchemaVersion = 2;
 
+/// Thrown when a backup was written by a newer app version than this build
+/// can read. A [FormatException] subtype so generic format handling still
+/// applies, while the import UI can catch it specifically and show a
+/// localized "update the app" message instead of the raw exception text.
+class BackupVersionException extends FormatException {
+  BackupVersionException(int version)
+    : super(
+        'Backup schema version $version is newer than this app supports '
+        '(max $backupSchemaVersion). Update the app, then import again.',
+      );
+}
+
 /// Settings that hold credentials (currently the Gemini API key; see
 /// `geminiKeySetting` in providers.dart). The backup ZIP is unencrypted and
 /// goes through the share sheet, so these are stripped from the export, never
@@ -190,14 +202,11 @@ String buildEntriesCsv(List<Entry> entries) {
 ///
 /// Honors the map's `schemaVersion`: v1 exports are migrated on the fly
 /// (mirroring the DB v2 migration), and an export written by a *newer* app is
-/// rejected with a [FormatException] before anything is touched.
+/// rejected with a [BackupVersionException] before anything is touched.
 Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
   final version = (map['schemaVersion'] as num?)?.toInt() ?? 1;
   if (version > backupSchemaVersion) {
-    throw FormatException(
-      'Backup schema version $version is newer than this app supports '
-      '(max $backupSchemaVersion). Update the app, then import again.',
-    );
+    throw BackupVersionException(version);
   }
   await db.transaction(() async {
     await db.delete(db.entries).go();

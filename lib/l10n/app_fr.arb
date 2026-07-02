@@ -158,6 +158,7 @@
   "backupReplaceBody": "L'import remplacera vos entrées actuelles, aliments personnalisés, recettes, objectifs et réglages par le contenu de la sauvegarde.",
   "backupRestored": "Sauvegarde restaurée.",
   "backupImportFailed": "Échec de l'import : {error}",
+  "backupImportNewerVersion": "Cette sauvegarde a été créée par une version plus récente de l'app. Mettez à jour l'app, puis réessayez l'import.",
 
   "amountLabel": "Quantité",
   "editEntryTitle": "Modifier l'entrée",

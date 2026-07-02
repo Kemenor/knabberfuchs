@@ -158,6 +158,7 @@
   "backupReplaceBody": "Beim Import werden deine aktuellen Einträge, eigenen Lebensmittel, Rezepte, Ziele und Einstellungen durch den Backup-Inhalt ersetzt.",
   "backupRestored": "Backup wiederhergestellt.",
   "backupImportFailed": "Import fehlgeschlagen: {error}",
+  "backupImportNewerVersion": "Dieses Backup stammt aus einer neueren App-Version. Aktualisiere die App und importiere es dann erneut.",
 
   "amountLabel": "Menge",
   "editEntryTitle": "Eintrag bearbeiten",
