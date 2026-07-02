@@ -376,23 +376,35 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   drives all four metrics: `DaySummary.barFractionFor(TargetMetric)` returns the
   0..1 fill or `null` (→ no bar). Live: the kcal bar + per-macro under-bars in
   `day_screen.dart` (`_SummaryCard` / `_MacroRow`).
-- **The Day card shows every metric at once — no toggle.** kcal headline + bar,
-  then the P/C/F row where each macro *with a target* gains a thin
-  status-colored under-bar and a status-colored value; targetless macros stay
-  plain text (mirrors the optional kcal bar, so a calorie-only card is
-  unchanged).
+- **The Day card shows every enabled metric at once — no toggle.** kcal
+  headline + bar, then the enabled nutrients (Phase 15: user-configurable,
+  P/C/F by default) as metric tiles that **wrap into rows of 3** (`_MacroRow`;
+  short rows keep empty thirds for column alignment). Each metric *with a
+  target* gains a thin status-colored under-bar and a status-colored value;
+  targetless metrics stay plain text, so a calorie-only card is unchanged.
 - **Macro value + under-bar fill = `statusColor(context, status)`** (in-range
   emerald, off-target amber, never red). The **kcal hero bar is the structural
   indigo (`secondary`)** progress track — status is carried by the value/text +
   the macro bars, not the kcal bar.
-- **Metric switching belongs on the chart, not the Day card.** Trends carries a
-  `SegmentedButton<TargetMetric>` (kcal · P · C · F) that swaps the plotted
-  series + target band; selection is in-memory (`selectedTrendMetricProvider`,
-  defaults to kcal). Values format per metric (kcal vs `g`).
-- **Targets get their own screen** (`settings/targets_screen.dart`), pushed from
-  a Settings `ListTile`. Metric-first (Calories / Protein / Carbohydrates /
-  Fat); each metric has an always-visible default Min/Max row + an independently
-  expandable per-weekday `ExpansionTile`. Every bound is optional.
+- **Budget adjustments are explained, never silent** (Phase 16): when active
+  energy shifts the kcal band, a muted `outline`-colored "⚡ +N kcal from
+  activity" line sits under the target text, and Trends carries a muted note
+  that its band stays static.
+- **Metric switching belongs on the chart, not the Day card.** Trends uses a
+  **horizontally scrollable single-select `ChoiceChip` row** (kcal + the
+  enabled nutrients — replaced the fixed 4-slot `SegmentedButton` when the
+  metric list became user-configurable). Selection is in-memory
+  (`selectedTrendMetricProvider`, defaults to kcal; a since-disabled selection
+  falls back to kcal). Values format per metric (kcal vs `g`).
+- **Feature-set toggles are a `FilterChip` `Wrap`** (new pattern, Phase 15):
+  the "Tracked nutrients" chip row atop the Targets screen — checkmarked
+  selected chips, toggling reveals/hides the dependent blocks live, disabling
+  never deletes the underlying values.
+- **Targets get their own screen** (`settings/targets_screen.dart`), pushed
+  from a Settings `ListTile`. Metric-first, blocks generated from kcal + the
+  enabled set; each metric has an always-visible default Min/Max row + an
+  independently expandable per-weekday `ExpansionTile`. Every bound is
+  optional.
 
 ---
 
