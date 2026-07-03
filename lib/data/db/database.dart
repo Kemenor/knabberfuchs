@@ -25,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -161,6 +161,53 @@ class AppDatabase extends _$AppDatabase {
           )
           WHERE food_id IS NOT NULL
             AND EXISTS (SELECT 1 FROM foods f WHERE f.id = entries.food_id)
+        ''');
+      }
+      if (from < 13) {
+        // The v12 backfill reached only entries still linked to a catalog
+        // food. Snapshot-only rows — recipe items (never had a food FK) and
+        // recipe-logged entries (food_id is NULL by design) — kept reading 0
+        // for the tracked nutrients, and re-logging a pre-v12 recipe kept
+        // producing micro-less entries forever (found via a tester's Health
+        // Connect resync, 2026-07-03). Re-link them heuristically: exactly
+        // one catalog food whose name (any locale — s_name is written from
+        // localizedName at log/recipe-build time) and kcal100 both match the
+        // snapshot. Additive only: json_patch(food, existing) lets keys
+        // already in the snapshot win, unlike v12 where none could exist.
+        String foodMicrosJson(String table) =>
+            '''
+          (SELECT json_patch(json_patch(json_patch(
+              CASE WHEN f.fiber100 IS NOT NULL
+                THEN json_object('fiber', f.fiber100) ELSE '{}' END,
+              CASE WHEN f.sat_fat100 IS NOT NULL
+                THEN json_object('satFat', f.sat_fat100) ELSE '{}' END),
+              CASE WHEN f.sugar100 IS NOT NULL
+                THEN json_object('sugar', f.sugar100) ELSE '{}' END),
+              CASE WHEN f.salt_g100 IS NOT NULL
+                THEN json_object('salt', f.salt_g100) ELSE '{}' END)
+           FROM foods f
+           WHERE $table.s_name IN (f.name, f.name_de, f.name_fr, f.name_it)
+             AND f.kcal100 = $table.s_kcal100)
+        ''';
+        String uniqueMatch(String table) =>
+            '''
+          (SELECT COUNT(*) FROM foods f
+           WHERE $table.s_name IN (f.name, f.name_de, f.name_fr, f.name_it)
+             AND f.kcal100 = $table.s_kcal100) = 1
+        ''';
+        await customStatement('''
+          UPDATE recipe_items SET s_micros_json = json_patch(
+            ${foodMicrosJson('recipe_items')},
+            COALESCE(s_micros_json, '{}')
+          )
+          WHERE ${uniqueMatch('recipe_items')}
+        ''');
+        await customStatement('''
+          UPDATE entries SET s_micros_json = json_patch(
+            ${foodMicrosJson('entries')},
+            COALESCE(s_micros_json, '{}')
+          )
+          WHERE food_id IS NULL AND ${uniqueMatch('entries')}
         ''');
       }
     },
