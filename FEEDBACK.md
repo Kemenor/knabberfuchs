@@ -222,3 +222,28 @@ tracks tester-driven changes specifically.
   is the inverse of split: entries move to the end of the target (adopting its day and
   meal type), then the emptied source group is deleted. Tests in
   `test/diary_mutations_test.dart`.
+
+## Feedback (2026-07-03)
+
+- ⏳ **Text-only AI guess (no photo)** — QUEUED 2026-07-03. Estimate a meal from a
+  typed description alone ("two slices of rye bread with butter and honey, large
+  coffee with milk") — for meals with no photo opportunity: already eaten,
+  restaurant courses, or anything a camera can't capture well.
+  - **Most of the plumbing exists:** `GeminiService.recognizeFood`
+    (`lib/data/ml/gemini_service.dart:75`) already sends a prompt + image and
+    parses a structured name/kcal/portion result, and the photo path already
+    carries an optional user hint (`buildGeminiPrompt`, `:19-27`). A text-only
+    variant is the same call minus the image part, with a prompt built around the
+    description as the primary signal instead of a refinement.
+  - **Cloud-only by nature:** the on-device classifier is image-in
+    (`lib/data/ml/food_classifier.dart`), so text-only rides the optional Gemini
+    key exactly like the existing cloud path — keyless users get the existing
+    key nudge, keyless-by-default ethos untouched.
+  - **Logging:** result lands as a snapshot entry (`logSnapshot`), same as the
+    photo guess — no catalog row, no barcode.
+  - **📝 decision:** entry point. Options: (a) a third action in the add-food
+    surface next to scan/photo (bottom sheet of labelled tiles per
+    `DESIGN_SYSTEM.md`), (b) reachable from the photo flow ("no photo? describe
+    it instead"), (c) both. Also: reuse the hint sheet
+    (`recognize_food_flow.dart:184`) as the input UI or a dedicated sheet with
+    examples/placeholder copy. l10n ×4 either way.
