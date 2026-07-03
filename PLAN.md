@@ -558,6 +558,16 @@ Strategy:
     harness case → S3 enabled-set provider + Targets-screen chips → S4 Day-card wrap
     → S5 Trends chips → S6 HC pass-through → S7 l10n (4 nutrients × labels ×4
     locales) + goldens (default state unchanged ⇒ existing goldens should hold).
+  - **Follow-up (v13, built 2026-07-03):** the v12 backfill skipped snapshot-only
+    rows, so pre-v12 **recipe items** and **recipe-logged entries** (no `foodId` by
+    design) kept reading 0 for the tracked nutrients — and re-logging an old recipe
+    kept producing micro-less entries (found via a tester's HC resync showing only
+    energy+P/C/F). The v13 migration re-links them heuristically: exactly one
+    catalog food whose name (any of the four locale columns — `sName` is written
+    from `localizedName`) **and** `kcal100` match the snapshot; additive-only
+    (`json_patch(food, existing)` — existing snapshot keys win), ambiguous or
+    edited-since foods are skipped. Health Connect picks the healed history up on
+    the next "Resync all days".
 
 - **Phase 16 — Health Connect energy read-back ("eat back your exercise"):**
   ✅ BUILT 2026-07-02 (commits `ac0f776`…`42105ed`; grilled the same day — from
