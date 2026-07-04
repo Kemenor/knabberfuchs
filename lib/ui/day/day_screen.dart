@@ -22,6 +22,7 @@ import '../food/log_food_sheet.dart';
 import '../food/quick_add_sheet.dart';
 import '../food/recognize_food_flow.dart';
 import '../recipes/ocr_meal_screen.dart';
+import 'meal_detail_screen.dart';
 import 'merge_meal_sheet.dart';
 import 'scale_meal_sheet.dart';
 import 'split_meal_sheet.dart';
@@ -555,9 +556,19 @@ class _GroupSection extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '${kcalStr(group.subtotal.kcal)} kcal',
-                        style: theme.textTheme.bodySmall,
+                      // Fast path to the read-only breakdown page; the ⋮ menu
+                      // carries the discoverable "Meal details" entry.
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => _openDetails(context),
+                        child: Semantics(
+                          button: true,
+                          hint: l10n.mealMenuDetails,
+                          child: Text(
+                            '${kcalStr(group.subtotal.kcal)} kcal',
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -568,6 +579,8 @@ class _GroupSection extends ConsumerWidget {
                 icon: const Icon(Symbols.more_vert_rounded, size: 20),
                 onSelected: (v) {
                   switch (v) {
+                    case 'details':
+                      _openDetails(context);
                     case 'edit':
                       _editMeal(context, ref);
                     case 'scale':
@@ -583,6 +596,10 @@ class _GroupSection extends ConsumerWidget {
                   }
                 },
                 itemBuilder: (_) => [
+                  PopupMenuItem(
+                    value: 'details',
+                    child: Text(l10n.mealMenuDetails),
+                  ),
                   PopupMenuItem(value: 'edit', child: Text(l10n.mealMenuEdit)),
                   PopupMenuItem(
                     value: 'scale',
@@ -633,6 +650,28 @@ class _GroupSection extends ConsumerWidget {
             ],
           ),
         ),
+        // Opt-in compact nutrient subtotals (tester request 2026-07-03).
+        // Part of the header, so it stays visible while collapsed — same
+        // rule as the kcal subtotal. Follows the enabled tracked set.
+        if (ref.watch(mealHeaderNutrientsProvider).asData?.value ?? false)
+          Builder(
+            builder: (context) {
+              final enabled =
+                  ref.watch(trackedNutrientsProvider).asData?.value ??
+                  defaultTrackedNutrients;
+              final line = nutrientLine(l10n, group.subtotal, enabled);
+              if (line.isEmpty) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                child: Text(
+                  line,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
+              );
+            },
+          ),
         if (!isCollapsed)
           for (var i = 0; i < group.items.length; i++) ...[
             if (i > 0)
@@ -642,6 +681,12 @@ class _GroupSection extends ConsumerWidget {
         const SizedBox(height: 4),
       ],
       ),
+    );
+  }
+
+  void _openDetails(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => MealDetailScreen(groupId: group.id)),
     );
   }
 

@@ -236,6 +236,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealMenuDelete => 'Delete meal';
 
   @override
+  String get mealMenuDetails => 'Meal details';
+
+  @override
+  String get settingsShowMealNutrients => 'Show nutrients per meal';
+
+  @override
+  String get settingsShowMealNutrientsSub =>
+      'Adds your tracked nutrients to each meal header';
+
+  @override
+  String get metricShortProtein => 'P';
+
+  @override
+  String get metricShortCarb => 'C';
+
+  @override
+  String get metricShortFat => 'F';
+
+  @override
+  String get metricShortFiber => 'Fib';
+
+  @override
+  String get metricShortSatFat => 'SatF';
+
+  @override
+  String get metricShortSugar => 'Sug';
+
+  @override
+  String get metricShortSalt => 'Salt';
+
+  @override
   String get mealFinish => 'Finish meal';
 
   @override
