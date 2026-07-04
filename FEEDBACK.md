@@ -131,15 +131,27 @@ tracks tester-driven changes specifically.
 
 ## Product questions (2026-07-02)
 
-- 📝 **Remove on-device photo recognition entirely?** — no decision yet. Feedback on
-  the local model is mediocre (weak on drinks/portions even after the a7eb950
-  improvements), and it was deliberately dropped from the store screenshot set for
-  that reason (2026-07-02). Options: (a) keep as-is (keyless default, manage
-  expectations), (b) remove local → photo feature exists only with a user Gemini key
-  (tension: "keyless by default" ethos and the feature vanishing for keyless users),
-  (c) keep local but stop pre-selling it anywhere. Deserves its own grill — touches
-  ethos, the 21 MB bundled model (APK size win if removed), `food_classifier.dart`,
-  and the capture UX copy.
+- ✅ **Remove on-device photo recognition entirely?** — DECIDED 2026-07-03 (grilled;
+  build pending). Feedback on the local model was uniformly negative (weak on
+  drinks/portions even after the a7eb950 improvements), and it was already dropped
+  from the store screenshot set (2026-07-02). **Decision: option (b) — remove the
+  local image model entirely.** Photo estimate becomes Gemini-only; keyless users
+  tapping it get the existing key nudge. Drops the 21 MB bundled model
+  (`food_classifier.dart` + assets, APK size win) and ends the expectation
+  management. The keyless-ethos tension is answered by the **local catalog
+  matcher** for typed input instead (see the text-only AI guess item, 2026-07-03):
+  keyless users keep an offline path whose numbers come from real food data, not
+  a weak model.
+  - **Small on-device text LLM was evaluated and rejected** (researched
+    2026-07-03): smallest viable text models via AI Edge/flutter_gemma are
+    Gemma 3 1B (~529 MB int4, wants ~4 GB RAM) — 25× the image model we're
+    removing — and the tiny tier (Gemma 3 270M / SmolLM 135M) only works
+    fine-tuned, i.e. a standing ML project (training data, 4-locale evals,
+    updates) with hallucinated-numbers risk. The catalog matcher beats both on
+    size, determinism and data quality for this task.
+  - **Ships together with the "Describe meal" feature** so the capture sheet and
+    its copy are reworked once and the changelog tells one story: model out,
+    text path in.
 
 ## Feedback (2026-07-01)
 
@@ -255,6 +267,14 @@ tracks tester-driven changes specifically.
     - **Input UI:** adapt `_GeminiHintSheet` (`recognize_food_flow.dart:184`)
       into an image-less mode — field required, example-description placeholder,
       button = Estimate. One widget, two modes. l10n ×4.
+    - **Keyless fallback: local catalog matcher** (grilled 2026-07-03, together
+      with the local-model removal above): without a Gemini key, the same
+      "Describe meal" input feeds the OCR-ingredient pipeline instead — parse
+      lines/quantities → `searchFoodsLocal` (synonyms + localized names +
+      `OcrMappings` memory) → per-line confirm pickers → logged as a group.
+      Deterministic, offline, 0 MB, real nutrition data. The key nudge then
+      up-sells the AI variant ("sharper, handles free-form descriptions")
+      rather than gating the whole tile.
 
 - ⏳ **Per-meal nutrition breakdown** — QUEUED 2026-07-03. "How much protein was
   breakfast?" currently requires mental math over the entry tiles — the group
