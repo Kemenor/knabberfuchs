@@ -273,3 +273,36 @@ tracks tester-driven changes specifically.
     detail page (header tap currently toggles collapse — likely a ⋮ entry
     "Meal details" or tapping the subtotal); read-only v1 or with entry
     actions. l10n ×4 either way.
+
+- ⏳ **Hidden debug menu (developer/tester tool)** — QUEUED 2026-07-03. A Debug
+  section in Settings, unlocked by an easter-egg gesture: **long-press the app
+  name in the About dialog** (`_AboutTile` → `showAboutDialog`,
+  `lib/ui/settings/settings_screen.dart:395-414`) to flip a `debugMenu` settings
+  key; the section then renders at the bottom of Settings until toggled off.
+  Not a user feature — no store-listing mention; English-only copy is acceptable
+  (breaks the l10n rule deliberately, DEBUG-labelled, off by default).
+  - **Clear all data:** wipe the DB (entries, groups, recipes, targets, custom
+    foods, settings, OCR mappings, packs) back to first-run. Destructive →
+    confirm dialog (Cancel → Confirm, red allowed here: destruction-only rule).
+    Decide whether it also calls `HealthService.deleteAll` so the health store
+    doesn't keep orphaned nutrition records.
+  - **Load test data:** seed a realistic multi-week demo diary (varied meals,
+    groups, a couple of recipes, custom foods, targets, some micros-rich and
+    micros-less rows) — makes Trends, backfills and goldens/screenshots
+    reviewable on an emulator without hand-logging. Could share its fixture with
+    the `integration_test/screenshots_test.dart` harness so demo data stays in
+    one place.
+  - **More candidates (pick freely):**
+    - **DB inspector line:** schema version, row counts per table, DB file size
+      — first question in any "my data looks wrong" report.
+    - **Export raw DB file** (share sheet) for desk debugging of tester reports.
+    - **Shift diary N days back:** age the whole diary to exercise Trends
+      windows, weekday targets and the day-navigation edges.
+    - **Fake activity kcal:** inject a pretend active-energy value so the
+      Phase 16 band shift is testable without a wearable/HC writer (the H6
+      verification pain point).
+    - **Health sync status:** enabled flags, permission probe result, last
+      `syncDay` outcome — HC failures are currently swallowed by design.
+  - **📝 decision:** does "Clear all data" graduate later into a proper
+    user-facing "Delete all my data" (privacy-friendly, matches the serverless
+    ethos) with full l10n — keeping the debug entry as the prototype?
