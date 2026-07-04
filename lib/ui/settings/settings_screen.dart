@@ -687,8 +687,9 @@ class _ThemePicker extends ConsumerWidget {
   }
 }
 
-/// Optional Google Gemini key (the user's own free-tier key) for cloud food
-/// recognition. Empty = the on-device classifier stays the default.
+/// Optional Google Gemini key (the user's own free-tier key) — unlocks the AI
+/// meal estimates (photo scan and text description). Keyless stays fully
+/// usable: search, barcode, OCR and the describe-meal catalog matcher.
 class _AiKeyTile extends ConsumerStatefulWidget {
   const _AiKeyTile();
   @override
@@ -699,7 +700,6 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   final _ctrl = TextEditingController();
   bool _obscure = true;
   bool _loaded = false;
-  bool _onDeviceOnly = false;
   String _model = 'gemini-2.5-flash';
 
   @override
@@ -713,9 +713,6 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
           _loaded = true;
         });
       }
-    });
-    db.getSetting(aiOnDeviceOnlySetting).then((v) {
-      if (mounted) setState(() => _onDeviceOnly = v == 'true');
     });
     db.getSetting(geminiModelSetting).then((v) {
       if (mounted && v != null) setState(() => _model = v);
@@ -800,60 +797,42 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               label: Text(l10n.aiKeyGet),
             ),
           ),
-          // Engine choice only matters once a key exists; until then every scan
-          // is on-device anyway.
+          // Model choice only matters once a key exists.
           if (_loaded && _ctrl.text.trim().isNotEmpty) ...[
+            const SizedBox(height: 4),
+            DropdownButtonFormField<String>(
+              initialValue: _model,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: l10n.aiModelLabel,
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: 'gemini-2.5-flash',
+                  child: Text(l10n.aiModelReliable),
+                ),
+                DropdownMenuItem(
+                  value: 'gemini-3.5-flash',
+                  child: Text(l10n.aiModelAccurate),
+                ),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() => _model = v);
+                ref.read(dbProvider).setSetting(geminiModelSetting, v);
+              },
+            ),
             Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.aiOnDeviceOnlyTitle),
-                subtitle: Text(l10n.aiOnDeviceOnlySubtitle),
-                value: _onDeviceOnly,
-                onChanged: (v) {
-                  setState(() => _onDeviceOnly = v);
-                  ref
-                      .read(dbProvider)
-                      .setSetting(aiOnDeviceOnlySetting, v ? 'true' : null);
-                },
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                l10n.aiModelNote,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
               ),
             ),
-            if (!_onDeviceOnly) ...[
-              const SizedBox(height: 4),
-              DropdownButtonFormField<String>(
-                initialValue: _model,
-                isExpanded: true,
-                decoration: InputDecoration(
-                  labelText: l10n.aiModelLabel,
-                  border: const OutlineInputBorder(),
-                  isDense: true,
-                ),
-                items: [
-                  DropdownMenuItem(
-                    value: 'gemini-2.5-flash',
-                    child: Text(l10n.aiModelReliable),
-                  ),
-                  DropdownMenuItem(
-                    value: 'gemini-3.5-flash',
-                    child: Text(l10n.aiModelAccurate),
-                  ),
-                ],
-                onChanged: (v) {
-                  if (v == null) return;
-                  setState(() => _model = v);
-                  ref.read(dbProvider).setSetting(geminiModelSetting, v);
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  l10n.aiModelNote,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.outline,
-                  ),
-                ),
-              ),
-            ],
           ],
         ],
       ),

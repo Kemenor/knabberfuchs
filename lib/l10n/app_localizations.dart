@@ -1290,28 +1290,10 @@ abstract class AppLocalizations {
   /// **'Take a photo'**
   String get recognizeTakePhoto;
 
-  /// Header above the photo-recognition guesses
+  /// Hint suggesting a Gemini API key to unlock the AI estimate features
   ///
   /// In en, this message translates to:
-  /// **'Looks like…'**
-  String get recognizeLooksLike;
-
-  /// Option to reject all recognition guesses and enter the food manually
-  ///
-  /// In en, this message translates to:
-  /// **'None of these — enter manually'**
-  String get recognizeNoneManual;
-
-  /// Shown when photo recognition produced no usable guess
-  ///
-  /// In en, this message translates to:
-  /// **'Couldn\'t recognize the food. Add it manually.'**
-  String get recognizeNoGuess;
-
-  /// Hint suggesting a Gemini API key for better photo recognition
-  ///
-  /// In en, this message translates to:
-  /// **'Tip: add a free Gemini key in Settings for better results — including drinks the on-device model can\'t recognize.'**
+  /// **'Tip: add a free Gemini key in Settings to unlock AI estimates for photos and descriptions.'**
   String get recognizeGeminiNudge;
 
   /// Tooltip of the camera action on the Day screen
@@ -1365,7 +1347,7 @@ abstract class AppLocalizations {
   /// Explainer for the Gemini API key setting, including the privacy implications
   ///
   /// In en, this message translates to:
-  /// **'Meal photos are recognised on your phone by default. Add a Google Gemini API key for sharper results and portion estimates. Your photo is then sent to Google. Gemini\'s free tier is plenty for personal use; if you\'ve enabled billing on your Google account, heavy use may incur charges. On the free tier, Google may use your photos to improve their models.'**
+  /// **'Add a Google Gemini API key to unlock AI meal estimates from a photo or a typed description. Photos and descriptions are then sent to Google. Gemini\'s free tier is plenty for personal use; if you\'ve enabled billing on your Google account, heavy use may incur charges. On the free tier, Google may use your data to improve their models.'**
   String get aiKeyDesc;
 
   /// Label of the Gemini API key field
@@ -1403,18 +1385,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'If your choice is busy it falls back to 2.5 Flash, then on-device.'**
   String get aiModelNote;
-
-  /// Toggle title: never upload photos, always use the on-device model
-  ///
-  /// In en, this message translates to:
-  /// **'Always recognise on-device'**
-  String get aiOnDeviceOnlyTitle;
-
-  /// Subtitle under the always-on-device toggle
-  ///
-  /// In en, this message translates to:
-  /// **'Never upload photos to Gemini — use the on-device model for every scan.'**
-  String get aiOnDeviceOnlySubtitle;
 
   /// Attribution badge on results estimated by Gemini
   ///
@@ -1524,17 +1494,47 @@ abstract class AppLocalizations {
   /// **'QR code for recipe {name}'**
   String a11yQrCode(String name);
 
-  /// Attribution badge on results estimated by the on-device model
+  /// Snackbar when Gemini was unreachable; the flow degrades to manual entry / the local matcher
   ///
   /// In en, this message translates to:
-  /// **'Estimated on-device'**
-  String get recognizeByOnDevice;
-
-  /// Snackbar when Gemini was unreachable and the on-device model was used instead
-  ///
-  /// In en, this message translates to:
-  /// **'Couldn\'t reach Gemini — used on-device recognition.'**
+  /// **'Couldn\'t reach Gemini — add the meal manually instead.'**
   String get geminiFailed;
+
+  /// Capture menu entry: type what you ate instead of photographing it
+  ///
+  /// In en, this message translates to:
+  /// **'Describe a meal'**
+  String get captureDescribe;
+
+  /// Subtitle under the describe-a-meal entry
+  ///
+  /// In en, this message translates to:
+  /// **'Type what you ate — we\'ll estimate it'**
+  String get captureDescribeSub;
+
+  /// Title of the describe-meal input sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the meal'**
+  String get describeMealTitle;
+
+  /// Label of the describe-meal text field
+  ///
+  /// In en, this message translates to:
+  /// **'What did you eat?'**
+  String get describeMealLabel;
+
+  /// Example placeholder in the describe-meal field; hints that amounts help
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 2 slices rye bread, butter 10 g, 1 apple'**
+  String get describeMealExample;
+
+  /// Shown when the keyless describe-meal parser found no usable ingredient lines
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read any items — write one food per line, ideally with an amount (e.g. \"Rice 150 g\").'**
+  String get describeMealNoLines;
 
   /// Rotating status line while waiting for Gemini (1/6)
   ///

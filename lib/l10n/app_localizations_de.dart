@@ -706,17 +706,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get recognizeTakePhoto => 'Foto aufnehmen';
 
   @override
-  String get recognizeLooksLike => 'Sieht aus wie…';
-
-  @override
-  String get recognizeNoneManual => 'Nichts davon – manuell eingeben';
-
-  @override
-  String get recognizeNoGuess => 'Essen nicht erkannt. Füge es manuell hinzu.';
-
-  @override
   String get recognizeGeminiNudge =>
-      'Tipp: Hinterlege in den Einstellungen einen kostenlosen Gemini-Schlüssel für bessere Ergebnisse – auch für Getränke, die das Gerätemodell nicht erkennt.';
+      'Tipp: Hinterlege in den Einstellungen einen kostenlosen Gemini-Schlüssel für KI-Schätzungen aus Fotos und Beschreibungen.';
 
   @override
   String get dayCaptureTooltip => 'Per Foto hinzufügen';
@@ -747,7 +738,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aiKeyDesc =>
-      'Fotos werden standardmäßig auf deinem Gerät erkannt. Füge einen Google-Gemini-API-Schlüssel hinzu für genauere Ergebnisse und Portionsschätzungen. Dein Foto wird dann an Google gesendet. Geminis kostenloser Tarif reicht für den privaten Gebrauch; wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen. Im kostenlosen Tarif kann Google deine Fotos zur Verbesserung seiner Modelle verwenden.';
+      'Füge einen Google-Gemini-API-Schlüssel hinzu, um KI-Schätzungen aus einem Foto oder einer getippten Beschreibung freizuschalten. Fotos und Beschreibungen werden dann an Google gesendet. Geminis kostenloser Tarif reicht für den privaten Gebrauch; wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen. Im kostenlosen Tarif kann Google deine Daten zur Verbesserung seiner Modelle verwenden.';
 
   @override
   String get aiKeyLabel => 'Gemini-API-Schlüssel';
@@ -767,13 +758,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get aiModelNote =>
       'Wenn dein Modell ausgelastet ist, wird auf 2.5 Flash und dann auf das Gerät zurückgegriffen.';
-
-  @override
-  String get aiOnDeviceOnlyTitle => 'Immer auf dem Gerät erkennen';
-
-  @override
-  String get aiOnDeviceOnlySubtitle =>
-      'Fotos nie an Gemini senden – für jeden Scan das Modell auf dem Gerät verwenden.';
 
   @override
   String get recognizeByGemini => 'Von Gemini geschätzt';
@@ -832,11 +816,29 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get recognizeByOnDevice => 'Auf dem Gerät geschätzt';
+  String get geminiFailed =>
+      'Gemini nicht erreichbar – füge die Mahlzeit stattdessen manuell hinzu.';
 
   @override
-  String get geminiFailed =>
-      'Gemini nicht erreichbar – Erkennung auf dem Gerät verwendet.';
+  String get captureDescribe => 'Mahlzeit beschreiben';
+
+  @override
+  String get captureDescribeSub =>
+      'Tippe, was du gegessen hast – wir schätzen es';
+
+  @override
+  String get describeMealTitle => 'Mahlzeit beschreiben';
+
+  @override
+  String get describeMealLabel => 'Was hast du gegessen?';
+
+  @override
+  String get describeMealExample =>
+      'z. B. 2 Scheiben Roggenbrot, Butter 10 g, 1 Apfel';
+
+  @override
+  String get describeMealNoLines =>
+      'Keine Zutaten erkannt – schreibe ein Lebensmittel pro Zeile, am besten mit Menge (z. B. \"Reis 150 g\").';
 
   @override
   String get geminiThinking1 => 'Gemini wird nach Kalorien gefragt…';
