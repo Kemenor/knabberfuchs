@@ -294,15 +294,20 @@ tracks tester-driven changes specifically.
     Existing per-entry actions (edit/delete) could ride along, but v1 can be
     read-only.
   - **Decisions (grilled 2026-07-03):**
-    - **Detail page only in v1.** The compact header subtotal line
-      (`P 12 · C 45 · F 8 g`) is **deferred pending tester feedback** — it costs
-      header height and caps at ~3 metrics; build it only if people ask for
-      collapsed-glance macros after living with the page.
-    - **Affordance:** "Meal details" entry in the group's existing ⋮ menu
-      (discoverable, matches conventions) **and** tapping the kcal subtotal as
-      the fast path.
+    - **Detail page:** opened via a "Meal details" entry in the group's existing
+      ⋮ menu (discoverable, matches conventions) **and** tapping the kcal
+      subtotal as the fast path.
     - **v1 is read-only:** meal totals per enabled nutrient + ingredient list
       with per-entry stats; editing stays on the Day screen. l10n ×4.
+    - **Header subtotal line: IN after all** — initially deferred, then a tester
+      specifically asked for the enabled nutrients in the meal header
+      (2026-07-03, second grill):
+      - **Content:** plain subtotals of the enabled tracked-nutrient set
+        (`P 32 · C 45 · F 8 g`) — no %-of-target math, no hardcoded P/C/F.
+      - **Toggleable:** opt-in switch in **Settings** (near the display
+        options), "Show nutrients per meal"; off by default.
+      - **Visibility:** part of the header, so it shows expanded **and**
+        collapsed — consistent with the always-visible kcal subtotal.
 
 - ⏳ **Hidden debug menu (developer/tester tool)** — QUEUED 2026-07-03. A Debug
   section in Settings, unlocked by an easter-egg gesture: **long-press the app
