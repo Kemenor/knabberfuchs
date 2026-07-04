@@ -248,22 +248,28 @@ tracks tester-driven changes specifically.
     (`recognize_food_flow.dart:184`) as the input UI or a dedicated sheet with
     examples/placeholder copy. l10n ×4 either way.
 
-- ⏳ **Toggle per-meal macros** — QUEUED 2026-07-03. Optionally show each meal
-  group's macro subtotals, not just its kcal — "how much protein was breakfast?"
-  currently requires mental math over the entry tiles.
+- ⏳ **Per-meal nutrition breakdown** — QUEUED 2026-07-03. "How much protein was
+  breakfast?" currently requires mental math over the entry tiles — the group
+  header shows only its kcal subtotal.
   - **Data is free:** `GroupView.subtotal` is already a full `Nutrition`
     (`lib/domain/day_summary.dart:38`); the header just renders only its kcal
-    (`'${kcalStr(group.subtotal.kcal)} kcal'`, `lib/ui/day/day_screen.dart:559`).
-    No schema/provider work — purely a display option.
-  - **Toggle, not always-on:** the group header is deliberately compact (it
-    also carries the chevron, ⋮ and + affordances, and stays visible when
-    collapsed); a P/C/F line on every group doubles header height for users who
-    never look at it. So an opt-in display setting — and it should follow the
-    Phase 15 **tracked-nutrients enabled set**, not hardcode P/C/F, so a
-    fiber-tracking user sees fiber per meal too.
-  - **📝 decision:** where the toggle lives (Settings next to the existing
-    day-display options vs. a chip on the Day screen itself), and whether the
-    macro line renders on the header row (visible while collapsed — likely the
-    point of the ask) or as a footer inside the expanded group. Also the format:
-    compact `P 12 · C 45 · F 8 g` vs. the Day-card bar treatment (bars feel
-    heavy ×N groups). l10n ×4 for any labels.
+    (`'${kcalStr(group.subtotal.kcal)} kcal'`, `lib/ui/day/day_screen.dart:559`),
+    and each `EntryView.nutrition` is complete too (`:911` shows kcal only).
+    No schema/provider work — purely a display surface.
+  - **Leading option — meal detail page:** tap a meal group → a screen with the
+    group's full stats (every enabled tracked nutrient, Phase 15 set — not
+    hardcoded P/C/F) plus each ingredient with its own stats. Keeps the day list
+    exactly as compact as today (the header already carries chevron/⋮/+, and a
+    macro line per group would double its height), gives the full nutrient set
+    room, and has a design precedent: the recipe detail screen's
+    `_NutritionCard` + per-item list (`lib/ui/recipes/recipe_detail_screen.dart:201`).
+    Existing per-entry actions (edit/delete) could ride along, but v1 can be
+    read-only.
+  - **Alternative (or complement):** an opt-in toggle rendering a compact
+    subtotal line (`P 12 · C 45 · F 8 g`) on the group header, visible while
+    collapsed — glanceable without navigation, but costs header height and
+    caps out at ~3 metrics before wrapping.
+  - **📝 decision:** page vs. header line vs. both; the tap affordance for the
+    detail page (header tap currently toggles collapse — likely a ⋮ entry
+    "Meal details" or tapping the subtotal); read-only v1 or with entry
+    actions. l10n ×4 either way.
