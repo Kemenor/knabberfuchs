@@ -236,6 +236,37 @@ class AppLocalizationsDe extends AppLocalizations {
   String get mealMenuDelete => 'Mahlzeit löschen';
 
   @override
+  String get mealMenuDetails => 'Mahlzeit-Details';
+
+  @override
+  String get settingsShowMealNutrients => 'Nährwerte pro Mahlzeit anzeigen';
+
+  @override
+  String get settingsShowMealNutrientsSub =>
+      'Zeigt deine erfassten Nährwerte in jeder Mahlzeiten-Kopfzeile';
+
+  @override
+  String get metricShortProtein => 'P';
+
+  @override
+  String get metricShortCarb => 'KH';
+
+  @override
+  String get metricShortFat => 'F';
+
+  @override
+  String get metricShortFiber => 'Bal';
+
+  @override
+  String get metricShortSatFat => 'GesF';
+
+  @override
+  String get metricShortSugar => 'Zu';
+
+  @override
+  String get metricShortSalt => 'Salz';
+
+  @override
   String get mealFinish => 'Mahlzeit abschließen';
 
   @override

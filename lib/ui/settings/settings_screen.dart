@@ -92,6 +92,22 @@ class SettingsScreen extends ConsumerWidget {
                     onChanged: (v) =>
                         db.setSetting('showTrends', v ? 'true' : 'false'),
                   ),
+                  SwitchListTile(
+                    contentPadding: _cardRowPadding,
+                    secondary: const Icon(Symbols.nutrition_rounded),
+                    title: Text(l10n.settingsShowMealNutrients),
+                    subtitle: Text(l10n.settingsShowMealNutrientsSub),
+                    value:
+                        ref
+                            .watch(mealHeaderNutrientsProvider)
+                            .asData
+                            ?.value ??
+                        false,
+                    onChanged: (v) => db.setSetting(
+                      'mealHeaderNutrients',
+                      v ? 'true' : null,
+                    ),
+                  ),
                 ],
               ),
               _SectionHeader(l10n.settingsFoodData),

@@ -516,6 +516,66 @@ abstract class AppLocalizations {
   /// **'Delete meal'**
   String get mealMenuDelete;
 
+  /// Meal overflow menu: open the read-only per-meal nutrition breakdown page
+  ///
+  /// In en, this message translates to:
+  /// **'Meal details'**
+  String get mealMenuDetails;
+
+  /// Settings toggle: add a compact tracked-nutrient subtotal line to every meal header on the Day screen
+  ///
+  /// In en, this message translates to:
+  /// **'Show nutrients per meal'**
+  String get settingsShowMealNutrients;
+
+  /// Subtitle under the Show nutrients per meal toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Adds your tracked nutrients to each meal header'**
+  String get settingsShowMealNutrientsSub;
+
+  /// Abbreviation for protein in compact nutrient lines (meal headers, ingredient rows)
+  ///
+  /// In en, this message translates to:
+  /// **'P'**
+  String get metricShortProtein;
+
+  /// Abbreviation for carbohydrates in compact nutrient lines
+  ///
+  /// In en, this message translates to:
+  /// **'C'**
+  String get metricShortCarb;
+
+  /// Abbreviation for fat in compact nutrient lines
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get metricShortFat;
+
+  /// Abbreviation for fibre in compact nutrient lines
+  ///
+  /// In en, this message translates to:
+  /// **'Fib'**
+  String get metricShortFiber;
+
+  /// Abbreviation for saturated fat in compact nutrient lines
+  ///
+  /// In en, this message translates to:
+  /// **'SatF'**
+  String get metricShortSatFat;
+
+  /// Abbreviation for sugar in compact nutrient lines
+  ///
+  /// In en, this message translates to:
+  /// **'Sug'**
+  String get metricShortSugar;
+
+  /// Abbreviation for salt in compact nutrient lines
+  ///
+  /// In en, this message translates to:
+  /// **'Salt'**
+  String get metricShortSalt;
+
   /// Tooltip of the ✓ button that closes the currently running meal
   ///
   /// In en, this message translates to:

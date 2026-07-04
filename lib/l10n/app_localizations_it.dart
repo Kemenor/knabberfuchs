@@ -236,6 +236,37 @@ class AppLocalizationsIt extends AppLocalizations {
   String get mealMenuDelete => 'Elimina pasto';
 
   @override
+  String get mealMenuDetails => 'Dettagli del pasto';
+
+  @override
+  String get settingsShowMealNutrients => 'Mostra i nutrienti per pasto';
+
+  @override
+  String get settingsShowMealNutrientsSub =>
+      'Aggiunge i nutrienti tracciati all\'intestazione di ogni pasto';
+
+  @override
+  String get metricShortProtein => 'P';
+
+  @override
+  String get metricShortCarb => 'C';
+
+  @override
+  String get metricShortFat => 'G';
+
+  @override
+  String get metricShortFiber => 'Fib';
+
+  @override
+  String get metricShortSatFat => 'GS';
+
+  @override
+  String get metricShortSugar => 'Zu';
+
+  @override
+  String get metricShortSalt => 'Sale';
+
+  @override
   String get mealFinish => 'Termina pasto';
 
   @override

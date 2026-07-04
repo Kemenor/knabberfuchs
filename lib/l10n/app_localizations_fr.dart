@@ -236,6 +236,37 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mealMenuDelete => 'Supprimer le repas';
 
   @override
+  String get mealMenuDetails => 'Détails du repas';
+
+  @override
+  String get settingsShowMealNutrients => 'Afficher les nutriments par repas';
+
+  @override
+  String get settingsShowMealNutrientsSub =>
+      'Ajoute vos nutriments suivis à l\'en-tête de chaque repas';
+
+  @override
+  String get metricShortProtein => 'P';
+
+  @override
+  String get metricShortCarb => 'G';
+
+  @override
+  String get metricShortFat => 'L';
+
+  @override
+  String get metricShortFiber => 'Fib';
+
+  @override
+  String get metricShortSatFat => 'AGS';
+
+  @override
+  String get metricShortSugar => 'Su';
+
+  @override
+  String get metricShortSalt => 'Sel';
+
+  @override
   String get mealFinish => 'Terminer le repas';
 
   @override

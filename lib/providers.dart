@@ -452,6 +452,15 @@ final healthEnergyReadProvider = StreamProvider<bool>(
       .map((v) => v == 'true'),
 );
 
+/// Whether meal-group headers show the compact tracked-nutrient subtotal line
+/// ('mealHeaderNutrients' setting; opt-in — tester request 2026-07-03).
+final mealHeaderNutrientsProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('mealHeaderNutrients')
+      .map((v) => v == 'true'),
+);
+
 /// Whether the hidden debug menu is unlocked (long-press the app name in the
 /// About dialog). Developer/tester tool — see FEEDBACK.md 2026-07-03.
 final debugMenuProvider = StreamProvider<bool>(
