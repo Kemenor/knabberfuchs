@@ -452,12 +452,31 @@ final healthEnergyReadProvider = StreamProvider<bool>(
       .map((v) => v == 'true'),
 );
 
+/// Whether the hidden debug menu is unlocked (long-press the app name in the
+/// About dialog). Developer/tester tool — see FEEDBACK.md 2026-07-03.
+final debugMenuProvider = StreamProvider<bool>(
+  (ref) =>
+      ref.watch(dbProvider).watchSetting('debugMenu').map((v) => v == 'true'),
+);
+
+/// Debug override: pretend the wearable reported this many active kcal today.
+/// Applies whenever set (no health toggle/permission needed) so the Phase 16
+/// band shift is testable on any emulator. Null/unset = real behavior.
+final debugFakeActivityProvider = StreamProvider<double?>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('debugFakeActivityKcal')
+      .map((v) => v == null ? null : double.tryParse(v)),
+);
+
 /// Active energy burned on the viewed day, read fresh from the health store
 /// (ephemeral — the store is the single source of truth; grilled 2026-07-02).
 /// Re-reads on day change and toggle change. 0 = no adjustment (feature off,
 /// permission revoked, store unavailable, or simply no data yet).
 final activeEnergyProvider = FutureProvider<double>((ref) async {
   final day = ref.watch(selectedDayProvider);
+  final fake = ref.watch(debugFakeActivityProvider).asData?.value;
+  if (fake != null && fake > 0) return fake;
   final on = ref.watch(healthEnergyReadProvider).asData?.value ?? false;
   if (!on) return 0;
   return ref.read(healthServiceProvider).activeEnergyFor(day);
