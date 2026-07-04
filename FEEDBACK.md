@@ -241,12 +241,20 @@ tracks tester-driven changes specifically.
     key nudge, keyless-by-default ethos untouched.
   - **Logging:** result lands as a snapshot entry (`logSnapshot`), same as the
     photo guess — no catalog row, no barcode.
-  - **📝 decision:** entry point. Options: (a) a third action in the add-food
-    surface next to scan/photo (bottom sheet of labelled tiles per
-    `DESIGN_SYSTEM.md`), (b) reachable from the photo flow ("no photo? describe
-    it instead"), (c) both. Also: reuse the hint sheet
-    (`recognize_food_flow.dart:184`) as the input UI or a dedicated sheet with
-    examples/placeholder copy. l10n ×4 either way.
+  - **Decisions (grilled 2026-07-03):**
+    - **Entry point:** 4th tile in the ⚡ capture sheet (Quick add · Scan a dish
+      · From list · **Describe meal**) — `_showCaptureMenu`,
+      `lib/ui/day/day_screen.dart:134`. No extra path inside the photo flow.
+    - **Keyless users:** tile stays visible; tapping without a key shows the
+      existing Gemini-key nudge (photo-flow pattern).
+    - **Result shape: itemized.** The prompt asks for per-component estimates
+      ("rye bread 120 g, butter 15 g, …") logged as **one meal group with an
+      entry per component** — matches the diary model; a wrong part is
+      individually correctable. (New prompt variant + list parsing; the photo
+      flow's single-guess shape is unchanged.)
+    - **Input UI:** adapt `_GeminiHintSheet` (`recognize_food_flow.dart:184`)
+      into an image-less mode — field required, example-description placeholder,
+      button = Estimate. One widget, two modes. l10n ×4.
 
 - ⏳ **Per-meal nutrition breakdown** — QUEUED 2026-07-03. "How much protein was
   breakfast?" currently requires mental math over the entry tiles — the group
@@ -265,14 +273,16 @@ tracks tester-driven changes specifically.
     `_NutritionCard` + per-item list (`lib/ui/recipes/recipe_detail_screen.dart:201`).
     Existing per-entry actions (edit/delete) could ride along, but v1 can be
     read-only.
-  - **Alternative (or complement):** an opt-in toggle rendering a compact
-    subtotal line (`P 12 · C 45 · F 8 g`) on the group header, visible while
-    collapsed — glanceable without navigation, but costs header height and
-    caps out at ~3 metrics before wrapping.
-  - **📝 decision:** page vs. header line vs. both; the tap affordance for the
-    detail page (header tap currently toggles collapse — likely a ⋮ entry
-    "Meal details" or tapping the subtotal); read-only v1 or with entry
-    actions. l10n ×4 either way.
+  - **Decisions (grilled 2026-07-03):**
+    - **Detail page only in v1.** The compact header subtotal line
+      (`P 12 · C 45 · F 8 g`) is **deferred pending tester feedback** — it costs
+      header height and caps at ~3 metrics; build it only if people ask for
+      collapsed-glance macros after living with the page.
+    - **Affordance:** "Meal details" entry in the group's existing ⋮ menu
+      (discoverable, matches conventions) **and** tapping the kcal subtotal as
+      the fast path.
+    - **v1 is read-only:** meal totals per enabled nutrient + ingredient list
+      with per-entry stats; editing stays on the Day screen. l10n ×4.
 
 - ⏳ **Hidden debug menu (developer/tester tool)** — QUEUED 2026-07-03. A Debug
   section in Settings, unlocked by an easter-egg gesture: **long-press the app
@@ -284,25 +294,27 @@ tracks tester-driven changes specifically.
   - **Clear all data:** wipe the DB (entries, groups, recipes, targets, custom
     foods, settings, OCR mappings, packs) back to first-run. Destructive →
     confirm dialog (Cancel → Confirm, red allowed here: destruction-only rule).
-    Decide whether it also calls `HealthService.deleteAll` so the health store
-    doesn't keep orphaned nutrition records.
   - **Load test data:** seed a realistic multi-week demo diary (varied meals,
     groups, a couple of recipes, custom foods, targets, some micros-rich and
     micros-less rows) — makes Trends, backfills and goldens/screenshots
     reviewable on an emulator without hand-logging. Could share its fixture with
     the `integration_test/screenshots_test.dart` harness so demo data stays in
     one place.
-  - **More candidates (pick freely):**
-    - **DB inspector line:** schema version, row counts per table, DB file size
-      — first question in any "my data looks wrong" report.
-    - **Export raw DB file** (share sheet) for desk debugging of tester reports.
-    - **Shift diary N days back:** age the whole diary to exercise Trends
-      windows, weekday targets and the day-navigation edges.
-    - **Fake activity kcal:** inject a pretend active-energy value so the
-      Phase 16 band shift is testable without a wearable/HC writer (the H6
-      verification pain point).
-    - **Health sync status:** enabled flags, permission probe result, last
-      `syncDay` outcome — HC failures are currently swallowed by design.
-  - **📝 decision:** does "Clear all data" graduate later into a proper
-    user-facing "Delete all my data" (privacy-friendly, matches the serverless
-    ethos) with full l10n — keeping the debug entry as the prototype?
+  - **Decisions (grilled 2026-07-03):**
+    - **Clear-all wipes the health store too** when the sync toggle was on
+      (`HealthService.deleteAll`) — a true factory reset, no orphaned records
+      that a reinstall would double on resync.
+    - **All four extra tools ship in v1:**
+      - **DB inspector + export:** schema version, per-table row counts, DB
+        file size, plus share-sheet export of the raw .sqlite — the desk
+        debugging kit for tester reports.
+      - **Fake activity kcal:** inject a pretend active-energy value so the
+        Phase 16 band shift is testable without a wearable/HC writer — unblocks
+        the open H6/TestFlight verification.
+      - **Shift diary N days back:** age the whole diary to exercise Trends
+        windows, weekday targets and day-navigation edges.
+      - **Health sync status:** enabled flags, permission probe result, last
+        `syncDay` outcome — surfaces the errors sync swallows by design.
+    - **Graduation queued:** a user-facing, localized **"Delete all my data"**
+      in Settings is a future item (privacy-friendly, fits the serverless
+      ethos); the debug entry doubles as its prototype.
