@@ -19,6 +19,13 @@ class HealthService {
   /// 'healthEnergyRead' setting) — a separate grant from write-sync.
   bool energyReadEnabled = false;
 
+  /// Last write-sync outcome, for the debug menu's sync-status view only —
+  /// sync errors are swallowed by design, so this is the one place they
+  /// surface. In-memory, resets on app restart.
+  DateTime? lastSyncAt;
+  String? lastSyncDay;
+  String? lastSyncError;
+
   // iOS HealthKit's umbrella NUTRITION type expands the permission sheet to ~40
   // dietary sub-types (every vitamin/mineral), even though we only ever write
   // energy + macros. So on iOS request exactly those four. Health Connect
@@ -118,6 +125,9 @@ class HealthService {
   /// current entries. Idempotent. Swallows errors (revoked permission / no HC).
   Future<void> syncDay(String day, List<Entry> entries) async {
     await _ensureConfigured();
+    lastSyncAt = DateTime.now();
+    lastSyncDay = day;
+    lastSyncError = null;
     final now = DateTime.now();
     final d = DateTime.parse(day); // 'YYYY-MM-DD' -> local midnight
     final start = DateTime(d.year, d.month, d.day);
@@ -164,8 +174,10 @@ class HealthService {
           sodium: micro('salt') == null ? null : micro('salt')! / 2.5,
         );
       }
-    } catch (_) {
-      // Permission revoked or Health Connect unavailable — ignore.
+    } catch (e) {
+      // Permission revoked or Health Connect unavailable — ignore (but keep
+      // the reason for the debug sync-status view).
+      lastSyncError = e.runtimeType.toString();
     }
   }
 

@@ -15,6 +15,7 @@ import '../../domain/meal_times.dart';
 import '../../domain/meal_type_i18n.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import 'debug_section.dart';
 import 'offline_regions_screen.dart';
 import 'targets_screen.dart';
 
@@ -197,6 +198,9 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              // Hidden developer section — unlocked via the About easter egg.
+              if (ref.watch(debugMenuProvider).asData?.value ?? false)
+                const DebugSection(),
             ],
           );
         },
@@ -388,10 +392,11 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
   }
 }
 
-/// A heartfelt thank-you to Open Food Facts, shown in the About box, with a
-/// link to their donation page.
 /// About entry — shows the real app version+build (so testers can report it)
-/// and opens the standard about dialog with a "view licenses" button.
+/// and opens an about dialog with a "view licenses" button. Hand-rolled
+/// instead of [showAboutDialog] because the app name doubles as the debug-menu
+/// unlock: long-pressing it toggles the hidden Debug section (FEEDBACK.md
+/// 2026-07-03).
 class _AboutTile extends ConsumerWidget {
   const _AboutTile();
 
@@ -405,16 +410,63 @@ class _AboutTile extends ConsumerWidget {
       title: const Text('Knabberfuchs'),
       subtitle: version == null ? null : Text(version),
       trailing: const Icon(Symbols.chevron_right_rounded),
-      onTap: () => showAboutDialog(
+      onTap: () => showDialog<void>(
         context: context,
-        applicationName: 'Knabberfuchs',
-        applicationVersion: version,
-        children: [
-          const SizedBox(height: 4),
-          Text(l10n.settingsAboutBody),
-          const SizedBox(height: 20),
-          const _OpenFoodFactsThanks(),
-        ],
+        builder: (ctx) {
+          final theme = Theme.of(ctx);
+          final material = MaterialLocalizations.of(ctx);
+          return AlertDialog(
+            title: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onLongPress: () => _toggleDebugMenu(ctx, ref),
+              child: Text('Knabberfuchs', style: theme.textTheme.titleLarge),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (version != null)
+                    Text(version, style: theme.textTheme.bodySmall),
+                  const SizedBox(height: 12),
+                  Text(l10n.settingsAboutBody),
+                  const SizedBox(height: 20),
+                  const _OpenFoodFactsThanks(),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => showLicensePage(
+                  context: ctx,
+                  applicationName: 'Knabberfuchs',
+                  applicationVersion: version,
+                ),
+                child: Text(material.viewLicensesButtonLabel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(material.closeButtonLabel),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// Debug-menu easter egg: flips the 'debugMenu' setting and closes the
+  /// dialog so the new Settings section is immediately visible. English-only
+  /// by design (debug surface).
+  Future<void> _toggleDebugMenu(BuildContext dialogCtx, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(dialogCtx);
+    final db = ref.read(dbProvider);
+    final on = await db.getSetting('debugMenu') == 'true';
+    await db.setSetting('debugMenu', on ? null : 'true');
+    if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+    messenger.showAutoSnackBar(
+      SnackBar(
+        content: Text(on ? 'Debug menu hidden' : 'Debug menu enabled'),
       ),
     );
   }
