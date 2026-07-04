@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 
 import '../../domain/enums.dart';
 import '../db/database.dart';
-import '../ml/food_kcal_fallback.dart';
 import '../offline/region_pack_store.dart';
 import '../sources/off_api.dart';
 
@@ -50,35 +49,6 @@ class FoodRepository {
       return a.name.length.compareTo(b.name.length);
     });
     return merged.take(50).toList();
-  }
-
-  /// Rough kcal estimate for a recognized dish [label]: the best local-catalog
-  /// match's kcal/100 g scaled to one portion (its serving size, or a 300 g
-  /// plate default). Null if nothing matches. Always shown to the user as an
-  /// editable estimate, never logged blindly.
-  Future<int?> estimateKcalForLabel(String label) async {
-    // The model's labels are specific ("Neapolitan pizza"); the catalog AND-
-    // matches all tokens, so try the full label first, then fall back to the
-    // head noun (usually the last word: "pizza", "rice") for a looser match.
-    final queries = <String>[label];
-    final words = label.split(RegExp(r'[\s\-,]+')).where((w) => w.isNotEmpty);
-    if (words.length > 1) queries.add(words.last);
-    Food? hit;
-    for (final q in queries) {
-      final hits = await searchLocal(q);
-      if (hits.isNotEmpty) {
-        hit = hits.first;
-        break;
-      }
-    }
-    // Category fallback for the portion size + as a last-resort estimate: most
-    // generic-catalog rows have no serving size, so without this almost every
-    // guess used a flat 300 g plate. portionForLabel() maps the dish category
-    // to a realistic weight (and energy density when nothing matches at all).
-    final fallback = portionForLabel(label);
-    if (hit == null) return fallback?.kcal;
-    final grams = hit.servingG ?? fallback?.grams ?? 300;
-    return (hit.kcal100 * grams / 100).round();
   }
 
   /// Persist a food if it's a synthetic search/pack hit (id 0), returning the

@@ -18,6 +18,7 @@ import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../add/add_food_screen.dart';
+import '../food/describe_meal_flow.dart';
 import '../food/log_food_sheet.dart';
 import '../food/quick_add_sheet.dart';
 import '../food/recognize_food_flow.dart';
@@ -131,7 +132,8 @@ class _DayScreenState extends ConsumerState<DayScreen>
     );
   }
 
-  /// Photo-based capture menu: AI dish recognition or an ingredient-list OCR.
+  /// Capture menu: quick add, AI photo scan, typed meal description, or an
+  /// ingredient-list OCR.
   void _showCaptureMenu(BuildContext context, WidgetRef ref, String day) {
     final l10n = AppLocalizations.of(context);
     showModalBottomSheet<void>(
@@ -157,6 +159,15 @@ class _DayScreenState extends ConsumerState<DayScreen>
               onTap: () {
                 Navigator.pop(sheetCtx);
                 recognizeFoodByDay(context, ref, day);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Symbols.edit_note_rounded),
+              title: Text(l10n.captureDescribe),
+              subtitle: Text(l10n.captureDescribeSub),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                startDescribeMealFlow(context, ref, day: day);
               },
             ),
             ListTile(

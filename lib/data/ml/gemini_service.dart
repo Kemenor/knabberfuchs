@@ -27,6 +27,20 @@ String buildGeminiPrompt(String? description) {
       '"$hint".';
 }
 
+/// The instruction for a text-only meal description ("Describe meal" flow).
+/// Unlike the photo prompt, the result is ITEMIZED: one estimate per food
+/// component, so each part logs as its own diary entry and stays individually
+/// correctable (grilled 2026-07-03).
+const _textPrompt =
+    'You are a nutrition assistant. The user describes a meal in free text '
+    '(English, German, French or Italian). Split it into its food components. '
+    'For each component estimate the edible weight in grams (realistic '
+    'portions when none is given) and the TOTALS for that amount (not per '
+    '100 g): calories in kcal, and protein, carbohydrate and fat in grams. '
+    'Keep component names short, in the language of the description. Also '
+    'return meal_name: a 1-3 word summary in that language. If the text does '
+    'not describe food or drink, set is_food to false.';
+
 /// One food estimate from Gemini — totals for the portion shown (not per 100 g).
 class GeminiFoodResult {
   final String name;
@@ -157,9 +171,144 @@ class GeminiService {
     return null;
   }
 
+  /// Text-only itemized estimate for the "Describe meal" flow. Same
+  /// model-fallback/cancel semantics as [recognizeFood], no image part.
+  /// Returns null when every model fails or the text isn't food — the caller
+  /// then falls back to the local catalog matcher.
+  Future<GeminiMealResult?> estimateMealFromText(
+    String description,
+    String apiKey, {
+    String? preferredModel,
+    bool Function()? isCancelled,
+  }) async {
+    final models = <String>{preferredModel ?? fallbackModel, fallbackModel};
+    final body = jsonEncode({
+      'contents': [
+        {
+          'parts': [
+            {'text': '$_textPrompt\n\nThe meal: "${description.trim()}"'},
+          ],
+        },
+      ],
+      'generationConfig': {
+        'temperature': 0.2,
+        'responseMimeType': 'application/json',
+        'responseSchema': {
+          'type': 'object',
+          'properties': {
+            'is_food': {'type': 'boolean'},
+            'meal_name': {'type': 'string'},
+            'items': {
+              'type': 'array',
+              'items': {
+                'type': 'object',
+                'properties': {
+                  'name': {'type': 'string'},
+                  'grams': {'type': 'number'},
+                  'kcal': {'type': 'number'},
+                  'protein_g': {'type': 'number'},
+                  'carb_g': {'type': 'number'},
+                  'fat_g': {'type': 'number'},
+                },
+                'required': ['name', 'kcal'],
+              },
+            },
+          },
+          'required': ['is_food', 'items'],
+        },
+      },
+    });
+    for (final model in models) {
+      if (isCancelled?.call() ?? false) return null;
+      final uri = Uri.parse('$_base/$model:generateContent');
+      final client = _injected ?? http.Client();
+      try {
+        final resp = await client
+            .post(
+              uri,
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey,
+              },
+              body: body,
+            )
+            .timeout(const Duration(seconds: 30));
+        if (resp.statusCode != 200) {
+          debugPrint('[gemini] $model HTTP ${resp.statusCode} — next model');
+          continue;
+        }
+        final r = parseGeminiMealResponse(resp.body);
+        debugPrint(
+          '[gemini] $model ok=${r != null} items=${r?.items.length}',
+        );
+        return r;
+      } on TimeoutException {
+        debugPrint('[gemini] $model timeout — next model');
+        continue;
+      } catch (e) {
+        // Log only the exception type: http exceptions embed the full URI.
+        debugPrint('[gemini] $model error: ${e.runtimeType} — next model');
+        continue;
+      } finally {
+        if (_injected == null) client.close();
+      }
+    }
+    return null;
+  }
+
   /// Request clients are created and closed per call; only an injected client
   /// (owned by the caller) would need closing, and the caller handles that.
   void dispose() {}
+}
+
+/// Itemized meal estimate from a text description: a short meal name plus one
+/// [GeminiFoodResult] per component.
+class GeminiMealResult {
+  final String? name;
+  final List<GeminiFoodResult> items;
+  const GeminiMealResult({this.name, required this.items});
+}
+
+/// Parse the text-estimate response into a [GeminiMealResult]. Null on shape
+/// mismatch, non-food, or an empty/valueless item list.
+GeminiMealResult? parseGeminiMealResponse(String responseBody) {
+  try {
+    final data = jsonDecode(responseBody) as Map<String, dynamic>;
+    final text =
+        (((data['candidates'] as List?)?.first
+                        as Map<String, dynamic>?)?['content']?['parts']
+                    as List?)
+                ?.first?['text']
+            as String?;
+    if (text == null) return null;
+    final j = jsonDecode(text) as Map<String, dynamic>;
+    if (j['is_food'] == false) return null;
+    double? n(dynamic v) => v is num ? v.toDouble() : null;
+    final items = <GeminiFoodResult>[];
+    for (final raw in (j['items'] as List? ?? const [])) {
+      if (raw is! Map<String, dynamic>) continue;
+      final name = (raw['name'] as String?)?.trim();
+      final kcal = n(raw['kcal']);
+      if (name == null || name.isEmpty || kcal == null) continue;
+      items.add(
+        GeminiFoodResult(
+          name: name,
+          grams: n(raw['grams']),
+          kcal: kcal,
+          protein: n(raw['protein_g']),
+          carb: n(raw['carb_g']),
+          fat: n(raw['fat_g']),
+        ),
+      );
+    }
+    if (items.isEmpty) return null;
+    return GeminiMealResult(
+      name: (j['meal_name'] as String?)?.trim(),
+      items: items,
+    );
+  } catch (_) {
+    return null;
+  }
 }
 
 /// Shrink the photo (longest side ≤ 768 px, JPEG q85) to keep the upload

@@ -15,7 +15,6 @@ import 'data/repositories/food_repository.dart';
 import 'data/repositories/recipe_repository.dart';
 import 'data/backup_service.dart';
 import 'data/health/health_service.dart';
-import 'data/ml/food_classifier.dart';
 import 'data/ml/gemini_service.dart';
 import 'data/ocr/ocr_service.dart';
 import 'data/offline/offline_pack_service.dart';
@@ -105,18 +104,7 @@ final appVersionProvider = FutureProvider<String>((ref) async {
   return '${info.version} (${info.buildNumber})';
 });
 
-final foodClassifierProvider = Provider<FoodClassifier>((ref) {
-  final c = FoodClassifier();
-  ref.onDispose(c.dispose);
-  return c;
-});
-
 const geminiKeySetting = 'geminiApiKey';
-
-/// When 'true', photo recognition always uses the on-device model and never
-/// uploads to Gemini, even if a key is configured. Only surfaced in settings
-/// once a key exists. Default (null/false) = use Gemini, fall back on-device.
-const aiOnDeviceOnlySetting = 'aiOnDeviceOnly';
 
 /// Preferred Gemini model to try first (the service always falls back to
 /// gemini-2.5-flash on a 503/timeout). Null = use the reliable default.

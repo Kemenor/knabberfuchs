@@ -90,4 +90,69 @@ void main() {
     expect(parseGeminiResponse('{}'), isNull);
     expect(parseGeminiResponse(jsonEncode({'candidates': []})), isNull);
   });
+
+  // The itemized text-estimate ("Describe meal") response.
+
+  test('meal response parses name and per-component items', () {
+    final r = parseGeminiMealResponse(
+      _wrap({
+        'is_food': true,
+        'meal_name': 'Znüni',
+        'items': [
+          {
+            'name': 'Roggenbrot',
+            'grams': 120,
+            'kcal': 260,
+            'protein_g': 8,
+            'carb_g': 50,
+            'fat_g': 2,
+          },
+          {'name': 'Butter', 'grams': 10, 'kcal': 74},
+        ],
+      }),
+    );
+    expect(r, isNotNull);
+    expect(r!.name, 'Znüni');
+    expect(r.items, hasLength(2));
+    expect(r.items[0].carb, 50);
+    expect(r.items[1].kcal, 74);
+    expect(r.items[1].protein, isNull);
+  });
+
+  test('meal response drops valueless items; all-dropped means null', () {
+    final r = parseGeminiMealResponse(
+      _wrap({
+        'is_food': true,
+        'items': [
+          {'name': 'Tee', 'kcal': 2},
+          {'name': ''},
+          {'kcal': 100},
+        ],
+      }),
+    );
+    expect(r!.items.single.name, 'Tee');
+    expect(
+      parseGeminiMealResponse(
+        _wrap({
+          'is_food': true,
+          'items': [
+            {'name': 'x'},
+          ],
+        }),
+      ),
+      isNull,
+    );
+  });
+
+  test('meal response: non-food, empty items, garbage all return null', () {
+    expect(
+      parseGeminiMealResponse(_wrap({'is_food': false, 'items': []})),
+      isNull,
+    );
+    expect(
+      parseGeminiMealResponse(_wrap({'is_food': true, 'items': []})),
+      isNull,
+    );
+    expect(parseGeminiMealResponse('not json'), isNull);
+  });
 }
