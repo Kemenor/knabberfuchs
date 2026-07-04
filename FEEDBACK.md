@@ -131,8 +131,9 @@ tracks tester-driven changes specifically.
 
 ## Product questions (2026-07-02)
 
-- ✅ **Remove on-device photo recognition entirely?** — DECIDED 2026-07-03 (grilled;
-  build pending). Feedback on the local model was uniformly negative (weak on
+- ✅ **Remove on-device photo recognition entirely?** — DECIDED 2026-07-03,
+  BUILT 2026-07-04 (`feature/feedback-0703`, together with the Describe-meal
+  flow as planned). Feedback on the local model was uniformly negative (weak on
   drinks/portions even after the a7eb950 improvements), and it was already dropped
   from the store screenshot set (2026-07-02). **Decision: option (b) — remove the
   local image model entirely.** Photo estimate becomes Gemini-only; keyless users
@@ -237,7 +238,8 @@ tracks tester-driven changes specifically.
 
 ## Feedback (2026-07-03)
 
-- ⏳ **Text-only AI guess (no photo)** — QUEUED 2026-07-03. Estimate a meal from a
+- ✅ **Text-only AI guess (no photo)** — BUILT 2026-07-04
+  (`feature/feedback-0703`; grilled 2026-07-03). Estimate a meal from a
   typed description alone ("two slices of rye bread with butter and honey, large
   coffee with milk") — for meals with no photo opportunity: already eaten,
   restaurant courses, or anything a camera can't capture well.
@@ -276,7 +278,8 @@ tracks tester-driven changes specifically.
       up-sells the AI variant ("sharper, handles free-form descriptions")
       rather than gating the whole tile.
 
-- ⏳ **Per-meal nutrition breakdown** — QUEUED 2026-07-03. "How much protein was
+- ✅ **Per-meal nutrition breakdown** — BUILT 2026-07-04
+  (`feature/feedback-0703`; grilled 2026-07-03). "How much protein was
   breakfast?" currently requires mental math over the entry tiles — the group
   header shows only its kcal subtotal.
   - **Data is free:** `GroupView.subtotal` is already a full `Nutrition`
@@ -309,7 +312,8 @@ tracks tester-driven changes specifically.
       - **Visibility:** part of the header, so it shows expanded **and**
         collapsed — consistent with the always-visible kcal subtotal.
 
-- ⏳ **Hidden debug menu (developer/tester tool)** — QUEUED 2026-07-03. A Debug
+- ✅ **Hidden debug menu (developer/tester tool)** — BUILT 2026-07-04
+  (`feature/feedback-0703`; grilled 2026-07-03). A Debug
   section in Settings, unlocked by an easter-egg gesture: **long-press the app
   name in the About dialog** (`_AboutTile` → `showAboutDialog`,
   `lib/ui/settings/settings_screen.dart:395-414`) to flip a `debugMenu` settings

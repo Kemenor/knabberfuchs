@@ -405,6 +405,23 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   enabled set; each metric has an always-visible default Min/Max row + an
   independently expandable per-weekday `ExpansionTile`. Every bound is
   optional.
+- **Compact nutrient line** (new pattern, 2026-07-04): space-tight surfaces
+  (meal-group headers behind the opt-in "Show nutrients per meal" toggle, the
+  meal-detail ingredient rows) render the enabled set as one muted
+  `outline`-colored `bodySmall` line — `P 32 · KH 45 · F 8 g`: abbreviated
+  labels (`metricShortLabel`, l10n ×4), canonical metric order, kcal never
+  included, single trailing unit. One helper builds it: `nutrientLine`
+  (`core/metric_labels.dart`).
+- **Read-only detail pages reuse the recipe-detail shape** (2026-07-04): the
+  meal detail page (`day/meal_detail_screen.dart`, opened from the group's ⋮
+  or by tapping its kcal subtotal) is a hero stats `Card` (kcal headline in
+  `primary` + label/value rows per enabled metric) above an uppercase
+  `labelSmall` section header and a `Card` of `ListTile` ingredient rows —
+  the same layout grammar as `recipe_detail_screen.dart`.
+- **Debug-only surfaces are the one sanctioned l10n exception**: the hidden
+  Settings Debug section (About-dialog long-press easter egg) is
+  English-only, DEBUG-labelled with an `error`-colored header, and never
+  store-advertised. Everything user-facing stays under the l10n rule.
 
 ---
 
