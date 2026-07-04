@@ -247,3 +247,23 @@ tracks tester-driven changes specifically.
     it instead"), (c) both. Also: reuse the hint sheet
     (`recognize_food_flow.dart:184`) as the input UI or a dedicated sheet with
     examples/placeholder copy. l10n ×4 either way.
+
+- ⏳ **Toggle per-meal macros** — QUEUED 2026-07-03. Optionally show each meal
+  group's macro subtotals, not just its kcal — "how much protein was breakfast?"
+  currently requires mental math over the entry tiles.
+  - **Data is free:** `GroupView.subtotal` is already a full `Nutrition`
+    (`lib/domain/day_summary.dart:38`); the header just renders only its kcal
+    (`'${kcalStr(group.subtotal.kcal)} kcal'`, `lib/ui/day/day_screen.dart:559`).
+    No schema/provider work — purely a display option.
+  - **Toggle, not always-on:** the group header is deliberately compact (it
+    also carries the chevron, ⋮ and + affordances, and stays visible when
+    collapsed); a P/C/F line on every group doubles header height for users who
+    never look at it. So an opt-in display setting — and it should follow the
+    Phase 15 **tracked-nutrients enabled set**, not hardcode P/C/F, so a
+    fiber-tracking user sees fiber per meal too.
+  - **📝 decision:** where the toggle lives (Settings next to the existing
+    day-display options vs. a chip on the Day screen itself), and whether the
+    macro line renders on the header row (visible while collapsed — likely the
+    point of the ask) or as a footer inside the expanded group. Also the format:
+    compact `P 12 · C 45 · F 8 g` vs. the Day-card bar treatment (bars feel
+    heavy ×N groups). l10n ×4 for any labels.
