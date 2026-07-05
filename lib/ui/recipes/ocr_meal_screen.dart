@@ -294,32 +294,42 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       lastDate: DateTime(2100),
     );
     if (picked == null || !mounted) return;
+    // Same double-tap guard as _saveRecipe: the sequential logSnapshot awaits
+    // keep the button live long enough to log the whole meal twice.
+    if (_saving) return;
+    setState(() => _saving = true);
     final day = DayKey.of(picked);
     final dayLbl = dayLabel(context, day);
     final db = ref.read(dbProvider);
     final diary = ref.read(diaryRepositoryProvider);
-    final gid = await db.createEntryGroup(
-      day,
-      _name.text.trim().isEmpty ? l10n.ocrDefaultMealName : _name.text.trim(),
-    );
     final meal =
         (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
             .inferNow();
-    for (final it in ready) {
-      await diary.logSnapshot(
-        name: it.matched!.name,
-        kcal100: it.matched!.kcal100,
-        protein100: it.matched!.protein100,
-        carb100: it.matched!.carb100,
-        fat100: it.matched!.fat100,
-        grams: _grams(it)!,
-        meal: meal,
-        day: day,
-        groupId: gid,
+    try {
+      final gid = await db.createEntryGroup(
+        day,
+        _name.text.trim().isEmpty ? l10n.ocrDefaultMealName : _name.text.trim(),
       );
+      for (final it in ready) {
+        await diary.logSnapshot(
+          name: it.matched!.name,
+          kcal100: it.matched!.kcal100,
+          protein100: it.matched!.protein100,
+          carb100: it.matched!.carb100,
+          fat100: it.matched!.fat100,
+          grams: _grams(it)!,
+          meal: meal,
+          day: day,
+          groupId: gid,
+        );
+      }
+      if (mounted) Navigator.of(context).pop();
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.loggedTo(dayLbl))),
+      );
+    } catch (_) {
+      if (mounted) setState(() => _saving = false);
     }
-    if (mounted) Navigator.of(context).pop();
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.loggedTo(dayLbl))));
   }
 
   @override
@@ -351,7 +361,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: FilledButton(
-                  onPressed: _logToDay,
+                  onPressed: _saving ? null : _logToDay,
                   child: Text(l10n.ocrLogToDay),
                 ),
               ),
@@ -445,7 +455,9 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       onDismissed: (_) => setState(() => _items.removeAt(i)),
       child: ListTile(
         leading: Icon(
-          it.matched != null ? Symbols.check_circle_rounded : Symbols.help_rounded,
+          it.matched != null
+              ? Symbols.check_circle_rounded
+              : Symbols.help_rounded,
           color: it.matched != null
               ? theme.colorScheme.primary
               : theme.disabledColor,
