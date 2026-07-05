@@ -209,10 +209,16 @@ String _rangeLabel(DateTime s, DateTime e, String locale) {
 String _metricValue(AppLocalizations l10n, TargetMetric m, double v) =>
     m == TargetMetric.kcal ? l10n.kcalValue(kcalStr(v)) : '${macroStr(v)} g';
 
-/// A "nice" y-axis gridline interval (~≤6 lines) that suits both the kcal range
-/// (thousands) and macro grams (tens to low hundreds).
+/// A "nice" y-axis gridline interval (~≤6 lines) that suits the kcal range
+/// (thousands), macro grams (tens to low hundreds) and low-gram metrics like
+/// salt (single digits — without the sub-10 steps its chart rendered with no
+/// gridlines or axis labels at all).
 double _niceInterval(double topY) {
   const List<double> steps = [
+    0.5,
+    1,
+    2,
+    5,
     10,
     20,
     25,
