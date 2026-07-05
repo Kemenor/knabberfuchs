@@ -234,15 +234,19 @@ class AppDatabase extends _$AppDatabase {
 
   /// Insert or update a catalog food by its (source, externalId) identity.
   /// Custom foods (null externalId) never conflict, so each is a fresh row.
-  /// Returns the row id (existing row's id on update).
-  Future<int> upsertFood(FoodsCompanion food) {
-    return into(foods).insert(
+  /// Returns the row id (existing row's id on update). Must go through
+  /// RETURNING: plain insert() hands back last_insert_rowid(), which SQLite
+  /// does not set on the DO UPDATE path — the stale value can be any recent
+  /// insert on the connection (even another table's row).
+  Future<int> upsertFood(FoodsCompanion food) async {
+    final row = await into(foods).insertReturning(
       food,
       onConflict: DoUpdate(
         (_) => food,
         target: [foods.source, foods.externalId],
       ),
     );
+    return row.id;
   }
 
   Future<Food?> foodById(int id) =>

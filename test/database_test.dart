@@ -40,6 +40,41 @@ void main() {
     expect(found.first.kcal100, 43);
   });
 
+  test(
+    'upsertFood update path returns the row id, not last_insert_rowid',
+    () async {
+      // Regression: insert() without RETURNING reports last_insert_rowid(),
+      // which SQLite leaves at the most recent *actual* insert when the upsert
+      // takes the DO UPDATE path. Pollute it with an unrelated insert first.
+      final colaId = await db.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.openFoodFacts,
+          externalId: const Value('123'),
+          name: 'Cola',
+          kcal100: 42,
+        ),
+      );
+      await db.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.openFoodFacts,
+          externalId: const Value('456'),
+          name: 'Water',
+          kcal100: 0,
+        ),
+      );
+      final again = await db.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.openFoodFacts,
+          externalId: const Value('123'),
+          name: 'Cola Zero',
+          kcal100: 0,
+        ),
+      );
+      expect(again, colaId);
+      expect((await db.foodById(again))!.name, 'Cola Zero');
+    },
+  );
+
   test('custom foods with null externalId stay distinct', () async {
     await db.upsertFood(
       FoodsCompanion.insert(
