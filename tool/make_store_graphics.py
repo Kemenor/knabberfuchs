@@ -17,7 +17,10 @@ FONT = subprocess.run(
 Image.open('assets/icon/cutefox.png').convert('RGBA').resize(
     (512, 512), Image.LANCZOS).save(f'{OUT}/icon.png')
 
-# 2) feature graphic — fox on a brand-green gradient with the app name
+# 2) feature graphic — fox on a green gradient with the app name.
+# NOTE: deliberately frozen pre-rebrand palette — the published Play feature
+# graphic uses it. If you regenerate store art, switch this gradient to the
+# tangerine triad first (see lib/core/theme.dart / the fuchsbau package).
 W, H = 1024, 500
 top, bot = (124, 166, 60), (58, 107, 42)
 bg = Image.new('RGB', (W, H))

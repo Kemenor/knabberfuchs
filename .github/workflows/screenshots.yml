@@ -110,7 +110,7 @@ jobs:
           set -euo pipefail
           for L in $LOCALES; do
             case $L in
-              en) D=en-US;; de) D=de-DE;; fr) D=fr-FR;; it) D=it;;
+              en) D=en-US;; de) D=de-DE;; fr) D=fr-FR;; it) D=it;; *) D=$L;;
             esac
             echo "=== $L → $D ==="
             ls -la "screenshots/$L/" || { echo "::warning::no screenshots for $L"; continue; }

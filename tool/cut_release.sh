@@ -30,6 +30,9 @@ CUR_BUILD=${CURRENT##*+}
 NEW_BUILD=$((CUR_BUILD + 1))
 NEW="$VERSION+$NEW_BUILD"
 [ "$VERSION" != "${CURRENT%%+*}" ] || { echo "✗ $VERSION is already the current version ($CURRENT)"; exit 1; }
+# Reject going backwards: sort -V puts the higher version last.
+HIGHEST=$(printf '%s\n%s\n' "${CURRENT%%+*}" "$VERSION" | sort -V | tail -1)
+[ "$HIGHEST" = "$VERSION" ] || { echo "✗ $VERSION is lower than the current version ($CURRENT)"; exit 1; }
 echo "✓ pubspec: $CURRENT → $NEW"
 
 MISSING=0
