@@ -193,7 +193,7 @@ class _DayScreenState extends ConsumerState<DayScreen>
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-    if (picked != null) {
+    if (picked != null && mounted) {
       ref.read(selectedDayProvider.notifier).set(DayKey.of(picked));
     }
   }
@@ -531,166 +531,175 @@ class _GroupSection extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
       child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
-          child: Row(
-            children: [
-              IconButton(
-                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                tooltip: isCollapsed ? l10n.mealExpand : l10n.mealCollapse,
-                icon: Icon(
-                  isCollapsed ? Symbols.expand_more_rounded : Symbols.expand_less_rounded,
-                  size: 22,
-                ),
-                onPressed: () =>
-                    ref.read(collapsedGroupsProvider.notifier).toggle(group.id),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => _editMeal(context, ref),
-                  child: Semantics(
-                    button: true,
-                    hint: AppLocalizations.of(context).editMealTitle,
-                    child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          group.name,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Fast path to the read-only breakdown page; the ⋮ menu
-                      // carries the discoverable "Meal details" entry.
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => _openDetails(context),
-                        child: Semantics(
-                          button: true,
-                          hint: l10n.mealMenuDetails,
-                          child: Text(
-                            '${kcalStr(group.subtotal.kcal)} kcal',
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  ),
-                ),
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(Symbols.more_vert_rounded, size: 20),
-                onSelected: (v) {
-                  switch (v) {
-                    case 'details':
-                      _openDetails(context);
-                    case 'edit':
-                      _editMeal(context, ref);
-                    case 'scale':
-                      showScaleMealSheet(context, group);
-                    case 'split':
-                      showSplitMealSheet(context, group);
-                    case 'merge':
-                      showMergeMealSheet(context, group);
-                    case 'recipe':
-                      _saveAsRecipe(context, ref);
-                    case 'delete':
-                      _delete(ref);
-                  }
-                },
-                itemBuilder: (_) => [
-                  PopupMenuItem(
-                    value: 'details',
-                    child: Text(l10n.mealMenuDetails),
-                  ),
-                  PopupMenuItem(value: 'edit', child: Text(l10n.mealMenuEdit)),
-                  PopupMenuItem(
-                    value: 'scale',
-                    child: Text(l10n.mealMenuScale),
-                  ),
-                  PopupMenuItem(
-                    value: 'split',
-                    child: Text(l10n.mealMenuSplit),
-                  ),
-                  PopupMenuItem(
-                    value: 'merge',
-                    child: Text(l10n.mealMenuMerge),
-                  ),
-                  PopupMenuItem(
-                    value: 'recipe',
-                    child: Text(l10n.mealMenuSaveRecipe),
-                  ),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Text(l10n.mealMenuDelete),
-                  ),
-                ],
-              ),
-              if (isActive)
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+            child: Row(
+              children: [
                 IconButton(
                   constraints: const BoxConstraints(
                     minWidth: 48,
                     minHeight: 48,
                   ),
-                  tooltip: l10n.mealFinish,
+                  tooltip: isCollapsed ? l10n.mealExpand : l10n.mealCollapse,
                   icon: Icon(
-                    Symbols.check_rounded,
+                    isCollapsed
+                        ? Symbols.expand_more_rounded
+                        : Symbols.expand_less_rounded,
                     size: 22,
-                    color: theme.colorScheme.primary,
                   ),
-                  onPressed: () => ref.read(activeGroupProvider.notifier).end(),
-                )
-              else
-                IconButton(
-                  constraints: const BoxConstraints(
-                    minWidth: 48,
-                    minHeight: 48,
-                  ),
-                  tooltip: l10n.mealAddTo,
-                  icon: const Icon(Symbols.add_rounded, size: 22),
-                  onPressed: reopenAndAdd,
+                  onPressed: () => ref
+                      .read(collapsedGroupsProvider.notifier)
+                      .toggle(group.id),
                 ),
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _editMeal(context, ref),
+                    child: Semantics(
+                      button: true,
+                      hint: AppLocalizations.of(context).editMealTitle,
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              group.name,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Fast path to the read-only breakdown page; the ⋮ menu
+                          // carries the discoverable "Meal details" entry.
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => _openDetails(context),
+                            child: Semantics(
+                              button: true,
+                              hint: l10n.mealMenuDetails,
+                              child: Text(
+                                '${kcalStr(group.subtotal.kcal)} kcal',
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  icon: const Icon(Symbols.more_vert_rounded, size: 20),
+                  onSelected: (v) {
+                    switch (v) {
+                      case 'details':
+                        _openDetails(context);
+                      case 'edit':
+                        _editMeal(context, ref);
+                      case 'scale':
+                        showScaleMealSheet(context, group);
+                      case 'split':
+                        showSplitMealSheet(context, group);
+                      case 'merge':
+                        showMergeMealSheet(context, group);
+                      case 'recipe':
+                        _saveAsRecipe(context, ref);
+                      case 'delete':
+                        _delete(ref);
+                    }
+                  },
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'details',
+                      child: Text(l10n.mealMenuDetails),
+                    ),
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Text(l10n.mealMenuEdit),
+                    ),
+                    PopupMenuItem(
+                      value: 'scale',
+                      child: Text(l10n.mealMenuScale),
+                    ),
+                    PopupMenuItem(
+                      value: 'split',
+                      child: Text(l10n.mealMenuSplit),
+                    ),
+                    PopupMenuItem(
+                      value: 'merge',
+                      child: Text(l10n.mealMenuMerge),
+                    ),
+                    PopupMenuItem(
+                      value: 'recipe',
+                      child: Text(l10n.mealMenuSaveRecipe),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(l10n.mealMenuDelete),
+                    ),
+                  ],
+                ),
+                if (isActive)
+                  IconButton(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    tooltip: l10n.mealFinish,
+                    icon: Icon(
+                      Symbols.check_rounded,
+                      size: 22,
+                      color: theme.colorScheme.primary,
+                    ),
+                    onPressed: () =>
+                        ref.read(activeGroupProvider.notifier).end(),
+                  )
+                else
+                  IconButton(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    tooltip: l10n.mealAddTo,
+                    icon: const Icon(Symbols.add_rounded, size: 22),
+                    onPressed: reopenAndAdd,
+                  ),
+              ],
+            ),
+          ),
+          // Opt-in compact nutrient subtotals (tester request 2026-07-03).
+          // Part of the header, so it stays visible while collapsed — same
+          // rule as the kcal subtotal. Follows the enabled tracked set.
+          if (ref.watch(mealHeaderNutrientsProvider).asData?.value ?? false)
+            Builder(
+              builder: (context) {
+                final enabled =
+                    ref.watch(trackedNutrientsProvider).asData?.value ??
+                    defaultTrackedNutrients;
+                final line = nutrientLine(l10n, group.subtotal, enabled);
+                if (line.isEmpty) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                  child: Text(
+                    line,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.outline,
+                    ),
+                  ),
+                );
+              },
+            ),
+          if (!isCollapsed)
+            for (var i = 0; i < group.items.length; i++) ...[
+              if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
+              _EntryTile(view: group.items[i], day: day),
             ],
-          ),
-        ),
-        // Opt-in compact nutrient subtotals (tester request 2026-07-03).
-        // Part of the header, so it stays visible while collapsed — same
-        // rule as the kcal subtotal. Follows the enabled tracked set.
-        if (ref.watch(mealHeaderNutrientsProvider).asData?.value ?? false)
-          Builder(
-            builder: (context) {
-              final enabled =
-                  ref.watch(trackedNutrientsProvider).asData?.value ??
-                  defaultTrackedNutrients;
-              final line = nutrientLine(l10n, group.subtotal, enabled);
-              if (line.isEmpty) return const SizedBox.shrink();
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-                child: Text(
-                  line,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.outline,
-                  ),
-                ),
-              );
-            },
-          ),
-        if (!isCollapsed)
-          for (var i = 0; i < group.items.length; i++) ...[
-            if (i > 0)
-              const Divider(height: 1, indent: 16, endIndent: 16),
-            _EntryTile(view: group.items[i], day: day),
-          ],
-        const SizedBox(height: 4),
-      ],
+          const SizedBox(height: 4),
+        ],
       ),
     );
   }
@@ -829,6 +838,10 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
     final newDay = DayKey.of(_when);
     final db = ref.read(dbProvider);
     final health = ref.read(healthServiceProvider);
+    // Read before the awaits: the sheet is drag/barrier-dismissible, and ref
+    // throws once the widget is unmounted — the save and the day-follow must
+    // still finish even if the user swipes the sheet away mid-save.
+    final dayNotifier = ref.read(selectedDayProvider.notifier);
     await db.editEntryGroup(
       id: widget.group.id,
       name: name.isEmpty ? _autoName : name,
@@ -844,7 +857,7 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
     if (newDay != widget.day) {
       await health.maybeSyncDay(newDay, await db.watchDay(newDay).first);
       // Follow the meal to its new day.
-      ref.read(selectedDayProvider.notifier).set(newDay);
+      dayNotifier.set(newDay);
     }
     if (mounted) Navigator.of(context).pop();
   }
@@ -868,7 +881,10 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
           children: [
             Semantics(
               header: true,
-              child: Text(l10n.editMealTitle, style: theme.textTheme.titleLarge),
+              child: Text(
+                l10n.editMealTitle,
+                style: theme.textTheme.titleLarge,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(

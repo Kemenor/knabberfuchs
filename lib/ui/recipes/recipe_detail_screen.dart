@@ -440,26 +440,29 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
     final label = dayLabel(context, _day);
+    // Read everything before the first await: the sheet is drag/barrier-
+    // dismissible, and ref throws once the widget is unmounted — the log and
+    // the jump-to-day must still finish if the user swipes mid-save (the
+    // catch below would otherwise silently drop the portion).
+    final db = ref.read(dbProvider);
+    final recipeRepo = ref.read(recipeRepositoryProvider);
+    final mealTimes =
+        ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults;
+    final dayNotifier = ref.read(selectedDayProvider.notifier);
+    final tabNotifier = ref.read(homeTabProvider.notifier);
     try {
       // Log the portion as its own meal group named after the recipe.
-      final groupId = await ref
-          .read(dbProvider)
-          .createEntryGroup(_day, widget.share.name);
-      final meal =
-          (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
-              .inferNow();
-      await ref
-          .read(recipeRepositoryProvider)
-          .logPortionGrams(
-            share: widget.share,
-            grams: grams,
-            meal: meal,
-            day: _day,
-            groupId: groupId,
-          );
+      final groupId = await db.createEntryGroup(_day, widget.share.name);
+      await recipeRepo.logPortionGrams(
+        share: widget.share,
+        grams: grams,
+        meal: mealTimes.inferNow(),
+        day: _day,
+        groupId: groupId,
+      );
       // Land the user on the day they just logged to, so they see the meal.
-      ref.read(selectedDayProvider.notifier).set(_day);
-      ref.read(homeTabProvider.notifier).set(HomeTab.day);
+      dayNotifier.set(_day);
+      tabNotifier.set(HomeTab.day);
       // Pop the sheet (and the recipe-detail route, if we came from it) back to
       // the home shell so the Day tab is actually visible.
       if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
