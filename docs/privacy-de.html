@@ -46,7 +46,7 @@
 <header>
   <img class="logo" src="favicon.png" alt="Knabberfuchs" />
   <h1>Datenschutzerklärung</h1>
-  <p class="meta">Knabberfuchs 🦊 &middot; zuletzt aktualisiert am 2. Juli 2026</p>
+  <p class="meta">Knabberfuchs 🦊 &middot; zuletzt aktualisiert am 5. Juli 2026</p>
   <p class="langs"><a href="privacy.html">EN</a> &middot; <strong>DE</strong> &middot; <a href="privacy-fr.html">FR</a> &middot; <a href="privacy-it.html">IT</a></p>
 </header>
 
@@ -86,8 +86,8 @@
       <td>Open Food Facts (<span class="muted">world.openfoodfacts.org</span>)</td>
     </tr>
     <tr>
-      <td>KI-Mahlzeitenerkennung per Foto <strong>(optional)</strong></td>
-      <td>Das aufgenommene Foto der Mahlzeit und, falls du einen eingegeben hast, dein kurzer Hinweistext zur Mahlzeit — <em>nur</em> wenn du deinen eigenen Google-Gemini-API-Schlüssel hinzugefügt hast</td>
+      <td>KI-Mahlzeitenschätzung <strong>(optional)</strong></td>
+      <td>Das aufgenommene Foto der Mahlzeit und/oder die von dir eingetippte Beschreibung der Mahlzeit — <em>nur</em> wenn du deinen eigenen Google-Gemini-API-Schlüssel hinzugefügt hast</td>
       <td>Google (<span class="muted">generativelanguage.googleapis.com</span>)</td>
     </tr>
     <tr>
@@ -102,16 +102,17 @@
     </tr>
   </table>
 
-  <h3>Mahlzeitenerkennung auf dem Gerät</h3>
-  <p>Standardmäßig läuft die Funktion „Mahlzeit mit KI scannen“ vollständig auf deinem Gerät mit einem
-    mitgelieferten Bildmodell. Dein Foto verlässt das Handy nie. Es wird nur dann an Google gesendet,
-    wenn du in den Einstellungen persönlich einen Google-Gemini-API-Schlüssel eingegeben hast — eine
-    Funktion, die deaktiviert ist, bis du sie einrichtest.</p>
+  <h3>KI-Schätzungen sind standardmäßig aus</h3>
+  <p>Die Funktionen „Mahlzeit mit KI scannen“ und „Mahlzeit beschreiben“ funktionieren erst, nachdem
+    du in den Einstellungen persönlich einen Google-Gemini-API-Schlüssel eingegeben hast. Ohne
+    Schlüssel wird nie etwas an Google gesendet — die App erklärt dir lediglich, wie du die Funktion
+    aktivierst.</p>
 
   <h3>Wenn du deinen eigenen Gemini-Schlüssel verwendest</h3>
-  <p>Wenn aktiviert, wird das Mahlzeitenfoto — zusammen mit dem optionalen kurzen Hinweistext, den du
-    zur Beschreibung der Mahlzeit eingeben kannst (z.&nbsp;B. „selbstgemachte Calzone“) — an Googles
-    Gemini-API gesendet, um das Gericht und seine Kalorien zu schätzen. Diese Anfrage unterliegt
+  <p>Wenn aktiviert, wird das Mahlzeitenfoto (zusammen mit dem optionalen kurzen Hinweistext, den du
+    zur Beschreibung der Mahlzeit eingeben kannst, z.&nbsp;B. „selbstgemachte Calzone“) oder die von
+    dir eingetippte Beschreibung der Mahlzeit an Googles Gemini-API gesendet, um das Gericht und seine
+    Kalorien zu schätzen. Diese Anfrage unterliegt
     <a href="https://policies.google.com/privacy">Googles Datenschutzerklärung</a> und den Bedingungen
     von Google AI Studio / der Gemini-API. Je nach deinem Google-Konto und -Tarif kann Google an die
     kostenlose Stufe gesendete Daten zur Verbesserung seiner Dienste verwenden. Dies ist deine
@@ -120,10 +121,11 @@
   <h2>4. Apple Health &amp; Health Connect (optional)</h2>
   <p>Wenn du es aktivierst, kann die App deine erfassten Kalorien und Makronährstoffe in den
     Gesundheitsspeicher deines Geräts schreiben — Apple Health unter iOS oder Health Connect unter
-    Android. Dies ist eine reine Schreibsynchronisierung: Die Daten bleiben auf deinem Gerät,
-    innerhalb von Apple Health oder Android Health Connect, und werden niemals an uns übermittelt. Du
-    kannst es jederzeit deaktivieren und steuerst über die Gesundheitseinstellungen deines Geräts,
-    welche Apps diese Daten lesen dürfen.</p>
+    Android. Wenn du zusätzlich das Aktivitätsbudget aktivierst, liest die App außerdem deinen
+    Aktivitätsverbrauch (Trainingskalorien) aus dem Gesundheitsspeicher, um das Kalorienbudget des
+    Tages anzupassen. All das bleibt auf deinem Gerät, innerhalb von Apple Health oder Android Health
+    Connect, und wird niemals an uns übermittelt. Du kannst beides jederzeit deaktivieren und steuerst
+    die Berechtigungen über die Gesundheitseinstellungen deines Geräts.</p>
 
   <h2>5. Keine Analyse, Werbung oder Tracking</h2>
   <p>Die App enthält keine Werbung, keine Analyse- oder Absturzbericht-SDKs, keine Social-Media-Tracker

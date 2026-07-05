@@ -46,7 +46,7 @@
 <header>
   <img class="logo" src="favicon.png" alt="Knabberfuchs" />
   <h1>Informativa sulla privacy</h1>
-  <p class="meta">Knabberfuchs 🦊 &middot; ultimo aggiornamento 2 luglio 2026</p>
+  <p class="meta">Knabberfuchs 🦊 &middot; ultimo aggiornamento 5 luglio 2026</p>
   <p class="langs"><a href="privacy.html">EN</a> &middot; <a href="privacy-de.html">DE</a> &middot; <a href="privacy-fr.html">FR</a> &middot; <strong>IT</strong></p>
 </header>
 
@@ -85,8 +85,8 @@
       <td>Open Food Facts (<span class="muted">world.openfoodfacts.org</span>)</td>
     </tr>
     <tr>
-      <td>Riconoscimento del pasto da foto con IA <strong>(facoltativo)</strong></td>
-      <td>La foto del pasto che hai scattato e, se l'hai digitata, la tua breve descrizione del pasto — <em>solo</em> se hai aggiunto la tua chiave API di Google&nbsp;Gemini</td>
+      <td>Stima del pasto con IA <strong>(facoltativo)</strong></td>
+      <td>La foto del pasto che hai scattato e/o la descrizione del pasto che hai digitato — <em>solo</em> se hai aggiunto la tua chiave API di Google&nbsp;Gemini</td>
       <td>Google (<span class="muted">generativelanguage.googleapis.com</span>)</td>
     </tr>
     <tr>
@@ -101,26 +101,27 @@
     </tr>
   </table>
 
-  <h3>Riconoscimento foto sul dispositivo</h3>
-  <p>Per impostazione predefinita, la funzione «scansiona un pasto con l'IA» funziona interamente sul
-    tuo dispositivo usando un modello di immagini integrato. La tua foto non lascia mai il telefono.
-    Viene inviata a Google solo se hai inserito personalmente una chiave API di Google Gemini nelle
-    Impostazioni — una funzione disattivata finché non la configuri.</p>
+  <h3>Le stime con IA sono disattivate per impostazione predefinita</h3>
+  <p>Le funzioni «scansiona un pasto con l'IA» e «descrivi un pasto» funzionano solo dopo che hai
+    inserito personalmente una chiave API di Google Gemini nelle Impostazioni. Senza chiave non viene
+    mai inviato nulla a Google — l'app si limita a spiegarti come attivare la funzione.</p>
 
   <h3>Se usi la tua chiave Gemini</h3>
-  <p>Quando è attiva, la foto del pasto — insieme alla breve descrizione facoltativa che puoi digitare
-    per descrivere il pasto (ad es. «calzone fatto in casa») — viene inviata all'API Gemini di Google
-    per stimare il piatto e le sue calorie. Quella richiesta è regolata dall'<a href="https://policies.google.com/privacy">informativa
+  <p>Quando è attiva, la foto del pasto (insieme al breve suggerimento facoltativo che puoi digitare,
+    ad es. «calzone fatto in casa») o la descrizione del pasto che hai digitato viene inviata all'API
+    Gemini di Google per stimare il piatto e le sue calorie. Quella richiesta è regolata dall'<a href="https://policies.google.com/privacy">informativa
     sulla privacy di Google</a> e dai termini di Google AI Studio / dell'API Gemini. A seconda del tuo
     account e piano Google, Google potrebbe usare i dati inviati al livello gratuito per migliorare i
     propri servizi. È una tua scelta; l'app funziona pienamente senza.</p>
 
   <h2>4. Apple Salute e Health Connect (facoltativo)</h2>
   <p>Se la attivi, l'app può scrivere le calorie e i macronutrienti registrati nell'archivio salute del
-    tuo dispositivo — Apple Salute su iOS, o Health Connect su Android. È una sincronizzazione in sola
-    scrittura: i dati restano sul tuo dispositivo, all'interno di Apple Salute o Android Health
-    Connect, e non ci vengono mai trasmessi. Puoi disattivarla in qualsiasi momento e controlli quali
-    app possono leggere quei dati tramite le impostazioni Salute del tuo dispositivo.</p>
+    tuo dispositivo — Apple Salute su iOS, o Health Connect su Android. Se attivi anche il budget di
+    attività, l'app legge inoltre la tua energia attiva (calorie di allenamento) dall'archivio salute
+    per adattare il budget calorico della giornata. Tutto questo resta sul tuo dispositivo,
+    all'interno di Apple Salute o Android Health Connect, e non ci viene mai trasmesso. Puoi
+    disattivare entrambi in qualsiasi momento e controlli le autorizzazioni tramite le impostazioni
+    Salute del tuo dispositivo.</p>
 
   <h2>5. Nessuna analisi, pubblicità o tracciamento</h2>
   <p>L'app non contiene pubblicità, né SDK di analisi o di segnalazione dei crash, né tracker di social

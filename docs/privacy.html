@@ -46,7 +46,7 @@
 <header>
   <img class="logo" src="favicon.png" alt="Knabberfuchs" />
   <h1>Privacy Policy</h1>
-  <p class="meta">Knabberfuchs 🦊 &middot; last updated 2 July 2026</p>
+  <p class="meta">Knabberfuchs 🦊 &middot; last updated 5 July 2026</p>
   <p class="langs"><strong>EN</strong> &middot; <a href="privacy-de.html">DE</a> &middot; <a href="privacy-fr.html">FR</a> &middot; <a href="privacy-it.html">IT</a></p>
 </header>
 
@@ -83,8 +83,8 @@
       <td>Open Food Facts (<span class="muted">world.openfoodfacts.org</span>)</td>
     </tr>
     <tr>
-      <td>AI meal photo recognition <strong>(optional)</strong></td>
-      <td>The meal photo you took and, if you typed one, your short text hint describing the meal — <em>only</em> if you have added your own Google&nbsp;Gemini API key</td>
+      <td>AI meal estimate <strong>(optional)</strong></td>
+      <td>The meal photo you took and/or the meal description you typed — <em>only</em> if you have added your own Google&nbsp;Gemini API key</td>
       <td>Google (<span class="muted">generativelanguage.googleapis.com</span>)</td>
     </tr>
     <tr>
@@ -99,25 +99,26 @@
     </tr>
   </table>
 
-  <h3>On-device photo recognition</h3>
-  <p>By default, the “scan a meal with AI” feature runs entirely on your device using a bundled image
-    model. Your photo never leaves the phone. It is only sent to Google if you have personally
-    entered a Google Gemini API key in Settings — a feature that is off until you set it up.</p>
+  <h3>AI meal estimates are off by default</h3>
+  <p>The “scan a meal with AI” and “describe a meal” features only work after you have personally
+    entered a Google Gemini API key in Settings. Without a key, nothing is ever sent to Google —
+    the app simply explains how to activate the feature.</p>
 
   <h3>If you use your own Gemini key</h3>
-  <p>When enabled, the meal photo — together with the optional short text hint you can type to
-    describe the meal (e.g. “homemade calzone”) — is sent to Google's Gemini API to estimate the
-    dish and its calories. That request is governed by
+  <p>When enabled, the meal photo (together with the optional short text hint you can type to
+    describe it, e.g. “homemade calzone”) or the meal description you typed is sent to Google's
+    Gemini API to estimate the dish and its calories. That request is governed by
     <a href="https://policies.google.com/privacy">Google's Privacy Policy</a> and the terms of Google
     AI Studio / the Gemini API. Depending on your Google account and plan, Google may use data sent to
     the free tier to improve their services. This is your choice; the app works fully without it.</p>
 
   <h2>4. Apple Health &amp; Health Connect (optional)</h2>
   <p>If you turn it on, the app can write your logged calories and macronutrients to your device's
-    health store — Apple Health on iOS, or Health Connect on Android. This is a write-only sync: the
-    data stays on your device, within Apple Health or Android Health Connect, and is never transmitted
-    to us. You can disable it at any time, and you control which apps may read that data through your
-    device's Health settings.</p>
+    health store — Apple Health on iOS, or Health Connect on Android. If you additionally enable the
+    activity budget, the app also reads your active energy (workout burn) from the health store to
+    adjust the day's calorie budget. All of this stays on your device, within Apple Health or Android
+    Health Connect, and is never transmitted to us. You can disable either at any time, and you
+    control the permissions through your device's Health settings.</p>
 
   <h2>5. No analytics, ads, or tracking</h2>
   <p>The app contains no advertising, no analytics or crash-reporting SDKs, no social-media trackers,

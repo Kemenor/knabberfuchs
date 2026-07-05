@@ -4,10 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Knabberfuchs — an honest calorie tracker</title>
-<meta name="description" content="Ad-free, no subscriptions, no popups. A fast, offline calorie tracker with barcode scan, AI meal photos, recipes and curated food data. Your data stays on your phone." />
+<meta name="description" content="Ad-free, no subscriptions, no popups. A fast, offline calorie tracker with barcode scan, AI meal estimates, recipes and curated food data. Your data stays on your phone." />
 <link rel="icon" href="favicon.png" type="image/png" />
 <meta property="og:title" content="Knabberfuchs — an honest calorie tracker" />
-<meta property="og:description" content="Ad-free, no subscriptions, no popups. Fast and offline, with barcode scan, AI meal photos and recipes. Your data stays on your phone." />
+<meta property="og:description" content="Ad-free, no subscriptions, no popups. Fast and offline, with barcode scan, AI meal estimates and recipes. Your data stays on your phone." />
 <meta property="og:image" content="screenshots/day.png" />
 <style>
   :root{
@@ -64,9 +64,9 @@
     <img class="logo" src="fox.png" alt="Knabberfuchs fox" />
     <h1>Knabberfuchs</h1>
     <p class="tagline">An honest calorie tracker.</p>
-    <p class="sub">Scan a barcode, search, snap a photo of your meal, or just type a name and
-      the calories. No ads, no subscription, no popups, no account. Works offline, and your
-      data never leaves your phone.</p>
+    <p class="sub">Scan a barcode, search, snap a photo of your meal, describe it in words, or
+      just type a name and the calories. No ads, no subscription, no popups, no account. Works
+      offline, and your data never leaves your phone.</p>
     <div class="store" style="margin:26px 0 4px">
       <a href="https://apps.apple.com/app/id6783844233"
          aria-label="Download Knabberfuchs on the App Store">
@@ -90,18 +90,20 @@
     <div class="shots">
       <figure><img src="screenshots/day.png" alt="The day view" />
         <figcaption>Your whole day at a glance</figcaption></figure>
-      <figure><img src="screenshots/recognize.png" alt="AI meal recognition" />
-        <figcaption>Snap a meal — AI names it &amp; estimates the calories</figcaption></figure>
+      <figure><img src="screenshots/targets.png" alt="Nutrient targets" />
+        <figcaption>Targets beyond calories — fibre, sugar, salt &amp; more</figcaption></figure>
       <figure><img src="screenshots/search.png" alt="Food search" />
         <figcaption>Search Open Food Facts + the Swiss food database</figcaption></figure>
+      <figure><img src="screenshots/trends.png" alt="Trends" />
+        <figcaption>See your trends — weekly &amp; monthly charts</figcaption></figure>
+      <figure><img src="screenshots/activity.png" alt="Activity budget" />
+        <figcaption>Opt in: workout burn raises the day's budget</figcaption></figure>
       <figure><img src="screenshots/recipe.png" alt="A recipe" />
         <figcaption>Build a recipe once, log it any day</figcaption></figure>
       <figure><img src="screenshots/regions.png" alt="Offline regions" />
         <figcaption>Download any country, search offline</figcaption></figure>
-      <figure><img src="screenshots/language.png" alt="Languages" />
-        <figcaption>English, German, French &amp; Italian</figcaption></figure>
-      <figure><img src="screenshots/trends.png" alt="Trends" />
-        <figcaption>See your trends — weekly &amp; monthly charts</figcaption></figure>
+      <figure><img src="screenshots/darkday.png" alt="Dark mode" />
+        <figcaption>Easy on the eyes — full dark mode</figcaption></figure>
     </div>
   </div>
 </section>
@@ -116,9 +118,10 @@
       <div class="feat"><span class="em">🔎</span><h3>Fast local search</h3>
         <p>Hundreds of thousands of foods from Open Food Facts, plus the curated Swiss Food
           Composition Database — instant, with smart ranking.</p></div>
-      <div class="feat"><span class="em">📸</span><h3>Recognise a meal</h3>
-        <p>Snap a photo and on-device AI guesses the dish and estimates the calories. No cloud,
-          no account — it runs entirely on your phone.</p></div>
+      <div class="feat"><span class="em">📸</span><h3>AI meal estimate</h3>
+        <p>Snap a photo or just describe the meal in words — AI names the dish and estimates
+          calories and macros. Optional and off by default: bring your own free Google Gemini
+          key; nothing is sent anywhere until you do.</p></div>
       <div class="feat"><span class="em">⚡</span><h3>Quick add</h3>
         <p>Already know the number? Log “Lasagna · 816&nbsp;kcal” in a couple of taps, with
           optional macros.</p></div>
@@ -136,8 +139,12 @@
         <p>Download any of 106 country databases and scan + search with no connection.</p></div>
       <div class="feat"><span class="em">🗣️</span><h3>Speaks your language</h3>
         <p>Available in English, German, French and Italian.</p></div>
-      <div class="feat"><span class="em">❤️</span><h3>Health Connect</h3>
-        <p>Optionally sync your logged calories &amp; macros to Android Health Connect.</p></div>
+      <div class="feat"><span class="em">🎯</span><h3>More than calories</h3>
+        <p>Track the nutrients you care about — protein, carbs, fat, fibre, saturated fat,
+          sugar, salt — each with its own per-weekday targets, day bars and trends.</p></div>
+      <div class="feat"><span class="em">❤️</span><h3>Apple Health &amp; Health Connect</h3>
+        <p>Optionally sync your logged calories &amp; macros, and opt in to let your workout
+          burn raise the day's calorie budget.</p></div>
       <div class="feat"><span class="em">💾</span><h3>Your data, a zip</h3>
         <p>Export everything to a backup zip (JSON + CSV) and restore it any time. No cloud,
           no lock-in.</p></div>
@@ -159,8 +166,7 @@
 <footer>
   <div class="wrap">
     Knabberfuchs · made in Switzerland 🇨🇭 · food data © Open Food Facts contributors (ODbL)
-    &amp; the Swiss Food Composition Database (FSVO) · on-device food recognition:
-    Google AIY food_V1 (Apache&nbsp;2.0)
+    &amp; the Swiss Food Composition Database (FSVO)
     <br /><a href="privacy.html">Privacy Policy</a> &middot; <a href="license.html">Licenses &amp; Attributions</a>
   </div>
 </footer>
