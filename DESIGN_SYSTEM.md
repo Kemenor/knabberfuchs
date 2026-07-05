@@ -30,17 +30,19 @@ application to components is app-level*).
 ## 1. Navigation
 
 - Root is a Material 3 `NavigationBar` ordered **Day, Recipes, [Trends],
-  Settings**. **Day is always index 0** (the only programmatic jump target). The
-  **Trends** tab is optional — toggled in Settings via `showTrendsProvider`; the
-  `pages`/`destinations` lists are built conditionally and the active index is
-  `clamp`ed. Each tab pairs an `_outlined` unselected icon with a filled
+  Settings**. The **Trends** tab is optional — toggled in Settings via
+  `showTrendsProvider`; the `tabs`/`pages`/`destinations` lists are built
+  conditionally. Each tab pairs an `_outlined` unselected icon with a filled
   `selectedIcon`. Live: `lib/ui/home_shell.dart`.
-- Tab index lives in `homeTabProvider` (`lib/providers.dart:307`). Switch tabs
-  with `ref.read(homeTabProvider.notifier).set(i)`; pages are kept alive in an
-  `IndexedStack` so scroll/search survive switching (`home_shell.dart:24`).
-- A flow can jump tabs programmatically — e.g. after logging a recipe portion it
-  jumps to Day: `ref.read(homeTabProvider.notifier).set(0)`
-  (`recipe_detail_screen.dart:297`).
+- The selected tab is a **`HomeTab` enum identity, never a raw index** —
+  `homeTabProvider` (`lib/providers.dart`). Indices shift meaning when the
+  optional Trends tab appears/disappears (that bug shipped once); HomeShell maps
+  the identity onto the current tab list and falls back to Day if the selected
+  tab vanished. Pages are kept alive in an `IndexedStack` so scroll/search
+  survive switching.
+- A flow can jump tabs programmatically — e.g. after logging a recipe portion:
+  `ref.read(homeTabProvider.notifier).set(HomeTab.day)`
+  (`recipe_detail_screen.dart`).
 - **No router package / named routes.** Push imperatively and return values via
   pop:
 
@@ -96,8 +98,14 @@ application to components is app-level*).
 
 - **Inline overflow menu on a row → `PopupMenuButton<String>`** with
   `icon: Icon(Symbols.more_vert_rounded, size: 20)`, text-only items (no leading
-  icons), labels from l10n. The only one is the meal-group header; item order is
-  **Edit, Scale, Split, Save as recipe, Delete**. Live: `day_screen.dart:518-545`.
+  icons), labels from l10n. Two live today: the meal-group header (item order
+  **Meal details, Edit, Scale, Split, Merge, Save as recipe, Delete** —
+  `day_screen.dart`) and the custom-food row (edit/delete —
+  `food_search_list.dart`). Destructive items confirm via the §5 Cancel →
+  Delete dialog before acting (meal delete cascades its entries).
+- The meal header's kcal subtotal is also a tappable **fast path** to the
+  read-only meal-detail page; the ⋮ menu carries the discoverable "Meal
+  details" entry for the same destination (`day_screen.dart`).
 
 - **A menu of distinct actions (not a row overflow) → a bottom sheet of labelled
   `ListTile`s, not a popup.** Each tile has a `leading` icon, `title`, and
