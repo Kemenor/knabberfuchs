@@ -116,6 +116,33 @@ void main() {
     expect(r.map((f) => f.name), isNot(contains('Candies, milk chocolate')));
   });
 
+  test(
+    'accented queries match accented stored names and search text',
+    () async {
+      await db.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.custom,
+          name: 'Birchermüesli, zubereitet',
+          kcal100: 86,
+        ),
+      );
+      // As typed with accents: the unfolded variant matches the stored name.
+      expect((await db.searchFoodsLocal('müesli')).length, 1);
+      expect((await db.searchFoodsLocal('Crème')).length, 0);
+      // Folded tokens match diacritic-free search_text spellings.
+      await db.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.custom,
+          externalId: const Value('st1'),
+          name: 'Crunchy Mix',
+          searchText: const Value('muesli mix crunchy'),
+          kcal100: 420,
+        ),
+      );
+      expect((await db.searchFoodsLocal('Müesli')).length, 2);
+    },
+  );
+
   test('ranks simpler/shorter names first', () async {
     await db.upsertFood(
       FoodsCompanion.insert(

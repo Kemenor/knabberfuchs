@@ -279,17 +279,24 @@ class AppDatabase extends _$AppDatabase {
   /// then shorter names so simple/raw entries beat prepared variants
   /// ("Potatoes, raw" before "Potatoes, au gratin, dry mix, ...").
   Future<List<Food>> searchFoodsLocal(String query, {int limit = 50}) {
-    final tokens = searchTokens(query);
+    // Each token must appear in name/brand/searchText under at least one of
+    // its spellings: diacritic-folded, or as typed (stored names and Swiss
+    // search_text keep their accents, and LIKE only case-folds ASCII).
+    final tokenVariants = searchTokenVariants(query);
     return (select(foods)
           ..where((f) {
             Expression<bool> expr = const Constant(true);
-            for (final t in tokens) {
-              final like = '%${t.replaceAll('%', '').replaceAll('_', '')}%';
-              expr =
-                  expr &
-                  (f.name.like(like) |
-                      f.brand.like(like) |
-                      f.searchText.like(like));
+            for (final variants in tokenVariants) {
+              Expression<bool> anySpelling = const Constant(false);
+              for (final v in variants) {
+                final like = '%${v.replaceAll('%', '').replaceAll('_', '')}%';
+                anySpelling =
+                    anySpelling |
+                    f.name.like(like) |
+                    f.brand.like(like) |
+                    f.searchText.like(like);
+              }
+              expr = expr & anySpelling;
             }
             return expr;
           })

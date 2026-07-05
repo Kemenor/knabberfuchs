@@ -31,4 +31,33 @@ void main() {
     expect(searchTokens('   '), isEmpty);
     expect(searchTokens(''), isEmpty);
   });
+
+  test('folds diacritics instead of splitting on them', () {
+    // Regression: splitting on [^a-z0-9] treated every accented letter as a
+    // separator ("Müsli" -> ['m', 'sli']), which broke offline-pack FTS
+    // prefix matching entirely for accented de/fr/it queries.
+    expect(searchTokens('Müsli'), ['musli']);
+    expect(searchTokens('Käse'), ['kase']);
+    expect(searchTokens('Crème fraîche'), ['creme', 'fraiche']);
+    expect(searchTokens('süß'), ['suss']);
+  });
+
+  test('searchTokenVariants pairs folded tokens with typed spellings', () {
+    expect(searchTokenVariants('Müesli'), [
+      ['muesli', 'müesli'],
+    ]);
+    expect(searchTokenVariants('crème fraîche'), [
+      ['creme', 'crème'],
+      ['fraiche', 'fraîche'],
+    ]);
+    // Pure-ASCII input has nothing extra to try.
+    expect(searchTokenVariants('olive oil'), [
+      ['olive'],
+      ['oil'],
+    ]);
+    // Synonym-introduced tokens exist only folded.
+    expect(searchTokenVariants('rocket'), [
+      ['arugula'],
+    ]);
+  });
 }

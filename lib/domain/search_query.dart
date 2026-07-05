@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'text_fold.dart';
+
 /// Common-name → USDA-name aliases. USDA uses formal "Noun, qualifier" names
 /// (e.g. "Peppers, sweet, green, raw"), so natural searches miss them. We
 /// rewrite the query after tokenizing, matching on whole-token phrases (longest
@@ -29,14 +31,15 @@ const Map<String, String> kSearchSynonyms = {
   'aubergines': 'eggplant',
 };
 
-/// Lower-case, split into alphanumeric tokens, apply produce synonyms on
-/// whole-token phrases.
+/// Lower-case, fold diacritics, split into alphanumeric tokens, apply produce
+/// synonyms on whole-token phrases. Folding must happen BEFORE the split:
+/// splitting on `[^a-z0-9]` treats every accented letter as a separator, so
+/// "Müsli" used to tokenize as ['m', 'sli'] — and 'sli*' can never prefix-match
+/// the offline packs' FTS index, which stores the diacritic-folded 'musli'.
 List<String> searchTokens(String raw) {
-  var tokens = raw
-      .toLowerCase()
-      .split(RegExp(r'[^a-z0-9]+'))
-      .where((t) => t.isNotEmpty)
-      .toList();
+  var tokens = foldDiacritics(
+    raw.toLowerCase(),
+  ).split(RegExp(r'[^a-z0-9]+')).where((t) => t.isNotEmpty).toList();
 
   // Longest key first so multi-word aliases ("bell pepper") win over any
   // shorter overlap before the tokens they'd consume are replaced.
@@ -52,6 +55,25 @@ List<String> searchTokens(String raw) {
 
   // Dedupe while preserving order (synonyms can introduce repeats).
   return LinkedHashSet<String>.from(tokens).toList();
+}
+
+/// Per-token spellings for LIKE-based local search: the folded token plus,
+/// when the user actually typed accents, the original accented token. Stored
+/// names and Swiss search_text keep their accents, and SQLite LIKE only
+/// case-folds ASCII — '%muesli%' alone would miss "Birchermüesli".
+List<List<String>> searchTokenVariants(String raw) {
+  final byFold = <String, String>{};
+  for (final t
+      in raw
+          .toLowerCase()
+          .split(RegExp(r'[^\p{L}\p{N}]+', unicode: true))
+          .where((t) => t.isNotEmpty)) {
+    byFold.putIfAbsent(foldDiacritics(t), () => t);
+  }
+  return [
+    for (final t in searchTokens(raw))
+      [t, if (byFold[t] != null && byFold[t] != t) byFold[t]!],
+  ];
 }
 
 /// Replace every contiguous run of [find] tokens with [replace] tokens.

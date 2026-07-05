@@ -1,3 +1,4 @@
+import 'text_fold.dart';
 import 'units.dart';
 
 /// One ingredient parsed from an OCR'd recipe line, e.g. "Olive Oil 2 tbsp".
@@ -28,37 +29,7 @@ class OcrIngredient {
 /// fold common accents, strip punctuation, collapse whitespace. So "Crème
 /// Fraîche" and "creme fraiche" map to the same key.
 String normalizeOcrName(String s) {
-  var n = s.toLowerCase().trim();
-  const accents = {
-    'à': 'a',
-    'á': 'a',
-    'â': 'a',
-    'ä': 'a',
-    'ã': 'a',
-    'å': 'a',
-    'è': 'e',
-    'é': 'e',
-    'ê': 'e',
-    'ë': 'e',
-    'ì': 'i',
-    'í': 'i',
-    'î': 'i',
-    'ï': 'i',
-    'ò': 'o',
-    'ó': 'o',
-    'ô': 'o',
-    'ö': 'o',
-    'õ': 'o',
-    'ù': 'u',
-    'ú': 'u',
-    'û': 'u',
-    'ü': 'u',
-    'ç': 'c',
-    'ñ': 'n',
-    'ß': 'ss',
-  };
-  accents.forEach((k, v) => n = n.replaceAll(k, v));
-  return n
+  return foldDiacritics(s.toLowerCase().trim())
       .replaceAll(RegExp(r'[^a-z0-9 ]'), ' ')
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();

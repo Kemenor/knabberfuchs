@@ -110,10 +110,28 @@ void main() {
 
     final results = await repo.searchLocal('yogurt');
     expect(results, hasLength(3));
-    expect(
-      results.map((f) => f.barcode).toSet(),
-      {'1000001', '1000002', '1000003'},
-    );
+    expect(results.map((f) => f.barcode).toSet(), {
+      '1000001',
+      '1000002',
+      '1000003',
+    });
+  });
+
+  test('accented queries hit the diacritic-folded pack FTS index', () async {
+    installFixture([
+      const PackProduct(barcode: '6000001', name: 'Familien Müsli'),
+      const PackProduct(barcode: '6000002', name: 'Käse Fondue'),
+    ]);
+
+    // Typed with accents: tokens must fold to match the folded index.
+    expect((await repo.searchLocal('Müsli')).map((f) => f.barcode), [
+      '6000001',
+    ]);
+    expect((await repo.searchLocal('Käse')).map((f) => f.barcode), ['6000002']);
+    // Typed without accents still matches the folded index.
+    expect((await repo.searchLocal('musli')).map((f) => f.barcode), [
+      '6000001',
+    ]);
   });
 
   test('searchLocal dedupes by barcode with cached rows winning', () async {
