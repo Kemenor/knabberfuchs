@@ -516,6 +516,12 @@ abstract class AppLocalizations {
   /// **'Delete meal'**
   String get mealMenuDelete;
 
+  /// Confirmation dialog title before deleting a whole meal group
+  ///
+  /// In en, this message translates to:
+  /// **'Delete “{name}”?'**
+  String mealDeleteConfirm(String name);
+
   /// Meal overflow menu: open the read-only per-meal nutrition breakdown page
   ///
   /// In en, this message translates to:

@@ -236,6 +236,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get mealMenuDelete => 'Mahlzeit löschen';
 
   @override
+  String mealDeleteConfirm(String name) {
+    return '„$name“ löschen?';
+  }
+
+  @override
   String get mealMenuDetails => 'Mahlzeit-Details';
 
   @override

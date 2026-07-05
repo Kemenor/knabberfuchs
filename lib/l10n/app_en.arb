@@ -148,6 +148,8 @@
   "@mealMenuSaveRecipe": { "description": "Meal overflow menu: save the meal as a recipe" },
   "mealMenuDelete": "Delete meal",
   "@mealMenuDelete": { "description": "Meal overflow menu: delete the meal and its entries" },
+  "mealDeleteConfirm": "Delete “{name}”?",
+  "@mealDeleteConfirm": { "description": "Confirmation dialog title before deleting a whole meal group", "placeholders": { "name": { "type": "String" } } },
   "mealMenuDetails": "Meal details",
   "@mealMenuDetails": { "description": "Meal overflow menu: open the read-only per-meal nutrition breakdown page" },
   "settingsShowMealNutrients": "Show nutrients per meal",

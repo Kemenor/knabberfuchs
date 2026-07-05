@@ -79,6 +79,7 @@
   "scaleMealDone": "Pasto ridimensionato al {pct}%",
   "mealMenuSaveRecipe": "Salva come ricetta",
   "mealMenuDelete": "Elimina pasto",
+  "mealDeleteConfirm": "Eliminare “{name}”?",
   "mealMenuDetails": "Dettagli del pasto",
   "settingsShowMealNutrients": "Mostra i nutrienti per pasto",
   "settingsShowMealNutrientsSub": "Aggiunge i nutrienti tracciati all'intestazione di ogni pasto",

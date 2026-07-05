@@ -236,6 +236,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealMenuDelete => 'Delete meal';
 
   @override
+  String mealDeleteConfirm(String name) {
+    return 'Delete “$name”?';
+  }
+
+  @override
   String get mealMenuDetails => 'Meal details';
 
   @override

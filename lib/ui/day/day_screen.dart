@@ -609,7 +609,7 @@ class _GroupSection extends ConsumerWidget {
                       case 'recipe':
                         _saveAsRecipe(context, ref);
                       case 'delete':
-                        _delete(ref);
+                        _delete(context, ref);
                     }
                   },
                   itemBuilder: (_) => [
@@ -745,11 +745,35 @@ class _GroupSection extends ConsumerWidget {
     );
   }
 
-  Future<void> _delete(WidgetRef ref) async {
-    if (ref.read(activeGroupProvider) == group.id) {
-      await ref.read(activeGroupProvider.notifier).end();
-    }
-    await ref.read(dbProvider).deleteEntryGroup(group.id);
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    // Destructive and un-undoable (the group cascade-deletes every entry in
+    // it), and the menu item sits right under "Save as recipe" — confirm,
+    // like recipe and custom-food deletion do.
+    final l10n = AppLocalizations.of(context);
+    // Read before the dialog await: ref is unusable if the card unmounts
+    // while the dialog is up.
+    final isActive = ref.read(activeGroupProvider) == group.id;
+    final activeNotifier = ref.read(activeGroupProvider.notifier);
+    final db = ref.read(dbProvider);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.mealDeleteConfirm(group.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.actionDelete),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    if (isActive) await activeNotifier.end();
+    await db.deleteEntryGroup(group.id);
   }
 }
 

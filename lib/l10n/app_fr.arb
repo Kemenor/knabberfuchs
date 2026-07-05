@@ -79,6 +79,7 @@
   "scaleMealDone": "Repas mis à {pct}%",
   "mealMenuSaveRecipe": "Enregistrer comme recette",
   "mealMenuDelete": "Supprimer le repas",
+  "mealDeleteConfirm": "Supprimer « {name} » ?",
   "mealMenuDetails": "Détails du repas",
   "settingsShowMealNutrients": "Afficher les nutriments par repas",
   "settingsShowMealNutrientsSub": "Ajoute vos nutriments suivis à l'en-tête de chaque repas",

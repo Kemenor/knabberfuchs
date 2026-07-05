@@ -79,6 +79,7 @@
   "scaleMealDone": "Mahlzeit auf {pct}% skaliert",
   "mealMenuSaveRecipe": "Als Rezept speichern",
   "mealMenuDelete": "Mahlzeit löschen",
+  "mealDeleteConfirm": "„{name}“ löschen?",
   "mealMenuDetails": "Mahlzeit-Details",
   "settingsShowMealNutrients": "Nährwerte pro Mahlzeit anzeigen",
   "settingsShowMealNutrientsSub": "Zeigt deine erfassten Nährwerte in jeder Mahlzeiten-Kopfzeile",
