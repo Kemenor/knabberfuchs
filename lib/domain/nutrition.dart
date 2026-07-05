@@ -64,12 +64,17 @@ class Nutrition {
 }
 
 /// Parse a micros JSON blob (nutrient-key -> number) into a typed map.
+/// Tolerant per entry: one malformed value drops that key, not the whole map
+/// (tracked nutrients would otherwise silently read 0 for the entry).
 Map<String, double> decodeMicros(String? json) {
   if (json == null || json.isEmpty) return const {};
   try {
     final raw = jsonDecode(json);
     if (raw is! Map) return const {};
-    return raw.map((k, v) => MapEntry(k.toString(), (v as num).toDouble()));
+    return {
+      for (final e in raw.entries)
+        if (e.value is num) e.key.toString(): (e.value as num).toDouble(),
+    };
   } catch (_) {
     return const {};
   }

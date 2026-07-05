@@ -77,6 +77,19 @@ void main() {
     expect(parseNutritionLabel(['Energie 473,0 kJ']).kcal100, closeTo(113, 1));
   });
 
+  test('salt matches whole words only, not Selen/selon/salato', () {
+    // Selenium row must not claim the salt slot before the real salt row.
+    final n = parseNutritionLabel(['Selen 0,01 mg', 'Salz 1,2 g']);
+    expect(n.saltG100, 1.2);
+    expect(
+      parseNutritionLabel(['préparé selon la recette 2 g']).saltG100,
+      isNull,
+    );
+    expect(parseNutritionLabel(['leggermente salato 3 g']).saltG100, isNull);
+    expect(parseNutritionLabel(['Sel 1,5 g']).saltG100, 1.5);
+    expect(parseNutritionLabel(['Sale 0,9 g']).saltG100, 0.9);
+  });
+
   test('hasAny false on irrelevant text', () {
     expect(parseNutritionLabel(['Ingredients: water, sugar']).hasAny, isFalse);
   });

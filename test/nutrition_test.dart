@@ -70,5 +70,9 @@ void main() {
       expect(decodeMicros('not json'), isEmpty);
       expect(decodeMicros(null), isEmpty);
     });
+
+    test('one malformed value drops that key, not the whole map', () {
+      expect(decodeMicros('{"fiber": 2.5, "salt": "oops"}'), {'fiber': 2.5});
+    });
   });
 }

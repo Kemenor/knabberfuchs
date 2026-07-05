@@ -40,7 +40,10 @@ const _protein = [
   'protein',
   'proteine',
 ];
-const _salt = ['salz', 'sel', 'salt', 'sale'];
+// Whole words only: plain contains would let 'sel' claim the selenium row of
+// Swiss labels ("Selen 0,01 mg") or French prose ("selon"), and 'sale'
+// Italian derivatives ("salato") — assigning the wrong number to salt.
+final _saltRe = RegExp(r'\b(salz|sel|salt|sale)\b');
 
 bool _has(String line, List<String> keys) => keys.any(line.contains);
 
@@ -113,7 +116,7 @@ NutritionLabel parseNutritionLabel(Iterable<String> lines) {
       out.carb100 = _grams(line);
     } else if (out.protein100 == null && _has(line, _protein)) {
       out.protein100 = _grams(line);
-    } else if (out.saltG100 == null && _has(line, _salt)) {
+    } else if (out.saltG100 == null && _saltRe.hasMatch(line)) {
       out.saltG100 = _grams(line);
     }
   }
