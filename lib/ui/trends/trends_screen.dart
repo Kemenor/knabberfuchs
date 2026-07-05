@@ -28,8 +28,7 @@ class TrendsScreen extends ConsumerWidget {
     // A selection whose nutrient was since disabled falls back to kcal (the
     // provider applies the same coercion to the charted series).
     final selected = ref.watch(selectedTrendMetricProvider);
-    final metric =
-        selected == TargetMetric.kcal || tracked.contains(selected)
+    final metric = selected == TargetMetric.kcal || tracked.contains(selected)
         ? selected
         : TargetMetric.kcal;
     final trendsAsync = ref.watch(trendsProvider);
@@ -213,7 +212,19 @@ String _metricValue(AppLocalizations l10n, TargetMetric m, double v) =>
 /// A "nice" y-axis gridline interval (~≤6 lines) that suits both the kcal range
 /// (thousands) and macro grams (tens to low hundreds).
 double _niceInterval(double topY) {
-  const List<double> steps = [10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000];
+  const List<double> steps = [
+    10,
+    20,
+    25,
+    50,
+    100,
+    200,
+    250,
+    500,
+    1000,
+    2000,
+    5000,
+  ];
   for (final s in steps) {
     if (topY / s <= 6) return s;
   }
@@ -251,10 +262,15 @@ class _TrendsBody extends StatelessWidget {
     // Summary is computed on the daily data; the chart collapses long ranges
     // into weekly buckets so they stay readable.
     final avg = logged.fold<double>(0, (s, t) => s + t.kcal) / logged.length;
-    final withTarget =
-        trends.where((t) => t.status != TargetStatus.none).toList();
-    final inTarget =
-        withTarget.where((t) => t.status == TargetStatus.inRange).length;
+    // "Days in target" counts only logged days: the gap-filled series carries
+    // 0 for unlogged days, and a max-only target scores 0 as inRange — two
+    // logged days out of thirty would otherwise read "30/30 in target".
+    final withTarget = logged
+        .where((t) => t.status != TargetStatus.none)
+        .toList();
+    final inTarget = withTarget
+        .where((t) => t.status == TargetStatus.inRange)
+        .length;
     final bucket = trendBucketFor(trends.length);
     final points = bucketTrends(trends);
 
@@ -280,7 +296,9 @@ class _TrendsBody extends StatelessWidget {
           ),
           const SizedBox(height: 4),
         ],
-        Expanded(child: _Chart(trends: points, bucket: bucket, metric: metric)),
+        Expanded(
+          child: _Chart(trends: points, bucket: bucket, metric: metric),
+        ),
       ],
     );
   }
@@ -330,7 +348,10 @@ class _SummaryCard extends StatelessWidget {
             ),
             if (targetedDays > 0)
               Expanded(
-                child: stat('$inTarget / $targetedDays', l10n.trendsDaysInTarget),
+                child: stat(
+                  '$inTarget / $targetedDays',
+                  l10n.trendsDaysInTarget,
+                ),
               ),
           ],
         ),
@@ -389,7 +410,8 @@ class _Chart extends StatelessWidget {
     // goals are uniform, sloped when they vary per weekday. Days without a goal
     // break the band. Always visible (it sits behind the line), so overshooting
     // never hides it.
-    FlSpot edge(int i, double? bound, double fallback) => trends[i].target.isEmpty
+    FlSpot edge(int i, double? bound, double fallback) =>
+        trends[i].target.isEmpty
         ? FlSpot.nullSpot
         : FlSpot(i.toDouble(), bound ?? fallback);
     final bandMin = [
@@ -403,145 +425,150 @@ class _Chart extends StatelessWidget {
     return Semantics(
       label: l10n.a11yTrendsChart,
       child: LineChart(
-      LineChartData(
-        minX: -0.4,
-        maxX: trends.length - 1 + 0.4,
-        minY: 0,
-        maxY: topY,
-        lineBarsData: [
-          // Intake line, dots colored by that day's status.
-          LineChartBarData(
-            spots: intake,
-            isCurved: false,
-            color: scheme.outline,
-            barWidth: 2.5,
-            dotData: FlDotData(
-              show: true,
-              getDotPainter: (spot, pct, bar, index) => FlDotCirclePainter(
-                radius: dense ? 2.5 : 4.5,
-                color: statusColor(context, trends[spot.x.round()].status),
-                strokeWidth: 0,
+        LineChartData(
+          minX: -0.4,
+          maxX: trends.length - 1 + 0.4,
+          minY: 0,
+          maxY: topY,
+          lineBarsData: [
+            // Intake line, dots colored by that day's status.
+            LineChartBarData(
+              spots: intake,
+              isCurved: false,
+              color: scheme.outline,
+              barWidth: 2.5,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, pct, bar, index) => FlDotCirclePainter(
+                  radius: dense ? 2.5 : 4.5,
+                  color: statusColor(context, trends[spot.x.round()].status),
+                  strokeWidth: 0,
+                ),
+              ),
+            ),
+            // Invisible band edges — only the fill between them shows.
+            if (hasTarget) ...[
+              LineChartBarData(
+                spots: bandMin,
+                barWidth: 0,
+                color: Colors.transparent,
+                dotData: const FlDotData(show: false),
+              ),
+              LineChartBarData(
+                spots: bandMax,
+                barWidth: 0,
+                color: Colors.transparent,
+                dotData: const FlDotData(show: false),
+              ),
+            ],
+          ],
+          betweenBarsData: [
+            if (hasTarget)
+              BetweenBarsData(
+                fromIndex: 1,
+                toIndex: 2,
+                color: scheme.primary.withValues(alpha: 0.13),
+              ),
+          ],
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: interval,
+            getDrawingHorizontalLine: (_) =>
+                FlLine(color: scheme.outlineVariant, strokeWidth: 0.5),
+          ),
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 44,
+                interval: interval,
+                getTitlesWidget: (value, meta) {
+                  if (value <= 0 || value > topY)
+                    return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Text(
+                      value.toInt().toString(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: scheme.outline,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 1,
+                reservedSize: 24,
+                getTitlesWidget: (value, meta) {
+                  final i = value.round();
+                  if (i < 0 || i >= trends.length || (value - i).abs() > 0.01) {
+                    return const SizedBox.shrink();
+                  }
+                  // Short ranges show weekday initials; longer ones thin out to
+                  // ~6 labels, anchored from the right so the latest day (the
+                  // focal point) is always labeled.
+                  if ((trends.length - 1 - i) % labelStep != 0) {
+                    return const SizedBox.shrink();
+                  }
+                  final date = trends[i].date;
+                  final label = switch (bucket) {
+                    // Months by name (with year if the range spans years).
+                    TrendBucket.monthly => DateFormat(
+                      trends.first.date.year != trends.last.date.year
+                          ? 'MMM yy'
+                          : 'MMM',
+                      locale,
+                    ).format(date),
+                    TrendBucket.weekly => DateFormat(
+                      'd/M',
+                      locale,
+                    ).format(date),
+                    TrendBucket.daily =>
+                      dense
+                          ? DateFormat('d/M', locale).format(date)
+                          : DateFormat('EEE', locale).format(date),
+                  };
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      label,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: scheme.outline,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
-          // Invisible band edges — only the fill between them shows.
-          if (hasTarget) ...[
-            LineChartBarData(
-              spots: bandMin,
-              barWidth: 0,
-              color: Colors.transparent,
-              dotData: const FlDotData(show: false),
-            ),
-            LineChartBarData(
-              spots: bandMax,
-              barWidth: 0,
-              color: Colors.transparent,
-              dotData: const FlDotData(show: false),
-            ),
-          ],
-        ],
-        betweenBarsData: [
-          if (hasTarget)
-            BetweenBarsData(
-              fromIndex: 1,
-              toIndex: 2,
-              color: scheme.primary.withValues(alpha: 0.13),
-            ),
-        ],
-        gridData: FlGridData(
-          show: true,
-          drawVerticalLine: false,
-          horizontalInterval: interval,
-          getDrawingHorizontalLine: (_) =>
-              FlLine(color: scheme.outlineVariant, strokeWidth: 0.5),
-        ),
-        borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(
-          topTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          rightTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 44,
-              interval: interval,
-              getTitlesWidget: (value, meta) {
-                if (value <= 0 || value > topY) return const SizedBox.shrink();
-                return Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Text(
-                    value.toInt().toString(),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: scheme.outline,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 1,
-              reservedSize: 24,
-              getTitlesWidget: (value, meta) {
-                final i = value.round();
-                if (i < 0 || i >= trends.length || (value - i).abs() > 0.01) {
-                  return const SizedBox.shrink();
-                }
-                // Short ranges show weekday initials; longer ones thin out to
-                // ~6 labels, anchored from the right so the latest day (the
-                // focal point) is always labeled.
-                if ((trends.length - 1 - i) % labelStep != 0) {
-                  return const SizedBox.shrink();
-                }
-                final date = trends[i].date;
-                final label = switch (bucket) {
-                  // Months by name (with year if the range spans years).
-                  TrendBucket.monthly => DateFormat(
-                    trends.first.date.year != trends.last.date.year
-                        ? 'MMM yy'
-                        : 'MMM',
-                    locale,
-                  ).format(date),
-                  TrendBucket.weekly => DateFormat('d/M', locale).format(date),
-                  TrendBucket.daily => dense
-                      ? DateFormat('d/M', locale).format(date)
-                      : DateFormat('EEE', locale).format(date),
-                };
-                return Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Text(
-                    label,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: scheme.outline,
-                    ),
-                  ),
-                );
-              },
+          lineTouchData: LineTouchData(
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipColor: (_) => scheme.inverseSurface,
+              getTooltipItems: (touched) => [
+                for (final s in touched)
+                  if (s.barIndex == 0)
+                    LineTooltipItem(
+                      '${DateFormat.MMMd(locale).format(trends[s.x.round()].date)}\n'
+                      '${_metricValue(l10n, metric, trends[s.x.round()].kcal)}',
+                      TextStyle(color: scheme.onInverseSurface, fontSize: 12),
+                    )
+                  else
+                    null,
+              ],
             ),
           ),
         ),
-        lineTouchData: LineTouchData(
-          touchTooltipData: LineTouchTooltipData(
-            getTooltipColor: (_) => scheme.inverseSurface,
-            getTooltipItems: (touched) => [
-              for (final s in touched)
-                if (s.barIndex == 0)
-                  LineTooltipItem(
-                    '${DateFormat.MMMd(locale).format(trends[s.x.round()].date)}\n'
-                    '${_metricValue(l10n, metric, trends[s.x.round()].kcal)}',
-                    TextStyle(color: scheme.onInverseSurface, fontSize: 12),
-                  )
-                else
-                  null,
-            ],
-          ),
-        ),
-      ),
       ),
     );
   }

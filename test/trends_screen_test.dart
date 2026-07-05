@@ -14,7 +14,9 @@ class _NoRestore extends TrendRangeNotifier {
 }
 
 void main() {
-  testWidgets('renders a LineChart and summary for logged days', (tester) async {
+  testWidgets('renders a LineChart and summary for logged days', (
+    tester,
+  ) async {
     const target = CalorieTarget(1800, 2200);
     final trends = [
       for (var i = 0; i < 7; i++)
@@ -49,6 +51,9 @@ void main() {
     expect(find.byType(LineChart), findsOneWidget);
     expect(find.text('Average / day'), findsOneWidget);
     expect(find.text('Days in target'), findsOneWidget);
+    // 6 logged days (the empty day is out of the denominator), of which
+    // 1900 and 2100 sit inside the 1800–2200 band.
+    expect(find.text('2 / 6'), findsOneWidget);
   });
 
   testWidgets('shows the empty state when nothing is logged', (tester) async {
