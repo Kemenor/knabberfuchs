@@ -92,6 +92,73 @@ void main() {
     expect(entry.groupId, groups.single.id);
   });
 
+  test(
+    'favorites/usage on catalog foods and OCR mappings round-trip',
+    () async {
+      final src = AppDatabase(NativeDatabase.memory());
+      addTearDown(src.close);
+
+      // A "seeded" catalog row the user favorited and used, with an OCR match.
+      final swissId = await src.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.swissFcdb,
+          externalId: const Value('273'),
+          name: 'Almond',
+          kcal100: 624,
+        ),
+      );
+      await src.setFavorite(swissId, true);
+      await src.bumpFoodUsage(swissId);
+      await src.setOcrMapping('mandel', swissId);
+
+      // An OCR match onto a custom food (row id will change on restore).
+      final repo = FoodRepository(src, OffApi(), RegionPackStore());
+      final custom = await repo.createFood(name: 'Oma Granola', kcal100: 450);
+      await src.setOcrMapping('granola', custom.id);
+
+      final map =
+          jsonDecode(
+                jsonEncode(
+                  await buildBackupMap(src, exportedAt: DateTime(2026, 7, 6)),
+                ),
+              )
+              as Map<String, dynamic>;
+
+      // Destination: same catalog row exists (re-seeded), plus stale user state
+      // that the restore must replace, not merge.
+      final dst = AppDatabase(NativeDatabase.memory());
+      addTearDown(dst.close);
+      final dstSwissId = await dst.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.swissFcdb,
+          externalId: const Value('273'),
+          name: 'Almond',
+          kcal100: 624,
+        ),
+      );
+      final other = await dst.upsertFood(
+        FoodsCompanion.insert(
+          source: FoodSource.swissFcdb,
+          externalId: const Value('999'),
+          name: 'Walnut',
+          kcal100: 654,
+        ),
+      );
+      await dst.setFavorite(other, true); // not in the backup -> cleared
+
+      await restoreBackupMap(dst, map);
+
+      final almond = (await dst.foodById(dstSwissId))!;
+      expect(almond.isFavorite, isTrue);
+      expect(almond.usageCount, 1);
+      expect(almond.lastUsedAt, isNotNull);
+      expect((await dst.foodById(other))!.isFavorite, isFalse);
+      expect((await dst.mappedFoodForOcr('mandel'))?.id, dstSwissId);
+      // Custom-food mapping re-links by name to the freshly-inserted row.
+      expect((await dst.mappedFoodForOcr('granola'))?.name, 'Oma Granola');
+    },
+  );
+
   test('restore is idempotent / replaces existing data', () async {
     final src = AppDatabase(NativeDatabase.memory());
     addTearDown(src.close);

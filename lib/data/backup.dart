@@ -12,8 +12,11 @@ import 'db/database.dart';
 /// added later within v2 restore to null/defaults when absent, so the version
 /// is unchanged: per-macro target bounds (`proteinMin/Max`, `carbMin/Max`,
 /// `fatMin/Max`), the Phase-15 nutrient bounds (`fiberMin/Max`,
-/// `satFatMin/Max`, `sugarMin/Max`, `saltMin/Max`) and the custom-food
-/// `barcode`/`externalId`/`densityGPerMl`/`usageCount`/`lastUsedAt` columns.
+/// `satFatMin/Max`, `sugarMin/Max`, `saltMin/Max`), the custom-food
+/// `barcode`/`externalId`/`densityGPerMl`/`usageCount`/`lastUsedAt` columns,
+/// and the `catalogFoodState` + `ocrMappings` sections (favorites/usage on
+/// catalog foods and remembered OCR matches, keyed by food identity rather
+/// than row id).
 const backupSchemaVersion = 2;
 
 /// Thrown when a backup was written by a newer app version than this build
@@ -49,7 +52,9 @@ Value<double?> _bound(Map<dynamic, dynamic> t, String key) =>
 
 /// Serialize all user data to a JSON-friendly map. Cached OFF/USDA foods are
 /// omitted (re-fetchable / re-seeded); entries carry their own nutrition
-/// snapshot, so nothing is lost.
+/// snapshot, so nothing is lost. User state *on* catalog rows — favorites,
+/// usage/recency, OCR matches — is user data and IS exported, keyed by the
+/// food's (source, externalId) identity so it survives differing row ids.
 Future<Map<String, dynamic>> buildBackupMap(
   AppDatabase db, {
   required DateTime exportedAt,
@@ -60,6 +65,34 @@ Future<Map<String, dynamic>> buildBackupMap(
   final recipes = await db.allRecipes();
   final targets = await db.allTargets();
   final settings = await db.allSettings();
+
+  // Favorites/usage on non-custom catalog rows (Swiss seed, OFF cache).
+  final catalogState =
+      await (db.select(db.foods)..where(
+            (f) =>
+                f.source.equalsValue(FoodSource.custom).not() &
+                f.externalId.isNotNull() &
+                (f.isFavorite.equals(true) |
+                    f.usageCount.isBiggerThanValue(0) |
+                    f.lastUsedAt.isNotNull()),
+          ))
+          .get();
+
+  // OCR name -> food matches, resolved to a portable food identity: custom
+  // foods restore with fresh row ids, so the mapping travels by name for
+  // those and by (source, externalId) for catalog rows.
+  final ocrMappings = <Map<String, dynamic>>[];
+  for (final m in await db.select(db.ocrMappings).get()) {
+    final food = await db.foodById(m.foodId);
+    if (food == null) continue;
+    if (food.source != FoodSource.custom && food.externalId == null) continue;
+    ocrMappings.add({
+      'name': m.normalizedName,
+      'foodSource': food.source.name,
+      'foodExternalId': food.externalId,
+      'foodName': food.name,
+    });
+  }
 
   final recipeItems = <Map<String, dynamic>>[];
   for (final r in recipes) {
@@ -162,6 +195,17 @@ Future<Map<String, dynamic>> buildBackupMap(
           'saltMax': t.saltMax,
         },
     ],
+    'catalogFoodState': [
+      for (final f in catalogState)
+        {
+          'source': f.source.name,
+          'externalId': f.externalId,
+          'isFavorite': f.isFavorite,
+          'usageCount': f.usageCount,
+          'lastUsedAt': f.lastUsedAt == null ? null : _ms(f.lastUsedAt!),
+        },
+    ],
+    'ocrMappings': ocrMappings,
     'settings': {
       for (final s in settings)
         if (!_credentialSettingKeys.contains(s.key)) s.key: s.value,
@@ -225,6 +269,20 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
     await (db.delete(
       db.foods,
     )..where((f) => f.source.equalsValue(FoodSource.custom))).go();
+    // Catalog rows stay, but the user state on them is replaced like every
+    // other user data: cleared here, re-applied from `catalogFoodState`
+    // below (absent in older exports -> cleared, matching restore-replaces
+    // semantics). Mappings onto deleted custom foods already cascaded away.
+    await (db.update(
+      db.foods,
+    )..where((f) => f.source.equalsValue(FoodSource.custom).not())).write(
+      const FoodsCompanion(
+        isFavorite: Value(false),
+        usageCount: Value(0),
+        lastUsedAt: Value(null),
+      ),
+    );
+    await db.delete(db.ocrMappings).go();
     await (db.delete(
       db.settings,
     )..where((s) => s.key.isNotIn(_credentialSettingKeys))).go();
@@ -359,6 +417,57 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
               saltMax: _bound(m, 'saltMax'),
             ),
           );
+    }
+
+    // Re-apply favorites/usage to catalog rows by (source, externalId).
+    // A row the destination doesn't have (e.g. an OFF product never scanned
+    // here) is skipped: the full food isn't in the backup, and it re-caches
+    // on the next scan/search.
+    for (final s in (map['catalogFoodState'] as List? ?? const [])) {
+      final source = FoodSource.values.asNameMap()[s['source'] as String?];
+      final ext = s['externalId'] as String?;
+      if (source == null || source == FoodSource.custom || ext == null) {
+        continue;
+      }
+      final food = await db.foodByExternal(source, ext);
+      if (food == null) continue;
+      await db.updateFoodById(
+        food.id,
+        FoodsCompanion(
+          isFavorite: Value((s['isFavorite'] as bool?) ?? false),
+          usageCount: Value((s['usageCount'] as num?)?.toInt() ?? 0),
+          lastUsedAt: Value(
+            s['lastUsedAt'] == null ? null : _dt(s['lastUsedAt']),
+          ),
+        ),
+      );
+    }
+
+    // Re-link OCR mappings: catalog foods by external identity, custom foods
+    // by name (their row ids changed on restore). Unresolvable ones are
+    // dropped — the auto-match memory just re-learns.
+    for (final m in (map['ocrMappings'] as List? ?? const [])) {
+      final name = m['name'] as String?;
+      final source = FoodSource.values.asNameMap()[m['foodSource'] as String?];
+      if (name == null || source == null) continue;
+      Food? food;
+      if (source == FoodSource.custom) {
+        final foodName = m['foodName'] as String?;
+        if (foodName != null) {
+          food =
+              await (db.select(db.foods)
+                    ..where(
+                      (f) =>
+                          f.source.equalsValue(FoodSource.custom) &
+                          f.name.equals(foodName),
+                    )
+                    ..limit(1))
+                  .getSingleOrNull();
+        }
+      } else if (m['foodExternalId'] is String) {
+        food = await db.foodByExternal(source, m['foodExternalId'] as String);
+      }
+      if (food != null) await db.setOcrMapping(name, food.id);
     }
 
     final settings = (map['settings'] as Map?) ?? const {};
