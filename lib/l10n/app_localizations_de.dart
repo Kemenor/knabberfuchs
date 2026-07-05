@@ -710,6 +710,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tipp: Hinterlege in den Einstellungen einen kostenlosen Gemini-Schlüssel für KI-Schätzungen aus Fotos und Beschreibungen.';
 
   @override
+  String get recognizeKeyMissingTitle => 'KI-Scan aktivieren';
+
+  @override
+  String get recognizeKeyMissingBody =>
+      'Das Scannen einer Mahlzeit mit KI nutzt Google Gemini und braucht einen kostenlosen API-Schlüssel. Hinterlege ihn in den Einstellungen unter „KI-Erkennung“, um die Funktion zu aktivieren.';
+
+  @override
+  String get actionGoToSettings => 'Zu den Einstellungen';
+
+  @override
   String get dayCaptureTooltip => 'Per Foto hinzufügen';
 
   @override

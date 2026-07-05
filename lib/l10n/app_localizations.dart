@@ -1296,6 +1296,24 @@ abstract class AppLocalizations {
   /// **'Tip: add a free Gemini key in Settings to unlock AI estimates for photos and descriptions.'**
   String get recognizeGeminiNudge;
 
+  /// Title of the dialog shown when the AI meal scan is tapped without a Gemini API key
+  ///
+  /// In en, this message translates to:
+  /// **'Activate AI scanning'**
+  String get recognizeKeyMissingTitle;
+
+  /// Body of the missing-key dialog; explains how to unlock the AI scan feature
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning a meal with AI uses Google Gemini and needs a free API key. Add one in Settings under “AI recognition” to activate it.'**
+  String get recognizeKeyMissingBody;
+
+  /// Dialog action that jumps to the Settings tab
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Settings'**
+  String get actionGoToSettings;
+
   /// Tooltip of the camera action on the Day screen
   ///
   /// In en, this message translates to:

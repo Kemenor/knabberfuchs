@@ -432,6 +432,22 @@ final homeTabProvider = NotifierProvider<HomeTabNotifier, int>(
   HomeTabNotifier.new,
 );
 
+/// One-shot scroll request for the Settings tab: flows that jump there (e.g.
+/// the missing-key dialog's "Go to Settings") name the section to reveal;
+/// SettingsScreen scrolls to it and clears the request.
+const settingsSectionAi = 'ai';
+
+class SettingsScrollNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void request(String section) => state = section;
+  void clear() => state = null;
+}
+
+final settingsScrollProvider = NotifierProvider<SettingsScrollNotifier, String?>(
+  SettingsScrollNotifier.new,
+);
+
 /// Whether the activity budget adjustment is on ('healthEnergyRead' setting).
 final healthEnergyReadProvider = StreamProvider<bool>(
   (ref) => ref

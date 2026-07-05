@@ -708,6 +708,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tip: add a free Gemini key in Settings to unlock AI estimates for photos and descriptions.';
 
   @override
+  String get recognizeKeyMissingTitle => 'Activate AI scanning';
+
+  @override
+  String get recognizeKeyMissingBody =>
+      'Scanning a meal with AI uses Google Gemini and needs a free API key. Add one in Settings under “AI recognition” to activate it.';
+
+  @override
+  String get actionGoToSettings => 'Go to Settings';
+
+  @override
   String get dayCaptureTooltip => 'Add from a photo';
 
   @override

@@ -22,11 +22,31 @@ import 'targets_screen.dart';
 /// HealthKit on iOS, Health Connect on Android — for user-facing labels.
 String _healthStore() => Platform.isIOS ? 'Apple Health' : 'Health Connect';
 
+/// Anchor for [settingsScrollProvider] requests targeting the AI section.
+/// File-level: the screen is a singleton inside HomeShell's IndexedStack.
+final _aiSectionKey = GlobalKey();
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<String?>(settingsScrollProvider, (_, target) {
+      if (target == null) return;
+      // Post-frame so a simultaneous tab switch has laid the list out.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final anchor = _aiSectionKey.currentContext;
+        if (target == settingsSectionAi && anchor != null) {
+          Scrollable.ensureVisible(
+            anchor,
+            alignment: 0,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
+        }
+        ref.read(settingsScrollProvider.notifier).clear();
+      });
+    });
     final db = ref.watch(dbProvider);
     final targetsAsync = ref.watch(targetsProvider);
     final healthSync =
@@ -127,7 +147,10 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              _SectionHeader(l10n.settingsAi),
+              KeyedSubtree(
+                key: _aiSectionKey,
+                child: _SectionHeader(l10n.settingsAi),
+              ),
               const _SettingsCard(children: [_AiKeyTile()]),
               _SectionHeader(l10n.settingsHealthConnect(_healthStore())),
               _SettingsCard(

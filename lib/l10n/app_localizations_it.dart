@@ -710,6 +710,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'Suggerimento: aggiungi una chiave Gemini gratuita nelle Impostazioni per sbloccare le stime IA da foto e descrizioni.';
 
   @override
+  String get recognizeKeyMissingTitle => 'Attiva la scansione IA';
+
+  @override
+  String get recognizeKeyMissingBody =>
+      'La scansione di un pasto con l\'IA usa Google Gemini e richiede una chiave API gratuita. Aggiungila nelle Impostazioni, sezione “Riconoscimento IA”, per attivare la funzione.';
+
+  @override
+  String get actionGoToSettings => 'Vai alle Impostazioni';
+
+  @override
   String get dayCaptureTooltip => 'Aggiungi da una foto';
 
   @override

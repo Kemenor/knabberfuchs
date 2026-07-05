@@ -50,17 +50,32 @@ Future<bool> startRecognizeFoodFlow(
   if (!context.mounted) return false;
 
   if (geminiKey == null || geminiKey.isEmpty) {
-    messenger.showAutoSnackBar(
-      SnackBar(content: Text(l10n.recognizeGeminiNudge)),
+    // No key → explain how to unlock the feature instead of dropping into a
+    // plain Quick add (testers misread that as the scan having "worked").
+    final goToSettings = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: Text(l10n.recognizeKeyMissingTitle),
+        content: Text(l10n.recognizeKeyMissingBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
+            child: Text(l10n.actionGoToSettings),
+          ),
+        ],
+      ),
     );
-    return await showQuickAddSheet(
-          context,
-          ref,
-          day: day,
-          meal: meal,
-          resolveGroup: resolveGroup,
-        ) ==
-        true;
+    if (goToSettings == true && context.mounted) {
+      // Settings is always the last tab (Day, Recipes, [Trends], Settings).
+      final showTrends = ref.read(showTrendsProvider).asData?.value ?? true;
+      ref.read(homeTabProvider.notifier).set(showTrends ? 3 : 2);
+      ref.read(settingsScrollProvider.notifier).request(settingsSectionAi);
+    }
+    return false;
   }
 
   final bytes = await ref.read(mealImagePickerProvider)(context);
