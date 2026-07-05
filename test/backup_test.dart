@@ -259,6 +259,56 @@ void main() {
     expect(await db.getSetting('geminiApiKey'), 'secret-key-123');
   });
 
+  test('corrupt mealType throws FormatException and rolls back', () async {
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+    await _seed(db); // existing data that must survive the failed restore
+
+    final bad = {
+      'schemaVersion': backupSchemaVersion,
+      'exportedAt': DateTime(2026, 7, 6).millisecondsSinceEpoch,
+      'entries': [
+        {
+          'id': 1,
+          'day': '2026-07-01',
+          'mealType': 99, // out of range
+          'grams': 100,
+          'sName': 'X',
+          'sKcal100': 50,
+        },
+      ],
+    };
+    await expectLater(
+      restoreBackupMap(db, bad),
+      throwsA(isA<FormatException>()),
+    );
+    // Transaction rolled back: the pre-existing diary is untouched.
+    expect((await db.allEntries()).single.sName, 'Apple');
+    expect((await db.allCustomFoods()).single.name, 'Apple');
+  });
+
+  test('missing createdAt restores as the export time, not 1970', () async {
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+    final exported = DateTime(2026, 7, 6);
+    await restoreBackupMap(db, {
+      'schemaVersion': backupSchemaVersion,
+      'exportedAt': exported.millisecondsSinceEpoch,
+      'entries': [
+        {
+          'id': 1,
+          'day': '2026-07-01',
+          'mealType': 0,
+          'grams': 100,
+          'sName': 'X',
+          'sKcal100': 50,
+          // no createdAt
+        },
+      ],
+    });
+    expect((await db.allEntries()).single.createdAt, exported);
+  });
+
   test('restore rejects a backup written by a newer app version', () async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);

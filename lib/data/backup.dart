@@ -42,6 +42,16 @@ DateTime _dt(Object? v) =>
     DateTime.fromMillisecondsSinceEpoch((v as num?)?.toInt() ?? 0);
 double? _d(Object? v) => v == null ? null : (v as num).toDouble();
 
+/// Enum-by-index from a backup value; a corrupted/hand-edited index becomes
+/// the localized "invalid format" error instead of a raw RangeError.
+T _enumAt<T>(List<T> values, Object? v, String field) {
+  final i = (v as num?)?.toInt() ?? -1;
+  if (i < 0 || i >= values.length) {
+    throw FormatException('Backup field $field has invalid value $v');
+  }
+  return values[i];
+}
+
 /// A target bound read from a backup: an *absent* key stays [Value.absent] so
 /// restoring an older export never null-overwrites bounds it predates, while
 /// a present-but-null key still restores as "no target set".
@@ -261,6 +271,12 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
   if (version > backupSchemaVersion) {
     throw BackupVersionException(version);
   }
+  // Missing/zero createdAt (hand-edited or pre-field exports) restores as the
+  // export time rather than 1970, so created-at ordering stays sane.
+  final exportedAt = _dt(
+    map['exportedAt'] ?? DateTime.now().millisecondsSinceEpoch,
+  );
+  DateTime createdAt(Object? v) => v == null ? exportedAt : _dt(v);
   await db.transaction(() async {
     await db.delete(db.entries).go();
     await db.delete(db.entryGroups).go();
@@ -363,7 +379,7 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
               id: Value((g['id'] as num).toInt()),
               day: Value(g['day'] as String),
               name: Value(g['name'] as String),
-              createdAt: Value(_dt(g['createdAt'])),
+              createdAt: Value(createdAt(g['createdAt'])),
             ),
           );
     }
@@ -376,7 +392,9 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
               id: Value((e['id'] as num).toInt()),
               day: Value(e['day'] as String),
               groupId: Value((e['groupId'] as num?)?.toInt()),
-              mealType: Value(MealType.values[(e['mealType'] as num).toInt()]),
+              mealType: Value(
+                _enumAt(MealType.values, e['mealType'], 'mealType'),
+              ),
               grams: Value(_d(e['grams']) ?? 0),
               sName: Value(e['sName'] as String),
               sKcal100: Value(_d(e['sKcal100']) ?? 0),
@@ -385,7 +403,7 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
               sFat100: Value(_d(e['sFat100'])),
               sMicrosJson: Value(e['sMicrosJson'] as String?),
               sortIndex: Value((e['sortIndex'] as num?)?.toInt() ?? 0),
-              createdAt: Value(_dt(e['createdAt'])),
+              createdAt: Value(createdAt(e['createdAt'])),
             ),
           );
     }
