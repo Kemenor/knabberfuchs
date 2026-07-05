@@ -30,122 +30,134 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
-      await m.createAll();
-      // Seed the 7 weekday target rows (all null = "use default").
-      for (var wd = 0; wd < 7; wd++) {
-        await into(targets).insert(TargetsCompanion.insert(weekday: Value(wd)));
-      }
+      await transaction(() async {
+        await m.createAll();
+        // Seed the 7 weekday target rows (all null = "use default").
+        for (var wd = 0; wd < 7; wd++) {
+          await into(
+            targets,
+          ).insert(TargetsCompanion.insert(weekday: Value(wd)));
+        }
+      });
     },
     onUpgrade: (m, from, to) async {
-      if (from < 2) {
-        // Split single calorie target into min/max; carry the old value
-        // forward as the maximum, and rename the default setting key.
-        await m.addColumn(targets, targets.kcalMin);
-        await m.addColumn(targets, targets.kcalMax);
-        await customStatement('UPDATE targets SET kcal_max = kcal');
-        await customStatement(
-          "UPDATE settings SET key = 'defaultKcalMax' "
-          "WHERE key = 'defaultKcalTarget'",
-        );
-      }
-      if (from < 3) {
-        // Ad-hoc meal groups for track-by-day mode.
-        await m.createTable(entryGroups);
-        await m.addColumn(entries, entries.groupId);
-      }
-      if (from < 4) {
-        // Installed offline region packs.
-        await m.createTable(installedPacks);
-      }
-      if (from < 5) {
-        // Remembered OCR ingredient-name -> food matches.
-        await m.createTable(ocrMappings);
-      }
-      if (from < 6) {
-        // Track recency for the "recently used" default food list. Seed it
-        // from updatedAt so previously-used foods aren't all blank.
-        await m.addColumn(foods, foods.lastUsedAt);
-        await customStatement(
-          'UPDATE foods SET last_used_at = updated_at '
-          'WHERE usage_count > 0',
-        );
-      }
-      if (from < 7) {
-        // Multilingual catalog (Swiss FCDB replaces the English-only USDA
-        // generic layer). Add localized name + cross-language search columns.
-        await m.addColumn(foods, foods.nameDe);
-        await m.addColumn(foods, foods.nameFr);
-        await m.addColumn(foods, foods.nameIt);
-        await m.addColumn(foods, foods.searchText);
-      }
-      if (from < 8) {
-        // The v7 Swiss-FCDB switch purged the bundled USDA rows in the seeder
-        // (not in the migration), so a device jumping here from <=6 still
-        // holds them — as old-numbering source 1, which the renumbering below
-        // would relabel as `custom`. Delete them first (a no-op for devices
-        // that went through v7, where the seeder already removed them). FK
-        // enforcement is off during migrations, so apply the declared
-        // referential actions by hand: entries.food_id is SET NULL,
-        // ocr_mappings.food_id is CASCADE.
-        await customStatement(
-          'UPDATE entries SET food_id = NULL WHERE food_id IN '
-          '(SELECT id FROM foods WHERE source = 1)',
-        );
-        await customStatement(
-          'DELETE FROM ocr_mappings WHERE food_id IN '
-          '(SELECT id FROM foods WHERE source = 1)',
-        );
-        await customStatement('DELETE FROM foods WHERE source = 1');
-        // FoodSource dropped the now-dead `usda` and `userContributed`
-        // values, so stored indices shift: old {off:0, usda:1, custom:2,
-        // userContributed:3, swissFcdb:4} -> new {off:0, custom:1,
-        // swissFcdb:2}. Renumber in order so no row moves twice.
-        await customStatement(
-          'UPDATE foods SET source = 1 WHERE source IN (2, 3)',
-        );
-        await customStatement('UPDATE foods SET source = 2 WHERE source = 4');
-      }
-      if (from < 9) {
-        // Per-food liquid density (g/ml) for accurate volume → grams.
-        await m.addColumn(foods, foods.densityGPerMl);
-      }
-      if (from < 10) {
-        // Drop the dead legacy `kcal` column (fully superseded by
-        // kcalMin/kcalMax; any value was migrated into kcal_max at v2).
-        await customStatement('ALTER TABLE targets DROP COLUMN kcal');
-      }
-      if (from < 11) {
-        // Per-macro min/max targets (protein/carb/fat), at parity with kcal.
-        // Replaces the never-surfaced single protein/carb/fat columns that have
-        // sat unused (always null) on the table since Phase 1.
-        await m.addColumn(targets, targets.proteinMin);
-        await m.addColumn(targets, targets.proteinMax);
-        await m.addColumn(targets, targets.carbMin);
-        await m.addColumn(targets, targets.carbMax);
-        await m.addColumn(targets, targets.fatMin);
-        await m.addColumn(targets, targets.fatMax);
-        await customStatement('ALTER TABLE targets DROP COLUMN protein');
-        await customStatement('ALTER TABLE targets DROP COLUMN carb');
-        await customStatement('ALTER TABLE targets DROP COLUMN fat');
-      }
-      if (from < 12) {
-        // Phase 15: configurable tracked nutrients — target bounds for
-        // fiber/satFat/sugar/salt, same shape as the v11 macro columns.
-        await m.addColumn(targets, targets.fiberMin);
-        await m.addColumn(targets, targets.fiberMax);
-        await m.addColumn(targets, targets.satFatMin);
-        await m.addColumn(targets, targets.satFatMax);
-        await m.addColumn(targets, targets.sugarMin);
-        await m.addColumn(targets, targets.sugarMax);
-        await m.addColumn(targets, targets.saltMin);
-        await m.addColumn(targets, targets.saltMax);
-        // Best-effort history backfill (grilled 2026-07-02): entries never
-        // snapshotted fiber/satFat/sugar/salt before v12, so entries that
-        // still link to a catalog food adopt the food's CURRENT per-100g
-        // values — explicitly a heuristic (foods are editable; foodId is only
-        // set-null on delete). json_patch keeps any existing micros keys.
-        // Snapshot-only entries (quick-add, recipes, imports) stay as logged.
-        await customStatement('''
+      // Drift executes these steps without a wrapping transaction and bumps
+      // user_version only after the callback returns, so a kill mid-upgrade
+      // would re-run already-committed steps on the next launch — and the v8
+      // renumbering is destructive on a second pass (source=1 then means
+      // `custom`). One transaction makes the whole chain all-or-nothing.
+      // FKs are still off here (beforeOpen hasn't run), which also matters
+      // because PRAGMA changes are ignored inside a transaction.
+      await transaction(() async {
+        if (from < 2) {
+          // Split single calorie target into min/max; carry the old value
+          // forward as the maximum, and rename the default setting key.
+          await m.addColumn(targets, targets.kcalMin);
+          await m.addColumn(targets, targets.kcalMax);
+          await customStatement('UPDATE targets SET kcal_max = kcal');
+          await customStatement(
+            "UPDATE settings SET key = 'defaultKcalMax' "
+            "WHERE key = 'defaultKcalTarget'",
+          );
+        }
+        if (from < 3) {
+          // Ad-hoc meal groups for track-by-day mode.
+          await m.createTable(entryGroups);
+          await m.addColumn(entries, entries.groupId);
+        }
+        if (from < 4) {
+          // Installed offline region packs.
+          await m.createTable(installedPacks);
+        }
+        if (from < 5) {
+          // Remembered OCR ingredient-name -> food matches.
+          await m.createTable(ocrMappings);
+        }
+        if (from < 6) {
+          // Track recency for the "recently used" default food list. Seed it
+          // from updatedAt so previously-used foods aren't all blank.
+          await m.addColumn(foods, foods.lastUsedAt);
+          await customStatement(
+            'UPDATE foods SET last_used_at = updated_at '
+            'WHERE usage_count > 0',
+          );
+        }
+        if (from < 7) {
+          // Multilingual catalog (Swiss FCDB replaces the English-only USDA
+          // generic layer). Add localized name + cross-language search columns.
+          await m.addColumn(foods, foods.nameDe);
+          await m.addColumn(foods, foods.nameFr);
+          await m.addColumn(foods, foods.nameIt);
+          await m.addColumn(foods, foods.searchText);
+        }
+        if (from < 8) {
+          // The v7 Swiss-FCDB switch purged the bundled USDA rows in the seeder
+          // (not in the migration), so a device jumping here from <=6 still
+          // holds them — as old-numbering source 1, which the renumbering below
+          // would relabel as `custom`. Delete them first (a no-op for devices
+          // that went through v7, where the seeder already removed them). FK
+          // enforcement is off during migrations, so apply the declared
+          // referential actions by hand: entries.food_id is SET NULL,
+          // ocr_mappings.food_id is CASCADE.
+          await customStatement(
+            'UPDATE entries SET food_id = NULL WHERE food_id IN '
+            '(SELECT id FROM foods WHERE source = 1)',
+          );
+          await customStatement(
+            'DELETE FROM ocr_mappings WHERE food_id IN '
+            '(SELECT id FROM foods WHERE source = 1)',
+          );
+          await customStatement('DELETE FROM foods WHERE source = 1');
+          // FoodSource dropped the now-dead `usda` and `userContributed`
+          // values, so stored indices shift: old {off:0, usda:1, custom:2,
+          // userContributed:3, swissFcdb:4} -> new {off:0, custom:1,
+          // swissFcdb:2}. Renumber in order so no row moves twice.
+          await customStatement(
+            'UPDATE foods SET source = 1 WHERE source IN (2, 3)',
+          );
+          await customStatement('UPDATE foods SET source = 2 WHERE source = 4');
+        }
+        if (from < 9) {
+          // Per-food liquid density (g/ml) for accurate volume → grams.
+          await m.addColumn(foods, foods.densityGPerMl);
+        }
+        if (from < 10) {
+          // Drop the dead legacy `kcal` column (fully superseded by
+          // kcalMin/kcalMax; any value was migrated into kcal_max at v2).
+          await customStatement('ALTER TABLE targets DROP COLUMN kcal');
+        }
+        if (from < 11) {
+          // Per-macro min/max targets (protein/carb/fat), at parity with kcal.
+          // Replaces the never-surfaced single protein/carb/fat columns that have
+          // sat unused (always null) on the table since Phase 1.
+          await m.addColumn(targets, targets.proteinMin);
+          await m.addColumn(targets, targets.proteinMax);
+          await m.addColumn(targets, targets.carbMin);
+          await m.addColumn(targets, targets.carbMax);
+          await m.addColumn(targets, targets.fatMin);
+          await m.addColumn(targets, targets.fatMax);
+          await customStatement('ALTER TABLE targets DROP COLUMN protein');
+          await customStatement('ALTER TABLE targets DROP COLUMN carb');
+          await customStatement('ALTER TABLE targets DROP COLUMN fat');
+        }
+        if (from < 12) {
+          // Phase 15: configurable tracked nutrients — target bounds for
+          // fiber/satFat/sugar/salt, same shape as the v11 macro columns.
+          await m.addColumn(targets, targets.fiberMin);
+          await m.addColumn(targets, targets.fiberMax);
+          await m.addColumn(targets, targets.satFatMin);
+          await m.addColumn(targets, targets.satFatMax);
+          await m.addColumn(targets, targets.sugarMin);
+          await m.addColumn(targets, targets.sugarMax);
+          await m.addColumn(targets, targets.saltMin);
+          await m.addColumn(targets, targets.saltMax);
+          // Best-effort history backfill (grilled 2026-07-02): entries never
+          // snapshotted fiber/satFat/sugar/salt before v12, so entries that
+          // still link to a catalog food adopt the food's CURRENT per-100g
+          // values — explicitly a heuristic (foods are editable; foodId is only
+          // set-null on delete). json_patch keeps any existing micros keys.
+          // Snapshot-only entries (quick-add, recipes, imports) stay as logged.
+          await customStatement('''
           UPDATE entries SET s_micros_json = json_patch(
             COALESCE(s_micros_json, '{}'),
             (SELECT json_patch(json_patch(json_patch(
@@ -162,20 +174,20 @@ class AppDatabase extends _$AppDatabase {
           WHERE food_id IS NOT NULL
             AND EXISTS (SELECT 1 FROM foods f WHERE f.id = entries.food_id)
         ''');
-      }
-      if (from < 13) {
-        // The v12 backfill reached only entries still linked to a catalog
-        // food. Snapshot-only rows — recipe items (never had a food FK) and
-        // recipe-logged entries (food_id is NULL by design) — kept reading 0
-        // for the tracked nutrients, and re-logging a pre-v12 recipe kept
-        // producing micro-less entries forever (found via a tester's Health
-        // Connect resync, 2026-07-03). Re-link them heuristically: exactly
-        // one catalog food whose name (any locale — s_name is written from
-        // localizedName at log/recipe-build time) and kcal100 both match the
-        // snapshot. Additive only: json_patch(food, existing) lets keys
-        // already in the snapshot win, unlike v12 where none could exist.
-        String foodMicrosJson(String table) =>
-            '''
+        }
+        if (from < 13) {
+          // The v12 backfill reached only entries still linked to a catalog
+          // food. Snapshot-only rows — recipe items (never had a food FK) and
+          // recipe-logged entries (food_id is NULL by design) — kept reading 0
+          // for the tracked nutrients, and re-logging a pre-v12 recipe kept
+          // producing micro-less entries forever (found via a tester's Health
+          // Connect resync, 2026-07-03). Re-link them heuristically: exactly
+          // one catalog food whose name (any locale — s_name is written from
+          // localizedName at log/recipe-build time) and kcal100 both match the
+          // snapshot. Additive only: json_patch(food, existing) lets keys
+          // already in the snapshot win, unlike v12 where none could exist.
+          String foodMicrosJson(String table) =>
+              '''
           (SELECT json_patch(json_patch(json_patch(
               CASE WHEN f.fiber100 IS NOT NULL
                 THEN json_object('fiber', f.fiber100) ELSE '{}' END,
@@ -189,27 +201,28 @@ class AppDatabase extends _$AppDatabase {
            WHERE $table.s_name IN (f.name, f.name_de, f.name_fr, f.name_it)
              AND f.kcal100 = $table.s_kcal100)
         ''';
-        String uniqueMatch(String table) =>
-            '''
+          String uniqueMatch(String table) =>
+              '''
           (SELECT COUNT(*) FROM foods f
            WHERE $table.s_name IN (f.name, f.name_de, f.name_fr, f.name_it)
              AND f.kcal100 = $table.s_kcal100) = 1
         ''';
-        await customStatement('''
+          await customStatement('''
           UPDATE recipe_items SET s_micros_json = json_patch(
             ${foodMicrosJson('recipe_items')},
             COALESCE(s_micros_json, '{}')
           )
           WHERE ${uniqueMatch('recipe_items')}
         ''');
-        await customStatement('''
+          await customStatement('''
           UPDATE entries SET s_micros_json = json_patch(
             ${foodMicrosJson('entries')},
             COALESCE(s_micros_json, '{}')
           )
           WHERE food_id IS NULL AND ${uniqueMatch('entries')}
         ''');
-      }
+        }
+      });
     },
     beforeOpen: (details) async {
       // Enforce FK constraints (recipe_items cascade, entries.food set-null).
