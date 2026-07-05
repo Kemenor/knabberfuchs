@@ -1,125 +1,117 @@
 # Knabberfuchs — Full Review Synthesis
 
-Knabberfuchs is in genuinely good shape for a solo project: the domain math, l10n, secret hygiene, and CI craftsmanship are all above par, and the verification pass repeatedly confirmed *conventions being followed*, not just bugs. The confirmed problems cluster in four places: **backup/restore** (a restore that can abort outright, silently dropped fields, an unimplemented version migration, and a plaintext API key in the ZIP), **the offline-pack feature** (two bugs that together make it far less functional than intended), **date arithmetic across DST** (real breakage for the app's Swiss/EU users, twice a year), and **test coverage exactly where damage is irreversible** (11 versions of hand-written SQL migrations with zero tests). A second tier is documentation rot — the privacy policy under-discloses what the Gemini flow sends, and DESIGN_SYSTEM.md/CLAUDE.md/README actively contradict the shipped code.
+*Review date: 2026-07-06, at commit `2af3c06` (v1.3.0+36). Four parallel deep-review passes: data layer, UI/state, domain+tests, CI/tooling/security/docs. Every finding below was verified against the actual code — file:line references included. Supersedes the 2026-07-02 review.*
+
+**Headline:** the 2026-07-02 review's entire top-priority list — all eight items — is **fixed and verified** (details in the last section). The suite is green: `flutter analyze` clean, 201/201 tests pass. The new findings cluster in three places: **upgrade-path atomicity** (the migration chain is not transactional, and an interrupted upgrade can destroy custom foods), **search for accented queries** (the tokenizer defeats offline-pack FTS for exactly the German/French queries this app's users type), and **identity/credential hygiene at the edges** (real name in commit author emails of a public repo; Gemini key rides along in OS cloud backups).
 
 ## At a glance
 
-| Dimension | Health | Confirmed findings |
+| Dimension | Health | Notes |
 |---|---|---|
-| data-layer | fair | 8 |
-| ui-design | good | 8 |
-| l10n | good | 5 |
-| net-ml-offline | fair | 9 |
-| platform-secrets | good | 5 |
-| tests | needs work | 12 |
-| ci | good | 8 |
-| docs | fair | 10 |
-
-*(Counts are per-dimension as reported; several findings are cross-dimension duplicates and are merged below.)*
+| data layer | good, one critical | Snapshot design, FK enforcement, transactional backup import all solid; migration chain lacks a transaction wrapper |
+| UI / state | good | Conventions followed almost everywhere; a wrong statistic and two sheet lifecycle gaps |
+| domain logic | good | Math verified correct (kJ, sodium, DST); tokenizer diacritic bug is the outlier |
+| tests | strong | 670-line fixture-based migration suite is the standout; gaps only at Gemini HTTP loop + Health service |
+| CI | strong | Release gates in place, secrets handled well, actions pinned |
+| security/privacy | fair | Tracked files clean; commit metadata and OS-backup scope are the two leaks |
+| docs | good | Privacy pages accurate and current; website hero overclaims; DESIGN_SYSTEM §3 rotted |
 
 ## Top priorities
 
-1. **Backup restore can abort entirely on a PK collision** — `lib/data/backup.dart:184`. Custom foods are reinserted with their original ids into a foods table that still holds Swiss-seed (~ids 1–290) and OFF-cache rows; any id overlap throws, rolls back the whole transaction, and restore fails with no recovery path. Fix: insert without explicit id and let autoincrement assign — nothing references custom-food ids (entries drop `foodId` on restore).
-2. **Offline-pack search results collapse to one row** — `lib/ui/food/food_search_list.dart:122`. All pack rows have `id: 0`, and the UI dedupes the merged list on raw `f.id`, silently dropping every pack result after the first. Fix: dedupe on the same key as `searchLocal` (`barcode ?? 'id:${f.id}:${f.name}'`) or give pack results sentinel ids.
-3. **Privacy policy misstates what the Gemini flow sends** — `docs/privacy.html:87` (+ de/fr/it). Since 2026-06-28 the user's free-text meal hint is embedded verbatim in the request to Google, but the policy (dated 24 June) says only the photo is sent. Update the Gemini row in all four pages and bump the date. Same-day fix: the README claim "the only thing that ever leaves the device is an optional Gemini photo upload" (`README.md:35`) contradicts OFF and Hugging Face calls — reword to match the policy.
-4. **Zero tests for 11 schema versions of hand-written, data-carrying SQL migrations** — `lib/data/db/database.dart:39`. v2 kcal carry-forward, v8 enum renumbering, v10/v11 DROP COLUMN — all untested; every test builds a fresh v11 DB. A mistake here silently corrupts user data on upgrade. Adopt drift's schema tooling: `dart run drift_dev schema dump` per version + step-by-step upgrade tests with data assertions.
-5. **DST-unsafe day arithmetic** — `lib/core/date_x.dart:17` and `lib/domain/day_summary.dart:184`. `Duration(days: 1)` stepping on local midnights makes day navigation no-op on the DST-end day, split-meal seeding duplicate a day, and trends duplicate/drop days (including silently omitting today). Fix both with calendar arithmetic — `DateTime(d.year, d.month, d.day + days)` — and add tests pinned to `TZ=Europe/Zurich` transition dates.
-6. **Gemini API key exported in plaintext in the shareable backup ZIP** — `lib/data/backup.dart:125` (flagged independently by two dimensions). `buildBackupMap` dumps the whole settings table, including `geminiApiKey`, into an unencrypted ZIP pushed through the share sheet. Strip credential-class keys on export; restore already tolerates their absence.
-7. **Pack update rewrites the SQLite file under a still-open handle** — `lib/data/offline/region_pack_store.dart:21`. `install()` overwrites `region_$code.sqlite` in place while the store holds a read-only handle that `setPacks` never reopens — mixed stale/new pages or SQLITE_NOTADB, swallowed by catch-alls into silently empty offline search until restart. Version the filename or close/reopen around install.
-8. **Tag-push releases are not gated on tests** — `.github/workflows/android.yml:22` / `ios.yml`. A `v*` tag on a red or never-tested commit still builds and assigns `status: 'completed'` to both closed-testing tracks and TestFlight. Add a test job and make the release job `needs: test`.
+1. **[critical] Migration chain is not transactional — an interrupted upgrade can permanently delete custom foods or brick the DB** — `lib/data/db/database.dart:39-213`. Drift runs `onUpgrade` statement-by-statement with no wrapping transaction and bumps `user_version` only after the whole callback succeeds (verified against drift 2.34.0 source). Concrete scenario: a device on schema ≤7 upgrades to 13; the v8 block renumbers `foods.source` (`2,3→1`, `4→2`) and autocommits; the process is killed during the slow v12/v13 backfills (correlated full-scan subqueries — an OS kill mid-spinner is realistic). On relaunch `user_version` is still ≤7, the v8 block re-runs, and now `source = 1` means *custom*: `DELETE FROM foods WHERE source = 1` silently destroys every user-created food. A crash between two `addColumn`s instead yields "duplicate column name" on every launch → drift refuses all queries → app permanently bricked. **Fix:** wrap the `onUpgrade` body in `await transaction(() async { ... })` (drift's documented pattern). The excellent migration test suite covers correctness but cannot cover interruption — this is the one hole left.
 
-## Data layer
+2. **[high] `upsertFood` returns a wrong row id on the update path** — `lib/data/db/database.dart:225-233`. `insert(..., onConflict: DoUpdate(...))` returns `last_insert_rowid()`, which SQLite does **not** update when the upsert takes the UPDATE path (drift documents this; the stale value is connection-wide across all tables, e.g. a diary-entry id). Repeat an online search whose results are already cached (`food_repository.dart:85-97`): every returned id is stale and `foodById(staleId)` drops results or resolves to an unrelated food the user can log with wrong nutrition. `createFood` re-saving with a used barcode (`food_repository.dart:140-161`) hits `(await db.foodById(id))!` → null-assert crash or wrong food. **Fix:** `insertReturning`, or re-fetch by the conflict key `(source, externalId)`.
 
-- **high — Restore aborts on PK collision with seeded/cached catalog rows** (`lib/data/backup.dart:184`). See priority 1.
-- **medium — Backup export silently drops custom-food fields** (`lib/data/backup.dart:85`). `barcode`/`externalId` are omitted, so scans stop resolving to the custom food after restore, and re-saving the barcode duplicates the row (the `(source, externalId)` upsert can't match a NULL). `densityGPerMl` loss is UX-only (sheet opens in grams); `usageCount`/`lastUsedAt` loss only degrades ranking. Add the fields to export and read them back.
-- **medium — `restoreBackupMap` ignores the backup `schemaVersion`** (`lib/data/backup.dart:168`). The file's own header promises import-time migration, but a v1 backup's legacy `kcal` target is silently dropped — worse, targets are upserted with explicit `Value(null)`, so a v1 restore *null-overwrites existing goals*. Newer-versioned backups import partially with no check. Map v1 `kcal` → `kcalMax` (mirroring the DB v2 migration), reject versions newer than `backupSchemaVersion`, and add a checked-in v1 fixture test.
-- **medium — DST-unsafe `DayKey.shift` and trend iteration** (`lib/core/date_x.dart:17`, `lib/domain/day_summary.dart:184`, `lib/providers.dart:473`). See priority 5. Also merged from the tests dimension: no DST tests exist and CI runs on UTC, so this is currently untestable as configured.
-- **medium — v8 migration never remaps or deletes old `usda` rows** (`lib/data/db/database.dart:86`). Devices skipping from schema ≤6 straight to v8+ have up to 8,077 USDA rows silently decode as `FoodSource.custom`, appear in the custom-foods list, and leak into backups. Add `DELETE FROM foods WHERE source = 1` before the renumbering.
-- **low — Multi-row diary writes not transactional** (`lib/data/repositories/recipe_repository.dart:106`). `logPortionGrams` inserts one entry per ingredient with no transaction (interruption = partial meal group); `logFood`'s insert + usage bump likewise. Siblings (`splitGroupAcrossDays`, `editEntryGroup`, `createRecipe`) do this correctly — wrap these two the same way.
+3. **[high] `searchTokens` destroys accented queries — offline-pack search misses German/French products entirely** — `lib/domain/search_query.dart:35-39`. The tokenizer splits on `[^a-z0-9]+` after lowercasing, so `"Müsli"` → `['m','sli']`, `"Käse"` → `['k','se']`. The pack FTS index folds diacritics (`unicode61 remove_diacritics 2` indexes `musli`), so the generated prefix query `MATCH 'm* sli*'` can never match — **a Swiss user searching "Müsli" or "Käse" offline gets zero pack results** in a de/fr/it-first app. Local `LIKE` search (`database.dart:265-287`) degrades to noisy substring matching. **Fix:** fold diacritics before tokenizing — the accent map already exists in `normalizeOcrName` (`lib/domain/ocr_ingredient.dart:30-65`); extract and share it. Add `expect(searchTokens('Müsli'), ['musli'])` — no current test feeds a non-ASCII query, which is why the green suite hides this.
 
-## UI
+4. **[high — FIXED 2026-07-06] Author's real name leaked via commit author/committer emails on a public repo** — 29 commit objects (2026-06-30 → 07-03) plus the taggers of two local-only annotated tags carried a personal Gmail address containing the real name. **Resolved:** history rewritten with `git filter-repo --mailmap` (identical trees, metadata-only), force-pushed `main`, `feature/feedback-0703`, and re-pointed `v1.2.0`/`v1.3.0` with the release workflows temporarily disabled; remote scan confirms 0 residual identities across all 320 commits; local tags `v1.0.25`/`v1.0.26` (never pushed) re-created with the clean identity. Residual: GitHub may serve the *old* commits by their original SHAs until garbage collection — request a purge via GitHub Support if desired; and enable "Keep my email addresses private" + "Block command line pushes that expose my email" at github.com/settings/emails to prevent recurrence. Two local stashes still chain to the old history (harmless — stashes can't be pushed).
 
-- **medium — `showAutoSnackBar` drops `action`** (`lib/core/snackbar.dart:18`). The wrapper rebuilds the SnackBar with only `content` and `duration`, so the offline-pack nudge's Download button (`offline_reminder.dart:40`) never appears. Copy all relevant fields (or wrap only the content) and fix the stale "callers only ever set content" comment.
-- **medium — OCR loading dialog isn't back-button-proof** (`lib/ui/recipes/ocr_meal_screen.dart:37`). `barrierDismissible: false` doesn't block hardware back; the unconditional `navigator.pop()` at :53 then pops the route beneath — which is the root HomeShell route, leaving a black screen. Wrap in `PopScope(canPop: false)` exactly as the sibling `recognize_food_flow.dart:73` already does.
-- **medium — Missing double-tap guards on two commit paths** (`lib/ui/day/scale_meal_sheet.dart:115`, `ocr_meal_screen.dart` `_saveRecipe`). Double-tap scales the meal twice (factor squared) or saves a duplicate recipe. Six sibling flows carry a `_busy`/`_saving` flag — add the same pattern here.
-- **medium — OCR Dismissible key embeds the list index** (`lib/ui/recipes/ocr_meal_screen.dart:404`). Adjacent duplicate ingredient names (common with multi-photo OCR overlap) hand a live row the dismissed widget's key — debug assertion, or a silently collapsed row in release. Key on a per-item id (`ValueKey('ocr-${item.id}')`), the repo's own convention.
-- **low — Day-entry Dismissible uses `onDismissed` with a stream-redrawn list** (`lib/ui/day/day_screen.dart:840`), violating the design system's documented rule. Move the delete into `confirmDismiss` returning false, matching `recipes_screen.dart`.
-- **low — AI guess sheet title uses `titleMedium`** (`lib/ui/food/recognize_food_flow.dart:368`); every other sheet uses `titleLarge` per §4. One-word fix.
-- **low — Food search list pads bottom 88 instead of 96** (`lib/ui/food/food_search_list.dart:194`) — form value under a list FAB.
+5. **[high] Trends "days in target" counts unlogged days** — `lib/ui/trends/trends_screen.dart:254-257` with `day_summary.dart:178-183`. The gap-filled series gives unlogged days value 0; for a max-only kcal target `statusFor(0, target)` returns `inRange`, so someone who logged 2 of 30 days sees "30/30 days in target". Min-bearing targets instead count unlogged days as "under", inflating the denominator. **Fix:** restrict to logged days (`t.kcal > 0 && t.status != TargetStatus.none`).
 
-## l10n
+6. **[medium] Gemini API key rides along in OS cloud backups** — the key is stored plaintext in the settings table inside the diary DB (`lib/providers.dart:107`). The in-app export correctly strips it (`backup.dart:35`), but `android/.../data_extraction_rules.xml` includes the DB in Google cloud backup/device transfer, and iOS backs up Documents to iCloud — so the credential the export flow protects still lands in Google/Apple backups. **Fix:** move the key to `flutter_secure_storage` (Keystore/Keychain), or exclude it from OS backup paths.
 
-- **medium — 'tsp'/'tbsp'/'cup' hardcoded English on the main logging path** (`lib/domain/units.dart:8`, rendered at `log_food_sheet.dart:276/308/363` and `ocr_meal_screen.dart:399`). Opaque to non-English users and violates the repo's own no-hardcoded-text rule. Add `unitTsp`/`unitTbsp`/`unitCup` keys in all four locales (de: TL/EL/Tasse, etc.).
-- **medium — Missing `CFBundleLocalizations` in `ios/Runner/Info.plist`**. iOS filters the preferred-languages list by declared localizations, so de/fr/it devices default to English out of the box. Add the four-entry array — this is the standard Flutter i18n plist edit.
-- **low — No ICU plurals for count strings** (`lib/l10n/app_en.arb:113` `recipeServings`, `:337` `shareMeta`): '1 servings' / '1 Portionen' are reachable. Convert to ICU plural with a **num** placeholder (servings can be fractional) and mirror to de/fr/it (fr `one` covers 0 and 1).
-- **low — 253 of 332 template keys lack `@key` metadata**, contrary to CLAUDE.md's own convention. Backfill descriptions, prioritizing ambiguous short labels and a11y strings.
-- **low — Hardcoded 'Backup' XTypeGroup label** (`lib/ui/settings/settings_screen.dart:246`) — the one remaining hardcoded literal in `lib/`; `l10n` is in scope two lines above.
+7. **[medium] Swiss dataset re-seed wipes favorites, usage/recency, OCR mappings, and entry links** — `lib/data/sources/swiss_seed.dart:132-142`. A `swissDatasetVersion` bump (already at v5) handles the update via `DELETE FROM foods WHERE source = swissFcdb` + fresh insert: `isFavorite`/`usageCount`/`lastUsedAt` reset, `ocr_mappings` cascade away, `entries.foodId` set-nulls — a routine app update silently empties the favorites and recently-used pickers. **Fix:** upsert by `(source, externalId)` updating nutrition columns only, or carry user-state columns over by `externalId`.
 
-## Networking / ML / offline
+8. **[medium] Backup doesn't export favorites/usage on catalog foods** — `lib/data/backup.dart:112-137`. Only custom foods are exported; favorites and recency on Swiss/OFF rows are user data and not re-fetchable, so device migration via backup empties the favorites/recent pickers. `ocr_mappings` are never backed up either. **Fix:** export `(source, externalId, isFavorite, usageCount, lastUsedAt)` tuples and re-apply by external id.
 
-- **high — Pack results collapse via id-0 dedupe** (`lib/ui/food/food_search_list.dart:122`). See priority 2.
-- **medium — Pack update under a still-open handle, never reopened** (`lib/data/offline/region_pack_store.dart:21`). See priority 7.
-- **medium — Gemini key in plaintext backups** (`lib/data/backup.dart:125`; flagged by both net-ml and platform-secrets). See priority 6.
-- **medium — `install()` compounding gaps** (`lib/data/offline/offline_pack_service.dart:55`): leaked `http.Client` (never closed), no timeout or cancellation (uncancellable spinner), full ~6 MB+ gzip buffered and decoded synchronously on the UI isolate, and a non-atomic `writeAsBytes` that on a crashed update leaves a corrupt pack the store silently swallows at every startup. Fix: closed client + stream timeout, decompress in an isolate, write to `<path>.tmp` and rename after checksum, support cancel.
-- **medium — `fetchManifest` has no timeout** (`offline_pack_service.dart:25`), and the provider isn't autoDispose — a stalled connection leaves a permanent spinner that survives leaving and re-entering the screen. Add `.timeout(Duration(seconds: 10))`, matching OffApi.
-- **medium — Image decode/encode and TFLite inference run on the UI isolate** (`lib/data/ml/gemini_service.dart:148`, `FoodClassifier.classify`, `preprocessLabelImage`). No `compute()`/`Isolate.run` anywhere in `lib/`. Blocking is bounded (~1 s) on the Gemini path but visibly freezes the spinner on the on-device classify path.
-- **low — Gemini key sent as `?key=` query param** (`gemini_service.dart:116`); on network errors the `debugPrint('… $e')` at :137 logs the full URI *including the key*. Switch to the `x-goog-api-key` header.
-- **low — Gemini request not user-cancellable** (`recognize_food_flow.dart:68`): up to ~60 s (two 30 s attempts) trapped behind a `canPop:false` modal. Add a Cancel button that pops with a sentinel and makes the flow ignore the late result (guard the unconditional pop at :87).
+## Other bugs (medium)
 
-## Platform & secrets
+- **Enabling the Trends tab from Settings yanks the user to Trends** — `lib/ui/home_shell.dart:25-30,57` + `settings_screen.dart:106-114`. With Trends hidden, Settings is index 2; inserting Trends makes index 2 the Trends page while the user is mid-toggle. The clamp only protects the shrink direction. Key tabs by enum identity, not raw index.
+- **`ref` used after `await` in dismissible sheets → StateError** — `day_screen.dart:827-850` (`_EditMealSheet._save`: after `editEntryGroup` + up to two multi-second `maybeSyncDay` platform calls) and `recipe_detail_screen.dart:440-470` (`_LogPortionSheet._log`: four `ref.read`s after the first await; the `catch (_)` can swallow the error so the portion silently never logs). Riverpod 3.3.2 throws from every `WidgetRef` method after unmount. Add `if (!mounted) return;` after each await gap or hoist reads before the first await.
+- **"Delete meal" has no confirmation and no undo** — `day_screen.dart:605-607,739-745`. One tap in the ⋮ menu (directly below "Save as recipe") cascade-deletes the group and every entry. Recipe and custom-food deletion both confirm; DESIGN_SYSTEM §10 calls for it. Add a confirm dialog or undo snackbar.
+- **Nutrition-label kJ parsing breaks on thousands separators** — `lib/domain/nutrition_label.dart:47-49,63-72`. `"Energie 2'000 kJ"` first-matches `"000 kj"` → kcal 0, accepted; `"1.046 kJ"` → 0.25 kcal. Fires exactly on partial OCR reads where no kcal figure is present. Strip grouping separators before matching and/or add a plausibility floor.
+- **Website hero still claims "your data never leaves your phone"** — `docs/index.html:68-69` + meta/OG at lines 7,10. Contradicts the (now accurate) privacy policy and README: OFF gets search terms/barcodes, Gemini gets photos/descriptions. Scope it as "your diary stays on your phone".
 
-- **medium — Missing `NSPhotoLibraryUsageDescription`** (`ios/Runner/Info.plist`). No runtime crash (PHPicker is permissionless on iOS 14+), but the key is required by App Store policy and its absence risks ITMS-90683 flags at upload. Add the purpose string.
-- **low — Android health integration over-permissioned** (`lib/data/health/health_service.dart:33`). Drop `android.permission.health.READ_NUTRITION` and request `HealthDataAccess.WRITE` when `!Platform.isIOS`. **Keep the iOS read access** — the plugin's delete path queries via HKSampleQuery, which needs read authorization; a WRITE-only iOS change would silently duplicate meals on re-sync.
-- **low — Silent debug-signing fallback in release builds** (`android/app/build.gradle.kts:54`). Local `flutter build appbundle --release` without `key.properties` produces a debug-signed AAB with no warning; the `as String` casts also fail opaquely on partial files. Add a loud `logger.warn` and validate the four properties.
-- **low — No `distributionSha256Sum`** in `android/gradle/wrapper/gradle-wrapper.properties:5` for a pipeline that signs store artifacts. One-line hardening.
+## Low-severity findings
 
-## Tests
+**UI / state**
+- `ocr_meal_screen.dart:282-323` — "Log to day" lacks the `_saving` double-tap guard its sibling `_saveRecipe` has; a second tap can log the meal twice.
+- `scan_screen.dart:119-149`, `recipes_screen.dart:55-88`, `ocr_meal_screen.dart:199-236`, `debug_section.dart:291-331` — `TextEditingController` disposed in `finally` while the dialog is still animating out; IME teardown can hit the disposed notifier in debug/profile.
+- `trends_screen.dart:215-221,451-483` — `_niceInterval`'s smallest step is 10, so low-gram metrics (salt tops out ~5.75) render with zero y-axis labels/gridlines. Extend steps downward (`0.5, 1, 2, 5, …`).
+- `day_screen.dart:189-199` — `_pickDate` reads `ref` after await unguarded; benign today (DayScreen lives in an IndexedStack) but a latent trap.
+- `settings_screen.dart:740-742,826-848` — Gemini model dropdown asserts if the stored setting matches neither item; any future model rename turns Settings into a crash. Coerce unknown values to the default.
+- `settings_screen.dart:588-600` + `meal_times.dart:31-36` — meal windows accept start ≥ end with no validation; "Dinner 20:00–00:30" stores an empty window and every dinner logs as Snack with no feedback. Either treat `end < start` as wrapping midnight or validate in the picker. *(Flagged independently by two reviewers.)*
+- `day_screen.dart:570-584` — the tappable meal-header kcal subtotal is a ~60×16 px tap target (codebase norm is 48dp); pad it or make the whole header open details.
+- `providers.dart:221-224` — meal auto-names always use `DateFormat('HH:mm')` regardless of locale; use `DateFormat.Hm(locale)`/`jm(locale)`.
 
-- **high — Zero migration tests for 11 raw-SQL schema versions** (`lib/data/db/database.dart:39`; also flagged by data-layer). See priority 4 — this is the single most valuable test investment in the repo.
-- **medium — `OffApi._mapProduct` untested despite an injectable `http.Client`** (`lib/data/sources/off_api.dart:112`). The sole OFF-payload translation (kcal drop, string numerics, `sodiumG * 1000`, name fallbacks, `status == 0`, `countries_tags`) fails silently through `catch (_) { return null; }`. A `MockClient` + realistic fixtures test is nearly free.
-- **medium — FoodRepository/RegionPackStore layering untested** (`food_repository.dart:131`). Pack-schema drift (column list mirrored in `pipeline/finalize_pack.py`) yields silently empty offline results. Test with a plain `package:sqlite3` fixture pack; add barcode-precedence tests with a stub OffApi.
-- **medium — `seedSwissIfNeeded` untested despite AssetBundle injection** (`lib/data/sources/swiss_seed.dart:117`) — including the documented release-only offset-ByteData failure it once had. Also: the asset actually holds ~1190 rows, not the ~290 the stale doc comment at :15 claims — a real-asset test would catch both.
-- **medium — `scaleGroup` and `editEntryGroup` untested** (`diary_repository.dart:85`, `database.dart:264`). Both rewrite logged history; both are trivially testable against `NativeDatabase.memory()` exactly like the existing split test.
-- **medium — `ActiveGroupNotifier` untested** (`lib/providers.dart:177`). Expiry/day-check/auto-naming logic with inline `DateTime.now()`; a regression silently files entries into dead or yesterday's groups. Inject a clock (the repo already does this for TokenBucket) and test in a ProviderContainer.
-- **low — `OfflinePackService` has no test seams** (`offline_pack_service.dart:46`) — inline client, direct `getApplicationDocumentsDirectory`. Inject client + base dir, then test install/checksum-reject/remove with an in-memory gzip fixture.
-- **low — Sole app widget test over-mocks every provider** (`test/widget_test.dart:16`); the real `daySummaryProvider`/`trendsProvider` composition is never executed. One ProviderContainer test overriding only `dbProvider` covers the glue.
-- **low — Weak assertions in `food_kcal_fallback_test`** (`:15`): 'eggplant parmesan' matches nothing today, so `isNot(155)` passes vacuously against null, and the formula check at :36 is tautological. Pin literal expected values.
-- **low — Locale-aware formatters untested** (`lib/core/format.dart:15`): 44 UI call sites, zero tests, and the code comment itself documents the fragile grouping invariant. A small `format_test.dart` closes it.
+**Domain**
+- `nutrition_label.dart:43,45` — `'sel'` keyword substring-matches "**Sel**en" (selenium rows on Swiss labels) and French "selon"; use word boundaries for the short keys.
+- `nutrition_label.dart:76-102` — OCR-merged lines ("Kohlenhydrate 50 g davon Zucker 30 g") assign the first number to the wrong branch (sugar=50, carbs=null); "number nearest keyword" would fix it.
+- `nutrition.dart:67-76` — `decodeMicros` drops the whole map on one bad value; tolerate per-entry instead.
 
-## CI
+**Data**
+- `debug_tools.dart:17-39` — debug wipe clears `installed_packs` rows but leaves pack files on disk and stale open handles; pack search keeps working until restart, files orphaned permanently. Call `OfflinePackService.remove()` per code.
+- `backup.dart:38-39,321` — restore maps absent `createdAt` to epoch 1970 and hard-crashes with `RangeError` on out-of-range `mealType` (transaction rolls back cleanly, but the user sees a raw exception, not the localized format error).
+- `debug_tools.dart:106` — debug seeder still uses `Duration(days:)` day-stepping (only DST-unsafe spot left; everywhere else uses `DayKey.shift`).
+- `entries.day` has no index — every day-view/trends query full-scans `entries`; worth adding as diaries grow.
 
-- **medium — Releases not gated on tests** (`android.yml:22`, `ios.yml`). See priority 8.
-- **medium — Third-party actions on mutable tags in secret-bearing jobs** (`android.yml:45` and 5 other sites): `subosito/flutter-action@v2` and `maxim-lobanov/setup-xcode@v1` run in the same jobs that materialize the keystore, Play key, and Apple certs. Pin to full commit SHAs with a version comment; add Dependabot for actions.
-- **medium — Flutter 3.44.4 duplicated across four workflows** with bump instructions naming only two of them, and goldens engine-locked to the exact version. Use `flutter-version-file` against a single `.fvmrc`, or at minimum list all four files in the bump comment.
-- **low — No concurrency groups anywhere**: stacked PR pushes duplicate 20-minute runs; concurrent android.yml runs can race independent Play edits. Add cancel-in-progress groups to test/screenshots and a non-cancelling `play-release` group to android.yml.
-- **low — `${{ inputs.locales }}` interpolated raw into `run:` blocks** (`screenshots.yml:87`, `:102`) — classic template injection, mitigated by write-access requirement. Pass through `env` like android.yml already does.
-- **low — `PLAY_STORE_KEY_JSON_BASE64` not validated** (`android.yml:75`): an empty secret writes a 0-byte JSON and fails ~10 minutes later with a google-auth traceback. Mirror the keystore step's `::error::` guard.
-- **low — Weekly offline-packs job installs DuckDB from `releases/latest`** (`offline-packs.yml:19`), and the pip deps are equally unpinned. Pin versions and bump deliberately alongside planned republishes.
+**CI / tooling / docs**
+- `ios-release.yml:49` (and `ios.yml:127`) — fastlane installed/used unpinned; a breaking fastlane release can alter an App Store submission on release day. Pin a version or use a Gemfile.
+- `offline-packs.yml:23`, `pipeline/build_all.sh:17-19` — DuckDB CLI zip and the 7 GB OFF parquet are downloaded with no checksum; output flows into the public HF dataset all installs download. Verify sha256 for the DuckDB zip at minimum.
+- `screenshots.yml:112-114` — locale `case` has no `*)` default; a custom locale input kills the staging step under `set -u` *after* the ~60-minute capture. Mirror `tool/screenshots.sh`'s fallback.
+- `android.yml:31` — workflow dispatch offers `production` with `status: completed` (full rollout); test-gated but a one-click prod push from any ref. Consider requiring a tag or environment approval.
+- `tool/cut_release.sh:32` — rejects only `VERSION == current`, not a *lower* version; `cut_release.sh 1.2.9` after 1.3.0 would tag confusingly.
+- `tool/make_store_graphics.py:23` — feature graphic still generated in pre-rebrand green; regenerating would reintroduce off-brand assets.
+- `pipeline/build_all.sh:27-28`, `build_pack.sh:20-21` — sed-into-SQL templating escapes `&` only for `SRC` and breaks on `|` in paths; hardening only.
+- `docs/privacy.html:68-70` — §2 says data "stays on the device unless you export it", but Android Auto Backup ships the diary DB (including the Gemini key, see priority 6) to Google Drive and iOS backups include it. Add a sentence on OS-level backups.
+- `DESIGN_SYSTEM.md` §3 rotted: meal-header menu now leads with "Meal details" and includes "Merge"; `food_search_list.dart:301-316` is a second `PopupMenuButton`; the tappable kcal-subtotal fast path is undocumented.
+- Minor l10n consistency: some sites inline `'… kcal'` instead of `l10n.kcalValue` (`day_screen.dart:579,966-967`, `merge_meal_sheet.dart:128`, `scale_meal_sheet.dart:75`, `recipe_detail_screen.dart:401`, `trends_screen.dart:211`).
 
-## Docs
+## Test coverage — where to invest next
 
-- **high — Privacy policy omits the Gemini hint text** (`docs/privacy.html:87` + de/fr/it). See priority 3. (Also flagged independently by net-ml-offline.)
-- **medium — DESIGN_SYSTEM.md §9 and §12 contradict the shipped code** (`DESIGN_SYSTEM.md:263`, `:337`; flagged by both ui-design and docs). §9 still prescribes the green `ColorScheme.fromSeed(0xFF43A047)` while `theme.dart` delegates to `fuchsbauTheme` (tangerine triad) — the doc contradicts its own §0. §12 mandates "Material `Icons.*` only" while `lib/` has 131 `Symbols.*` usages and zero `Icons.*`; CLAUDE.md's UI summary carries the same stale icon prescriptions. An agent following either section verbatim would reintroduce abandoned patterns. Rewrite both sections and refresh the drifted file:line anchors.
-- **medium — CLAUDE.md release/platform rot** (merged with the CI docs-drift finding). It says "Android calorie tracker", documents only the manual `play_upload_aab.py` path, and ends "App is still in closed testing" — while the app is live on the App Store with a full iOS pipeline (fastlane `platform :ios`, `ios.yml`) and a `v*` tag auto-stages `status: 'completed'` releases to both Play tracks and TestFlight. `play_upload_aab.py`'s "stays in Draft" docstring is likewise wrong. Update CLAUDE.md, fix the docstring, and consider a CI step asserting the tag matches pubspec's `version:`.
-- **medium — README rot** (`README.md:3/28/35/40/58`, grouped): Android-only framing and Health-Connect-only bullet despite shipping on iOS with Apple Health; the "only thing that ever leaves the device" claim contradicted by OFF/HF calls (see priority 3); `openfoodfacts` listed in Stack but not a dependency (OFF is a hand-rolled `http` client); "License: TBD" with no LICENSE file on a publicly shipped app. One README pass fixes all five.
-- **medium — ACCESSIBILITY.md presents fixed items as open** (`ACCESSIBILITY.md:10`). The 1.1.2+34 a11y sweep (commit e586818) implemented many findings verbatim (liveRegion snackbars, tooltips, the exact suggested status-text hexes), but the doc has no status markers — a future audit would redo or mis-report the work. Mark resolved items or date the audit as pre-sweep.
-- **low — PLAN.md Phase 14 still "🚧 IN PROGRESS"** (`PLAN.md:461`) though the redesign shipped and the app is live; the pre-redesign status-color note at :22 also diverges from the shipped mapping. Flip to DONE and record the final mapping.
+Suite state: **201 tests, all passing; `flutter analyze` clean** (run 2026-07-06). Migration coverage is now the standout: `test/migration_test.dart` (670 lines) runs real on-disk fixtures of v1/v6/v7/v10/v11/v12 through the genuine upgrade chain to v13, asserting migrated data, FK integrity, and `user_version`. Goldens are tolerance-hardened and Linux-scoped — not fragile. Remaining gaps, by risk:
 
-## What's in good shape
+1. **Gemini HTTP loop** (`gemini_service.dart:89-172`) — model-fallback on 503/timeout, cancellation, non-200 paths untested despite an injectable `http.Client` and an existing MockClient pattern in `test/off_api_test.dart` to copy.
+2. **HealthService** (226 lines, zero tests) — the timestamp clamping (`health_service.dart:141-156`) silently corrupts what lands in Health Connect if wrong; it's extractable and cheap to test.
+3. **Backup failure paths** — round-trip/collision/version tests exist; missing: malformed record mid-list proving rollback, and `restoreFromZip` with a corrupt zip.
+4. **Adversarial label-parser inputs** — grouped-digit kJ, `Selen`/`selon`, merged rows (the three bugs above).
+5. **Accented search queries** — one-line test would have caught priority 3.
+6. **Log-food sheet math** (`log_food_sheet.dart:203`) — the one UI spot where a regression alters stored numbers; only covered indirectly via `units_test`.
 
-- **l10n is near-exemplary**: 332 keys with script-verified key/placeholder parity across all four locales, idiomatic translations, locale-aware number/date formatting, and complete translated fastlane metadata/changelogs.
-- **Secret hygiene is clean**: nothing in the working tree or full git history; keystore/Play key properly gitignored and CI-injected; minimal, well-commented Android permissions; git dependency pinned by commit.
-- **CI craftsmanship**: test.yml genuinely gates PRs and main, secrets pass via env (no interpolation, no `pull_request_target`), and the golden-test infrastructure (vendored Roboto, tolerant comparator, pinned engine, failure-diff artifacts) is a model setup.
-- **UI discipline**: sheets, heroTags, dialog button order, messenger-before-await, controller disposal, and the no-red status rule are consistently right; the flagged items are outliers against the app's own strong conventions.
-- **Domain logic and its tests**: nutrition math, target resolution, OCR parsing, share codec, and the injected-clock rate limiter are clean and well-covered.
-- **Data-layer design**: per-entry snapshots protect history, migrations are stepwise and commented, restores run in one transaction — the *design* is right; the gaps are specific bugs and missing tests.
+## What's verifiably good
 
-## Suggested order of attack
+- **All 8 top-priority findings from the 2026-07-02 review are fixed** (see below).
+- Domain math verified correct: kJ→kcal 4.184, OFF sodium g→mg, Health salt→sodium ÷2.5; DST handling systematically eliminated via calendar arithmetic with Europe/Zurich-pinned tests.
+- Snapshot-per-entry design makes diary history immune to catalog edits; FKs declared and enforced (`PRAGMA foreign_keys = ON`); backup import fully transactional and version-gated both directions.
+- UI discipline: exact 371-key ARB parity across en/de/fr/it, zero `Icons.*`, unique heroTags, snackbars uniformly via `showAutoSnackBar` with messenger captured pre-await, AA-checked status colors, live-region snackbars.
+- CI: release builds gated on analyze+test with tag==pubspec verification; third-party actions SHA-pinned; secrets env-passed with fail-fast empty checks; `.fvmrc` single-sourced; no secret ever committed (verified across full history).
+- Versions consistent end-to-end: pubspec 1.3.0+36 == tag == 4× Android changelog == 4× iOS release notes.
 
-1. **One backup/restore PR**: fix the PK-collision insert (no explicit ids), export the missing custom-food fields, implement the v1 `schemaVersion` migration + newer-version rejection, and strip `geminiApiKey` from the export. Add the v1-fixture and dirty-database restore tests in the same PR — they'd have caught all of this.
-2. **One offline-packs PR**: fix the search dedupe key, version the pack filename (solves the stale-handle problem), and add the manifest timeout. The install hardening (isolate decode, atomic write, cancel) can follow separately.
-3. **DST fix**: two-line calendar-arithmetic changes in `date_x.dart` and `day_summary.dart` (+ `TrendRangeNotifier.preset`), plus Europe/Zurich-pinned tests.
-4. **Migration test harness**: drift schema dumps + step-by-step upgrade tests. Do this before the next schema version, not after.
-5. **CI hardening afternoon**: gate releases on tests, SHA-pin third-party actions, single-source the Flutter version, validate the Play key secret.
-6. **Docs sweep in one sitting**: privacy pages (all four), README, CLAUDE.md, DESIGN_SYSTEM §9/§12, ACCESSIBILITY status markers, PLAN Phase 14. Mostly mechanical, and it stops the docs from misdirecting future agent sessions.
-7. **Remaining UI/l10n polish** (PopScope, double-tap guards, Dismissible keys, unit labels, `CFBundleLocalizations`, snackbar action passthrough) as a batch of small fixes, then the medium-value test additions (OffApi, repo layering, diary mutations, ActiveGroupNotifier) opportunistically.
+## Status of the 2026-07-02 review's top priorities — all fixed
+
+| # | Prior finding | Status | Evidence |
+|---|---|---|---|
+| 1 | Backup restore aborts on PK collision | **Fixed** | `backup.dart:232-264` — custom foods re-inserted without explicit id, documented |
+| 2 | Offline-pack results collapse to one row | **Fixed** | `food_search_list.dart:153-162` — dedupe on `barcode ?? 'id:$id:$name'` composite key |
+| 3 | Privacy policy omits Gemini text hint | **Fixed** | All four privacy pages cover photo *and* typed description incl. the new describe-meal flow, dated 5 July 2026; in-app `aiKeyDesc` matches |
+| 4 | Zero migration tests | **Fixed** | `test/migration_test.dart` — real fixtures v1→v13 with data assertions |
+| 5 | DST-unsafe day arithmetic | **Fixed** | `date_x.dart:18-22`, `day_summary.dart:227-229`, `health_service.dart:104-136` all calendar-based (only the debug seeder remains, noted above) |
+| 6 | Gemini key in backup ZIP | **Fixed** | `backup.dart:35,165-167,369` — stripped on export *and* on import of old backups |
+| 7 | Pack file rewritten under open handle | **Fixed** | Versioned filenames + tmp-write/rename (`offline_pack_service.dart:74-125`); store reopens on path change |
+| 8 | Releases not gated on tests | **Fixed** | `android.yml` `play: needs: test`, `ios.yml` `testflight: needs: test`, both with tag==pubspec checks |
+
+*(README egress overclaim also fixed at `README.md:41-45`; the website hero at `docs/index.html:68` is the one surface still making the old absolute claim.)*
+
+## Working-tree note
+
+`pubspec.lock` is currently dirty because the gitignored `pubspec_overrides.yaml` flips fuchsbau to a local `path:` dependency. Don't commit it in that state — `cut_release.sh`'s clean-tree check will correctly block a release until it's reverted.
