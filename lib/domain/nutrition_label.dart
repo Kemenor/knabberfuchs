@@ -60,7 +60,25 @@ double? _grams(String s) {
   return (v != null && v >= 0 && v <= 100) ? v : null;
 }
 
-double? _energyKcal(String line) {
+/// Digit-grouping separator between a digit and exactly three digits with no
+/// fourth: Swiss 2'000 / 2’000, German 1.046, French 2 000 (incl. no-break
+/// spaces), English 1,000. "473,0" keeps its decimal comma.
+final _groupingRe = RegExp("(\\d)[\\u00A0\\u202F '’.,](\\d{3})(?!\\d)");
+
+/// Collapse grouped energy figures so the kcal/kJ regexes read the whole
+/// number: "Energie 2'000 kJ" once first-matched as "000 kj" -> 0 kcal, and
+/// "1.046 kJ" parsed as 1.046 kJ -> 0.25 kcal. Looped for multi-group values.
+String _ungroup(String s) {
+  var out = s;
+  while (true) {
+    final next = out.replaceAllMapped(_groupingRe, (m) => '${m[1]}${m[2]}');
+    if (next == out) return out;
+    out = next;
+  }
+}
+
+double? _energyKcal(String rawLine) {
+  final line = _ungroup(rawLine);
   final k = _kcalRe.firstMatch(line);
   if (k != null) return double.tryParse(k.group(1)!.replaceAll(',', '.'));
   final j = _kjRe.firstMatch(line);

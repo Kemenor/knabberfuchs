@@ -59,6 +59,24 @@ void main() {
     expect(n.kcal100, closeTo(478, 1)); // 2000 / 4.184
   });
 
+  test('reads grouped energy figures (Swiss/German/French/English)', () {
+    // Regression: "2'000 kJ" first-matched as "000 kj" -> 0 kcal, accepted.
+    expect(parseNutritionLabel(["Energie 2'000 kJ"]).kcal100, closeTo(478, 1));
+    expect(parseNutritionLabel(['Energie 2’000 kJ']).kcal100, closeTo(478, 1));
+    // German dot grouping: 1.046 kJ is 1046 kJ, not 1.046 kJ (0.25 kcal).
+    expect(
+      parseNutritionLabel(['Brennwert 1.046 kJ']).kcal100,
+      closeTo(250, 1),
+    );
+    expect(parseNutritionLabel(['énergie 2 000 kJ']).kcal100, closeTo(478, 1));
+    expect(
+      parseNutritionLabel(['Energy 1,046 kJ / 250 kcal']).kcal100,
+      closeTo(250, 1),
+    );
+    // A decimal comma is not grouping.
+    expect(parseNutritionLabel(['Energie 473,0 kJ']).kcal100, closeTo(113, 1));
+  });
+
   test('hasAny false on irrelevant text', () {
     expect(parseNutritionLabel(['Ingredients: water, sugar']).hasAny, isFalse);
   });
