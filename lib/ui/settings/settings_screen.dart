@@ -118,15 +118,10 @@ class SettingsScreen extends ConsumerWidget {
                     title: Text(l10n.settingsShowMealNutrients),
                     subtitle: Text(l10n.settingsShowMealNutrientsSub),
                     value:
-                        ref
-                            .watch(mealHeaderNutrientsProvider)
-                            .asData
-                            ?.value ??
+                        ref.watch(mealHeaderNutrientsProvider).asData?.value ??
                         false,
-                    onChanged: (v) => db.setSetting(
-                      'mealHeaderNutrients',
-                      v ? 'true' : null,
-                    ),
+                    onChanged: (v) =>
+                        db.setSetting('mealHeaderNutrients', v ? 'true' : null),
                   ),
                 ],
               ),
@@ -220,9 +215,7 @@ class SettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Symbols.chevron_right_rounded),
                     onTap: () async {
                       final messenger = ScaffoldMessenger.of(context);
-                      final locale = Localizations.localeOf(
-                        context,
-                      ).toString();
+                      final locale = Localizations.localeOf(context).toString();
                       final ok = await contactDeveloper(locale: locale);
                       if (!ok) {
                         messenger.showAutoSnackBar(
@@ -268,9 +261,7 @@ class _HealthResyncTileState extends ConsumerState<_HealthResyncTile> {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
     try {
-      await ref
-          .read(healthServiceProvider)
-          .resyncAll(ref.read(dbProvider));
+      await ref.read(healthServiceProvider).resyncAll(ref.read(dbProvider));
       messenger.showAutoSnackBar(
         SnackBar(content: Text(l10n.healthResyncDone(_healthStore()))),
       );
@@ -333,9 +324,7 @@ Future<void> _toggleEnergyRead(
   }
   await db.setSetting('healthEnergyRead', 'true');
   await health.refreshEnabled(db);
-  messenger.showAutoSnackBar(
-    SnackBar(content: Text(l10n.healthEnergyReadOn)),
-  );
+  messenger.showAutoSnackBar(SnackBar(content: Text(l10n.healthEnergyReadOn)));
 }
 
 Future<void> _toggleHealthSync(
@@ -351,12 +340,16 @@ Future<void> _toggleHealthSync(
   if (!value) {
     await db.setSetting('healthSync', 'false');
     await health.refreshEnabled(db);
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.healthSyncOff(_healthStore()))));
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.healthSyncOff(_healthStore()))),
+    );
     return;
   }
 
   if (!await health.isAvailable()) {
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.healthUnavailable(_healthStore()))));
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.healthUnavailable(_healthStore()))),
+    );
     return;
   }
   final granted = await health.requestPermissions();
@@ -371,7 +364,9 @@ Future<void> _toggleHealthSync(
   // Sync the selected day immediately so the user sees data right away.
   final day = ref.read(selectedDayProvider);
   await health.syncDay(day, await db.watchDay(day).first);
-  messenger.showAutoSnackBar(SnackBar(content: Text(l10n.healthSyncOn(_healthStore()))));
+  messenger.showAutoSnackBar(
+    SnackBar(content: Text(l10n.healthSyncOn(_healthStore()))),
+  );
 }
 
 Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
@@ -504,9 +499,7 @@ class _AboutTile extends ConsumerWidget {
     await db.setSetting('debugMenu', on ? null : 'true');
     if (dialogCtx.mounted) Navigator.pop(dialogCtx);
     messenger.showAutoSnackBar(
-      SnackBar(
-        content: Text(on ? 'Debug menu hidden' : 'Debug menu enabled'),
-      ),
+      SnackBar(content: Text(on ? 'Debug menu hidden' : 'Debug menu enabled')),
     );
   }
 }
@@ -527,7 +520,11 @@ class _OpenFoodFactsThanks extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Symbols.favorite_rounded, size: 18, color: theme.colorScheme.primary),
+            Icon(
+              Symbols.favorite_rounded,
+              size: 18,
+              color: theme.colorScheme.primary,
+            ),
             const SizedBox(width: 6),
             Text(
               l10n.offThanksTitle,
@@ -664,7 +661,8 @@ class _TypefacePicker extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final db = ref.read(dbProvider);
-    final current = ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
+    final current =
+        ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
     return FuchsbauChoicePicker<FuchsbauFont>(
       icon: Symbols.text_fields_rounded,
       title: l10n.settingsTypeface,
@@ -702,10 +700,8 @@ class _ThemePicker extends ConsumerWidget {
         ThemeMode.light: l10n.themeLight,
         ThemeMode.dark: l10n.themeDark,
       },
-      onChanged: (v) => db.setSetting(
-        'appThemeMode',
-        v == ThemeMode.system ? null : v.name,
-      ),
+      onChanged: (v) =>
+          db.setSetting('appThemeMode', v == ThemeMode.system ? null : v.name),
     );
   }
 }
@@ -723,6 +719,8 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   final _ctrl = TextEditingController();
   bool _obscure = true;
   bool _loaded = false;
+  // Must stay in sync with the DropdownMenuItem values below.
+  static const _models = ['gemini-2.5-flash', 'gemini-3.5-flash'];
   String _model = 'gemini-2.5-flash';
 
   @override
@@ -738,7 +736,12 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
       }
     });
     db.getSetting(geminiModelSetting).then((v) {
-      if (mounted && v != null) setState(() => _model = v);
+      // Coerce unknown stored values (e.g. after a model rename) to the
+      // default: DropdownButtonFormField asserts when initialValue matches
+      // no item, which would crash the whole Settings screen.
+      if (mounted && v != null && _models.contains(v)) {
+        setState(() => _model = v);
+      }
     });
   }
 
@@ -775,11 +778,11 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               border: const OutlineInputBorder(),
               isDense: true,
               suffixIcon: IconButton(
-                tooltip: _obscure
-                    ? l10n.a11yShowApiKey
-                    : l10n.a11yHideApiKey,
+                tooltip: _obscure ? l10n.a11yShowApiKey : l10n.a11yHideApiKey,
                 icon: Icon(
-                  _obscure ? Symbols.visibility_rounded : Symbols.visibility_off_rounded,
+                  _obscure
+                      ? Symbols.visibility_rounded
+                      : Symbols.visibility_off_rounded,
                   size: 20,
                 ),
                 onPressed: () => setState(() => _obscure = !_obscure),
@@ -913,4 +916,3 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
-
