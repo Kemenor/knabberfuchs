@@ -30,4 +30,23 @@ void main() {
     // unset windows fall back to defaults
     expect(mt.breakfastStart, MealTimes.defaults.breakfastStart);
   });
+
+  test('a window with end <= start wraps past midnight', () {
+    final late = MealTimes.fromSettings({
+      MealTimes.startKey(MealType.dinner): '1200', // 20:00
+      MealTimes.endKey(MealType.dinner): '30', // 00:30 next day
+    });
+    expect(late.inferAtMinutes(21 * 60), MealType.dinner); // 21:00
+    expect(late.inferAtMinutes(0), MealType.dinner); // midnight
+    expect(late.inferAtMinutes(29), MealType.dinner); // 00:29
+    expect(late.inferAtMinutes(30), MealType.snack); // half-open end
+    expect(late.inferAtMinutes(12 * 60), MealType.lunch); // others intact
+
+    // start == end stays an empty window, not all-day.
+    final empty = MealTimes.fromSettings({
+      MealTimes.startKey(MealType.dinner): '1200',
+      MealTimes.endKey(MealType.dinner): '1200',
+    });
+    expect(empty.inferAtMinutes(20 * 60), MealType.snack);
+  });
 }

@@ -27,11 +27,17 @@ class MealTimes {
     dinnerEnd: 21 * 60 + 30, // 21:30
   );
 
-  /// Meal for a given minute-of-day. First matching window wins; gaps are snacks.
+  /// Meal for a given minute-of-day. First matching window wins; gaps are
+  /// snacks. A window with end <= start wraps past midnight ("Dinner
+  /// 20:00–00:30") — the time picker can produce that, and treating it as an
+  /// empty window silently turned every dinner into a snack.
+  static bool _inWindow(int m, int start, int end) =>
+      start <= end ? m >= start && m < end : m >= start || m < end;
+
   MealType inferAtMinutes(int m) {
-    if (m >= breakfastStart && m < breakfastEnd) return MealType.breakfast;
-    if (m >= lunchStart && m < lunchEnd) return MealType.lunch;
-    if (m >= dinnerStart && m < dinnerEnd) return MealType.dinner;
+    if (_inWindow(m, breakfastStart, breakfastEnd)) return MealType.breakfast;
+    if (_inWindow(m, lunchStart, lunchEnd)) return MealType.lunch;
+    if (_inWindow(m, dinnerStart, dinnerEnd)) return MealType.dinner;
     return MealType.snack;
   }
 
