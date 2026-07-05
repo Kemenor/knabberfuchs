@@ -110,10 +110,11 @@ List<FoodsCompanion> parseSwissCsv(String csv) {
 
 /// Import the bundled Swiss Food Composition Database (FSVO/BLV) into the local
 /// catalog. Runs on first launch and again whenever [swissDatasetVersion]
-/// changes. Replaces the old English-only USDA generic layer (deletes both
-/// previously-seeded Swiss and USDA rows; diary entries keep their snapshots,
-/// so logged history is unaffected). Idempotent within a version. Returns the
-/// number of rows imported (0 if up to date or asset missing).
+/// changes. Updates existing rows in place (by external id) and removes rows
+/// no longer in the dataset, so user state on Swiss foods — favorites, usage
+/// counts, recency, OCR mappings, entry links — survives version bumps; diary
+/// entries keep their snapshots regardless. Idempotent within a version.
+/// Returns the number of rows imported (0 if up to date or asset missing).
 Future<int> seedSwissIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
   if (await db.getSetting(_versionKey) == swissDatasetVersion) return 0;
   final b = bundle ?? rootBundle;
@@ -130,15 +131,26 @@ Future<int> seedSwissIfNeeded(AppDatabase db, {AssetBundle? bundle}) async {
     final csv = utf8.decode(gzip.decode(bytes));
     final companions = parseSwissCsv(csv);
     await db.transaction(() async {
-      // Replace any previously-seeded Swiss rows. The entries FK is set-null on
-      // delete, so logged history is unaffected. (The old USDA layer is already
-      // gone — removed by the v8 migration / earlier reseeds.)
-      await (db.delete(
-        db.foods,
-      )..where((f) => f.source.equalsValue(FoodSource.swissFcdb))).go();
-      await db.batch((batch) {
-        batch.insertAll(db.foods, companions, mode: InsertMode.insertOrIgnore);
-      });
+      // Upsert by (source, externalId) instead of delete-all + reinsert: rows
+      // keep their ids, so favorites, usage/recency, OCR mappings and entry
+      // links survive a dataset version bump. The upsert companion carries
+      // only catalog columns, so isFavorite/usageCount/lastUsedAt are never
+      // touched on the update path.
+      for (final c in companions) {
+        await db.upsertFood(c);
+      }
+      // Foods dropped from the new dataset go away for real; the declared FK
+      // actions (entries set-null, ocr_mappings cascade) clean up after them.
+      final keep = companions
+          .map((c) => c.externalId.value)
+          .whereType<String>()
+          .toList();
+      await (db.delete(db.foods)..where(
+            (f) =>
+                f.source.equalsValue(FoodSource.swissFcdb) &
+                f.externalId.isNotIn(keep),
+          ))
+          .go();
     });
     await db.setSetting(_versionKey, swissDatasetVersion);
     debugPrint('[swiss] seeded ${companions.length} foods');

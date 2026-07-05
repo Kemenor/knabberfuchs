@@ -95,29 +95,68 @@ void main() {
     setUp(() => db = AppDatabase(NativeDatabase.memory()));
     tearDown(() => db.close());
 
-    test('imports the full bundled dataset from an offset ByteData view',
-        () async {
-      final imported = await seedSwissIfNeeded(db, bundle: _OffsetFileBundle());
-      expect(imported, 1190);
+    test(
+      'imports the full bundled dataset from an offset ByteData view',
+      () async {
+        final imported = await seedSwissIfNeeded(
+          db,
+          bundle: _OffsetFileBundle(),
+        );
+        expect(imported, 1190);
 
-      final foods = await db.select(db.foods).get();
-      expect(foods.length, 1190);
-      expect(foods.every((f) => f.source == FoodSource.swissFcdb), isTrue);
+        final foods = await db.select(db.foods).get();
+        expect(foods.length, 1190);
+        expect(foods.every((f) => f.source == FoodSource.swissFcdb), isTrue);
 
-      // A known row survives the whole pipeline (gzip -> CSV -> insert).
-      final almond = foods.singleWhere((f) => f.externalId == '273');
-      expect(almond.name, 'Almond');
-      expect(almond.nameDe, 'Mandel');
-      expect(almond.nameIt, 'Mandorle');
-      expect(almond.kcal100, 624);
-      expect(almond.fat100, 52.1);
-      expect(almond.servingG, 30);
-      expect(almond.servingLabel, 'handful');
-      expect(almond.sodiumMg100, isNull);
+        // A known row survives the whole pipeline (gzip -> CSV -> insert).
+        final almond = foods.singleWhere((f) => f.externalId == '273');
+        expect(almond.name, 'Almond');
+        expect(almond.nameDe, 'Mandel');
+        expect(almond.nameIt, 'Mandorle');
+        expect(almond.kcal100, 624);
+        expect(almond.fat100, 52.1);
+        expect(almond.servingG, 30);
+        expect(almond.servingLabel, 'handful');
+        expect(almond.sodiumMg100, isNull);
 
-      // Idempotent within a dataset version: a second call is a no-op.
-      expect(await seedSwissIfNeeded(db, bundle: _OffsetFileBundle()), 0);
-      expect((await db.select(db.foods).get()).length, 1190);
-    });
+        // Idempotent within a dataset version: a second call is a no-op.
+        expect(await seedSwissIfNeeded(db, bundle: _OffsetFileBundle()), 0);
+        expect((await db.select(db.foods).get()).length, 1190);
+      },
+    );
+
+    test(
+      're-seed on version bump preserves user state on Swiss rows',
+      () async {
+        await seedSwissIfNeeded(db, bundle: _OffsetFileBundle());
+        final almond = (await db.select(db.foods).get()).singleWhere(
+          (f) => f.externalId == '273',
+        );
+
+        // User state accrued on a catalog row: favorite, usage, OCR mapping.
+        await db.setFavorite(almond.id, true);
+        await db.bumpFoodUsage(almond.id);
+        await db.setOcrMapping('mandel', almond.id);
+
+        // Simulate a dataset version bump and re-import.
+        await db.setSetting('swissDatasetVersion', '0');
+        expect(
+          await seedSwissIfNeeded(db, bundle: _OffsetFileBundle()),
+          greaterThan(0),
+        );
+
+        // Same row id (delete-all + reinsert would have re-keyed it), and
+        // favorites / usage / recency / OCR mapping all intact.
+        final after = (await db.select(db.foods).get()).singleWhere(
+          (f) => f.externalId == '273',
+        );
+        expect(after.id, almond.id);
+        expect(after.isFavorite, isTrue);
+        expect(after.usageCount, 1);
+        expect(after.lastUsedAt, isNotNull);
+        expect((await db.mappedFoodForOcr('mandel'))?.id, almond.id);
+        expect((await db.select(db.foods).get()).length, 1190);
+      },
+    );
   });
 }

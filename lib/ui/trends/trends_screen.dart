@@ -491,8 +491,9 @@ class _Chart extends StatelessWidget {
                 reservedSize: 44,
                 interval: interval,
                 getTitlesWidget: (value, meta) {
-                  if (value <= 0 || value > topY)
+                  if (value <= 0 || value > topY) {
                     return const SizedBox.shrink();
+                  }
                   return Padding(
                     padding: const EdgeInsets.only(right: 4),
                     child: Text(
