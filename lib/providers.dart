@@ -343,21 +343,22 @@ String defaultSettingKey(TargetMetric m, {required bool max}) {
 /// App-wide default target bounds for every non-kcal metric (the
 /// `default<Metric>Min/Max` settings). kcal defaults stay in
 /// [defaultMinProvider] / [defaultMaxProvider].
-final macroDefaultsProvider =
-    StreamProvider<Map<TargetMetric, CalorieTarget>>((ref) {
-      return ref.watch(dbProvider).watchAllSettings().map((rows) {
-        final s = {for (final r in rows) r.key: r.value};
-        double? n(String k) => s[k] == null ? null : double.tryParse(s[k]!);
-        return {
-          for (final m in TargetMetric.values)
-            if (m != TargetMetric.kcal)
-              m: CalorieTarget(
-                n(defaultSettingKey(m, max: false)),
-                n(defaultSettingKey(m, max: true)),
-              ),
-        };
-      });
-    });
+final macroDefaultsProvider = StreamProvider<Map<TargetMetric, CalorieTarget>>((
+  ref,
+) {
+  return ref.watch(dbProvider).watchAllSettings().map((rows) {
+    final s = {for (final r in rows) r.key: r.value};
+    double? n(String k) => s[k] == null ? null : double.tryParse(s[k]!);
+    return {
+      for (final m in TargetMetric.values)
+        if (m != TargetMetric.kcal)
+          m: CalorieTarget(
+            n(defaultSettingKey(m, max: false)),
+            n(defaultSettingKey(m, max: true)),
+          ),
+    };
+  });
+});
 
 /// The UI language override. `null` = follow the device locale; otherwise a
 /// `Locale` built from the stored language code ('en'/'de'/'fr'/'it').
@@ -371,7 +372,10 @@ final localeProvider = StreamProvider<Locale?>(
 /// The user-selected typeface (DESIGN.md §2 accessibility picker), persisted as
 /// the `appFont` setting (stores the enum `name`); defaults to Figtree.
 final fontProvider = StreamProvider<FuchsbauFont>(
-  (ref) => ref.watch(dbProvider).watchSetting('appFont').map(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('appFont')
+      .map(
         (v) => FuchsbauFont.values.firstWhere(
           (f) => f.name == v,
           orElse: () => FuchsbauFont.figtree,
@@ -382,7 +386,10 @@ final fontProvider = StreamProvider<FuchsbauFont>(
 /// Light / dark / follow-system, persisted as the `appThemeMode` setting;
 /// defaults to following the OS (ThemeMode.system).
 final themeModeProvider = StreamProvider<ThemeMode>(
-  (ref) => ref.watch(dbProvider).watchSetting('appThemeMode').map(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('appThemeMode')
+      .map(
         (v) => switch (v) {
           'light' => ThemeMode.light,
           'dark' => ThemeMode.dark,
@@ -418,17 +425,21 @@ final selectedDayProvider = NotifierProvider<SelectedDayNotifier, String>(
   SelectedDayNotifier.new,
 );
 
-/// HomeShell bottom-nav tab index. Day is always 0; the remaining tabs depend
-/// on whether the Trends tab is enabled ([showTrendsProvider]) — Day, Recipes,
-/// [Trends], Settings. A provider so flows like "log a recipe portion to a day"
-/// can jump to the Day tab (index 0) on the day they just logged to.
-class HomeTabNotifier extends Notifier<int> {
+/// The HomeShell bottom-nav destinations. Kept as identities, not indices:
+/// the Trends tab is optional ([showTrendsProvider]), so a raw index shifts
+/// meaning when the tab list grows or shrinks (enabling Trends from Settings
+/// used to silently switch the visible tab to Trends — both were "index 2").
+enum HomeTab { day, recipes, trends, settings }
+
+/// HomeShell's selected tab. A provider so flows like "log a recipe portion
+/// to a day" can jump to the Day tab on the day they just logged to.
+class HomeTabNotifier extends Notifier<HomeTab> {
   @override
-  int build() => 0;
-  void set(int index) => state = index;
+  HomeTab build() => HomeTab.day;
+  void set(HomeTab tab) => state = tab;
 }
 
-final homeTabProvider = NotifierProvider<HomeTabNotifier, int>(
+final homeTabProvider = NotifierProvider<HomeTabNotifier, HomeTab>(
   HomeTabNotifier.new,
 );
 
@@ -444,9 +455,10 @@ class SettingsScrollNotifier extends Notifier<String?> {
   void clear() => state = null;
 }
 
-final settingsScrollProvider = NotifierProvider<SettingsScrollNotifier, String?>(
-  SettingsScrollNotifier.new,
-);
+final settingsScrollProvider =
+    NotifierProvider<SettingsScrollNotifier, String?>(
+      SettingsScrollNotifier.new,
+    );
 
 /// Whether the activity budget adjustment is on ('healthEnergyRead' setting).
 final healthEnergyReadProvider = StreamProvider<bool>(
@@ -554,9 +566,11 @@ class TrendWindow {
   /// Count via UTC midnights: a local-time difference across a DST change is
   /// not a whole number of 24 h days.
   int get days =>
-      DateTime.utc(end.year, end.month, end.day)
-          .difference(DateTime.utc(start.year, start.month, start.day))
-          .inDays +
+      DateTime.utc(
+        end.year,
+        end.month,
+        end.day,
+      ).difference(DateTime.utc(start.year, start.month, start.day)).inDays +
       1;
 }
 
@@ -617,7 +631,9 @@ class TrendRangeNotifier extends Notifier<TrendWindow> {
     final e = DateTime(end.year, end.month, end.day);
     state = TrendWindow(TrendMode.custom, 0, s, e);
     _savedCustom = (start: s, end: e);
-    ref.read(dbProvider).setSetting(_customKey, '${DayKey.of(s)}:${DayKey.of(e)}');
+    ref
+        .read(dbProvider)
+        .setSetting(_customKey, '${DayKey.of(s)}:${DayKey.of(e)}');
   }
 }
 

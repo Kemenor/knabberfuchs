@@ -22,6 +22,12 @@ class HomeShell extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final showTrends = ref.watch(showTrendsProvider).asData?.value ?? true;
 
+    final tabs = <HomeTab>[
+      HomeTab.day,
+      HomeTab.recipes,
+      if (showTrends) HomeTab.trends,
+      HomeTab.settings,
+    ];
     final pages = <Widget>[
       const DayScreen(),
       const RecipesScreen(),
@@ -52,9 +58,12 @@ class HomeShell extends ConsumerWidget {
       ),
     ];
 
-    // Clamp so toggling Trends off while on a later tab can't point past the
-    // (now shorter) list.
-    final index = ref.watch(homeTabProvider).clamp(0, pages.length - 1);
+    // Selection is a tab identity, so the list growing/shrinking around it
+    // never moves the user (enabling Trends while on Settings keeps Settings
+    // selected). A selected tab that disappears falls back to Day — only
+    // possible via an external settings change, e.g. a backup restore.
+    final selected = ref.watch(homeTabProvider);
+    final index = tabs.contains(selected) ? tabs.indexOf(selected) : 0;
 
     return Scaffold(
       body: IndexedStack(index: index, children: pages),
@@ -63,7 +72,7 @@ class HomeShell extends ConsumerWidget {
         child: NavigationBar(
           selectedIndex: index,
           onDestinationSelected: (i) =>
-              ref.read(homeTabProvider.notifier).set(i),
+              ref.read(homeTabProvider.notifier).set(tabs[i]),
           destinations: destinations,
         ),
       ),

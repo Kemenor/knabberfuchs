@@ -133,11 +133,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                     children: [
                       for (var i = 0; i < share.items.length; i++) ...[
                         if (i > 0)
-                          const Divider(
-                            height: 1,
-                            indent: 16,
-                            endIndent: 16,
-                          ),
+                          const Divider(height: 1, indent: 16, endIndent: 16),
                         ListTile(
                           leading: Icon(
                             foodIconFor(share.items[i].name),
@@ -463,7 +459,7 @@ class _LogPortionSheetState extends ConsumerState<_LogPortionSheet> {
           );
       // Land the user on the day they just logged to, so they see the meal.
       ref.read(selectedDayProvider.notifier).set(_day);
-      ref.read(homeTabProvider.notifier).set(0); // Day tab
+      ref.read(homeTabProvider.notifier).set(HomeTab.day);
       // Pop the sheet (and the recipe-detail route, if we came from it) back to
       // the home shell so the Day tab is actually visible.
       if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);

@@ -18,18 +18,18 @@ import 'quick_add_sheet.dart';
 /// screenshot harness can feed a bundled photo without driving the native picker.
 final mealImagePickerProvider =
     Provider<Future<Uint8List?> Function(BuildContext)>((ref) {
-  return (context) async {
-    final source = await pickImageSource(context);
-    if (source == null || !context.mounted) return null;
-    final img = await ImagePicker().pickImage(
-      source: source,
-      maxWidth: 1024,
-      imageQuality: 85,
-    );
-    if (img == null) return null;
-    return img.readAsBytes();
-  };
-});
+      return (context) async {
+        final source = await pickImageSource(context);
+        if (source == null || !context.mounted) return null;
+        final img = await ImagePicker().pickImage(
+          source: source,
+          maxWidth: 1024,
+          imageQuality: 85,
+        );
+        if (img == null) return null;
+        return img.readAsBytes();
+      };
+    });
 
 /// Photo → Gemini estimate → prefilled Quick add. Gemini-only since the
 /// on-device classifier was removed (uniformly negative feedback; FEEDBACK.md
@@ -70,9 +70,7 @@ Future<bool> startRecognizeFoodFlow(
       ),
     );
     if (goToSettings == true && context.mounted) {
-      // Settings is always the last tab (Day, Recipes, [Trends], Settings).
-      final showTrends = ref.read(showTrendsProvider).asData?.value ?? true;
-      ref.read(homeTabProvider.notifier).set(showTrends ? 3 : 2);
+      ref.read(homeTabProvider.notifier).set(HomeTab.settings);
       ref.read(settingsScrollProvider.notifier).request(settingsSectionAi);
     }
     return false;
