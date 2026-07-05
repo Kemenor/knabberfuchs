@@ -100,8 +100,7 @@ class DebugSection extends ConsumerWidget {
               ListTile(
                 leading: const Icon(Symbols.visibility_off_rounded),
                 title: const Text('Hide debug menu'),
-                onTap: () =>
-                    ref.read(dbProvider).setSetting('debugMenu', null),
+                onTap: () => ref.read(dbProvider).setSetting('debugMenu', null),
               ),
             ],
           ),
@@ -276,10 +275,11 @@ class DebugSection extends ConsumerWidget {
     if (confirmed != true) return;
     final db = ref.read(dbProvider);
     final health = ref.read(healthServiceProvider);
+    final packs = ref.read(offlinePackServiceProvider);
     // Grilled 2026-07-03: a true factory reset also clears our records from
     // the health store, so a reinstall doesn't double them on resync.
     if (health.enabled) await health.deleteAll();
-    await wipeAllData(db);
+    await wipeAllData(db, packs: packs);
     await health.refreshEnabled(db);
     ref.read(selectedDayProvider.notifier).today();
     messenger.showAutoSnackBar(

@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../domain/enums.dart';
 import '../../domain/nutrition.dart' show encodeMicros;
 import '../db/database.dart';
+import '../offline/offline_pack_service.dart';
 
 /// Developer/tester tools behind the hidden debug menu (FEEDBACK.md
 /// 2026-07-03). Deliberately English-only and never store-advertised.
@@ -14,7 +15,17 @@ import '../db/database.dart';
 /// Wipe every table back to first-run state (targets re-seeded to the 7 empty
 /// weekday rows, settings cleared so the Swiss seeder re-imports on next
 /// launch). Children first so the runtime FK constraints never trip.
-Future<void> wipeAllData(AppDatabase db) async {
+///
+/// [packs] removes installed offline packs properly first — closing the
+/// store's open handles and deleting the multi-MB region_*.sqlite files.
+/// Clearing only the installed_packs rows left pack search alive from the
+/// open handles until restart and orphaned the files forever.
+Future<void> wipeAllData(AppDatabase db, {OfflinePackService? packs}) async {
+  if (packs != null) {
+    for (final pack in await db.installedPacksList()) {
+      await packs.remove(pack.code);
+    }
+  }
   await db.transaction(() async {
     for (final table in [
       'entries',
@@ -30,10 +41,9 @@ Future<void> wipeAllData(AppDatabase db) async {
       await db.customStatement('DELETE FROM $table');
     }
     for (var wd = 0; wd < 7; wd++) {
-      await db.customStatement(
-        'INSERT INTO targets (weekday) VALUES (?)',
-        [wd],
-      );
+      await db.customStatement('INSERT INTO targets (weekday) VALUES (?)', [
+        wd,
+      ]);
     }
   });
 }
@@ -56,19 +66,30 @@ class _SeedFood {
 // Realistic per-100g values; a mix of micros-rich and micros-less rows so the
 // tracked-nutrient surfaces (day card, trends, meal header) show both states.
 const _seedFoods = [
-  _SeedFood('Vollkornbrot', 220, 8.5, 41, 1.7,
-      {'fiber': 7.5, 'sugar': 2.1, 'satFat': 0.3, 'salt': 1.2}),
+  _SeedFood('Vollkornbrot', 220, 8.5, 41, 1.7, {
+    'fiber': 7.5,
+    'sugar': 2.1,
+    'satFat': 0.3,
+    'salt': 1.2,
+  }),
   _SeedFood('Skyr', 63, 11, 4, 0.2, {'sugar': 4.0, 'satFat': 0.1}),
   _SeedFood('Banane', 89, 1.1, 23, 0.3, {'fiber': 2.6, 'sugar': 12.2}),
-  _SeedFood('Haferflocken', 372, 13.5, 58.7, 7,
-      {'fiber': 10, 'sugar': 0.7, 'satFat': 1.2}),
+  _SeedFood('Haferflocken', 372, 13.5, 58.7, 7, {
+    'fiber': 10,
+    'sugar': 0.7,
+    'satFat': 1.2,
+  }),
   _SeedFood('Poulet-Brust', 165, 31, 0, 3.6, {'satFat': 1.0}),
   _SeedFood('Reis, gekocht', 130, 2.7, 28, 0.3),
   _SeedFood('Brokkoli', 34, 2.8, 7, 0.4, {'fiber': 2.6, 'sugar': 1.7}),
   _SeedFood('Olivenöl', 884, 0, 0, 100, {'satFat': 14}),
   _SeedFood('Apfel', 52, 0.3, 14, 0.2, {'fiber': 2.4, 'sugar': 10.4}),
-  _SeedFood('Erdnussbutter', 588, 25, 20, 50,
-      {'fiber': 6, 'sugar': 9, 'satFat': 10, 'salt': 1.2}),
+  _SeedFood('Erdnussbutter', 588, 25, 20, 50, {
+    'fiber': 6,
+    'sugar': 9,
+    'satFat': 10,
+    'salt': 1.2,
+  }),
   _SeedFood('Pasta, gekocht', 158, 5.8, 31, 0.9, {'fiber': 1.8}),
   _SeedFood('Tomatensauce', 29, 1.5, 5, 0.2, {'sugar': 4.1, 'salt': 0.9}),
 ];
@@ -103,7 +124,9 @@ Future<int> seedTestData(AppDatabase db, {int days = 21}) async {
 
   await db.transaction(() async {
     for (var d = days; d >= 1; d--) {
-      final date = today.subtract(Duration(days: d));
+      // Calendar step, not Duration: near a DST boundary a 23/25-hour day
+      // would skip or repeat a day string (same rule as DayKey.shift).
+      final date = DateTime(today.year, today.month, today.day - d);
       final day =
           '${date.year.toString().padLeft(4, '0')}-'
           '${date.month.toString().padLeft(2, '0')}-'
@@ -137,9 +160,7 @@ Future<int> seedTestData(AppDatabase db, {int days = 21}) async {
               sFat100: Value(f.fat),
               // Every 4th day predates micros tracking — snapshot has none,
               // which keeps the "0.0 g on old days" state reproducible.
-              sMicrosJson: Value(
-                d % 4 == 0 ? null : encodeMicros(f.micros),
-              ),
+              sMicrosJson: Value(d % 4 == 0 ? null : encodeMicros(f.micros)),
               sortIndex: Value(i),
               createdAt: Value(at.add(Duration(minutes: i))),
             ),
@@ -154,7 +175,11 @@ Future<int> seedTestData(AppDatabase db, {int days = 21}) async {
   await db.createRecipe(
     RecipesCompanion.insert(name: 'Test Porridge', servings: Value(2)),
     [
-      for (final (i, f) in [_seedFoods[3], _seedFoods[2], _seedFoods[1]].indexed)
+      for (final (i, f) in [
+        _seedFoods[3],
+        _seedFoods[2],
+        _seedFoods[1],
+      ].indexed)
         RecipeItemsCompanion.insert(
           recipeId: 0, // replaced by createRecipe
           sName: f.name,
