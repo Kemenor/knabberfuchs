@@ -73,6 +73,10 @@ class EntryGroups extends Table {
 
 /// A logged food on a given day. Carries a nutrition snapshot so editing or
 /// re-caching the source food never rewrites history.
+///
+/// Indexed by [day]: the day view, trends and health sync all filter on it,
+/// which was a full table scan growing with the diary (v14).
+@TableIndex(name: 'idx_entries_day', columns: {#day})
 class Entries extends Table {
   IntColumn get id => integer().autoIncrement()();
 

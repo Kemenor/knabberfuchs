@@ -5456,6 +5456,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SettingsTable settings = $SettingsTable(this);
   late final $InstalledPacksTable installedPacks = $InstalledPacksTable(this);
   late final $OcrMappingsTable ocrMappings = $OcrMappingsTable(this);
+  late final Index idxEntriesDay = Index(
+    'idx_entries_day',
+    'CREATE INDEX idx_entries_day ON entries (day)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5470,6 +5474,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settings,
     installedPacks,
     ocrMappings,
+    idxEntriesDay,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([

@@ -25,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -221,6 +221,11 @@ class AppDatabase extends _$AppDatabase {
           )
           WHERE food_id IS NULL AND ${uniqueMatch('entries')}
         ''');
+        }
+        if (from < 14) {
+          // Day view, trends and health sync all filter entries by day —
+          // previously a full table scan growing with the diary.
+          await m.createIndex(idxEntriesDay);
         }
       });
     },

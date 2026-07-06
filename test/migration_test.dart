@@ -221,7 +221,9 @@ void main() {
   }
 
   Future<int> count(AppDatabase d, String table) async {
-    final row = await d.customSelect('SELECT COUNT(*) AS c FROM $table').getSingle();
+    final row = await d
+        .customSelect('SELECT COUNT(*) AS c FROM $table')
+        .getSingle();
     return row.read<int>('c');
   }
 
@@ -238,7 +240,15 @@ void main() {
 
   Future<void> expectSchemaVersionLatest(AppDatabase d) async {
     final row = await d.customSelect('PRAGMA user_version').getSingle();
-    expect(row.read<int>('user_version'), 13);
+    expect(row.read<int>('user_version'), 14);
+    // v14: the entries.day index exists on migrated DBs, same as on fresh ones.
+    final idx = await d
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type = 'index' "
+          "AND name = 'idx_entries_day'",
+        )
+        .get();
+    expect(idx, hasLength(1));
   }
 
   test('v1 -> latest: kcal target carries into kcal_max, usda layer purged', () async {
@@ -294,7 +304,10 @@ void main() {
     // a custom food; the other rows decode to the same semantic source.
     expect(await count(d, 'foods'), 2);
     expect(await d.foodByExternal(FoodSource.custom, 'fdc-broccoli'), isNull);
-    final cola = await d.foodByExternal(FoodSource.openFoodFacts, '7610000000001');
+    final cola = await d.foodByExternal(
+      FoodSource.openFoodFacts,
+      '7610000000001',
+    );
     expect(cola, isNotNull);
     final soup = (await d.allCustomFoods()).single;
     expect(soup.name, 'Grandma soup');
@@ -425,10 +438,10 @@ void main() {
       await d.foodByExternal(FoodSource.openFoodFacts, '7610000000001'),
       isNotNull,
     );
-    expect(
-      (await d.allCustomFoods()).map((f) => f.name).toSet(),
-      {'My bread', 'Scanned bar'},
-    );
+    expect((await d.allCustomFoods()).map((f) => f.name).toSet(), {
+      'My bread',
+      'Scanned bar',
+    });
     final apple = await d.foodByExternal(FoodSource.swissFcdb, 'S1103');
     expect(apple, isNotNull);
     expect(apple!.nameDe, 'Apfel, roh');
@@ -451,7 +464,14 @@ void main() {
         raw.execute(
           'INSERT INTO targets (weekday, protein, carb, fat, kcal_min, kcal_max) '
           'VALUES (?, ?, ?, ?, ?, ?)',
-          [wd, wd == 0 ? 99 : null, null, null, wd == 0 ? 1500 : null, wd == 0 ? 2200 : 2000],
+          [
+            wd,
+            wd == 0 ? 99 : null,
+            null,
+            null,
+            wd == 0 ? 1500 : null,
+            wd == 0 ? 2200 : 2000,
+          ],
         );
       }
       // New numbering already applies at v10: off:0, custom:1, swissFcdb:2.
@@ -530,8 +550,10 @@ void main() {
       ]) {
         raw.execute('ALTER TABLE targets ADD COLUMN $c REAL NULL');
       }
-      raw.execute('INSERT INTO targets (weekday, kcal_min, protein_min) '
-          'VALUES (0, 1800, 120)');
+      raw.execute(
+        'INSERT INTO targets (weekday, kcal_min, protein_min) '
+        'VALUES (0, 1800, 120)',
+      );
       // A food rich in tracked nutrients, one with only fiber, plus entries:
       // linked to each, one snapshot-only, one whose micros blob has a key.
       raw.execute(
@@ -554,8 +576,14 @@ void main() {
     expect(
       cols,
       containsAll([
-        'fiber_min', 'fiber_max', 'sat_fat_min', 'sat_fat_max',
-        'sugar_min', 'sugar_max', 'salt_min', 'salt_max',
+        'fiber_min',
+        'fiber_max',
+        'sat_fat_min',
+        'sat_fat_max',
+        'sugar_min',
+        'sugar_max',
+        'salt_min',
+        'salt_max',
       ]),
     );
     final monday = await d.targetForWeekday(0);
@@ -584,86 +612,92 @@ void main() {
     await expectSchemaVersionLatest(d);
   });
 
-  test('v12 -> v13: snapshot-only rows adopt micros via name+kcal match', () async {
-    final d = openFixture(12, _schemaV10(), (raw) {
-      // Reproduce the v12 shape exactly as m.addColumn left it.
-      for (final c in [
-        'protein_min', 'protein_max', 'carb_min', 'carb_max',
-        'fat_min', 'fat_max', // v11 macro bounds
-        'fiber_min', 'fiber_max', 'sat_fat_min', 'sat_fat_max',
-        'sugar_min', 'sugar_max', 'salt_min', 'salt_max', // v12 nutrient bounds
-      ]) {
-        raw.execute('ALTER TABLE targets ADD COLUMN $c REAL NULL');
-      }
-      // Foods: one rich in tracked nutrients; one matched only via its
-      // localized name; an ambiguous same-name-same-kcal pair; one whose
-      // kcal was edited since the snapshot was taken.
-      raw.execute(
-        'INSERT INTO foods (id, source, name, name_de, kcal100, fiber100, '
-        'sugar100, sat_fat100, salt_g100) VALUES '
-        "(1, 1, 'Vollkornbrot', NULL, 220, 7.5, 2.1, 0.4, 1.2), "
-        "(2, 2, 'Ginger, raw', 'Ingwer', 80, 2.0, NULL, NULL, NULL), "
-        "(3, 1, 'Joghurt', NULL, 60, NULL, 4.7, NULL, NULL), "
-        "(4, 1, 'Joghurt', NULL, 60, NULL, 9.9, NULL, NULL), "
-        "(5, 1, 'Erdnussbutter', NULL, 640, 5.0, NULL, NULL, NULL)",
-      );
-      // Recipe items are snapshot-only by schema (no food FK).
-      raw.execute(
-        "INSERT INTO recipes (id, name, servings) VALUES (1, 'Brotzeit', 2)",
-      );
-      raw.execute(
-        'INSERT INTO recipe_items (recipe_id, s_name, grams, s_kcal100, '
-        's_micros_json, sort_index) VALUES '
-        "(1, 'Vollkornbrot', 80, 220, NULL, 0), "
-        "(1, 'Ingwer', 10, 80, NULL, 1), "
-        "(1, 'Joghurt', 150, 60, NULL, 2), "
-        "(1, 'Vollkornbrot', 40, 220, '{\"fiber\": 9.9, \"iron\": 0.3}', 3), "
-        "(1, 'Erdnussbutter', 30, 630, NULL, 4)",
-      );
-      // Entries: recipe-logged ones carry no food_id; a food-linked one with
-      // a NULL blob proves v13 stays out of v12's (already-run) territory.
-      raw.execute(
-        'INSERT INTO entries (day, meal_type, food_id, grams, s_name, '
-        's_kcal100, s_micros_json) VALUES '
-        "('2026-07-02', 2, NULL, 20, 'Ingwer', 80, NULL), "
-        "('2026-07-02', 2, NULL, 200, 'Quick add', 150, NULL), "
-        "('2026-07-02', 0, 1, 80, 'Vollkornbrot', 220, NULL)",
-      );
-    });
+  test(
+    'v12 -> v13: snapshot-only rows adopt micros via name+kcal match',
+    () async {
+      final d = openFixture(12, _schemaV10(), (raw) {
+        // Reproduce the v12 shape exactly as m.addColumn left it.
+        for (final c in [
+          'protein_min', 'protein_max', 'carb_min', 'carb_max',
+          'fat_min', 'fat_max', // v11 macro bounds
+          'fiber_min', 'fiber_max', 'sat_fat_min', 'sat_fat_max',
+          'sugar_min',
+          'sugar_max',
+          'salt_min',
+          'salt_max', // v12 nutrient bounds
+        ]) {
+          raw.execute('ALTER TABLE targets ADD COLUMN $c REAL NULL');
+        }
+        // Foods: one rich in tracked nutrients; one matched only via its
+        // localized name; an ambiguous same-name-same-kcal pair; one whose
+        // kcal was edited since the snapshot was taken.
+        raw.execute(
+          'INSERT INTO foods (id, source, name, name_de, kcal100, fiber100, '
+          'sugar100, sat_fat100, salt_g100) VALUES '
+          "(1, 1, 'Vollkornbrot', NULL, 220, 7.5, 2.1, 0.4, 1.2), "
+          "(2, 2, 'Ginger, raw', 'Ingwer', 80, 2.0, NULL, NULL, NULL), "
+          "(3, 1, 'Joghurt', NULL, 60, NULL, 4.7, NULL, NULL), "
+          "(4, 1, 'Joghurt', NULL, 60, NULL, 9.9, NULL, NULL), "
+          "(5, 1, 'Erdnussbutter', NULL, 640, 5.0, NULL, NULL, NULL)",
+        );
+        // Recipe items are snapshot-only by schema (no food FK).
+        raw.execute(
+          "INSERT INTO recipes (id, name, servings) VALUES (1, 'Brotzeit', 2)",
+        );
+        raw.execute(
+          'INSERT INTO recipe_items (recipe_id, s_name, grams, s_kcal100, '
+          's_micros_json, sort_index) VALUES '
+          "(1, 'Vollkornbrot', 80, 220, NULL, 0), "
+          "(1, 'Ingwer', 10, 80, NULL, 1), "
+          "(1, 'Joghurt', 150, 60, NULL, 2), "
+          "(1, 'Vollkornbrot', 40, 220, '{\"fiber\": 9.9, \"iron\": 0.3}', 3), "
+          "(1, 'Erdnussbutter', 30, 630, NULL, 4)",
+        );
+        // Entries: recipe-logged ones carry no food_id; a food-linked one with
+        // a NULL blob proves v13 stays out of v12's (already-run) territory.
+        raw.execute(
+          'INSERT INTO entries (day, meal_type, food_id, grams, s_name, '
+          's_kcal100, s_micros_json) VALUES '
+          "('2026-07-02', 2, NULL, 20, 'Ingwer', 80, NULL), "
+          "('2026-07-02', 2, NULL, 200, 'Quick add', 150, NULL), "
+          "('2026-07-02', 0, 1, 80, 'Vollkornbrot', 220, NULL)",
+        );
+      });
 
-    final items = await d.itemsForRecipe(1);
-    // Unique name+kcal match: the item adopts the food's tracked nutrients.
-    expect(decodeMicros(items[0].sMicrosJson), {
-      'fiber': 7.5,
-      'sugar': 2.1,
-      'satFat': 0.4,
-      'salt': 1.2,
-    });
-    // The match works through any localized name column (name_de here).
-    expect(decodeMicros(items[1].sMicrosJson), {'fiber': 2.0});
-    // Two foods share name+kcal -> ambiguous -> untouched.
-    expect(items[2].sMicrosJson, isNull);
-    // Additive only: existing snapshot keys beat the food's current values.
-    expect(decodeMicros(items[3].sMicrosJson), {
-      'fiber': 9.9,
-      'iron': 0.3,
-      'sugar': 2.1,
-      'satFat': 0.4,
-      'salt': 1.2,
-    });
-    // kcal edited since the snapshot -> no match -> untouched.
-    expect(items[4].sMicrosJson, isNull);
+      final items = await d.itemsForRecipe(1);
+      // Unique name+kcal match: the item adopts the food's tracked nutrients.
+      expect(decodeMicros(items[0].sMicrosJson), {
+        'fiber': 7.5,
+        'sugar': 2.1,
+        'satFat': 0.4,
+        'salt': 1.2,
+      });
+      // The match works through any localized name column (name_de here).
+      expect(decodeMicros(items[1].sMicrosJson), {'fiber': 2.0});
+      // Two foods share name+kcal -> ambiguous -> untouched.
+      expect(items[2].sMicrosJson, isNull);
+      // Additive only: existing snapshot keys beat the food's current values.
+      expect(decodeMicros(items[3].sMicrosJson), {
+        'fiber': 9.9,
+        'iron': 0.3,
+        'sugar': 2.1,
+        'satFat': 0.4,
+        'salt': 1.2,
+      });
+      // kcal edited since the snapshot -> no match -> untouched.
+      expect(items[4].sMicrosJson, isNull);
 
-    final entries = await d.watchDay('2026-07-02').first;
-    final ingwer = entries.firstWhere((e) => e.sName == 'Ingwer');
-    expect(decodeMicros(ingwer.sMicrosJson), {'fiber': 2.0});
-    final quick = entries.firstWhere((e) => e.sName == 'Quick add');
-    expect(quick.sMicrosJson, isNull);
-    // Food-linked entries are v12's job, which already ran on a v12 device.
-    final brot = entries.firstWhere((e) => e.sName == 'Vollkornbrot');
-    expect(brot.sMicrosJson, isNull);
+      final entries = await d.watchDay('2026-07-02').first;
+      final ingwer = entries.firstWhere((e) => e.sName == 'Ingwer');
+      expect(decodeMicros(ingwer.sMicrosJson), {'fiber': 2.0});
+      final quick = entries.firstWhere((e) => e.sName == 'Quick add');
+      expect(quick.sMicrosJson, isNull);
+      // Food-linked entries are v12's job, which already ran on a v12 device.
+      final brot = entries.firstWhere((e) => e.sName == 'Vollkornbrot');
+      expect(brot.sMicrosJson, isNull);
 
-    await expectFkIntegrity(d);
-    await expectSchemaVersionLatest(d);
-  });
+      await expectFkIntegrity(d);
+      await expectSchemaVersionLatest(d);
+    },
+  );
 }
