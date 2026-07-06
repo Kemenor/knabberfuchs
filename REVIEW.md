@@ -37,21 +37,16 @@
 | Gemini HTTP fallback-loop tests + corrupt-photo tolerance | `dc88745` |
 | HealthService record-window clamping extracted + tested | `ada973d` |
 
-**Still open** —
-
-1. **Priority 6: Gemini key in OS cloud backups.** Needs a decision:
-   `flutter_secure_storage` (new plugin dep — blocked on a clean
-   `pubspec.lock`, currently dirtied by the local fuchsbau path override) vs.
-   excluding the key another way. The privacy pages already disclose OS
-   backups since `b337aff`.
-2. **fastlane version pinning** in `ios.yml`/`ios-release.yml` — pick and pin
-   a known-good version (or Gemfile + lockfile).
-3. **sha256 verification** for the DuckDB CLI zip (offline-packs.yml) and
-   ideally the OFF parquet (pipeline/build_all.sh) — needs the real hashes.
-4. **`production`-track dispatch approval gate** in android.yml — policy call.
-5. ~~Test investments~~ — all covered now: Gemini HTTP loop, HealthService
-   clamping, and the log-food sheet math driven through the real widget
-   (`886e9fc`).
+**Still open** — nothing. The 2026-07-06 follow-up session closed the rest:
+the Gemini key moved to the platform keystore with silent migration
+(`flutter_secure_storage`; excluded from Android backup rules, Keychain
+this-device-only on iOS), fastlane is pinned to 2.236.1 in both iOS
+workflows, the DuckDB CLI download is sha256-verified, a production-track
+dispatch now waits on the protected `play-production` environment (required
+reviewer), and fuchsbau moved from a local path override to the pinned
+v0.2.0 tag so pubspec.lock stays clean. Not done by design: no checksum for
+the 7 GB OFF parquet (it changes weekly upstream; the packs built from it
+are content-addressed and checksummed themselves).
 
 ## At a glance
 
