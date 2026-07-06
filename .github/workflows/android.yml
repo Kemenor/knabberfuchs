@@ -58,6 +58,12 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    # A manual dispatch to the production track is a full public rollout
+    # (status: completed) — bind it to the protected `play-production`
+    # environment, whose required-reviewer rule holds the job until approved
+    # in the GitHub UI. Every other path (tag pushes to closed testing,
+    # manual closed-track staging) runs unguarded as before.
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.track == 'production' && 'play-production' || '' }}
     # Serialize Play uploads: concurrent runs would race independent edits
     # against the same app. Queue, never cancel, a release in flight.
     concurrency:
