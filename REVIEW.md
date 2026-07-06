@@ -4,6 +4,43 @@
 
 **Headline:** the 2026-07-02 review's entire top-priority list — all eight items — is **fixed and verified** (details in the last section). The suite is green: `flutter analyze` clean, 201/201 tests pass. The new findings cluster in three places: **upgrade-path atomicity** (the migration chain is not transactional, and an interrupted upgrade can destroy custom foods), **search for accented queries** (the tokenizer defeats offline-pack FTS for exactly the German/French queries this app's users type), and **identity/credential hygiene at the edges** (real name in commit author emails of a public repo; Gemini key rides along in OS cloud backups).
 
+## Fix status (updated 2026-07-06, same-day fix session)
+
+**Fixed and committed** (each commit references its finding):
+
+| Finding | Commit |
+|---|---|
+| #1 critical — migration chain not transactional | `e67b0ec` |
+| #2 high — `upsertFood` stale rowid on update path | `4105d00` |
+| #3 high — diacritic queries defeat offline/local search | `cd28a3a` |
+| #4 high — real name in commit metadata | history rewritten + force-pushed, remote verified clean; see finding for residual GitHub-support purge |
+| #5 high — trends "days in target" counts unlogged days | `c9e7c71` |
+| #7 medium — Swiss re-seed wipes favorites/usage/mappings | `3ae31ad` |
+| #8 medium — backup drops catalog favorites + OCR mappings | `beffd46` |
+| Trends-tab toggle yanks user off Settings | `9fd7866` (HomeTab enum) |
+| `ref` after `await` in dismissible sheets (+`_pickDate`) | `360a5bb` |
+| Unconfirmed meal delete | `1ae12b6` (+ `mealDeleteConfirm` ×4 locales) |
+| kJ thousands-separator parsing | `eefd865` |
+| Website hero overclaim + privacy §2 OS-backup gap | `b337aff` |
+| `_logToDay` double-tap; salt-chart y-axis; Gemini dropdown crash | `b76a155` / `16fd7c9` / `1b1284f` |
+| Meal windows crossing midnight → snack | `1125ea9` |
+| Debug wipe leaves pack files; seeder DST stepping | `2dcf3ec` |
+| Backup RangeError + 1970 timestamps on restore | `0285b77` |
+| Salt keyword substring false-positive; `decodeMicros` all-or-nothing | `c22ef5e` |
+| cut_release lower-version guard; screenshots.yml locale fallback; store-graphic palette note | `5c96a64` |
+| DESIGN_SYSTEM §1/§3 rot | `995a348` |
+
+**Still open** — priority 6 (Gemini key in OS cloud backups — needs a
+`flutter_secure_storage` decision and a clean `pubspec.lock`, currently dirtied
+by the local fuchsbau override), and these lows: dialog-owned
+`TextEditingController` disposal (4 sites), meal-header kcal tap target,
+locale-aware `HH:mm` in auto meal names, `l10n.kcalValue` consistency sweep,
+"davon" merged-OCR-row heuristic, `entries.day` index (needs schema v14),
+fastlane version pinning in iOS workflows, sha256 for DuckDB/OFF pipeline
+downloads, `production`-track dispatch approval gate (policy call),
+pipeline sed escaping, and the test investments in "Test coverage" below
+(Gemini HTTP loop, HealthService, log-food sheet math).
+
 ## At a glance
 
 | Dimension | Health | Notes |
