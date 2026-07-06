@@ -123,9 +123,13 @@ class _MergeSheetState extends ConsumerState<_MergeSheet> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Symbols.restaurant_rounded, size: 20),
-                  title: Text(g.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  title: Text(
+                    g.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   trailing: Text(
-                    '${kcalStr(kcal)} kcal',
+                    l10n.kcalValue(kcalStr(kcal)),
                     style: theme.textTheme.bodySmall,
                   ),
                   enabled: !_merging,

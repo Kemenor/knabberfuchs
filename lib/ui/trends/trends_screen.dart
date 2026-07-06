@@ -207,7 +207,9 @@ String _rangeLabel(DateTime s, DateTime e, String locale) {
 /// Format a metric value with its unit: "1850 kcal" for calories, "82 g" for a
 /// macro.
 String _metricValue(AppLocalizations l10n, TargetMetric m, double v) =>
-    m == TargetMetric.kcal ? l10n.kcalValue(kcalStr(v)) : '${macroStr(v)} g';
+    m == TargetMetric.kcal
+    ? l10n.kcalValue(kcalStr(v))
+    : l10n.gramsValue(macroStr(v));
 
 /// A "nice" y-axis gridline interval (~≤6 lines) that suits the kcal range
 /// (thousands), macro grams (tens to low hundreds) and low-gram metrics like

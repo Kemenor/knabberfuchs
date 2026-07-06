@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/date_label.dart';
@@ -473,7 +474,7 @@ class _MacroRow extends ConsumerWidget {
       child: Column(
         children: [
           Text(
-            '${macroStr(value)} g',
+            AppLocalizations.of(context).gramsValue(macroStr(value)),
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: textColor,
@@ -572,7 +573,7 @@ class _GroupSection extends ConsumerWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 4),
                           // Fast path to the read-only breakdown page; the ⋮ menu
                           // carries the discoverable "Meal details" entry.
                           GestureDetector(
@@ -581,9 +582,22 @@ class _GroupSection extends ConsumerWidget {
                             child: Semantics(
                               button: true,
                               hint: l10n.mealMenuDetails,
-                              child: Text(
-                                '${kcalStr(group.subtotal.kcal)} kcal',
-                                style: theme.textTheme.bodySmall,
+                              // 48dp hit area around the small text (the row is
+                              // already that tall from the neighboring
+                              // IconButtons, so this adds no visible height).
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minWidth: 48,
+                                  minHeight: 48,
+                                ),
+                                alignment: Alignment.centerLeft,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                child: Text(
+                                  l10n.kcalValue(kcalStr(group.subtotal.kcal)),
+                                  style: theme.textTheme.bodySmall,
+                                ),
                               ),
                             ),
                           ),
@@ -799,8 +813,9 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
   // Once the user edits the name by hand, stop auto-rewriting it on reclassify.
   bool _nameDirty = false;
 
+  // Locale time pattern, not hardcoded 24 h — "1:05 PM" for en, "13:05" de/fr/it.
   String get _timeLabel =>
-      '${_when.hour.toString().padLeft(2, '0')}:${_when.minute.toString().padLeft(2, '0')}';
+      DateFormat.jm(Localizations.localeOf(context).languageCode).format(_when);
   String get _autoName =>
       '${mealTypeTitle(_meal, Localizations.localeOf(context).languageCode)} '
       '$_timeLabel';
@@ -1003,8 +1018,12 @@ class _EntryTile extends ConsumerWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
         title: Text(view.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text('${gramsStr(view.grams)} g'),
-        trailing: Text('${kcalStr(view.nutrition.kcal)} kcal'),
+        subtitle: Text(
+          AppLocalizations.of(context).gramsValue(gramsStr(view.grams)),
+        ),
+        trailing: Text(
+          AppLocalizations.of(context).kcalValue(kcalStr(view.nutrition.kcal)),
+        ),
         onTap: () => showEditEntrySheet(context, ref, view.entry),
       ),
     );

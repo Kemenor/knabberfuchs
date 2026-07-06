@@ -72,7 +72,8 @@ class _ScaleSheetState extends ConsumerState<_ScaleSheet> {
                 const Spacer(),
                 Flexible(
                   child: Text(
-                    '${kcalStr(currentKcal)} → ${kcalStr(newKcal)} kcal',
+                    '${kcalStr(currentKcal)} → '
+                    '${l10n.kcalValue(kcalStr(newKcal))}',
                     style: theme.textTheme.titleMedium,
                     overflow: TextOverflow.ellipsis,
                   ),

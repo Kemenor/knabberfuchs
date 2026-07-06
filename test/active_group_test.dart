@@ -3,8 +3,12 @@ import 'package:calorie_tracker/providers.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
+  // The auto-name formats its time with DateFormat.jm(locale), which needs
+  // the locale symbols loaded (main.dart does the same at app startup).
+  setUpAll(initializeDateFormatting);
   late AppDatabase db;
   late DateTime now;
   late ProviderContainer container;
@@ -38,7 +42,9 @@ void main() {
       final id = await n.ensureGroup('2026-06-17');
       final g = await db.entryGroupById(id);
       expect(g!.day, '2026-06-17');
-      expect(g.name, 'Lunch 12:30'); // 12:30 is in the default lunch window
+      // 12:30 is in the default lunch window; en uses the 12-hour clock
+      // (CLDR separates the day period with a narrow no-break space).
+      expect(g.name, 'Lunch 12:30\u202FPM');
       expect(container.read(activeGroupProvider), id);
 
       now = now.add(const Duration(minutes: 14));
@@ -46,14 +52,17 @@ void main() {
     },
   );
 
-  test('auto-name uses the stored app locale and inferred meal window', () async {
-    await db.setSetting('appLocale', 'de');
-    now = DateTime(2026, 6, 17, 8, 5);
-    final n = container.read(activeGroupProvider.notifier);
+  test(
+    'auto-name uses the stored app locale and inferred meal window',
+    () async {
+      await db.setSetting('appLocale', 'de');
+      now = DateTime(2026, 6, 17, 8, 5);
+      final n = container.read(activeGroupProvider.notifier);
 
-    final id = await n.ensureGroup('2026-06-17');
-    expect((await db.entryGroupById(id))!.name, 'Frühstück 08:05');
-  });
+      final id = await n.ensureGroup('2026-06-17');
+      expect((await db.entryGroupById(id))!.name, 'Frühstück 08:05');
+    },
+  );
 
   test('an expired group is not reused; a fresh one is created', () async {
     final n = container.read(activeGroupProvider.notifier);
@@ -65,15 +74,18 @@ void main() {
     expect(container.read(activeGroupProvider), id2);
   });
 
-  test('a group from another day is not reused even within the timeout', () async {
-    final n = container.read(activeGroupProvider.notifier);
-    final id = await n.ensureGroup('2026-06-17');
+  test(
+    'a group from another day is not reused even within the timeout',
+    () async {
+      final n = container.read(activeGroupProvider.notifier);
+      final id = await n.ensureGroup('2026-06-17');
 
-    now = now.add(const Duration(minutes: 5));
-    final id2 = await n.ensureGroup('2026-06-18');
-    expect(id2, isNot(id));
-    expect((await db.entryGroupById(id2))!.day, '2026-06-18');
-  });
+      now = now.add(const Duration(minutes: 5));
+      final id2 = await n.ensureGroup('2026-06-18');
+      expect(id2, isNot(id));
+      expect((await db.entryGroupById(id2))!.day, '2026-06-18');
+    },
+  );
 
   test('refreshTimeout clears an expired active group', () async {
     final n = container.read(activeGroupProvider.notifier);

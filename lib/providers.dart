@@ -218,9 +218,11 @@ class ActiveGroupNotifier extends Notifier<int?> {
     // Localize the auto-name at creation in the active UI language (no
     // BuildContext here, so resolve the locale code directly).
     final locale = resolveUiLocale(settings['appLocale']);
+    // jm follows the locale's clock ("1:05 PM" en, "13:05" de/fr/it) instead
+    // of forcing 24 h on everyone.
     final name =
         '${mealTypeTitle(mt.inferAt(now), locale)} '
-        '${DateFormat('HH:mm').format(now)}';
+        '${DateFormat.jm(locale).format(now)}';
     final id = await _db.createEntryGroup(day, name);
     await _setActive(id);
     return id;
