@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:calorie_tracker/data/ml/gemini_service.dart';
+import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 String _wrap(Map<String, dynamic> inner) => jsonEncode({
   'candidates': [
@@ -29,15 +33,18 @@ void main() {
       expect(buildGeminiPrompt('   '), buildGeminiPrompt(null));
     });
 
-    test('a real hint is appended (trimmed, quoted) and refines, not replaces', () {
-      final p = buildGeminiPrompt('  homemade lasagne, large portion  ');
-      // Still anchored on the base instruction.
-      expect(p, startsWith(buildGeminiPrompt(null)));
-      // The trimmed hint is embedded.
-      expect(p, contains('"homemade lasagne, large portion"'));
-      // Framed as a refinement that still defers to the photo.
-      expect(p, contains('still rely on the photo'));
-    });
+    test(
+      'a real hint is appended (trimmed, quoted) and refines, not replaces',
+      () {
+        final p = buildGeminiPrompt('  homemade lasagne, large portion  ');
+        // Still anchored on the base instruction.
+        expect(p, startsWith(buildGeminiPrompt(null)));
+        // The trimmed hint is embedded.
+        expect(p, contains('"homemade lasagne, large portion"'));
+        // Framed as a refinement that still defers to the photo.
+        expect(p, contains('still rely on the photo'));
+      },
+    );
   });
 
   test('parses a valid food estimate (portion totals)', () {
@@ -154,5 +161,131 @@ void main() {
       isNull,
     );
     expect(parseGeminiMealResponse('not json'), isNull);
+  });
+
+  group('model fallback / HTTP loop', () {
+    String mealBody() => _wrap({
+      'is_food': true,
+      'meal_name': 'Test',
+      'items': [
+        {'name': 'Toast', 'kcal': 180.0},
+      ],
+    });
+
+    test('preferred 503 falls back to gemini-2.5-flash and succeeds', () async {
+      final requested = <String>[];
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          requested.add(req.url.path);
+          if (req.url.path.contains('gemini-3.5-flash')) {
+            return http.Response('overloaded', 503);
+          }
+          return http.Response(mealBody(), 200);
+        }),
+      );
+      final r = await svc.estimateMealFromText(
+        'toast',
+        'test-key',
+        preferredModel: 'gemini-3.5-flash',
+      );
+      expect(r?.items.single.name, 'Toast');
+      expect(requested, hasLength(2));
+      expect(requested.first, contains('gemini-3.5-flash'));
+      expect(requested.last, contains('gemini-2.5-flash'));
+    });
+
+    test('preferred timeout falls back; both failing returns null', () async {
+      var calls = 0;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          calls++;
+          if (req.url.path.contains('gemini-3.5-flash')) {
+            throw TimeoutException('slow');
+          }
+          return http.Response('teapot', 418);
+        }),
+      );
+      final r = await svc.estimateMealFromText(
+        'toast',
+        'test-key',
+        preferredModel: 'gemini-3.5-flash',
+      );
+      expect(r, isNull);
+      expect(calls, 2);
+    });
+
+    test('preferred == fallback is tried only once', () async {
+      var calls = 0;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          calls++;
+          return http.Response('overloaded', 503);
+        }),
+      );
+      final r = await svc.estimateMealFromText(
+        'toast',
+        'test-key',
+        preferredModel: GeminiService.fallbackModel,
+      );
+      expect(r, isNull);
+      expect(calls, 1);
+    });
+
+    test('cancellation between attempts stops the fallback upload', () async {
+      var calls = 0;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          calls++;
+          return http.Response('overloaded', 503);
+        }),
+      );
+      final r = await svc.estimateMealFromText(
+        'toast',
+        'test-key',
+        preferredModel: 'gemini-3.5-flash',
+        // Cancelled right after the first attempt: the photo/text must not
+        // be re-sent to the fallback model.
+        isCancelled: () => calls >= 1,
+      );
+      expect(r, isNull);
+      expect(calls, 1);
+    });
+
+    test('api key travels in the header, never the URL', () async {
+      http.Request? seen;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          seen = req;
+          return http.Response(mealBody(), 200);
+        }),
+      );
+      await svc.estimateMealFromText('toast', 'secret-key');
+      expect(seen!.headers['x-goog-api-key'], 'secret-key');
+      expect(seen!.url.toString(), isNot(contains('secret-key')));
+    });
+
+    test('recognizeFood uses the same fallback loop (photo path)', () async {
+      final requested = <String>[];
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          requested.add(req.url.path);
+          if (req.url.path.contains('gemini-3.5-flash')) {
+            return http.Response('overloaded', 503);
+          }
+          return http.Response(
+            _wrap({'is_food': true, 'name': 'Calzone', 'kcal': 640.0}),
+            200,
+          );
+        }),
+      );
+      // Undecodable bytes pass through the downscaler unchanged — fine here.
+      final r = await svc.recognizeFood(
+        Uint8List.fromList([1, 2, 3]),
+        'test-key',
+        preferredModel: 'gemini-3.5-flash',
+      );
+      expect(r?.name, 'Calzone');
+      expect(requested, hasLength(2));
+    });
   });
 }

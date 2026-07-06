@@ -238,9 +238,7 @@ class GeminiService {
           continue;
         }
         final r = parseGeminiMealResponse(resp.body);
-        debugPrint(
-          '[gemini] $model ok=${r != null} items=${r?.items.length}',
-        );
+        debugPrint('[gemini] $model ok=${r != null} items=${r?.items.length}');
         return r;
       } on TimeoutException {
         debugPrint('[gemini] $model timeout — next model');
@@ -315,7 +313,14 @@ GeminiMealResult? parseGeminiMealResponse(String responseBody) {
 /// small and fast — plenty of detail for recognition. Top-level so [compute]
 /// can run it in a worker isolate.
 Uint8List _downscaleJpeg(Uint8List bytes) {
-  final decoded = img.decodeImage(bytes);
+  img.Image? decoded;
+  try {
+    decoded = img.decodeImage(bytes);
+  } catch (_) {
+    // Truncated/corrupt buffers can make the format probes throw rather than
+    // return null (e.g. the PSD header reader on very short input).
+    return bytes;
+  }
   if (decoded == null) return bytes;
   var im = decoded;
   final maxSide = decoded.width >= decoded.height
