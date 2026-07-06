@@ -33,14 +33,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # Shared fuchs-family design system (theme, triad palette, fonts). Pinned by
-  # ref for reproducible CI / release builds (HTTPS so CI can fetch the public
-  # repo without SSH keys). For live local co-development, a gitignored
-  # pubspec_overrides.yaml points it at the ../fuchsbau sibling checkout.
+  # Shared fuchs-family design system (theme, triad palette, fonts). Pinned to
+  # a release tag for reproducible CI / release builds (HTTPS so CI can fetch
+  # the public repo without SSH keys); bump the tag deliberately. For live
+  # co-development against the ../fuchsbau sibling checkout, drop a gitignored
+  # pubspec_overrides.yaml with a path override — and delete it + pub get
+  # again before committing, so pubspec.lock stays on the tag.
   fuchsbau:
     git:
       url: https://github.com/Kemenor/fuchsbau.git
-      ref: cda97e7138eef3ddf27fcb63d1d46cb2cdce102b
+      ref: v0.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
