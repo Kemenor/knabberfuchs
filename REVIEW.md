@@ -34,6 +34,8 @@
 | "davon" merged-OCR-row nearest-keyword heuristic | `afb4446` |
 | Pipeline sed-metacharacter escaping | `dda6824` |
 | `entries.day` index (schema v14, migration + tests) | `10ba9e7` |
+| Gemini HTTP fallback-loop tests + corrupt-photo tolerance | `dc88745` |
+| HealthService record-window clamping extracted + tested | `ada973d` |
 
 **Still open** —
 
@@ -47,9 +49,8 @@
 3. **sha256 verification** for the DuckDB CLI zip (offline-packs.yml) and
    ideally the OFF parquet (pipeline/build_all.sh) — needs the real hashes.
 4. **`production`-track dispatch approval gate** in android.yml — policy call.
-5. **Test investments** (see "Test coverage" below): Gemini HTTP
-   fallback/cancellation loop, HealthService timestamp clamping, log-food
-   sheet math through the sheet.
+5. **Test investment left**: log-food sheet math driven through the sheet
+   (Gemini HTTP loop and HealthService clamping are now covered).
 
 ## At a glance
 
