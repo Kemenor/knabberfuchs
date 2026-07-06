@@ -119,6 +119,11 @@ jobs:
         # signing, the App Store provisioning profile.
         run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
+      - name: Pin fastlane
+        # The macOS runner image ships whatever fastlane is newest; pin the
+        # locally-verified version so TestFlight uploads stay reproducible.
+        run: sudo gem install fastlane --no-document -v 2.236.1
+
       - name: Upload to TestFlight
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}

@@ -46,7 +46,9 @@ jobs:
           echo "$ASC_API_KEY_P8_BASE64" | base64 --decode > "fastlane/AuthKey_${ASC_KEY_ID}.p8"
 
       - name: Install fastlane
-        run: sudo gem install fastlane --no-document
+        # Pinned to the locally-verified version: an unpinned latest can fail
+        # (or subtly alter) an App Store submission on release day.
+        run: sudo gem install fastlane --no-document -v 2.236.1
 
       - name: Submit for review
         env:
