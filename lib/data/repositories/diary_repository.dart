@@ -61,6 +61,7 @@ class DiaryRepository {
     required MealType meal,
     required String day,
     int? groupId,
+    String? photoPath,
   }) async {
     await db.addEntry(
       EntriesCompanion.insert(
@@ -74,6 +75,7 @@ class DiaryRepository {
         sCarb100: Value(carb100),
         sFat100: Value(fat100),
         sMicrosJson: Value(microsJson),
+        photoPath: Value(photoPath),
       ),
     );
   }
@@ -134,6 +136,9 @@ class DiaryRepository {
               sFat100: Value(e.sFat100),
               sMicrosJson: Value(e.sMicrosJson),
               sortIndex: Value(i),
+              // Every portion shares the original's photo file; the sweep
+              // only reclaims it once no entry references it anymore.
+              photoPath: Value(e.photoPath),
             ),
           );
         }

@@ -27,6 +27,7 @@ void main() {
           grams: 300,
           sName: 'Beans',
           sKcal100: 100,
+          photoPath: const Value('meal_1.jpg'),
         ),
       );
       await db.addEntry(
@@ -76,6 +77,11 @@ void main() {
         expect(
           entries.firstWhere((e) => e.sName == 'Beef').grams,
           closeTo(200, 0.001),
+        );
+        // Every portion keeps pointing at the original's meal photo.
+        expect(
+          entries.firstWhere((e) => e.sName == 'Beans').photoPath,
+          'meal_1.jpg',
         );
       }
     },

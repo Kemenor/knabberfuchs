@@ -99,7 +99,7 @@ void main() {
   test('dbStats reports schema version and row counts', () async {
     await seedTestData(db, days: 2);
     final stats = await dbStats(db);
-    expect(stats['schema version'], '14');
+    expect(stats['schema version'], '15');
     expect(stats['recipes'], '1 rows');
     expect(stats['targets'], '7 rows');
   });

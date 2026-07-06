@@ -440,6 +440,14 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   `primary` + label/value rows per enabled metric) above an uppercase
   `labelSmall` section header and a `Card` of `ListTile` ingredient rows —
   the same layout grammar as `recipe_detail_screen.dart`.
+- **Meal photos** (2026-07-06, tester feedback): the AI-recognition photo is
+  kept with the logged entry (`entries.photoPath`, file in the documents
+  `meal_photos/` dir; orphaned files swept at startup). It previews as a
+  rounded (`12`) 96-high thumbnail in the Quick add sheet and as a rounded
+  (`16`) 180-high `BoxFit.cover` banner atop the meal detail page (multiple
+  photos → horizontal strip), tap → full-screen black `InteractiveViewer`.
+  A missing file (backup restored elsewhere) renders nothing — no broken-image
+  placeholder.
 - **Debug-only surfaces are the one sanctioned l10n exception**: the hidden
   Settings Debug section (About-dialog long-press easter egg) is
   English-only, DEBUG-labelled with an `error`-colored header, and never

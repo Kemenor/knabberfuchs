@@ -27,6 +27,7 @@ Future<bool?> showQuickAddSheet(
   double? initialFat,
   double? initialWeight,
   String? sourceLabel,
+  Uint8List? photoBytes,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -43,6 +44,7 @@ Future<bool?> showQuickAddSheet(
       initialFat: initialFat,
       initialWeight: initialWeight,
       sourceLabel: sourceLabel,
+      photoBytes: photoBytes,
     ),
   );
 }
@@ -58,6 +60,9 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
   final double? initialFat;
   final double? initialWeight;
   final String? sourceLabel;
+
+  /// The recognized meal photo — kept with the entry and shown in Meal detail.
+  final Uint8List? photoBytes;
   const _QuickAddSheet({
     required this.day,
     required this.meal,
@@ -69,6 +74,7 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
     required this.initialFat,
     required this.initialWeight,
     required this.sourceLabel,
+    required this.photoBytes,
   });
 
   @override
@@ -169,6 +175,16 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
       final groupId = widget.resolveGroup == null
           ? null
           : await widget.resolveGroup!();
+      // Persist the photo only now, at log time — a dismissed sheet leaves no
+      // file behind. If the write fails the entry still logs, just photo-less.
+      String? photoPath;
+      if (widget.photoBytes != null) {
+        try {
+          photoPath = await ref
+              .read(mealPhotoStoreProvider)
+              .save(widget.photoBytes!);
+        } catch (_) {}
+      }
       // The fields hold portion totals. With a weight, store the real grams and
       // a correct per-100 g snapshot (total / grams * 100) so the entry scales
       // when edited; without one, fall back to grams=100 (totals verbatim).
@@ -192,6 +208,7 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
             meal: widget.meal,
             day: widget.day,
             groupId: groupId,
+            photoPath: photoPath,
           );
       if (mounted) Navigator.of(context).pop(true);
     } catch (_) {
@@ -233,6 +250,19 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
                     ),
                   ),
                 ],
+              ),
+            ],
+            if (widget.photoBytes != null) ...[
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.memory(
+                  widget.photoBytes!,
+                  height: 96,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  semanticLabel: l10n.a11yMealPhoto,
+                ),
               ),
             ],
             const SizedBox(height: 12),

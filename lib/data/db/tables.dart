@@ -111,6 +111,12 @@ class Entries extends Table {
 
   IntColumn get sortIndex => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  /// File name (not full path) of the meal photo in the app's `meal_photos`
+  /// dir — set when the entry was logged via AI photo recognition. The file
+  /// may be gone (backup restored onto another device): display must tolerate
+  /// a dangling name, and unreferenced files are swept at startup.
+  TextColumn get photoPath => text().nullable()();
 }
 
 /// Optional per-weekday targets (0 = Monday … 6 = Sunday) for calories and each

@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'dart:convert' show jsonDecode, jsonEncode;
 
 import 'package:flutter/widgets.dart' show Locale;
@@ -11,6 +12,7 @@ import 'core/date_x.dart';
 import 'core/locale.dart';
 import 'data/db/database.dart';
 import 'data/gemini_key_store.dart';
+import 'data/meal_photo_store.dart';
 import 'data/repositories/diary_repository.dart';
 import 'data/repositories/food_repository.dart';
 import 'data/repositories/recipe_repository.dart';
@@ -91,6 +93,16 @@ final backupServiceProvider = Provider<BackupService>(
   (ref) => BackupService(ref.watch(dbProvider)),
 );
 
+final mealPhotoStoreProvider = Provider<MealPhotoStore>(
+  (ref) => MealPhotoStore(ref.watch(dbProvider)),
+);
+
+/// Absolute path of the meal-photos folder, resolved once — lets widgets turn
+/// a stored file name into a `File` synchronously.
+final mealPhotoDirProvider = FutureProvider<String>(
+  (ref) => ref.watch(mealPhotoStoreProvider).photosDirPath(),
+);
+
 final ocrServiceProvider = Provider<OcrService>((ref) {
   final s = OcrService();
   ref.onDispose(s.dispose);
@@ -140,6 +152,8 @@ final appStartupProvider = FutureProvider<void>((ref) async {
   await seedSwissIfNeeded(ref.watch(dbProvider));
   await ref.read(offlinePackServiceProvider).syncStore();
   await ref.read(healthServiceProvider).refreshEnabled(ref.read(dbProvider));
+  // Fire-and-forget: photo GC must never delay or fail first paint.
+  unawaited(ref.read(mealPhotoStoreProvider).sweepOrphans());
 });
 
 // ---------------- Track-by-day groups ----------------

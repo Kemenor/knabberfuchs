@@ -1991,6 +1991,17 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, Entry> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
+  @override
+  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
+    'photo_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2007,6 +2018,7 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, Entry> {
     sMicrosJson,
     sortIndex,
     createdAt,
+    photoPath,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2109,6 +2121,12 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, Entry> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('photo_path')) {
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
+    }
     return context;
   }
 
@@ -2176,6 +2194,10 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, Entry> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      ),
     );
   }
 
@@ -2210,6 +2232,12 @@ class Entry extends DataClass implements Insertable<Entry> {
   final String? sMicrosJson;
   final int sortIndex;
   final DateTime createdAt;
+
+  /// File name (not full path) of the meal photo in the app's `meal_photos`
+  /// dir — set when the entry was logged via AI photo recognition. The file
+  /// may be gone (backup restored onto another device): display must tolerate
+  /// a dangling name, and unreferenced files are swept at startup.
+  final String? photoPath;
   const Entry({
     required this.id,
     required this.day,
@@ -2225,6 +2253,7 @@ class Entry extends DataClass implements Insertable<Entry> {
     this.sMicrosJson,
     required this.sortIndex,
     required this.createdAt,
+    this.photoPath,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2259,6 +2288,9 @@ class Entry extends DataClass implements Insertable<Entry> {
     }
     map['sort_index'] = Variable<int>(sortIndex);
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || photoPath != null) {
+      map['photo_path'] = Variable<String>(photoPath);
+    }
     return map;
   }
 
@@ -2290,6 +2322,9 @@ class Entry extends DataClass implements Insertable<Entry> {
           : Value(sMicrosJson),
       sortIndex: Value(sortIndex),
       createdAt: Value(createdAt),
+      photoPath: photoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoPath),
     );
   }
 
@@ -2315,6 +2350,7 @@ class Entry extends DataClass implements Insertable<Entry> {
       sMicrosJson: serializer.fromJson<String?>(json['sMicrosJson']),
       sortIndex: serializer.fromJson<int>(json['sortIndex']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      photoPath: serializer.fromJson<String?>(json['photoPath']),
     );
   }
   @override
@@ -2337,6 +2373,7 @@ class Entry extends DataClass implements Insertable<Entry> {
       'sMicrosJson': serializer.toJson<String?>(sMicrosJson),
       'sortIndex': serializer.toJson<int>(sortIndex),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'photoPath': serializer.toJson<String?>(photoPath),
     };
   }
 
@@ -2355,6 +2392,7 @@ class Entry extends DataClass implements Insertable<Entry> {
     Value<String?> sMicrosJson = const Value.absent(),
     int? sortIndex,
     DateTime? createdAt,
+    Value<String?> photoPath = const Value.absent(),
   }) => Entry(
     id: id ?? this.id,
     day: day ?? this.day,
@@ -2370,6 +2408,7 @@ class Entry extends DataClass implements Insertable<Entry> {
     sMicrosJson: sMicrosJson.present ? sMicrosJson.value : this.sMicrosJson,
     sortIndex: sortIndex ?? this.sortIndex,
     createdAt: createdAt ?? this.createdAt,
+    photoPath: photoPath.present ? photoPath.value : this.photoPath,
   );
   Entry copyWithCompanion(EntriesCompanion data) {
     return Entry(
@@ -2391,6 +2430,7 @@ class Entry extends DataClass implements Insertable<Entry> {
           : this.sMicrosJson,
       sortIndex: data.sortIndex.present ? data.sortIndex.value : this.sortIndex,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
     );
   }
 
@@ -2410,7 +2450,8 @@ class Entry extends DataClass implements Insertable<Entry> {
           ..write('sFat100: $sFat100, ')
           ..write('sMicrosJson: $sMicrosJson, ')
           ..write('sortIndex: $sortIndex, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('photoPath: $photoPath')
           ..write(')'))
         .toString();
   }
@@ -2431,6 +2472,7 @@ class Entry extends DataClass implements Insertable<Entry> {
     sMicrosJson,
     sortIndex,
     createdAt,
+    photoPath,
   );
   @override
   bool operator ==(Object other) =>
@@ -2449,7 +2491,8 @@ class Entry extends DataClass implements Insertable<Entry> {
           other.sFat100 == this.sFat100 &&
           other.sMicrosJson == this.sMicrosJson &&
           other.sortIndex == this.sortIndex &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.photoPath == this.photoPath);
 }
 
 class EntriesCompanion extends UpdateCompanion<Entry> {
@@ -2467,6 +2510,7 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
   final Value<String?> sMicrosJson;
   final Value<int> sortIndex;
   final Value<DateTime> createdAt;
+  final Value<String?> photoPath;
   const EntriesCompanion({
     this.id = const Value.absent(),
     this.day = const Value.absent(),
@@ -2482,6 +2526,7 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
     this.sMicrosJson = const Value.absent(),
     this.sortIndex = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.photoPath = const Value.absent(),
   });
   EntriesCompanion.insert({
     this.id = const Value.absent(),
@@ -2498,6 +2543,7 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
     this.sMicrosJson = const Value.absent(),
     this.sortIndex = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.photoPath = const Value.absent(),
   }) : day = Value(day),
        mealType = Value(mealType),
        grams = Value(grams),
@@ -2518,6 +2564,7 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
     Expression<String>? sMicrosJson,
     Expression<int>? sortIndex,
     Expression<DateTime>? createdAt,
+    Expression<String>? photoPath,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2534,6 +2581,7 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
       if (sMicrosJson != null) 's_micros_json': sMicrosJson,
       if (sortIndex != null) 'sort_index': sortIndex,
       if (createdAt != null) 'created_at': createdAt,
+      if (photoPath != null) 'photo_path': photoPath,
     });
   }
 
@@ -2552,6 +2600,7 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
     Value<String?>? sMicrosJson,
     Value<int>? sortIndex,
     Value<DateTime>? createdAt,
+    Value<String?>? photoPath,
   }) {
     return EntriesCompanion(
       id: id ?? this.id,
@@ -2568,6 +2617,7 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
       sMicrosJson: sMicrosJson ?? this.sMicrosJson,
       sortIndex: sortIndex ?? this.sortIndex,
       createdAt: createdAt ?? this.createdAt,
+      photoPath: photoPath ?? this.photoPath,
     );
   }
 
@@ -2618,6 +2668,9 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (photoPath.present) {
+      map['photo_path'] = Variable<String>(photoPath.value);
+    }
     return map;
   }
 
@@ -2637,7 +2690,8 @@ class EntriesCompanion extends UpdateCompanion<Entry> {
           ..write('sFat100: $sFat100, ')
           ..write('sMicrosJson: $sMicrosJson, ')
           ..write('sortIndex: $sortIndex, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('photoPath: $photoPath')
           ..write(')'))
         .toString();
   }
@@ -6640,6 +6694,7 @@ typedef $$EntriesTableCreateCompanionBuilder =
       Value<String?> sMicrosJson,
       Value<int> sortIndex,
       Value<DateTime> createdAt,
+      Value<String?> photoPath,
     });
 typedef $$EntriesTableUpdateCompanionBuilder =
     EntriesCompanion Function({
@@ -6657,6 +6712,7 @@ typedef $$EntriesTableUpdateCompanionBuilder =
       Value<String?> sMicrosJson,
       Value<int> sortIndex,
       Value<DateTime> createdAt,
+      Value<String?> photoPath,
     });
 
 final class $$EntriesTableReferences
@@ -6765,6 +6821,11 @@ class $$EntriesTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6884,6 +6945,11 @@ class $$EntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$EntryGroupsTableOrderingComposer get groupId {
     final $$EntryGroupsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -6980,6 +7046,9 @@ class $$EntriesTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
   $$EntryGroupsTableAnnotationComposer get groupId {
     final $$EntryGroupsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -7069,6 +7138,7 @@ class $$EntriesTableTableManager
                 Value<String?> sMicrosJson = const Value.absent(),
                 Value<int> sortIndex = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
               }) => EntriesCompanion(
                 id: id,
                 day: day,
@@ -7084,6 +7154,7 @@ class $$EntriesTableTableManager
                 sMicrosJson: sMicrosJson,
                 sortIndex: sortIndex,
                 createdAt: createdAt,
+                photoPath: photoPath,
               ),
           createCompanionCallback:
               ({
@@ -7101,6 +7172,7 @@ class $$EntriesTableTableManager
                 Value<String?> sMicrosJson = const Value.absent(),
                 Value<int> sortIndex = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
               }) => EntriesCompanion.insert(
                 id: id,
                 day: day,
@@ -7116,6 +7188,7 @@ class $$EntriesTableTableManager
                 sMicrosJson: sMicrosJson,
                 sortIndex: sortIndex,
                 createdAt: createdAt,
+                photoPath: photoPath,
               ),
           withReferenceMapper: (p0) => p0
               .map(

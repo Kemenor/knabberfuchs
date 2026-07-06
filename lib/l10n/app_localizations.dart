@@ -1506,6 +1506,18 @@ abstract class AppLocalizations {
   /// **'Selected meal photo'**
   String get a11ySelectedPhoto;
 
+  /// Accessibility label of the stored photo shown with a logged meal (quick add sheet, meal detail)
+  ///
+  /// In en, this message translates to:
+  /// **'Meal photo'**
+  String get a11yMealPhoto;
+
+  /// Accessibility label of the tappable photo banner on the meal detail page
+  ///
+  /// In en, this message translates to:
+  /// **'Meal photo. Tap to view full screen.'**
+  String get a11yMealPhotoOpen;
+
   /// Accessibility description of the trends chart
   ///
   /// In en, this message translates to:

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -41,11 +43,26 @@ class MealDetailScreen extends ConsumerWidget {
     }
     final subtotal = group.subtotal;
 
+    // Distinct photos across the group's entries (AI-recognized items carry
+    // one), resolved against the photos dir. Files can be gone after a backup
+    // restore on another device — each image hides itself on load error.
+    final photoDir = ref.watch(mealPhotoDirProvider).asData?.value;
+    final photos = photoDir == null
+        ? const <File>[]
+        : [
+            for (final name in {
+              for (final it in group.items)
+                if (it.entry.photoPath != null) it.entry.photoPath!,
+            })
+              File('$photoDir/$name'),
+          ];
+
     return Scaffold(
       appBar: AppBar(title: Text(group.name)),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 96),
         children: [
+          if (photos.isNotEmpty) _PhotoBanner(photos: photos),
           Card(
             margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Padding(
@@ -109,6 +126,87 @@ class MealDetailScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The meal's photo(s) above the totals card: one photo fills the width, more
+/// become a horizontal strip. Tapping opens the full-screen viewer. A missing
+/// file renders nothing (errorBuilder), so a dangling photoPath after a
+/// backup restore leaves the page clean.
+class _PhotoBanner extends StatelessWidget {
+  final List<File> photos;
+  const _PhotoBanner({required this.photos});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    Widget photo(File f, {double? width}) => Semantics(
+      label: l10n.a11yMealPhotoOpen,
+      button: true,
+      image: true,
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => _PhotoViewerScreen(file: f)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.file(
+            f,
+            height: 180,
+            width: width,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          ),
+        ),
+      ),
+    );
+
+    if (photos.length == 1) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        child: photo(photos.first, width: double.infinity),
+      );
+    }
+    return SizedBox(
+      height: 192,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        itemCount: photos.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (_, i) => photo(photos[i], width: 240),
+      ),
+    );
+  }
+}
+
+/// Full-screen, zoomable view of a meal photo (dark, like a gallery).
+class _PhotoViewerScreen extends StatelessWidget {
+  final File file;
+  const _PhotoViewerScreen({required this.file});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+      ),
+      extendBodyBehindAppBar: true,
+      body: Center(
+        child: InteractiveViewer(
+          maxScale: 5,
+          child: Image.file(
+            file,
+            fit: BoxFit.contain,
+            semanticLabel: l10n.a11yMealPhoto,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          ),
+        ),
       ),
     );
   }

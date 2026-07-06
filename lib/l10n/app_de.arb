@@ -260,6 +260,8 @@
   "a11yAnalysing": "Analysiere…",
   "a11yChangeDate": "Datum ändern",
   "a11ySelectedPhoto": "Ausgewähltes Essensfoto",
+  "a11yMealPhoto": "Essensfoto",
+  "a11yMealPhotoOpen": "Essensfoto. Zum Vergrößern antippen.",
   "a11yTrendsChart": "Trenddiagramm für den gewählten Zeitraum",
   "a11yQrCode": "QR-Code für Rezept {name}",
   "@a11yQrCode": { "placeholders": { "name": { "type": "String" } } },

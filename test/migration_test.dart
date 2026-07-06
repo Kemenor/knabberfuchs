@@ -240,7 +240,7 @@ void main() {
 
   Future<void> expectSchemaVersionLatest(AppDatabase d) async {
     final row = await d.customSelect('PRAGMA user_version').getSingle();
-    expect(row.read<int>('user_version'), 14);
+    expect(row.read<int>('user_version'), 15);
     // v14: the entries.day index exists on migrated DBs, same as on fresh ones.
     final idx = await d
         .customSelect(
@@ -249,6 +249,8 @@ void main() {
         )
         .get();
     expect(idx, hasLength(1));
+    // v15: the meal-photo column exists (and old rows read null).
+    expect(await columnsOf(d, 'entries'), contains('photo_path'));
   }
 
   test('v1 -> latest: kcal target carries into kcal_max, usda layer purged', () async {

@@ -138,6 +138,9 @@ Future<bool> startRecognizeFoodFlow(
         initialFat: r?.fat,
         initialWeight: r?.grams,
         sourceLabel: r == null ? null : l10n.recognizeByGemini,
+        // Kept even when recognition failed — it's still a photo of the meal
+        // being logged, and Meal detail can show it.
+        photoBytes: bytes,
       ) ==
       true;
 }

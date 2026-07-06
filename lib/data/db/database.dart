@@ -25,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -227,6 +227,10 @@ class AppDatabase extends _$AppDatabase {
           // previously a full table scan growing with the diary.
           await m.createIndex(idxEntriesDay);
         }
+        if (from < 15) {
+          // Meal photo kept from AI recognition (tester feedback 2026-07-06).
+          await m.addColumn(entries, entries.photoPath);
+        }
       });
     },
     beforeOpen: (details) async {
@@ -372,6 +376,17 @@ class AppDatabase extends _$AppDatabase {
           .get();
 
   Future<int> addEntry(EntriesCompanion entry) => into(entries).insert(entry);
+
+  /// Every meal-photo file name still referenced by an entry (feeds the
+  /// startup sweep that deletes unreferenced files; deletes themselves can't
+  /// be hooked — group deletion cascades in SQL).
+  Future<Set<String>> referencedPhotoPaths() async {
+    final rows = await customSelect(
+      'SELECT DISTINCT photo_path FROM entries WHERE photo_path IS NOT NULL',
+      readsFrom: {entries},
+    ).get();
+    return rows.map((r) => r.read<String>('photo_path')).toSet();
+  }
 
   Future<void> updateEntry(Entry entry) => update(entries).replace(entry);
 

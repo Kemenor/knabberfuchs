@@ -260,6 +260,8 @@
   "a11yAnalysing": "Analyse…",
   "a11yChangeDate": "Changer la date",
   "a11ySelectedPhoto": "Photo du repas sélectionnée",
+  "a11yMealPhoto": "Photo du repas",
+  "a11yMealPhotoOpen": "Photo du repas. Toucher pour l'afficher en plein écran.",
   "a11yTrendsChart": "Graphique de tendance pour la période choisie",
   "a11yQrCode": "QR code pour la recette {name}",
   "@a11yQrCode": { "placeholders": { "name": { "type": "String" } } },

@@ -152,6 +152,10 @@ Future<Map<String, dynamic>> buildBackupMap(
           'sMicrosJson': e.sMicrosJson,
           'sortIndex': e.sortIndex,
           'createdAt': _ms(e.createdAt),
+          // File name only; the photo file itself is not in the backup. On
+          // the same device a restore finds it again, elsewhere the name
+          // dangles harmlessly (display tolerates a missing file).
+          'photoPath': e.photoPath,
         },
     ],
     'customFoods': [
@@ -406,6 +410,7 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
               sMicrosJson: Value(e['sMicrosJson'] as String?),
               sortIndex: Value((e['sortIndex'] as num?)?.toInt() ?? 0),
               createdAt: Value(createdAt(e['createdAt'])),
+              photoPath: Value(e['photoPath'] as String?),
             ),
           );
     }

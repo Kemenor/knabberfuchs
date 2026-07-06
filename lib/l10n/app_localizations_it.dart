@@ -824,6 +824,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get a11ySelectedPhoto => 'Foto del pasto selezionata';
 
   @override
+  String get a11yMealPhoto => 'Foto del pasto';
+
+  @override
+  String get a11yMealPhotoOpen =>
+      'Foto del pasto. Tocca per vederla a schermo intero.';
+
+  @override
   String get a11yTrendsChart => 'Grafico dell\'andamento per il periodo scelto';
 
   @override

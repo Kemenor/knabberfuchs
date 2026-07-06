@@ -823,6 +823,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get a11ySelectedPhoto => 'Ausgewähltes Essensfoto';
 
   @override
+  String get a11yMealPhoto => 'Essensfoto';
+
+  @override
+  String get a11yMealPhotoOpen => 'Essensfoto. Zum Vergrößern antippen.';
+
+  @override
   String get a11yTrendsChart => 'Trenddiagramm für den gewählten Zeitraum';
 
   @override

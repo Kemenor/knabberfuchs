@@ -825,6 +825,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get a11ySelectedPhoto => 'Photo du repas sélectionnée';
 
   @override
+  String get a11yMealPhoto => 'Photo du repas';
+
+  @override
+  String get a11yMealPhotoOpen =>
+      'Photo du repas. Toucher pour l\'afficher en plein écran.';
+
+  @override
   String get a11yTrendsChart => 'Graphique de tendance pour la période choisie';
 
   @override

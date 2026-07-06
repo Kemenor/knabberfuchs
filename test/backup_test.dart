@@ -31,6 +31,7 @@ Future<void> _seed(AppDatabase db) async {
       sName: 'Apple',
       sKcal100: 52,
       sProtein100: const Value(0.3),
+      photoPath: const Value('meal_1750000000000000.jpg'),
     ),
   );
   await db.createRecipe(RecipesCompanion.insert(name: 'Salad'), [
@@ -90,6 +91,8 @@ void main() {
     expect(entry.sName, 'Apple');
     expect(entry.foodId, isNull);
     expect(entry.groupId, groups.single.id);
+    // The meal-photo file name survives (the file itself isn't backed up).
+    expect(entry.photoPath, 'meal_1750000000000000.jpg');
   });
 
   test(

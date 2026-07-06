@@ -260,6 +260,8 @@
   "a11yAnalysing": "Analisi…",
   "a11yChangeDate": "Cambia data",
   "a11ySelectedPhoto": "Foto del pasto selezionata",
+  "a11yMealPhoto": "Foto del pasto",
+  "a11yMealPhotoOpen": "Foto del pasto. Tocca per vederla a schermo intero.",
   "a11yTrendsChart": "Grafico dell'andamento per il periodo scelto",
   "a11yQrCode": "Codice QR per la ricetta {name}",
   "@a11yQrCode": { "placeholders": { "name": { "type": "String" } } },
