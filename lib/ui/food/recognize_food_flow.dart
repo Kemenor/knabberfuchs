@@ -46,10 +46,10 @@ Future<bool> startRecognizeFoodFlow(
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
   final db = ref.read(dbProvider);
-  final geminiKey = (await db.getSetting(geminiKeySetting))?.trim();
+  final geminiKey = await ref.read(geminiKeyStoreProvider).read();
   if (!context.mounted) return false;
 
-  if (geminiKey == null || geminiKey.isEmpty) {
+  if (geminiKey == null) {
     // No key → explain how to unlock the feature instead of dropping into a
     // plain Quick add (testers misread that as the scan having "worked").
     final goToSettings = await showDialog<bool>(

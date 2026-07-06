@@ -727,7 +727,8 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   void initState() {
     super.initState();
     final db = ref.read(dbProvider);
-    db.getSetting(geminiKeySetting).then((v) {
+    // Keystore-backed (and migrates a pre-2026-07 key out of the DB).
+    ref.read(geminiKeyStoreProvider).read().then((v) {
       if (mounted) {
         setState(() {
           _ctrl.text = v ?? '';
@@ -790,12 +791,7 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
             ),
             onChanged: (v) {
               setState(() {}); // toggle visibility follows the key field
-              ref
-                  .read(dbProvider)
-                  .setSetting(
-                    geminiKeySetting,
-                    v.trim().isEmpty ? null : v.trim(),
-                  );
+              ref.read(geminiKeyStoreProvider).write(v);
             },
           ),
           Align(

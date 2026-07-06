@@ -31,10 +31,12 @@ class BackupVersionException extends FormatException {
       );
 }
 
-/// Settings that hold credentials (currently the Gemini API key; see
-/// `geminiKeySetting` in providers.dart). The backup ZIP is unencrypted and
-/// goes through the share sheet, so these are stripped from the export, never
-/// imported, and preserved on-device across a restore.
+/// Settings keys that ever held credentials. The Gemini API key now lives in
+/// the platform keystore (see `GeminiKeyStore`), so current exports never see
+/// it — but pre-migration devices and old backup files still can. The backup
+/// ZIP is unencrypted and goes through the share sheet, so these are stripped
+/// from the export, never imported, and left untouched on-device by a
+/// restore.
 const _credentialSettingKeys = {'geminiApiKey'};
 
 int _ms(DateTime d) => d.millisecondsSinceEpoch;

@@ -44,6 +44,9 @@ dependencies:
       url: https://github.com/Kemenor/fuchsbau.git
       ref: v0.2.0
 
+  # Android Keystore / iOS Keychain storage for the user's Gemini API key —
+  # the diary DB is included in OS device backups, credentials must not be.
+  flutter_secure_storage: ^9.2.2
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8

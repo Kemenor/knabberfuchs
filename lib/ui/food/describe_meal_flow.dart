@@ -27,8 +27,8 @@ Future<bool> startDescribeMealFlow(
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
   final db = ref.read(dbProvider);
-  final geminiKey = (await db.getSetting(geminiKeySetting))?.trim();
-  final hasKey = geminiKey != null && geminiKey.isNotEmpty;
+  final geminiKey = await ref.read(geminiKeyStoreProvider).read();
+  final hasKey = geminiKey != null;
   if (!context.mounted) return false;
 
   final description = await showModalBottomSheet<String>(
@@ -110,9 +110,8 @@ Future<void> _logItemized(
 }) async {
   final db = ref.read(dbProvider);
   final diary = ref.read(diaryRepositoryProvider);
-  final meal =
-      (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
-          .inferNow();
+  final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
+      .inferNow();
   final gid = await db.createEntryGroup(
     day,
     result.name?.isNotEmpty == true ? result.name! : l10n.ocrDefaultMealName,

@@ -10,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'core/date_x.dart';
 import 'core/locale.dart';
 import 'data/db/database.dart';
+import 'data/gemini_key_store.dart';
 import 'data/repositories/diary_repository.dart';
 import 'data/repositories/food_repository.dart';
 import 'data/repositories/recipe_repository.dart';
@@ -104,7 +105,13 @@ final appVersionProvider = FutureProvider<String>((ref) async {
   return '${info.version} (${info.buildNumber})';
 });
 
-const geminiKeySetting = 'geminiApiKey';
+/// The user's Gemini API key lives in the platform keystore, NOT the settings
+/// table (the diary DB is included in OS device backups). All reads/writes go
+/// through this store; it migrates pre-2026-07 keys out of the DB on first
+/// read.
+final geminiKeyStoreProvider = Provider<GeminiKeyStore>(
+  (ref) => GeminiKeyStore(ref.watch(dbProvider)),
+);
 
 /// Preferred Gemini model to try first (the service always falls back to
 /// gemini-2.5-flash on a 503/timeout). Null = use the reliable default.

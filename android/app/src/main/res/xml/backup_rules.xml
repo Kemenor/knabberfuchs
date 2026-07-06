@@ -5,4 +5,6 @@
 <full-backup-content>
     <exclude domain="root" path="app_flutter/flutter_assets" />
     <exclude domain="root" path="app_flutter/packs" />
+    <exclude domain="sharedpref" path="FlutterSecureStorage" />
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
 </full-backup-content>
