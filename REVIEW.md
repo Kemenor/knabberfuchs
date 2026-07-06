@@ -49,8 +49,9 @@
 3. **sha256 verification** for the DuckDB CLI zip (offline-packs.yml) and
    ideally the OFF parquet (pipeline/build_all.sh) — needs the real hashes.
 4. **`production`-track dispatch approval gate** in android.yml — policy call.
-5. **Test investment left**: log-food sheet math driven through the sheet
-   (Gemini HTTP loop and HealthService clamping are now covered).
+5. ~~Test investments~~ — all covered now: Gemini HTTP loop, HealthService
+   clamping, and the log-food sheet math driven through the real widget
+   (`886e9fc`).
 
 ## At a glance
 
