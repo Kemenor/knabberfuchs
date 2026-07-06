@@ -90,6 +90,15 @@ void main() {
     expect(parseNutritionLabel(['Sale 0,9 g']).saltG100, 0.9);
   });
 
+  test('merged OCR rows assign the number nearest the matched keyword', () {
+    // One OCR line holding two label rows: the sugar keyword must read the
+    // sugar figure (30), not the carb figure that comes first on the line.
+    final n = parseNutritionLabel(['Kohlenhydrate 50 g davon Zucker 30 g']);
+    expect(n.sugar100, 30);
+    // Number-before-keyword layouts still fall back to the first number.
+    expect(parseNutritionLabel(['30 g Zucker']).sugar100, 30);
+  });
+
   test('hasAny false on irrelevant text', () {
     expect(parseNutritionLabel(['Ingredients: water, sugar']).hasAny, isFalse);
   });

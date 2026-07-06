@@ -63,6 +63,29 @@ double? _grams(String s) {
   return (v != null && v >= 0 && v <= 100) ? v : null;
 }
 
+/// Index where the first of [keys] occurs in [line], or -1.
+int _keyIndex(String line, List<String> keys) {
+  var best = -1;
+  for (final k in keys) {
+    final i = line.indexOf(k);
+    if (i >= 0 && (best == -1 || i < best)) best = i;
+  }
+  return best;
+}
+
+/// Gram value nearest AFTER position [from] — so an OCR line that merged two
+/// rows ("Kohlenhydrate 50 g davon Zucker 30 g", matched via the sugar
+/// keyword) reads the sugar figure, not the first number on the line. Falls
+/// back to the first number when none follows the keyword ("30 g Zucker").
+double? _gramsAfter(String line, int from) {
+  for (final m in _numRe.allMatches(line)) {
+    if (m.start < from) continue;
+    final v = double.tryParse(m.group(1)!.replaceAll(',', '.'));
+    return (v != null && v >= 0 && v <= 100) ? v : null;
+  }
+  return _grams(line);
+}
+
 /// Digit-grouping separator between a digit and exactly three digits with no
 /// fourth: Swiss 2'000 / 2’000, German 1.046, French 2 000 (incl. no-break
 /// spaces), English 1,000. "473,0" keeps its decimal comma.
@@ -105,19 +128,19 @@ NutritionLabel parseNutritionLabel(Iterable<String> lines) {
       // Ceiling allows pure fats/oils (~900 kcal/100 g) plus OCR slack.
       out.kcal100 = (k != null && k >= 0 && k <= 1200) ? k : null;
     } else if (out.satFat100 == null && _has(line, _satFat)) {
-      out.satFat100 = _grams(line);
+      out.satFat100 = _gramsAfter(line, _keyIndex(line, _satFat));
     } else if (out.sugar100 == null && _has(line, _sugar)) {
-      out.sugar100 = _grams(line);
+      out.sugar100 = _gramsAfter(line, _keyIndex(line, _sugar));
     } else if (out.fiber100 == null && _has(line, _fiber)) {
-      out.fiber100 = _grams(line);
+      out.fiber100 = _gramsAfter(line, _keyIndex(line, _fiber));
     } else if (out.fat100 == null && _has(line, _fat)) {
-      out.fat100 = _grams(line);
+      out.fat100 = _gramsAfter(line, _keyIndex(line, _fat));
     } else if (out.carb100 == null && _has(line, _carb)) {
-      out.carb100 = _grams(line);
+      out.carb100 = _gramsAfter(line, _keyIndex(line, _carb));
     } else if (out.protein100 == null && _has(line, _protein)) {
-      out.protein100 = _grams(line);
+      out.protein100 = _gramsAfter(line, _keyIndex(line, _protein));
     } else if (out.saltG100 == null && _saltRe.hasMatch(line)) {
-      out.saltG100 = _grams(line);
+      out.saltG100 = _gramsAfter(line, _saltRe.firstMatch(line)!.start);
     }
   }
   return out;
