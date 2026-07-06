@@ -24,7 +24,10 @@ if [ "${REGEN_REGIONS:-0}" = "1" ]; then
 fi
 
 echo "extracting intermediate from $(basename "$SRC") ..."
-sed "s|__SRC__|${SRC//&/\\&}|g; s|__EXTRACT__|${EXTRACT}|g" \
+# Escape backslash, the | delimiter, and & (sed whole-match) — a checkout
+# path containing any of them would otherwise corrupt the generated SQL.
+sed_esc() { printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'; }
+sed "s|__SRC__|$(sed_esc "$SRC")|g; s|__EXTRACT__|$(sed_esc "$EXTRACT")|g" \
   "$DIR/build_extract.sql.tmpl" | duckdb
 echo "intermediate -> $EXTRACT ($(du -h "$EXTRACT" | cut -f1))"
 

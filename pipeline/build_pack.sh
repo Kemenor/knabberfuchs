@@ -16,7 +16,10 @@ mkdir -p "$OUTDIR"
 rm -f "$OUT" "$OUT.gz"
 
 echo "[$CC] building from $(basename "$SRC") ..."
-sed "s|__SRC__|${SRC//&/\\&}|g; s|__COUNTRY_TAG__|${TAG}|g; s|__OUT__|${OUT}|g" \
+# Escape backslash, the | delimiter, and & (sed whole-match) — a checkout
+# path containing any of them would otherwise corrupt the generated SQL.
+sed_esc() { printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'; }
+sed "s|__SRC__|$(sed_esc "$SRC")|g; s|__COUNTRY_TAG__|$(sed_esc "$TAG")|g; s|__OUT__|$(sed_esc "$OUT")|g" \
   "$DIR/build_region.sql.tmpl" | duckdb
 
 echo "[$CC] dedup + index + FTS5 ..."
