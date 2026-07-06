@@ -141,19 +141,13 @@ class HealthService {
       for (var i = 0; i < entries.length; i++) {
         final e = entries[i];
         final factor = e.grams / 100.0;
-        // Anchor on the real moment the entry was logged (editable via
-        // back-dating). HC rejects future records, and startT must stay >=
-        // the day's start or the record lands on the wrong day. So cap the
-        // window at min(now, end); when the log time is unset / out of range /
-        // future, fall back to a stable in-day slot (noon, spread a minute
-        // apart to keep order), then clamp the tail to the cap.
-        final upper = now.isBefore(end) ? now : end;
-        var endT = e.createdAt;
-        if (endT.isBefore(start) || !endT.isBefore(upper)) {
-          endT = start.add(Duration(hours: 12, minutes: i));
-        }
-        if (!endT.isBefore(upper)) endT = upper;
-        final startT = endT.subtract(const Duration(minutes: 1));
+        final (start: startT, end: endT) = entryRecordWindow(
+          createdAt: e.createdAt,
+          index: i,
+          dayStart: start,
+          dayEnd: end,
+          now: now,
+        );
         final micros = decodeMicros(e.sMicrosJson);
         double? micro(String key) =>
             micros[key] == null ? null : micros[key]! * factor;
@@ -223,4 +217,28 @@ class HealthService {
     MealType.dinner => h.MealType.DINNER,
     MealType.snack => h.MealType.SNACK,
   };
+}
+
+/// The [start, end] window written for one entry, anchored on the real moment
+/// it was logged (editable via back-dating). Constraints: the health stores
+/// reject future records, and start must stay >= the day's start or the
+/// record lands on the wrong day. So the window is capped at min(now,
+/// dayEnd); a createdAt that is unset / out of range / in the future falls
+/// back to a stable in-day slot (noon, spread a minute apart by [index] to
+/// keep order), then the tail clamps to the cap. Pure — unit-tested; a wrong
+/// clamp silently corrupts what lands in Health Connect / HealthKit.
+({DateTime start, DateTime end}) entryRecordWindow({
+  required DateTime createdAt,
+  required int index,
+  required DateTime dayStart,
+  required DateTime dayEnd,
+  required DateTime now,
+}) {
+  final upper = now.isBefore(dayEnd) ? now : dayEnd;
+  var endT = createdAt;
+  if (endT.isBefore(dayStart) || !endT.isBefore(upper)) {
+    endT = dayStart.add(Duration(hours: 12, minutes: index));
+  }
+  if (!endT.isBefore(upper)) endT = upper;
+  return (start: endT.subtract(const Duration(minutes: 1)), end: endT);
 }
