@@ -15,7 +15,10 @@ The **colours, fonts, shape/spacing scales, and base component patterns come
 from the shared [fuchsbau](https://github.com/Kemenor/fuchsbau) package**
 (`fuchsbauTheme()` in `lib/core/theme.dart`) — the pinned tangerine triad (fox
 orange · indigo · emerald), Figtree + the accessibility font picker, soft
-rounding, the pill FAB. This doc records knabberfuchs-specifics and any
+rounding, the pill FAB, and (since fuchsbau v0.3.0) the shared settings
+anatomy: `FuchsbauSectionHeader` + `FuchsbauSettingsCard` +
+`fuchsbauCardRowPadding`, extracted verbatim from the private widgets that
+used to live in `settings_screen.dart`. This doc records knabberfuchs-specifics and any
 **deviation** from Fuchsbau (the principle: *the triad is family, its
 application to components is app-level*).
 

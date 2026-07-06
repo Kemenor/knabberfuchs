@@ -42,7 +42,7 @@ dependencies:
   fuchsbau:
     git:
       url: https://github.com/Kemenor/fuchsbau.git
-      ref: v0.2.0
+      ref: v0.3.0
 
   # Android Keystore / iOS Keychain storage for the user's Gemini API key —
   # the diary DB is included in OS device backups, credentials must not be.

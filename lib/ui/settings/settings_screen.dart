@@ -66,19 +66,19 @@ class SettingsScreen extends ConsumerWidget {
               ref.watch(showTrendsProvider).asData?.value ?? true;
           return ListView(
             children: [
-              _SectionHeader(l10n.settingsAppearance),
-              const _SettingsCard(
+              FuchsbauSectionHeader(l10n.settingsAppearance),
+              const FuchsbauSettingsCard(
                 children: [
                   _ThemePicker(),
                   _LanguagePicker(),
                   _TypefacePicker(),
                 ],
               ),
-              _SectionHeader(l10n.settingsTracking),
-              _SettingsCard(
+              FuchsbauSectionHeader(l10n.settingsTracking),
+              FuchsbauSettingsCard(
                 children: [
                   ListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     leading: const Icon(Symbols.flag_rounded),
                     title: Text(l10n.settingsTargets),
                     subtitle: Text(l10n.settingsTargetsSub),
@@ -88,7 +88,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   ExpansionTile(
-                    tilePadding: _cardRowPadding,
+                    tilePadding: fuchsbauCardRowPadding,
                     leading: const Icon(Symbols.schedule_rounded),
                     title: Text(l10n.settingsMealTimes),
                     subtitle: Text(l10n.settingsMealTimesSub),
@@ -104,7 +104,7 @@ class SettingsScreen extends ConsumerWidget {
                     ],
                   ),
                   SwitchListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     secondary: const Icon(Symbols.insights_rounded),
                     title: Text(l10n.settingsShowTrends),
                     subtitle: Text(l10n.settingsShowTrendsSub),
@@ -113,7 +113,7 @@ class SettingsScreen extends ConsumerWidget {
                         db.setSetting('showTrends', v ? 'true' : 'false'),
                   ),
                   SwitchListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     secondary: const Icon(Symbols.nutrition_rounded),
                     title: Text(l10n.settingsShowMealNutrients),
                     subtitle: Text(l10n.settingsShowMealNutrientsSub),
@@ -125,11 +125,11 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              _SectionHeader(l10n.settingsFoodData),
-              _SettingsCard(
+              FuchsbauSectionHeader(l10n.settingsFoodData),
+              FuchsbauSettingsCard(
                 children: [
                   ListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     leading: const Icon(Symbols.public_rounded),
                     title: Text(l10n.settingsOfflineRegions),
                     subtitle: Text(l10n.settingsOfflineRegionsSub),
@@ -144,14 +144,14 @@ class SettingsScreen extends ConsumerWidget {
               ),
               KeyedSubtree(
                 key: _aiSectionKey,
-                child: _SectionHeader(l10n.settingsAi),
+                child: FuchsbauSectionHeader(l10n.settingsAi),
               ),
-              const _SettingsCard(children: [_AiKeyTile()]),
-              _SectionHeader(l10n.settingsHealthConnect(_healthStore())),
-              _SettingsCard(
+              const FuchsbauSettingsCard(children: [_AiKeyTile()]),
+              FuchsbauSectionHeader(l10n.settingsHealthConnect(_healthStore())),
+              FuchsbauSettingsCard(
                 children: [
                   SwitchListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     secondary: const Icon(Symbols.favorite_border_rounded),
                     title: Text(l10n.settingsHealthSync(_healthStore())),
                     subtitle: Text(l10n.settingsHealthSyncSub(_healthStore())),
@@ -161,7 +161,7 @@ class SettingsScreen extends ConsumerWidget {
                   // Independent of write-sync: reading burned energy is a
                   // separate permission grant and a separate decision.
                   SwitchListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     secondary: const Icon(Symbols.bolt_rounded),
                     title: Text(l10n.settingsHealthEnergyRead),
                     subtitle: Text(
@@ -173,7 +173,7 @@ class SettingsScreen extends ConsumerWidget {
                   if (healthSync) ...[
                     const _HealthResyncTile(),
                     ListTile(
-                      contentPadding: _cardRowPadding,
+                      contentPadding: fuchsbauCardRowPadding,
                       leading: const Icon(Symbols.info_rounded),
                       dense: true,
                       title: Text(l10n.settingsHealthTimeNote),
@@ -182,11 +182,11 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ],
               ),
-              _SectionHeader(l10n.settingsDataBackup),
-              _SettingsCard(
+              FuchsbauSectionHeader(l10n.settingsDataBackup),
+              FuchsbauSettingsCard(
                 children: [
                   ListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     leading: const Icon(Symbols.upload_rounded),
                     title: Text(l10n.settingsExport),
                     subtitle: Text(l10n.settingsExportSub),
@@ -194,7 +194,7 @@ class SettingsScreen extends ConsumerWidget {
                     onTap: () => _exportBackup(context, ref),
                   ),
                   ListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     leading: const Icon(Symbols.download_rounded),
                     title: Text(l10n.settingsImport),
                     subtitle: Text(l10n.settingsImportSub),
@@ -203,12 +203,12 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              _SectionHeader(l10n.settingsAbout),
-              _SettingsCard(
+              FuchsbauSectionHeader(l10n.settingsAbout),
+              FuchsbauSettingsCard(
                 children: [
                   const _AboutTile(),
                   ListTile(
-                    contentPadding: _cardRowPadding,
+                    contentPadding: fuchsbauCardRowPadding,
                     leading: const Icon(Symbols.mail_rounded),
                     title: Text(l10n.settingsContactDev),
                     subtitle: Text(l10n.settingsContactDevSub),
@@ -274,7 +274,7 @@ class _HealthResyncTileState extends ConsumerState<_HealthResyncTile> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListTile(
-      contentPadding: _cardRowPadding,
+      contentPadding: fuchsbauCardRowPadding,
       leading: _busy
           ? const SizedBox(
               width: 24,
@@ -439,7 +439,7 @@ class _AboutTile extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final version = ref.watch(appVersionProvider).asData?.value;
     return ListTile(
-      contentPadding: _cardRowPadding,
+      contentPadding: fuchsbauCardRowPadding,
       leading: const Icon(Symbols.info_rounded),
       title: const Text('Knabberfuchs'),
       subtitle: version == null ? null : Text(version),
@@ -862,53 +862,6 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   }
 }
 
-/// Consistent horizontal inset for rows living inside a [_SettingsCard], so
-/// leading icons/labels align with the card's content padding.
-const _cardRowPadding = EdgeInsets.symmetric(horizontal: 12);
-
-/// Groups a section's rows inside a single white [Card], inserting a hairline
-/// divider between consecutive rows. Card fill/border/radius come from the
-/// theme — do not override them here.
-class _SettingsCard extends StatelessWidget {
-  final List<Widget> children;
-  const _SettingsCard({required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    final rows = <Widget>[];
-    for (var i = 0; i < children.length; i++) {
-      if (i > 0) {
-        rows.add(const Divider(height: 1, indent: 16, endIndent: 16));
-      }
-      rows.add(children[i]);
-    }
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: Column(children: rows),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  const _SectionHeader(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-      child: Semantics(
-        header: true,
-        child: Text(
-          title.toUpperCase(),
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.outline,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.6,
-          ),
-        ),
-      ),
-    );
-  }
-}
+// The settings anatomy (FuchsbauSettingsCard, FuchsbauSectionHeader,
+// fuchsbauCardRowPadding) comes from the fuchsbau package since v0.3.0 —
+// extracted verbatim from the private widgets that used to live here.
