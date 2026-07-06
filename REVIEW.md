@@ -29,17 +29,27 @@
 | Salt keyword substring false-positive; `decodeMicros` all-or-nothing | `c22ef5e` |
 | cut_release lower-version guard; screenshots.yml locale fallback; store-graphic palette note | `5c96a64` |
 | DESIGN_SYSTEM §1/§3 rot | `995a348` |
+| Locale-aware meal times; 48dp kcal fast-path; l10n unit sweep | `62b01ba` |
+| Dialog-owned TextEditingController (shared `showTextPromptDialog`, 4 sites) | `149d2b8` |
+| "davon" merged-OCR-row nearest-keyword heuristic | `afb4446` |
+| Pipeline sed-metacharacter escaping | `dda6824` |
+| `entries.day` index (schema v14, migration + tests) | `10ba9e7` |
 
-**Still open** — priority 6 (Gemini key in OS cloud backups — needs a
-`flutter_secure_storage` decision and a clean `pubspec.lock`, currently dirtied
-by the local fuchsbau override), and these lows: dialog-owned
-`TextEditingController` disposal (4 sites), meal-header kcal tap target,
-locale-aware `HH:mm` in auto meal names, `l10n.kcalValue` consistency sweep,
-"davon" merged-OCR-row heuristic, `entries.day` index (needs schema v14),
-fastlane version pinning in iOS workflows, sha256 for DuckDB/OFF pipeline
-downloads, `production`-track dispatch approval gate (policy call),
-pipeline sed escaping, and the test investments in "Test coverage" below
-(Gemini HTTP loop, HealthService, log-food sheet math).
+**Still open** —
+
+1. **Priority 6: Gemini key in OS cloud backups.** Needs a decision:
+   `flutter_secure_storage` (new plugin dep — blocked on a clean
+   `pubspec.lock`, currently dirtied by the local fuchsbau path override) vs.
+   excluding the key another way. The privacy pages already disclose OS
+   backups since `b337aff`.
+2. **fastlane version pinning** in `ios.yml`/`ios-release.yml` — pick and pin
+   a known-good version (or Gemfile + lockfile).
+3. **sha256 verification** for the DuckDB CLI zip (offline-packs.yml) and
+   ideally the OFF parquet (pipeline/build_all.sh) — needs the real hashes.
+4. **`production`-track dispatch approval gate** in android.yml — policy call.
+5. **Test investments** (see "Test coverage" below): Gemini HTTP
+   fallback/cancellation loop, HealthService timestamp clamping, log-food
+   sheet math through the sheet.
 
 ## At a glance
 
