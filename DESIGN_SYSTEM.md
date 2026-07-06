@@ -421,13 +421,16 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   enabled set; each metric has an always-visible default Min/Max row + an
   independently expandable per-weekday `ExpansionTile`. Every bound is
   optional.
-- **Compact nutrient line** (new pattern, 2026-07-04): space-tight surfaces
-  (meal-group headers behind the opt-in "Show nutrients per meal" toggle, the
-  meal-detail ingredient rows) render the enabled set as one muted
-  `outline`-colored `bodySmall` line — `P 32 · KH 45 · F 8 g`: abbreviated
-  labels (`metricShortLabel`, l10n ×4), canonical metric order, kcal never
-  included, single trailing unit. One helper builds it: `nutrientLine`
-  (`core/metric_labels.dart`).
+- **Compact nutrient line** (2026-07-04, revised 2026-07-06): space-tight
+  surfaces (meal-group headers behind the opt-in "Show nutrients per meal"
+  toggle, the meal-detail ingredient rows) render the enabled set as one muted
+  `outline`-colored `bodySmall` rich-text line — **P** 32 · **KH** 45 ·
+  **F** 8: abbreviated labels (`metricShortLabel`, l10n ×4) in `w700`,
+  values regular, canonical metric order, kcal never included, and
+  **unitless** — the old single trailing "g" read as if it belonged to the
+  last nutrient only (tester feedback 2026-07-06). One helper builds the
+  spans: `nutrientSpans` (`core/metric_labels.dart`), rendered via
+  `Text.rich`.
 - **Read-only detail pages reuse the recipe-detail shape** (2026-07-04): the
   meal detail page (`day/meal_detail_screen.dart`, opened from the group's ⋮
   or by tapping its kcal subtotal) is a hero stats `Card` (kcal headline in

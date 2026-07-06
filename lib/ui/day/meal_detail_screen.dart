@@ -123,17 +123,17 @@ class _IngredientTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final line = nutrientLine(l10n, view.nutrition, enabled);
+    final spans = nutrientSpans(l10n, view.nutrition, enabled);
     return ListTile(
-      leading: Icon(
-        foodIconFor(view.name),
-        color: theme.colorScheme.primary,
-      ),
+      leading: Icon(foodIconFor(view.name), color: theme.colorScheme.primary),
       title: Text(view.name),
-      subtitle: Text(
-        line.isEmpty
-            ? l10n.gramsValue(gramsStr(view.grams))
-            : '${l10n.gramsValue(gramsStr(view.grams))} · $line',
+      subtitle: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(text: l10n.gramsValue(gramsStr(view.grams))),
+            if (spans.isNotEmpty) ...[const TextSpan(text: ' · '), ...spans],
+          ],
+        ),
       ),
       trailing: Text(l10n.kcalValue(kcalStr(view.nutrition.kcal))),
     );

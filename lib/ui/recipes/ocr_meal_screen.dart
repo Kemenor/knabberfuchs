@@ -93,6 +93,10 @@ class OcrMealScreen extends ConsumerStatefulWidget {
 class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   late final List<_Item> _items = widget.ingredients.map(_Item.new).toList();
   final _name = TextEditingController();
+  // Servings for "Save as recipe" — askable at creation, not only when
+  // re-editing the saved recipe afterwards (feedback 2026-07-06). Defaults to
+  // 1: the scanned list is usually "what I ate", unlike the recipe editor's 2.
+  final _servings = TextEditingController(text: '1');
   bool _nameInit = false;
 
   @override
@@ -113,6 +117,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   @override
   void dispose() {
     _name.dispose();
+    _servings.dispose();
     super.dispose();
   }
 
@@ -150,6 +155,13 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
 
   List<_Item> get _ready =>
       _items.where((it) => it.matched != null && _grams(it) != null).toList();
+
+  /// Servings for the saved recipe; blank/invalid/zero falls back to 1
+  /// (matching the pre-field behavior).
+  double get _servingsValue {
+    final v = double.tryParse(_servings.text.replaceAll(',', '.'));
+    return (v == null || v <= 0) ? 1 : v;
+  }
 
   Future<void> _match(int i) async {
     final food = await Navigator.of(context).push<Food>(
@@ -232,7 +244,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
             name: _name.text.trim().isEmpty
                 ? l10n.ocrDefaultMealName
                 : _name.text.trim(),
-            servings: 1,
+            servings: _servingsValue,
             items: [
               for (final it in ready)
                 RecipeShareItem(
@@ -349,13 +361,36 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: TextField(
-              controller: _name,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l10n.ocrMealName,
-                border: const OutlineInputBorder(),
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _name,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      labelText: l10n.ocrMealName,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 104,
+                  child: TextField(
+                    controller: _servings,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: l10n.recipeServingsField,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(

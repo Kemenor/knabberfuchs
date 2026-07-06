@@ -1,3 +1,5 @@
+import 'package:flutter/painting.dart' show FontWeight, TextSpan, TextStyle;
+
 import '../domain/day_summary.dart';
 import '../domain/nutrition.dart';
 import '../l10n/app_localizations.dart';
@@ -30,18 +32,28 @@ String metricShortLabel(AppLocalizations l10n, TargetMetric m) => switch (m) {
   TargetMetric.salt => l10n.metricShortSalt,
 };
 
-/// Compact one-line nutrient summary ("P 32 · KH 45 · F 8 g") for [metrics]
-/// (canonical enum order, kcal skipped), all grams so the unit rides once at
-/// the end. Empty when no metric is enabled.
-String nutrientLine(
+/// Compact one-line nutrient summary as rich-text spans — "**P** 32 ·
+/// **KH** 45 · **F** 8" for [metrics] (canonical enum order, kcal skipped).
+/// Bold labels carry the emphasis; deliberately unitless: values are always
+/// grams, and a single trailing "g" read as if it belonged to the last
+/// nutrient only (tester feedback 2026-07-06). Empty when no metric is
+/// enabled.
+List<TextSpan> nutrientSpans(
   AppLocalizations l10n,
   Nutrition n,
   Set<TargetMetric> metrics,
 ) {
-  final parts = [
-    for (final m in TargetMetric.values)
-      if (m != TargetMetric.kcal && metrics.contains(m))
-        '${metricShortLabel(l10n, m)} ${gramsStr(metricValue(n, m))}',
-  ];
-  return parts.isEmpty ? '' : '${parts.join(' · ')} g';
+  final spans = <TextSpan>[];
+  for (final m in TargetMetric.values) {
+    if (m == TargetMetric.kcal || !metrics.contains(m)) continue;
+    if (spans.isNotEmpty) spans.add(const TextSpan(text: ' · '));
+    spans.add(
+      TextSpan(
+        text: metricShortLabel(l10n, m),
+        style: const TextStyle(fontWeight: FontWeight.w700),
+      ),
+    );
+    spans.add(TextSpan(text: ' ${gramsStr(metricValue(n, m))}'));
+  }
+  return spans;
 }

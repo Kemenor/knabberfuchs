@@ -8,6 +8,26 @@ tracks tester-driven changes specifically.
 
 ## Feedback queue (opened 2026-06-24)
 
+- ✅ **Servings at recipe creation from an ingredient list** — DONE 2026-07-06.
+  The OCR review screen (`ui/recipes/ocr_meal_screen.dart`) previously saved
+  recipes hardcoded to 1 serving; setting the real count meant reopening the
+  saved recipe in the editor. A servings field now sits next to the meal-name
+  field (same numeric input as the recipe editor, `recipeServingsField` label;
+  blank/invalid falls back to 1).
+
+- ✅ **Meal-type change no longer overwrites a custom meal name** — DONE
+  2026-07-06. The edit-meal sheet treated only names edited *inside the sheet*
+  as user-chosen, so reclassifying (e.g. Lunch → Dinner) rewrote a
+  previously customized name with the auto "MealType HH:MM" pattern. The sheet
+  now also treats any stored name that doesn't match the auto pattern as
+  custom and never rewrites it (`day_screen.dart` `_EditMealSheet`).
+
+- ✅ **Meal-header nutrient line: bold labels, no trailing unit** — DONE
+  2026-07-06. `P 32 · KH 45 · F 8 g` read as if only fat had a unit; the line
+  is now unitless with bold metric letters (**P** 32 · **KH** 45 · **F** 8) —
+  `nutrientSpans` replaces `nutrientLine` (`core/metric_labels.dart`), also
+  used by the meal-detail ingredient rows. DESIGN_SYSTEM §13 updated.
+
 - ✅ **Collapsible meals in day overview** — DONE 2026-06-24. Each meal group has a
   chevron toggle; collapsed groups keep their subtotal kcal visible. Let testers
   expand/collapse each meal group on the day screen to reduce scrolling on busy days.

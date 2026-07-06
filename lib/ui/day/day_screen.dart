@@ -694,12 +694,12 @@ class _GroupSection extends ConsumerWidget {
                 final enabled =
                     ref.watch(trackedNutrientsProvider).asData?.value ??
                     defaultTrackedNutrients;
-                final line = nutrientLine(l10n, group.subtotal, enabled);
-                if (line.isEmpty) return const SizedBox.shrink();
+                final spans = nutrientSpans(l10n, group.subtotal, enabled);
+                if (spans.isEmpty) return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-                  child: Text(
-                    line,
+                  child: Text.rich(
+                    TextSpan(children: spans),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -810,8 +810,24 @@ class _EditMealSheetState extends ConsumerState<_EditMealSheet> {
       ? widget.group.items.first.meal
       : MealType.snack;
   late DateTime _when = widget.group.group.createdAt;
-  // Once the user edits the name by hand, stop auto-rewriting it on reclassify.
+  // While false, reclassify/time changes keep the name in sync with the auto
+  // pattern. A hand-edited name must never be rewritten — including names
+  // customized BEFORE this sheet opened: treating only in-sheet edits as
+  // dirty clobbered saved names on a meal-type change (feedback 2026-07-06).
   bool _nameDirty = false;
+  bool _dirtyInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_dirtyInitialized) {
+      _dirtyInitialized = true;
+      // Needs Localizations, hence not in initState. Anything that doesn't
+      // match the auto-name for the group's current state counts as custom
+      // (a stale-locale/clock-format auto-name errs on the protective side).
+      _nameDirty = widget.group.name != _autoName;
+    }
+  }
 
   // Locale time pattern, not hardcoded 24 h — "1:05 PM" for en, "13:05" de/fr/it.
   String get _timeLabel =>
