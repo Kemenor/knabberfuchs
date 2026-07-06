@@ -4,6 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/snackbar.dart';
+import '../../core/text_prompt_dialog.dart';
 import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
@@ -54,38 +55,16 @@ class RecipesScreen extends ConsumerWidget {
 
     Future<void> importFromText() async {
       final messenger = ScaffoldMessenger.of(context);
-      final controller = TextEditingController();
-      String? text;
-      try {
-        text = await showDialog<String>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(l10n.importTextTitle),
-            content: TextField(
-              controller: controller,
-              autofocus: true,
-              minLines: 2,
-              maxLines: 5,
-              decoration: InputDecoration(
-                hintText: l10n.importTextHint,
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(l10n.actionCancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(ctx, controller.text),
-                child: Text(l10n.actionImport),
-              ),
-            ],
-          ),
-        );
-      } finally {
-        controller.dispose();
-      }
+      final text = await showTextPromptDialog(
+        context,
+        title: l10n.importTextTitle,
+        confirmLabel: l10n.actionImport,
+        cancelLabel: l10n.actionCancel,
+        hintText: l10n.importTextHint,
+        minLines: 2,
+        maxLines: 5,
+        outlined: true,
+      );
       if (text == null || text.trim().isEmpty) return;
       await applyImport(messenger, text);
     }
@@ -207,7 +186,8 @@ class RecipesScreen extends ConsumerWidget {
                                   title: Text(l10n.recipeDeleteConfirm(r.name)),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(ctx, false),
+                                      onPressed: () =>
+                                          Navigator.pop(ctx, false),
                                       child: Text(l10n.actionCancel),
                                     ),
                                     FilledButton(

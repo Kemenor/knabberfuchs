@@ -8,6 +8,7 @@ import '../../core/date_label.dart';
 import '../../core/date_x.dart';
 import '../../core/format.dart';
 import '../../core/snackbar.dart';
+import '../../core/text_prompt_dialog.dart';
 import '../../data/db/database.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/day_summary.dart' show snapshotMicros100;
@@ -198,42 +199,17 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
 
   Future<void> _editGrams(int i) async {
     final l10n = AppLocalizations.of(context);
-    final c = TextEditingController(
-      text: _grams(_items[i])?.let(gramsStr) ?? '',
+    final text = await showTextPromptDialog(
+      context,
+      title: _items[i].matched?.name ?? _items[i].parsed.name,
+      confirmLabel: l10n.actionSet,
+      cancelLabel: l10n.actionCancel,
+      initial: _grams(_items[i])?.let(gramsStr) ?? '',
+      suffixText: 'g',
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
     );
-    double? g;
-    try {
-      g = await showDialog<double>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(_items[i].matched?.name ?? _items[i].parsed.name),
-          content: TextField(
-            controller: c,
-            autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            ],
-            decoration: const InputDecoration(suffixText: 'g'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(l10n.actionCancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(
-                ctx,
-                double.tryParse(c.text.replaceAll(',', '.')),
-              ),
-              child: Text(l10n.actionSet),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      c.dispose();
-    }
+    final g = text == null ? null : double.tryParse(text.replaceAll(',', '.'));
     if (g != null && mounted) setState(() => _items[i].gramsOverride = g);
   }
 

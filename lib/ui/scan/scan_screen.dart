@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/text_prompt_dialog.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Barcode/QR scanner. Pops the scanned (or manually entered) string.
@@ -118,35 +119,15 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
   Future<void> _enterManually() async {
     final l10n = AppLocalizations.of(context);
-    final controller = TextEditingController();
-    String? code;
-    try {
-      code = await showDialog<String>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(l10n.scanEnterBarcode),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: InputDecoration(hintText: l10n.scanExampleHint),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(l10n.actionCancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-              child: Text(l10n.scanLookUp),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      controller.dispose();
-    }
+    final code = (await showTextPromptDialog(
+      context,
+      title: l10n.scanEnterBarcode,
+      confirmLabel: l10n.scanLookUp,
+      cancelLabel: l10n.actionCancel,
+      hintText: l10n.scanExampleHint,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    ))?.trim();
     if (code != null && code.isNotEmpty && mounted) {
       Navigator.of(context).pop(code);
     }
@@ -169,7 +150,9 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
                 final on = state.torchState == TorchState.on;
                 return IconButton(
                   tooltip: l10n.scanTorch,
-                  icon: Icon(on ? Symbols.flash_on_rounded : Symbols.flash_off_rounded),
+                  icon: Icon(
+                    on ? Symbols.flash_on_rounded : Symbols.flash_off_rounded,
+                  ),
                   onPressed: () => _controller?.toggleTorch(),
                 );
               },

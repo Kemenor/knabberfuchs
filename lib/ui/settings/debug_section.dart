@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/snackbar.dart';
+import '../../core/text_prompt_dialog.dart';
 import '../../data/debug/debug_tools.dart';
 import '../../providers.dart';
 
@@ -295,38 +296,18 @@ class DebugSection extends ConsumerWidget {
     required String initial,
     String? helper,
   }) async {
-    final ctrl = TextEditingController(text: initial);
-    try {
-      return await showDialog<double>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(title),
-          content: TextField(
-            controller: ctrl,
-            autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            ],
-            decoration: InputDecoration(suffixText: suffix, helperText: helper),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(
-                ctx,
-                double.tryParse(ctrl.text.replaceAll(',', '.')) ?? 0,
-              ),
-              child: const Text('Set'),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      ctrl.dispose();
-    }
+    final text = await showTextPromptDialog(
+      context,
+      title: title,
+      confirmLabel: 'Set',
+      cancelLabel: 'Cancel',
+      initial: initial,
+      suffixText: suffix,
+      helperText: helper,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+    );
+    if (text == null) return null;
+    return double.tryParse(text.replaceAll(',', '.')) ?? 0;
   }
 }

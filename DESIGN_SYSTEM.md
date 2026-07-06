@@ -202,6 +202,14 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
 
 ## 6. Forms & inputs
 
+- **A dialog asking for one line of text/number → `showTextPromptDialog`**
+  (`lib/core/text_prompt_dialog.dart`). It owns its `TextEditingController` in
+  the dialog's State so disposal rides the route; never create a controller at
+  the call site and dispose it in a `finally` after `showDialog` — that kills
+  it while the exit animation still runs and the IME teardown can touch it.
+  Callers post-process the returned string (trim, `double.tryParse`, …). Used
+  by manual barcode entry, recipe text-import, OCR gram edits, and the debug
+  number prompts.
 - Use `TextField` (no `Form`/`TextFormField`). Standard decoration:
 
   ```dart
