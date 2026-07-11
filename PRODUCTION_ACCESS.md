@@ -1,5 +1,10 @@
 # Google Play — Production Access Application
 
+**Status: application SUBMITTED 2026-07-11 — awaiting Google review (typically a
+few days, up to ~a week).** While waiting: keep the closed track live and testers
+opted in — dropping below 12 opted-in testers during review can void the
+application. On approval, continue at "After access is granted" below.
+
 Prepared 2026-07-11. The closed test (12+ opted-in testers, 14+ consecutive days —
 requirement for personal developer accounts created after 2023-11-13) has run its
 course; this file holds the paste-ready answers for the Play Console
