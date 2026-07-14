@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'backup.dart';
 import 'db/database.dart';
@@ -46,14 +46,24 @@ class BackupService {
     return file;
   }
 
-  Future<void> shareBackup({String? subject}) async {
+  /// Build the ZIP and open the system SAVE dialog (SAF / document picker) —
+  /// the share sheet has no reliable save-to-file target on every ROM, and
+  /// the save dialog reaches cloud providers too (knobelfuchs finding,
+  /// 2026-07-14). Returns the zip size in bytes, or null when cancelled.
+  Future<int?> saveBackup() async {
     final file = await buildZip();
-    await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile(file.path)],
-        subject: subject ?? 'Knabberfuchs backup',
-      ),
-    );
+    try {
+      final saved = await FlutterFileDialog.saveFile(
+        params: SaveFileDialogParams(
+          sourceFilePath: file.path,
+          fileName: file.uri.pathSegments.last,
+          mimeTypesFilter: const ['application/zip'],
+        ),
+      );
+      return saved != null ? await file.length() : null;
+    } finally {
+      if (await file.exists()) await file.delete();
+    }
   }
 
   /// Replace all user data with the contents of a backup .zip. Throws

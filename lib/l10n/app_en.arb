@@ -336,8 +336,8 @@
 
   "backupExportFailed": "Export failed: {error}",
   "@backupExportFailed": { "description": "Snackbar when exporting a backup fails", "placeholders": { "error": { "type": "String" } } },
-  "backupFileType": "Backup",
-  "@backupFileType": { "description": "File-type filter name shown in the system file picker when choosing a backup .zip" },
+  "backupSaved": "Backup saved ({size}).",
+  "@backupSaved": { "description": "Snackbar after the backup zip was saved via the system save dialog; size is human-readable like '1.2 MB'", "placeholders": { "size": { "type": "String" } } },
   "backupReplaceTitle": "Replace all data?",
   "@backupReplaceTitle": { "description": "Confirmation dialog title before importing a backup" },
   "backupReplaceBody": "Importing will replace your current entries, custom foods, recipes, targets, and settings with the backup contents.",
@@ -712,8 +712,6 @@
   "addCouldntRead": "Couldn't read the table. Enter the values manually.",
   "@addCouldntRead": { "description": "Error banner when the nutrition-label OCR failed" },
 
-  "backupShareSubject": "Knabberfuchs backup",
-  "@backupShareSubject": { "description": "Share-sheet subject line for an exported backup file" },
   "scanRecipeQr": "Scan recipe QR",
   "@scanRecipeQr": { "description": "Title of the recipe QR scanner screen" },
   "splashPreparing": "Preparing food database…",

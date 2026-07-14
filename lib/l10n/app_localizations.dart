@@ -1044,11 +1044,11 @@ abstract class AppLocalizations {
   /// **'Export failed: {error}'**
   String backupExportFailed(String error);
 
-  /// File-type filter name shown in the system file picker when choosing a backup .zip
+  /// Snackbar after the backup zip was saved via the system save dialog; size is human-readable like '1.2 MB'
   ///
   /// In en, this message translates to:
-  /// **'Backup'**
-  String get backupFileType;
+  /// **'Backup saved ({size}).'**
+  String backupSaved(String size);
 
   /// Confirmation dialog title before importing a backup
   ///
@@ -2123,12 +2123,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t read the table. Enter the values manually.'**
   String get addCouldntRead;
-
-  /// Share-sheet subject line for an exported backup file
-  ///
-  /// In en, this message translates to:
-  /// **'Knabberfuchs backup'**
-  String get backupShareSubject;
 
   /// Title of the recipe QR scanner screen
   ///

@@ -179,7 +179,7 @@
   "trendsActivityNote": "Das Zielband berücksichtigt keine Aktivitäts-Anpassungen.",
 
   "backupExportFailed": "Export fehlgeschlagen: {error}",
-  "backupFileType": "Backup",
+  "backupSaved": "Sicherung gespeichert ({size}).",
   "backupReplaceTitle": "Alle Daten ersetzen?",
   "backupReplaceBody": "Beim Import werden deine aktuellen Einträge, eigenen Lebensmittel, Rezepte, Ziele und Einstellungen durch den Backup-Inhalt ersetzt.",
   "backupRestored": "Backup wiederhergestellt.",
@@ -375,8 +375,6 @@
   "offContributeAction": "In Open Food Facts öffnen",
   "addFilledFromLabel": "Vom Etikett übernommen — bitte die Werte prüfen.",
   "addCouldntRead": "Tabelle konnte nicht gelesen werden. Gib die Werte manuell ein.",
-
-  "backupShareSubject": "Knabberfuchs-Backup",
   "scanRecipeQr": "Rezept-QR scannen",
   "splashPreparing": "Lebensmitteldatenbank wird vorbereitet…",
   "scanEnterBarcode": "Barcode eingeben",

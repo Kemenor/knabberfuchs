@@ -179,7 +179,7 @@
   "trendsActivityNote": "La bande d'objectif n'inclut pas les ajustements d'activité.",
 
   "backupExportFailed": "Échec de l'export : {error}",
-  "backupFileType": "Sauvegarde",
+  "backupSaved": "Sauvegarde enregistrée ({size}).",
   "backupReplaceTitle": "Remplacer toutes les données ?",
   "backupReplaceBody": "L'import remplacera vos entrées actuelles, aliments personnalisés, recettes, objectifs et réglages par le contenu de la sauvegarde.",
   "backupRestored": "Sauvegarde restaurée.",
@@ -375,8 +375,6 @@
   "offContributeAction": "Ouvrir dans Open Food Facts",
   "addFilledFromLabel": "Rempli à partir de l'étiquette — veuillez vérifier les valeurs.",
   "addCouldntRead": "Impossible de lire le tableau. Saisissez les valeurs manuellement.",
-
-  "backupShareSubject": "Sauvegarde Knabberfuchs",
   "scanRecipeQr": "Scanner le QR de la recette",
   "splashPreparing": "Préparation de la base de données alimentaire…",
   "scanEnterBarcode": "Saisir le code-barres",

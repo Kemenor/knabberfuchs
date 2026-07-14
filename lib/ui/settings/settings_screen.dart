@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -373,9 +373,18 @@ Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = AppLocalizations.of(context);
   try {
-    await ref
-        .read(backupServiceProvider)
-        .shareBackup(subject: l10n.backupShareSubject);
+    final bytes = await ref.read(backupServiceProvider).saveBackup();
+    if (bytes != null) {
+      // Size in the confirmation: MIUI file managers show stale 0-byte
+      // entries for freshly saved documents (knobelfuchs finding) — the
+      // snackbar is the trustworthy receipt.
+      final size = bytes >= 1024 * 1024
+          ? '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB'
+          : '${(bytes / 1024).round()} KB';
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.backupSaved(size))),
+      );
+    } // cancelled save dialog = no ceremony
   } catch (e) {
     messenger.showAutoSnackBar(
       SnackBar(content: Text(l10n.backupExportFailed('$e'))),
@@ -386,12 +395,17 @@ Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
 Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = AppLocalizations.of(context);
-  final file = await openFile(
-    acceptedTypeGroups: [
-      XTypeGroup(label: l10n.backupFileType, extensions: const ['zip']),
-    ],
+  // flutter_file_dialog, not file_selector: MIUI's documents provider
+  // reports stale 0-byte sizes and file_selector trusted them, delivering
+  // empty reads for good files (knobelfuchs tablet playtest 2026-07-14).
+  // No mime filter — restore validates, and filters hid files on some
+  // pickers.
+  final path = await FlutterFileDialog.pickFile(
+    params: const OpenFileDialogParams(
+      dialogType: OpenFileDialogType.document,
+    ),
   );
-  if (file == null || !context.mounted) return;
+  if (path == null || !context.mounted) return;
 
   final confirmed = await showDialog<bool>(
     context: context,
@@ -413,7 +427,7 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
   if (confirmed != true) return;
 
   try {
-    await ref.read(backupServiceProvider).restoreFromZip(file.path);
+    await ref.read(backupServiceProvider).restoreFromZip(path);
     messenger.showAutoSnackBar(SnackBar(content: Text(l10n.backupRestored)));
   } on BackupVersionException {
     messenger.showAutoSnackBar(

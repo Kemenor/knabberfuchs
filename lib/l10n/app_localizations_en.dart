@@ -562,7 +562,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get backupFileType => 'Backup';
+  String backupSaved(String size) {
+    return 'Backup saved ($size).';
+  }
 
   @override
   String get backupReplaceTitle => 'Replace all data?';
@@ -1190,9 +1192,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get addCouldntRead =>
       'Couldn\'t read the table. Enter the values manually.';
-
-  @override
-  String get backupShareSubject => 'Knabberfuchs backup';
 
   @override
   String get scanRecipeQr => 'Scan recipe QR';

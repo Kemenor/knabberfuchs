@@ -12,6 +12,7 @@ commit passes changesNotSentForReview=True where the API allows it, falling
 back to a plain commit otherwise.
 """
 import os
+import re
 import socket
 import sys
 
@@ -31,6 +32,18 @@ META = 'fastlane/metadata/android'
 # quoted as a single argv entry by the caller.
 TRACKS = sys.argv[1:] if len(sys.argv) > 1 else ['internal']
 SCOPES = ['https://www.googleapis.com/auth/androidpublisher']
+
+
+def release_name():
+    """"1.2.0 (14)" from pubspec — otherwise Play names every release after
+    the first upload it ever saw (knobelfuchs Console finding, 2026-07-14)."""
+    try:
+        with open('pubspec.yaml', encoding='utf-8') as f:
+            m = re.search(r'^version:\s*(\S+)', f.read(), re.M)
+        version, _, build = m.group(1).partition('+')
+        return f'{version} ({build})' if build else version
+    except Exception:
+        return None
 
 
 def release_notes(version_code):
@@ -66,15 +79,18 @@ def main():
         print('uploaded versionCode %s' % vc)
 
         notes = release_notes(vc)
+        name = release_name()
         for track in TRACKS:
+            release = {'versionCodes': [str(vc)],
+                       'status': 'completed',
+                       'releaseNotes': notes}
+            if name:
+                release['name'] = name
             svc.edits().tracks().update(
                 packageName=PKG, editId=edit_id, track=track,
-                body={'track': track,
-                      'releases': [{'versionCodes': [str(vc)],
-                                    'status': 'completed',
-                                    'releaseNotes': notes}]}
+                body={'track': track, 'releases': [release]}
             ).execute()
-            print('assigned to track "%s"' % track)
+            print('assigned to track "%s" (name=%s)' % (track, name or 'auto'))
 
         try:
             svc.edits().commit(packageName=PKG, editId=edit_id,
