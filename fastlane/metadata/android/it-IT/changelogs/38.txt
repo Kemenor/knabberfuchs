@@ -1,4 +1,4 @@
-• Il backup ora apre la finestra file di sistema — salva direttamente nell'app File o nel tuo cloud, senza menu di condivisione
+• Il backup ora apre la finestra di salvataggio di sistema — salva direttamente sul dispositivo o nel tuo cloud, senza menu di condivisione
 • Il ripristino di un backup è più affidabile su più dispositivi
 • La foto del riconoscimento IA ora viene conservata e mostrata nei dettagli del pasto
 • Schermata Impostazioni rinnovata e più ordinata

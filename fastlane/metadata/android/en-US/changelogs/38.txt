@@ -1,4 +1,4 @@
-• Backing up now opens the system file dialog — save straight to the Files app or your cloud instead of the share sheet
+• Backing up now opens the system save dialog — save straight to device storage or your cloud instead of the share sheet
 • Restoring a backup is more reliable across devices
 • The photo from AI meal recognition is now kept and shown in the meal's details
 • Refreshed, tidier Settings screen

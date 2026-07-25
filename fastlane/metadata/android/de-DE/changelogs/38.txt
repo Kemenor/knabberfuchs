@@ -1,4 +1,4 @@
-• Backups öffnen jetzt den System-Dateidialog — direkt in der Dateien-App oder deiner Cloud speichern statt über das Teilen-Menü
+• Backups öffnen jetzt den System-Speicherdialog — direkt auf dem Gerät oder in deiner Cloud speichern statt über das Teilen-Menü
 • Das Wiederherstellen von Backups klappt auf mehr Geräten zuverlässig
 • Das Foto der KI-Erkennung bleibt jetzt erhalten und erscheint in den Mahlzeit-Details
 • Aufgeräumter Einstellungen-Bildschirm

@@ -1,4 +1,4 @@
-• La sauvegarde ouvre désormais la boîte de dialogue Fichiers du système — enregistrez directement dans l'app Fichiers ou votre cloud, sans menu de partage
+• La sauvegarde ouvre désormais la boîte d'enregistrement du système — directement sur l'appareil ou dans votre cloud, sans menu de partage
 • La restauration d'une sauvegarde est plus fiable sur davantage d'appareils
 • La photo de la reconnaissance IA est conservée et affichée dans le détail du repas
 • Écran Réglages rafraîchi et plus clair
