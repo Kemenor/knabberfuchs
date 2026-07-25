@@ -24,13 +24,20 @@ distrobox enter flutter -- bash -lc 'flutter <cmd>'
   tags `vX.Y.Z` and pushes. The tag triggers `.github/workflows/android.yml`
   (analyze+test gate → signed AAB → *completed* release on both Play
   closed-testing tracks) and `ios.yml` (analyze+test gate → TestFlight).
+  **Play production:** promote the *verified closed-testing build* — never
+  re-upload — with `gh workflow run android.yml -f track=production
+  -f promote_version_code=<N>`; the run holds on the protected
+  `play-production` environment until approved in the GitHub UI, then goes
+  fully live (subject to Play review).
   **App Store production:** once the build is on TestFlight, update
   `fastlane/metadata/ios/*/release_notes.txt` and run
   `gh workflow run ios-release.yml -f version=x.y.z -f build_number=N` —
   submits for review, **auto-releases on approval**. Manual fallback:
   `flutter build appbundle --release` → `python3 tool/play_upload_aab.py <track>`
   (track(s) as positional args, e.g. `internal`; AAB path hardcoded in the
-  script). Status: Android in Play closed testing; iOS **live on the App Store**.
+  script; `play-store-key.json` lives in CI secrets, not on every machine).
+  Status: Android has Play production access (2026-07-25), first production
+  rollout pending; iOS **live on the App Store**.
   The CI Flutter version is single-sourced in `.fvmrc` (all workflows read it via
   `flutter-version-file`); bump it together with the goldens (see `test.yml`).
 - **Store screenshots (local):** `tool/screenshots.sh android|ios [locales]` runs

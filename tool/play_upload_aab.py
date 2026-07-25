@@ -4,6 +4,12 @@
 fastlane changelogs, and commit the edit.
 
     python3 tool/play_upload_aab.py [track ...]
+    python3 tool/play_upload_aab.py --promote <versionCode> [track ...]
+
+--promote skips the upload and assigns an ALREADY-UPLOADED versionCode to the
+given track(s) — Play rejects a re-upload of an existing versionCode, so
+moving a verified closed-testing build to production must promote, not
+rebuild (first needed for the 1.4.0 closed→production cutover, 2026-07-25).
 
 Nothing stays in Draft and there is no publish step in the Console afterwards:
 committing a 'completed' release rolls the build out to that track's testers
@@ -30,7 +36,16 @@ META = 'fastlane/metadata/android'
 # One or more tracks (the AAB is uploaded once, then assigned to each). Track
 # names with spaces (e.g. a custom closed track "Google Group - Alpha") must be
 # quoted as a single argv entry by the caller.
-TRACKS = sys.argv[1:] if len(sys.argv) > 1 else ['internal']
+_args = sys.argv[1:]
+PROMOTE = None  # versionCode to promote instead of uploading the AAB
+if '--promote' in _args:
+    i = _args.index('--promote')
+    try:
+        PROMOTE = int(_args[i + 1])
+    except (IndexError, ValueError):
+        sys.exit('usage: play_upload_aab.py --promote <versionCode> [track ...]')
+    del _args[i:i + 2]
+TRACKS = _args if _args else ['internal']
 SCOPES = ['https://www.googleapis.com/auth/androidpublisher']
 
 
@@ -62,21 +77,26 @@ def main():
     svc = build('androidpublisher', 'v3', credentials=creds,
                 cache_discovery=False)
     edit_id = svc.edits().insert(packageName=PKG, body={}).execute()['id']
-    print('edit %s — uploading %s (%.0f MB)' % (
-        edit_id, AAB, os.path.getsize(AAB) / 1e6))
     try:
-        req = svc.edits().bundles().upload(
-            packageName=PKG, editId=edit_id,
-            media_body=MediaFileUpload(
-                AAB, mimetype='application/octet-stream', resumable=True,
-                chunksize=10 * 1024 * 1024))
-        resp = None
-        while resp is None:
-            status, resp = req.next_chunk(num_retries=5)
-            if status:
-                print('  %d%%' % int(status.progress() * 100))
-        vc = resp['versionCode']
-        print('uploaded versionCode %s' % vc)
+        if PROMOTE is not None:
+            vc = PROMOTE
+            print('edit %s — promoting existing versionCode %s' % (
+                edit_id, vc))
+        else:
+            print('edit %s — uploading %s (%.0f MB)' % (
+                edit_id, AAB, os.path.getsize(AAB) / 1e6))
+            req = svc.edits().bundles().upload(
+                packageName=PKG, editId=edit_id,
+                media_body=MediaFileUpload(
+                    AAB, mimetype='application/octet-stream', resumable=True,
+                    chunksize=10 * 1024 * 1024))
+            resp = None
+            while resp is None:
+                status, resp = req.next_chunk(num_retries=5)
+                if status:
+                    print('  %d%%' % int(status.progress() * 100))
+            vc = resp['versionCode']
+            print('uploaded versionCode %s' % vc)
 
         notes = release_notes(vc)
         name = release_name()

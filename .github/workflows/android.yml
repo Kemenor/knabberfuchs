@@ -4,7 +4,10 @@ name: Android · Play
 # ("alpha" + the custom "Google Group - Alpha") on a version tag (v*) — the
 # Android counterpart to ios.yml (which ships the iOS build to TestFlight, the
 # iOS closed-testing equivalent). A manual workflow_dispatch stages on a single
-# chosen track instead. Reuses the local
+# chosen track instead — with promote_version_code set it skips the build and
+# assigns that ALREADY-UPLOADED build to the track (Play rejects re-uploading
+# a versionCode, so a closed→production cutover of the same build must
+# promote, not rebuild). Reuses the local
 # release tooling: the upload keystore for signing + tool/play_upload_aab.py
 # (service account) for the upload, exactly as documented in CLAUDE.md.
 #
@@ -29,6 +32,10 @@ on:
         default: "alpha"
         type: choice
         options: ["alpha", "Google Group - Alpha", internal, beta, production]
+      promote_version_code:
+        description: "Promote this already-uploaded versionCode to the track instead of building (e.g. 38)"
+        default: ""
+        type: string
 
 jobs:
   # Same analyze + test suite as test.yml: a v* tag on a red or never-tested
@@ -83,21 +90,28 @@ jobs:
             exit 1
           fi
 
+      # Promote runs (promote_version_code set) skip everything build-related:
+      # no Java/Flutter/keystore/AAB — only the service-account key install
+      # and the track assignment below.
       - uses: actions/setup-java@v5
+        if: github.event.inputs.promote_version_code == ''
         with:
           distribution: temurin
           java-version: "21"
 
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        if: github.event.inputs.promote_version_code == ''
         with:
           flutter-version-file: .fvmrc
           channel: stable
           cache: true
 
       - name: Flutter pub get
+        if: github.event.inputs.promote_version_code == ''
         run: flutter pub get
 
       - name: Install signing keystore & key.properties
+        if: github.event.inputs.promote_version_code == ''
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -130,14 +144,19 @@ jobs:
           echo "$PLAY_STORE_KEY_JSON_BASE64" | base64 --decode > fastlane/play-store-key.json
 
       - name: Build release App Bundle
+        if: github.event.inputs.promote_version_code == ''
         run: flutter build appbundle --release
 
       - name: Upload to Play
         env:
           DISPATCH_TRACK: ${{ github.event.inputs.track }}
+          PROMOTE_VC: ${{ github.event.inputs.promote_version_code }}
         run: |
           python3 -m pip install --quiet google-api-python-client google-auth
-          if [ -n "$DISPATCH_TRACK" ]; then
+          if [ -n "$PROMOTE_VC" ]; then
+            # Manual promote: assign the existing build to the chosen track.
+            python3 tool/play_upload_aab.py --promote "$PROMOTE_VC" "$DISPATCH_TRACK"
+          elif [ -n "$DISPATCH_TRACK" ]; then
             # Manual run: stage on the chosen track only.
             python3 tool/play_upload_aab.py "$DISPATCH_TRACK"
           else
