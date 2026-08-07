@@ -46,10 +46,20 @@ class FoodRepository {
       if (a.usageCount != b.usageCount) {
         return b.usageCount.compareTo(a.usageCount);
       }
+      // Curated sources above OFF products (same rank as searchFoodsLocal):
+      // a typed query usually targets a base item, not a packaged variant.
+      final rank = _sourceRank(a.source).compareTo(_sourceRank(b.source));
+      if (rank != 0) return rank;
       return a.name.length.compareTo(b.name.length);
     });
     return merged.take(50).toList();
   }
+
+  static int _sourceRank(FoodSource source) => switch (source) {
+    FoodSource.custom => 0,
+    FoodSource.swissFcdb => 1,
+    FoodSource.openFoodFacts => 2,
+  };
 
   /// Persist a food if it's a synthetic search/pack hit (id 0), returning the
   /// stored row. A no-op for foods already in the catalog.

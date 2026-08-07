@@ -134,6 +134,26 @@ void main() {
     ]);
   });
 
+  test('searchLocal ranks Swiss DB rows above pack products', () async {
+    // The pack product's name is shorter, so only the source rank can put
+    // the Swiss base item first.
+    installFixture([const PackProduct(barcode: '8000001', name: 'Chicken')]);
+    await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.swissFcdb,
+        externalId: const Value('sfcdb1'),
+        name: 'Chicken, breast, meat only, raw',
+        kcal100: 110,
+      ),
+    );
+
+    final results = await repo.searchLocal('chicken');
+    expect(results.map((f) => f.name).toList(), [
+      'Chicken, breast, meat only, raw',
+      'Chicken',
+    ]);
+  });
+
   test('searchLocal dedupes by barcode with cached rows winning', () async {
     installFixture([
       const PackProduct(barcode: '2000001', name: 'Bircher Pack Variant'),

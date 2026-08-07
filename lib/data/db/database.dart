@@ -285,7 +285,9 @@ class AppDatabase extends _$AppDatabase {
   /// Tokenizes the query (with produce synonyms) and requires every token to
   /// appear in the name or brand — order-independent, so "sweet pepper" matches
   /// "Peppers, sweet, green, raw". Ranks favorites and frequently-used first,
-  /// then shorter names so simple/raw entries beat prepared variants
+  /// then curated sources (custom, then Swiss FCDB) above cached OFF products —
+  /// a typed query usually targets a base item, not one of the many packaged
+  /// variants — then shorter names so simple/raw entries beat prepared ones
   /// ("Potatoes, raw" before "Potatoes, au gratin, dry mix, ...").
   Future<List<Food>> searchFoodsLocal(String query, {int limit = 50}) {
     // Each token must appear in name/brand/searchText under at least one of
@@ -312,6 +314,15 @@ class AppDatabase extends _$AppDatabase {
           ..orderBy([
             (f) => OrderingTerm.desc(f.isFavorite),
             (f) => OrderingTerm.desc(f.usageCount),
+            (f) => OrderingTerm.asc(
+              f.source.caseMatch<int>(
+                when: {
+                  Constant(FoodSource.custom.index): const Constant(0),
+                  Constant(FoodSource.swissFcdb.index): const Constant(1),
+                },
+                orElse: const Constant(2),
+              ),
+            ),
             (f) => OrderingTerm.asc(f.name.length),
             (f) => OrderingTerm.asc(f.name),
           ])

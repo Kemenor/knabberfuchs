@@ -251,6 +251,11 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   `scale_meal_sheet.dart:75-85`.
 - **`ActionChip`** for fire-and-forget quick-pick that just sets a value
   (`log_food_sheet.dart:304-308`).
+- **`FilterChip`** when a selection *narrows a list* and "none selected" is a
+  valid state meaning "everything": single-select with tap-again-to-clear, in a
+  horizontally scrollable `Row` (8 right-gap) under the input it refines. Live:
+  the food-search source filter (`food_search_list.dart`). Multi-select
+  feature-set toggles use a `FilterChip` `Wrap` (Targets screen, §13).
 - The curated / "natural" option **leads** the quick-pick row
   (`log_food_sheet.dart:285-287`).
 

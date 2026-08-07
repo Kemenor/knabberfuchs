@@ -45,6 +45,10 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
   final _controller = TextEditingController();
   Timer? _debounce;
   String _query = '';
+
+  /// Quick source filter while typing (null = all sources). Only applied — and
+  /// only shown — for an active query; the recents list stays unfiltered.
+  FoodSource? _sourceFilter;
   List<Food> _local = const [];
   List<Food> _online = const [];
   bool _searchingOnline = false;
@@ -163,8 +167,11 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
 
   @override
   Widget build(BuildContext context) {
-    final results = _merged;
     final l10n = AppLocalizations.of(context);
+    final searching = _query.trim().isNotEmpty;
+    final results = searching && _sourceFilter != null
+        ? _merged.where((f) => f.source == _sourceFilter).toList()
+        : _merged;
     return Column(
       children: [
         Padding(
@@ -199,7 +206,33 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
             ),
           ),
         ),
-        if (widget.onQuickAdd != null && _query.trim().isNotEmpty)
+        if (searching)
+          // Scrollable toggleable source chips (tap the active one to clear) —
+          // same pattern as the Trends metric row.
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: Row(
+              children: [
+                for (final (source, label) in [
+                  (FoodSource.swissFcdb, l10n.sourceSwiss),
+                  (FoodSource.openFoodFacts, l10n.sourceOff),
+                  (FoodSource.custom, l10n.sourceCustom),
+                ])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(label),
+                      selected: _sourceFilter == source,
+                      onSelected: (sel) => setState(
+                        () => _sourceFilter = sel ? source : null,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        if (widget.onQuickAdd != null && searching)
           ListTile(
             leading: const Icon(Symbols.bolt_rounded),
             title: Text(

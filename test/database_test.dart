@@ -164,6 +164,62 @@ void main() {
     expect(r.first.name, 'Potatoes, raw');
   });
 
+  test('ranks custom and Swiss sources above OFF products', () async {
+    // The OFF product gets the shortest name so the old length tie-break
+    // would have put it first.
+    await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.openFoodFacts,
+        externalId: const Value('off1'),
+        name: 'Chicken',
+        kcal100: 200,
+      ),
+    );
+    await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.swissFcdb,
+        externalId: const Value('sfcdb1'),
+        name: 'Chicken, breast, raw',
+        kcal100: 110,
+      ),
+    );
+    await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.custom,
+        name: 'Chicken leftovers, homemade stew',
+        kcal100: 150,
+      ),
+    );
+    final r = await db.searchFoodsLocal('chicken');
+    expect(r.map((f) => f.source).toList(), [
+      FoodSource.custom,
+      FoodSource.swissFcdb,
+      FoodSource.openFoodFacts,
+    ]);
+  });
+
+  test('favorites and usage still outrank source priority', () async {
+    final offId = await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.openFoodFacts,
+        externalId: const Value('off2'),
+        name: 'Oat Drink Barista',
+        kcal100: 61,
+      ),
+    );
+    await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.swissFcdb,
+        externalId: const Value('sfcdb2'),
+        name: 'Oat flakes',
+        kcal100: 372,
+      ),
+    );
+    await db.bumpFoodUsage(offId);
+    final r = await db.searchFoodsLocal('oat');
+    expect(r.first.name, 'Oat Drink Barista');
+  });
+
   test('watchDay reflects added entries', () async {
     const day = '2026-06-17';
     await db.addEntry(
