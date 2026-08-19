@@ -1,6 +1,11 @@
 name: iOS · TestFlight
 
-# Build the iOS app and upload it to TestFlight on a version tag (v*).
+# Build the iOS app, upload it to TestFlight, and — on a version tag (v*) —
+# submit it straight for App Store review, which auto-releases on approval.
+# **The tag IS the human gate** (decided 2026-08-19): cutting a tag is already
+# a deliberate act, so there is no second approval step. A plain
+# workflow_dispatch stops at TestFlight; ios-release.yml remains the manual
+# way to (re)submit an existing TestFlight build on its own.
 # Free on GitHub-hosted macOS runners because this repo is public.
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
@@ -55,7 +60,9 @@ jobs:
     # older macos-15 default (Xcode 16) fails to compile it. macos-latest still
     # points at macOS 15 during the migration, so pin macos-26 explicitly.
     runs-on: macos-26
-    timeout-minutes: 40
+    # The beta lane now blocks until Apple finishes processing the build, so
+    # the job outlives the upload itself — give processing room.
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v7
 
@@ -130,3 +137,48 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_FILEPATH: fastlane/AuthKey_${{ secrets.ASC_KEY_ID }}.p8
         run: fastlane ios beta
+
+  # Tag pushes only: submit the build that `testflight` just uploaded for App
+  # Store review (auto-releases on approval). Same fastlane `release` lane
+  # ios-release.yml drives, so there is one submission path, not two — pure
+  # App Store Connect API work, hence Linux. The version/build pair is read
+  # from pubspec.yaml, which the tag-vs-pubspec check above already proved
+  # matches the tag.
+  release:
+    needs: testflight
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read version and build number from pubspec
+        id: ver
+        run: |
+          V=$(grep -m1 '^version:' pubspec.yaml | awk '{print $2}')
+          echo "version=${V%%+*}" >> "$GITHUB_OUTPUT"
+          echo "build=${V##*+}" >> "$GITHUB_OUTPUT"
+          echo "Submitting ${V%%+*} (${V##*+}) for App Store review"
+
+      - name: Install App Store Connect API key (.p8)
+        env:
+          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          mkdir -p fastlane
+          echo "$ASC_API_KEY_P8_BASE64" | base64 --decode > "fastlane/AuthKey_${ASC_KEY_ID}.p8"
+
+      - name: Install fastlane
+        # Pinned to the locally-verified version, same as ios-release.yml.
+        run: sudo gem install fastlane --no-document -v 2.236.1
+
+      - name: Submit for review
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_FILEPATH: fastlane/AuthKey_${{ secrets.ASC_KEY_ID }}.p8
+          # Inputs via env, not inline interpolation (repo convention:
+          # injection-safe env passing).
+          REL_VERSION: ${{ steps.ver.outputs.version }}
+          REL_BUILD: ${{ steps.ver.outputs.build }}
+        run: fastlane ios release version:"$REL_VERSION" build:"$REL_BUILD"

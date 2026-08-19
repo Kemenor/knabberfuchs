@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# Cut a test release: bump pubspec, verify the four changelogs, commit, tag,
-# push. The v-tag then triggers CI (android.yml → both Play closed tracks,
-# ios.yml → TestFlight), which re-asserts tag == pubspec as the backstop.
+# Cut a release: bump pubspec, verify the four changelogs, commit, tag, push.
+# The v-tag then triggers CI (android.yml → both Play closed tracks AND
+# production, ios.yml → TestFlight → App Store review), which re-asserts
+# tag == pubspec as the backstop.
+#
+# THE TAG IS THE HUMAN GATE (2026-08-19) — there is no approval step after
+# this script. What you tag goes live on both stores.
 #
 #   tool/cut_release.sh 1.2.0
 #
@@ -49,8 +53,15 @@ for LOC in en-US de-DE fr-FR it-IT; do
 done
 [ "$MISSING" -eq 0 ] || { echo "  fix the changelogs for build $NEW_BUILD, then re-run"; exit 1; }
 echo "✓ changelogs $NEW_BUILD.txt ×4 locales exist, all ≤500 chars"
-echo "ℹ reminder: fastlane/metadata/ios/*/release_notes.txt is the TestFlight/App-Store"
-echo "  'What's New' — update it if this build changes user-visible behaviour"
+# The iOS release notes are submitted to the App Store by the tag itself now,
+# so stale notes ship. Warn if they haven't been touched since the last tag.
+LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+if [ -n "$LAST_TAG" ] && git diff --quiet "$LAST_TAG" HEAD -- fastlane/metadata/ios; then
+  echo "⚠ fastlane/metadata/ios/*/release_notes.txt unchanged since $LAST_TAG — the tag"
+  echo "  submits them to the App Store as this version's 'What's New'. Ctrl-C to fix."
+else
+  echo "✓ iOS release notes touched since ${LAST_TAG:-the beginning}"
+fi
 
 # Best-effort CI check on the tip commit (gh optional).
 if command -v gh >/dev/null 2>&1; then
@@ -68,4 +79,5 @@ git add pubspec.yaml
 git commit -q -m "chore(release): $NEW"
 git tag "v$VERSION"
 git push origin main "v$VERSION"
-echo "✓ pushed main + v$VERSION → CI ships to Play closed tracks + TestFlight"
+echo "✓ pushed main + v$VERSION → CI ships to Play production (+ closed tracks)"
+echo "  and submits the iOS build for App Store review — no further approval"
