@@ -130,7 +130,11 @@ Build the IPA first for `beta` (macOS only): `flutter build ipa --release`.
 ## CI
 
 `.github/workflows/ios.yml` runs `beta` on a `v*` tag using the free macOS
-runner. It needs these repo secrets — the first three we already have, the rest
+runner, then — tag pushes only — runs the `release` lane on Linux to submit
+that build for App Store review (auto-releases on approval). **The tag is the
+human gate** (2026-08-19), so there is no approval step in between; write the
+four `metadata/ios/*/release_notes.txt` before tagging. `beta` waits for
+Apple's build processing so the submission can select the build. It needs these repo secrets — the first three we already have, the rest
 come from the first Mac build:
 
 | Secret | Status |

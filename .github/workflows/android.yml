@@ -1,10 +1,14 @@
 name: Android · Play
 
-# Build the signed Android App Bundle and stage it on BOTH closed-testing tracks
-# ("alpha" + the custom "Google Group - Alpha") on a version tag (v*) — the
-# Android counterpart to ios.yml (which ships the iOS build to TestFlight, the
-# iOS closed-testing equivalent). A manual workflow_dispatch stages on a single
-# chosen track instead — with promote_version_code set it skips the build and
+# Build the signed Android App Bundle on a version tag (v*) and release it on
+# BOTH closed-testing tracks ("alpha" + the custom "Google Group - Alpha") AND
+# production, in a single edit — the Android counterpart to ios.yml (which
+# ships the build to TestFlight and then submits it for App Store review).
+# **The tag IS the human gate** (decided 2026-08-19): cutting a tag is already
+# a deliberate act, so a tagged release goes fully live with no second
+# approval. The protected `play-production` environment hold now applies only
+# to the manual production dispatch below, which has no tag behind it.
+# A manual workflow_dispatch stages on a single chosen track instead — with promote_version_code set it skips the build and
 # assigns that ALREADY-UPLOADED build to the track (Play rejects re-uploading
 # a versionCode, so a closed→production cutover of the same build must
 # promote, not rebuild). Reuses the local
@@ -66,10 +70,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     # A manual dispatch to the production track is a full public rollout
-    # (status: completed) — bind it to the protected `play-production`
-    # environment, whose required-reviewer rule holds the job until approved
-    # in the GitHub UI. Every other path (tag pushes to closed testing,
-    # manual closed-track staging) runs unguarded as before.
+    # (status: completed) with no tag behind it — bind it to the protected
+    # `play-production` environment, whose required-reviewer rule holds the
+    # job until approved in the GitHub UI. Tag pushes run unguarded even
+    # though they now reach production too: the tag is the human gate.
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.track == 'production' && 'play-production' || '' }}
     # Serialize Play uploads: concurrent runs would race independent edits
     # against the same app. Queue, never cancel, a release in flight.
@@ -160,6 +164,7 @@ jobs:
             # Manual run: stage on the chosen track only.
             python3 tool/play_upload_aab.py "$DISPATCH_TRACK"
           else
-            # Tag push (v*): stage on BOTH closed-testing tracks.
-            python3 tool/play_upload_aab.py "alpha" "Google Group - Alpha"
+            # Tag push (v*): one upload, released on both closed-testing
+            # tracks AND production — the tag is the gate.
+            python3 tool/play_upload_aab.py "alpha" "Google Group - Alpha" "production"
           fi
