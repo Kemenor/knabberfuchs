@@ -755,13 +755,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aiKeyDesc =>
-      'Füge einen Google-Gemini-API-Schlüssel hinzu, um KI-Schätzungen aus einem Foto oder einer getippten Beschreibung freizuschalten. Fotos und Beschreibungen werden dann an Google gesendet. Geminis kostenloser Tarif reicht für den privaten Gebrauch; wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen. Im kostenlosen Tarif kann Google deine Daten zur Verbesserung seiner Modelle verwenden.';
+      'Füge einen Google-Gemini-API-Schlüssel hinzu, um KI-Schätzungen aus einem Foto oder einer getippten Beschreibung freizuschalten. Fotos und Beschreibungen werden dann an Google gesendet. Geminis kostenloser Tarif reicht für den privaten Gebrauch; wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen. Im kostenlosen Tarif kann Google deine Daten zur Verbesserung seiner Modelle verwenden – außer im EWR, in der Schweiz und im Vereinigten Königreich, wo auch für die kostenlose Nutzung Googles Datenbedingungen für kostenpflichtige Dienste gelten.';
 
   @override
   String get aiKeyLabel => 'Gemini-API-Schlüssel';
 
   @override
   String get aiKeyGet => 'API-Schlüssel holen';
+
+  @override
+  String get aiKeyTest => 'Schlüssel testen';
+
+  @override
+  String get aiKeyTesting => 'Wird geprüft …';
+
+  @override
+  String get aiKeyTestOk => 'Der Schlüssel funktioniert.';
 
   @override
   String get aiModelLabel => 'KI-Modell';
@@ -774,7 +783,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aiModelNote =>
-      'Wenn dein Modell ausgelastet ist, wird auf 2.5 Flash und dann auf das Gerät zurückgegriffen.';
+      'Ist dein Modell nicht verfügbar oder ausgelastet, wird 2.5 Flash versucht.';
 
   @override
   String get recognizeByGemini => 'Von Gemini geschätzt';
@@ -839,8 +848,41 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get geminiFailed =>
-      'Gemini nicht erreichbar – füge die Mahlzeit stattdessen manuell hinzu.';
+  String get geminiProblemTitle => 'KI-Schätzung nicht möglich';
+
+  @override
+  String get geminiErrorInvalidKey =>
+      'Google lehnt diesen API-Schlüssel ab. Prüfe ihn unter Einstellungen → KI-Erkennung oder füge einen neuen aus Google AI Studio ein.';
+
+  @override
+  String get geminiErrorNoAccess =>
+      'Dieser API-Schlüssel darf Gemini nicht nutzen. Womöglich ist im zugehörigen Google-Cloud-Projekt die Generative Language API nicht aktiviert, oder der Schlüssel ist eingeschränkt.';
+
+  @override
+  String get geminiErrorModelUnavailable =>
+      'Dein Schlüssel erreicht dieses KI-Modell nicht. Wähle unter Einstellungen → KI-Erkennung das andere Modell.';
+
+  @override
+  String get geminiErrorQuota =>
+      'Dein Gemini-Kontingent ist vorerst aufgebraucht. Versuche es später noch einmal oder prüfe deine Nutzung in Google AI Studio.';
+
+  @override
+  String get geminiErrorBusy =>
+      'Gemini ist gerade ausgelastet – füge die Mahlzeit manuell hinzu oder versuche es gleich noch einmal.';
+
+  @override
+  String get geminiErrorNetwork =>
+      'Keine Verbindung zu Google. Prüfe deine Internetverbindung und versuche es erneut.';
+
+  @override
+  String get geminiErrorNotFood => 'Gemini hat hier kein Essen erkannt.';
+
+  @override
+  String get geminiErrorUnknown =>
+      'Gemini hat etwas Unerwartetes zurückgegeben. Füge die Mahlzeit stattdessen manuell hinzu.';
+
+  @override
+  String get actionContinueManually => 'Manuell weiter';
 
   @override
   String get captureDescribe => 'Mahlzeit beschreiben';

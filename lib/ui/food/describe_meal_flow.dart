@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/date_label.dart';
+import '../../core/gemini_error.dart';
 import '../../core/snackbar.dart';
 import '../../data/ml/gemini_service.dart';
 import '../../domain/meal_times.dart';
@@ -11,6 +12,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../recipes/ocr_meal_screen.dart';
 import 'gemini_loading_dialog.dart';
+import 'gemini_problem_dialog.dart';
 
 /// "Describe meal": type what you ate, no photo (grilled 2026-07-03).
 /// With a Gemini key the description comes back ITEMIZED and logs as one meal
@@ -30,6 +32,9 @@ Future<bool> startDescribeMealFlow(
   final geminiKey = await ref.read(geminiKeyStoreProvider).read();
   final hasKey = geminiKey != null;
   if (!context.mounted) return false;
+  // Set when Gemini failed for a reason the user can only wait out; shown
+  // after the next screen is up rather than under the sheet they just left.
+  String? geminiNote;
 
   final description = await showModalBottomSheet<String>(
     context: context,
@@ -59,9 +64,11 @@ Future<bool> startDescribeMealFlow(
         ),
       ),
     );
-    GeminiMealResult? r;
+    var outcome = const GeminiOutcome<GeminiMealResult>.failed(
+      GeminiFailure.unknown,
+    );
     try {
-      r = await ref
+      outcome = await ref
           .read(geminiServiceProvider)
           .estimateMealFromText(
             description,
@@ -73,6 +80,7 @@ Future<bool> startDescribeMealFlow(
     if (cancelled) return false;
     if (context.mounted) navigator.pop();
     if (!context.mounted) return false;
+    final r = outcome.value;
     if (r != null) {
       final dayLbl = dayLabel(context, day);
       await _logItemized(ref, day: day, result: r, l10n: l10n);
@@ -81,21 +89,39 @@ Future<bool> startDescribeMealFlow(
       );
       return true;
     }
-    // Gemini unreachable/non-food — degrade to the local matcher below.
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.geminiFailed)));
-    if (!context.mounted) return false;
+    // Gemini gave us nothing — degrade to the local matcher below, but say
+    // which kind of nothing. A fixable cause (rejected key, spent quota) gets
+    // the dialog with a route into Settings; the rest becomes a note shown
+    // once the next screen is up.
+    if (outcome.isActionable) {
+      final left = await showGeminiProblemDialog(
+        context,
+        ref,
+        outcome.failure!,
+      );
+      if (left || !context.mounted) return false;
+    } else {
+      geminiNote = geminiFailureMessage(l10n, outcome.failure!);
+    }
   }
 
   final items = _parseTypedLines(description);
   if (items.isEmpty) {
+    // One message, not two queued behind each other: when Gemini had
+    // something to say, that's the more useful half of the pair.
     messenger.showAutoSnackBar(
-      SnackBar(content: Text(l10n.describeMealNoLines)),
+      SnackBar(content: Text(geminiNote ?? l10n.describeMealNoLines)),
     );
     return false;
   }
   navigator.push(
     MaterialPageRoute(builder: (_) => OcrMealScreen(ingredients: items)),
   );
+  // After the push, so it lands on the review screen the user is now looking
+  // at rather than under the sheet they just left.
+  if (geminiNote != null) {
+    messenger.showAutoSnackBar(SnackBar(content: Text(geminiNote)));
+  }
   return false; // the review screen logs on its own terms
 }
 

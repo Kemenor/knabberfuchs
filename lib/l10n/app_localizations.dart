@@ -1371,7 +1371,7 @@ abstract class AppLocalizations {
   /// Explainer for the Gemini API key setting, including the privacy implications
   ///
   /// In en, this message translates to:
-  /// **'Add a Google Gemini API key to unlock AI meal estimates from a photo or a typed description. Photos and descriptions are then sent to Google. Gemini\'s free tier is plenty for personal use; if you\'ve enabled billing on your Google account, heavy use may incur charges. On the free tier, Google may use your data to improve their models.'**
+  /// **'Add a Google Gemini API key to unlock AI meal estimates from a photo or a typed description. Photos and descriptions are then sent to Google. Gemini\'s free tier is plenty for personal use; if you\'ve enabled billing on your Google account, heavy use may incur charges. On the free tier Google may use your data to improve their models — except in the EEA, Switzerland and the UK, where Google\'s paid-service data terms apply to free use too.'**
   String get aiKeyDesc;
 
   /// Label of the Gemini API key field
@@ -1385,6 +1385,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get an API key'**
   String get aiKeyGet;
+
+  /// Button that checks the entered Gemini API key against Google
+  ///
+  /// In en, this message translates to:
+  /// **'Test key'**
+  String get aiKeyTest;
+
+  /// Label of the key-test button while the check is running
+  ///
+  /// In en, this message translates to:
+  /// **'Testing…'**
+  String get aiKeyTesting;
+
+  /// Result line after a successful key test
+  ///
+  /// In en, this message translates to:
+  /// **'The key works.'**
+  String get aiKeyTestOk;
 
   /// Label of the AI model picker
   ///
@@ -1407,7 +1425,7 @@ abstract class AppLocalizations {
   /// Note under the model picker explaining the fallback chain
   ///
   /// In en, this message translates to:
-  /// **'If your choice is busy it falls back to 2.5 Flash, then on-device.'**
+  /// **'If your choice is unavailable or busy, 2.5 Flash is tried next.'**
   String get aiModelNote;
 
   /// Attribution badge on results estimated by Gemini
@@ -1530,11 +1548,65 @@ abstract class AppLocalizations {
   /// **'QR code for recipe {name}'**
   String a11yQrCode(String name);
 
-  /// Snackbar when Gemini was unreachable; the flow degrades to manual entry / the local matcher
+  /// Title of the dialog shown when an AI estimate failed for a reason the user can fix
   ///
   /// In en, this message translates to:
-  /// **'Couldn\'t reach Gemini — add the meal manually instead.'**
-  String get geminiFailed;
+  /// **'AI estimate didn\'t work'**
+  String get geminiProblemTitle;
+
+  /// Gemini failure: Google rejected the API key (HTTP 400 API_KEY_INVALID / 401)
+  ///
+  /// In en, this message translates to:
+  /// **'Google rejected this API key. Check it under Settings → AI recognition, or paste a fresh one from Google AI Studio.'**
+  String get geminiErrorInvalidKey;
+
+  /// Gemini failure: the key is not permitted (HTTP 403) — API not enabled or key restricted
+  ///
+  /// In en, this message translates to:
+  /// **'This API key isn\'t allowed to use Gemini. Its Google Cloud project may not have the Generative Language API enabled, or the key is restricted.'**
+  String get geminiErrorNoAccess;
+
+  /// Gemini failure: the chosen model is not reachable with this key (HTTP 404)
+  ///
+  /// In en, this message translates to:
+  /// **'Your key can\'t reach this AI model. Pick the other model under Settings → AI recognition.'**
+  String get geminiErrorModelUnavailable;
+
+  /// Gemini failure: rate limit or daily free-tier quota exhausted (HTTP 429)
+  ///
+  /// In en, this message translates to:
+  /// **'Your Gemini quota is used up for now. Try again later, or check your usage in Google AI Studio.'**
+  String get geminiErrorQuota;
+
+  /// Gemini failure: Google overloaded or slow (HTTP 5xx / timeout)
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini is busy right now — add the meal manually, or try again in a moment.'**
+  String get geminiErrorBusy;
+
+  /// Gemini failure: the request never reached Google (no connectivity)
+  ///
+  /// In en, this message translates to:
+  /// **'No connection to Google. Check your internet connection and try again.'**
+  String get geminiErrorNetwork;
+
+  /// Gemini answered, but the photo/text is not food
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini didn\'t recognise any food here.'**
+  String get geminiErrorNotFood;
+
+  /// Gemini failure: unclassified status or an unusable payload
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini sent back something unexpected. Add the meal manually instead.'**
+  String get geminiErrorUnknown;
+
+  /// Dismiss action on the AI-problem dialog: skip the AI and enter the meal by hand
+  ///
+  /// In en, this message translates to:
+  /// **'Continue manually'**
+  String get actionContinueManually;
 
   /// Capture menu entry: type what you ate instead of photographing it
   ///

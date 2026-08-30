@@ -324,7 +324,7 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   ```dart
   final messenger = ScaffoldMessenger.of(context); // capture BEFORE await
   // …await…
-  messenger.showAutoSnackBar(SnackBar(content: Text(l10n.geminiFailed)));
+  messenger.showAutoSnackBar(SnackBar(content: Text(l10n.geminiErrorBusy)));
   ```
 
   > **Don't** call `messenger.showSnackBar(...)` directly — there are zero such
@@ -349,6 +349,24 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
 - **Error:** `AsyncValue.error` branches render
   `Center(child: Text(l10n.genericError('$e')))`.
 - **Confirmation:** `AlertDialog` with Cancel(`TextButton`) → confirm(`FilledButton`).
+- **Never show a snackbar immediately before opening a modal sheet.** A sheet is
+  a route drawn over the Scaffold, and both sit at the bottom — the snackbar is
+  buried unread (tester report, 2026-08-27). Either show it *after* the sheet
+  closes, or, when the message is the reason the sheet looks empty, promote it
+  to a dialog *before* the sheet.
+- **Failure that the user can fix → dialog, not snackbar.** A cause the user can
+  act on (a rejected API key, a model their key can't reach, a spent quota)
+  gets an `AlertDialog` whose confirm action routes to the relevant Settings
+  section — `showGeminiProblemDialog` (`ui/food/gemini_problem_dialog.dart`),
+  which mirrors the missing-key dialog. Causes the user can only wait out
+  (busy, offline) stay a snackbar. The caller must abandon its flow when the
+  dialog reports that the user left for Settings, rather than opening a sheet
+  on top of the Settings tab.
+- **One cause, one sentence, one source.** Every surface that reports a Gemini
+  failure — both capture flows and the Settings key test — renders it through
+  `geminiFailureMessage` (`core/gemini_error.dart`), so a given cause always
+  reads the same. Collapsing distinct causes into one string is what sent a
+  tester with a rejected key hunting for a network outage.
 
 ---
 

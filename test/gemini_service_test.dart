@@ -188,13 +188,13 @@ void main() {
         'test-key',
         preferredModel: 'gemini-3.5-flash',
       );
-      expect(r?.items.single.name, 'Toast');
+      expect(r.value?.items.single.name, 'Toast');
       expect(requested, hasLength(2));
       expect(requested.first, contains('gemini-3.5-flash'));
       expect(requested.last, contains('gemini-2.5-flash'));
     });
 
-    test('preferred timeout falls back; both failing returns null', () async {
+    test('preferred timeout falls back; both failing reports why', () async {
       var calls = 0;
       final svc = GeminiService(
         client: MockClient((req) async {
@@ -210,7 +210,9 @@ void main() {
         'test-key',
         preferredModel: 'gemini-3.5-flash',
       );
-      expect(r, isNull);
+      expect(r.ok, isFalse);
+      // 418 isn't a status we classify; it outranks the timeout's "busy".
+      expect(r.failure, GeminiFailure.unknown);
       expect(calls, 2);
     });
 
@@ -227,7 +229,7 @@ void main() {
         'test-key',
         preferredModel: GeminiService.fallbackModel,
       );
-      expect(r, isNull);
+      expect(r.failure, GeminiFailure.busy);
       expect(calls, 1);
     });
 
@@ -247,7 +249,7 @@ void main() {
         // be re-sent to the fallback model.
         isCancelled: () => calls >= 1,
       );
-      expect(r, isNull);
+      expect(r.ok, isFalse);
       expect(calls, 1);
     });
 
@@ -284,8 +286,181 @@ void main() {
         'test-key',
         preferredModel: 'gemini-3.5-flash',
       );
-      expect(r?.name, 'Calzone');
+      expect(r.value?.name, 'Calzone');
       expect(requested, hasLength(2));
+    });
+  });
+
+  // Every failure used to collapse into a bare null, so the UI could only ever
+  // say "couldn't reach Gemini" — including for a key Google was rejecting
+  // (FEEDBACK.md 2026-08-27). The cause must survive to the caller.
+  group('failure classification', () {
+    test('a rejected key is 400 API_KEY_INVALID, not 401', () {
+      const body =
+          '{"error":{"code":400,"message":"API key not valid. Please pass a '
+          'valid API key.","status":"INVALID_ARGUMENT","details":[{"reason":'
+          '"API_KEY_INVALID"}]}}';
+      expect(classifyGeminiError(400, body), GeminiFailure.invalidKey);
+    });
+
+    test('a plain 400 is not blamed on the key', () {
+      expect(
+        classifyGeminiError(400, '{"error":{"message":"bad request"}}'),
+        GeminiFailure.unknown,
+      );
+    });
+
+    test('statuses map to the cause the user needs to hear', () {
+      expect(classifyGeminiError(401, ''), GeminiFailure.invalidKey);
+      expect(classifyGeminiError(403, ''), GeminiFailure.noAccess);
+      expect(classifyGeminiError(404, ''), GeminiFailure.modelUnavailable);
+      expect(classifyGeminiError(429, ''), GeminiFailure.quota);
+      expect(classifyGeminiError(500, ''), GeminiFailure.busy);
+      expect(classifyGeminiError(503, ''), GeminiFailure.busy);
+      expect(classifyGeminiError(504, ''), GeminiFailure.busy);
+      expect(classifyGeminiError(418, ''), GeminiFailure.unknown);
+    });
+
+    test('only fixable causes earn the dialog', () {
+      for (final f in [
+        GeminiFailure.invalidKey,
+        GeminiFailure.noAccess,
+        GeminiFailure.modelUnavailable,
+        GeminiFailure.quota,
+      ]) {
+        expect(GeminiOutcome<int>.failed(f).isActionable, isTrue, reason: '$f');
+      }
+      for (final f in [
+        GeminiFailure.busy,
+        GeminiFailure.network,
+        GeminiFailure.notFood,
+        GeminiFailure.unknown,
+      ]) {
+        expect(GeminiOutcome<int>.failed(f).isActionable, isFalse, reason: '$f');
+      }
+    });
+
+    test('a rejected key short-circuits — the photo is not re-uploaded', () async {
+      var calls = 0;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          calls++;
+          return http.Response('{"error":{"reason":"API_KEY_INVALID"}}', 400);
+        }),
+      );
+      final r = await svc.recognizeFood(
+        Uint8List.fromList([1, 2, 3]),
+        'bad-key',
+        preferredModel: 'gemini-3.5-flash',
+      );
+      expect(r.failure, GeminiFailure.invalidKey);
+      expect(calls, 1, reason: 'the fallback model would be rejected too');
+    });
+
+    test('a 403 short-circuits the same way', () async {
+      var calls = 0;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          calls++;
+          return http.Response('forbidden', 403);
+        }),
+      );
+      final r = await svc.estimateMealFromText('toast', 'k',
+          preferredModel: 'gemini-3.5-flash');
+      expect(r.failure, GeminiFailure.noAccess);
+      expect(calls, 1);
+    });
+
+    test('404 on the preferred model still tries the fallback', () async {
+      final requested = <String>[];
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          requested.add(req.url.path);
+          return http.Response('no such model', 404);
+        }),
+      );
+      final r = await svc.estimateMealFromText('toast', 'k',
+          preferredModel: 'gemini-3.5-flash');
+      expect(requested, hasLength(2));
+      expect(r.failure, GeminiFailure.modelUnavailable);
+    });
+
+    test('the most actionable cause wins over a mere "busy"', () async {
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          return req.url.path.contains('gemini-3.5-flash')
+              ? http.Response('quota', 429)
+              : http.Response('overloaded', 503);
+        }),
+      );
+      final r = await svc.estimateMealFromText('toast', 'k',
+          preferredModel: 'gemini-3.5-flash');
+      expect(r.failure, GeminiFailure.quota);
+    });
+
+    test('a 200 that says "not food" is not reported as a failure to reach '
+        'Google', () async {
+      final svc = GeminiService(
+        client: MockClient(
+          (req) async =>
+              http.Response(_wrap({'is_food': false, 'name': 'a cat'}), 200),
+        ),
+      );
+      final r = await svc.recognizeFood(Uint8List.fromList([1]), 'k');
+      expect(r.failure, GeminiFailure.notFood);
+    });
+
+    test('a 200 with an unusable payload is unknown, not notFood', () async {
+      final svc = GeminiService(
+        client: MockClient((req) async => http.Response('{"junk":1}', 200)),
+      );
+      final r = await svc.recognizeFood(Uint8List.fromList([1]), 'k');
+      expect(r.failure, GeminiFailure.unknown);
+    });
+
+    test('geminiSaidNotFood only fires on an explicit is_food:false', () {
+      expect(geminiSaidNotFood(_wrap({'is_food': false})), isTrue);
+      expect(geminiSaidNotFood(_wrap({'is_food': true, 'kcal': 1})), isFalse);
+      expect(geminiSaidNotFood('not json'), isFalse);
+      expect(geminiSaidNotFood('{}'), isFalse);
+    });
+  });
+
+  group('testKey', () {
+    test('a working key returns null and hits the chosen model', () async {
+      http.Request? seen;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          seen = req;
+          return http.Response('{}', 200);
+        }),
+      );
+      expect(await svc.testKey('good', model: 'gemini-3.5-flash'), isNull);
+      expect(seen!.url.path, contains('gemini-3.5-flash'));
+      expect(seen!.headers['x-goog-api-key'], 'good');
+      expect(seen!.url.toString(), isNot(contains('good')));
+    });
+
+    test('a rejected key comes back named', () async {
+      final svc = GeminiService(
+        client: MockClient(
+          (req) async =>
+              http.Response('{"error":{"reason":"API_KEY_INVALID"}}', 400),
+        ),
+      );
+      expect(await svc.testKey('bad'), GeminiFailure.invalidKey);
+    });
+
+    test('no model given falls back to the reliable default', () async {
+      http.Request? seen;
+      final svc = GeminiService(
+        client: MockClient((req) async {
+          seen = req;
+          return http.Response('{}', 200);
+        }),
+      );
+      await svc.testKey('k');
+      expect(seen!.url.path, contains(GeminiService.fallbackModel));
     });
   });
 }

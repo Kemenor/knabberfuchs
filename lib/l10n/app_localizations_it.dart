@@ -755,13 +755,22 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get aiKeyDesc =>
-      'Aggiungi una chiave API Google Gemini per sbloccare le stime IA dei pasti da una foto o da una descrizione scritta. Foto e descrizioni vengono quindi inviate a Google. Il piano gratuito di Gemini è sufficiente per l\'uso personale; se hai attivato la fatturazione sul tuo account Google, un uso intenso può comportare costi. Nel piano gratuito Google può usare i tuoi dati per migliorare i propri modelli.';
+      'Aggiungi una chiave API Google Gemini per sbloccare le stime IA dei pasti da una foto o da una descrizione scritta. Foto e descrizioni vengono quindi inviate a Google. Il piano gratuito di Gemini è sufficiente per l\'uso personale; se hai attivato la fatturazione sul tuo account Google, un uso intenso può comportare costi. Nel piano gratuito Google può usare i tuoi dati per migliorare i propri modelli — tranne nel SEE, in Svizzera e nel Regno Unito, dove le condizioni sui dati dei servizi a pagamento valgono anche per l\'uso gratuito.';
 
   @override
   String get aiKeyLabel => 'Chiave API Gemini';
 
   @override
   String get aiKeyGet => 'Ottieni una chiave API';
+
+  @override
+  String get aiKeyTest => 'Prova la chiave';
+
+  @override
+  String get aiKeyTesting => 'Verifica in corso…';
+
+  @override
+  String get aiKeyTestOk => 'La chiave funziona.';
 
   @override
   String get aiModelLabel => 'Modello IA';
@@ -775,7 +784,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get aiModelNote =>
-      'Se il tuo modello è occupato, passa a 2.5 Flash e poi al dispositivo.';
+      'Se il modello scelto non è disponibile o è occupato, viene provato 2.5 Flash.';
 
   @override
   String get recognizeByGemini => 'Stimato da Gemini';
@@ -841,8 +850,41 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get geminiFailed =>
-      'Gemini non raggiungibile — aggiungi il pasto manualmente.';
+  String get geminiProblemTitle => 'Stima IA non riuscita';
+
+  @override
+  String get geminiErrorInvalidKey =>
+      'Google rifiuta questa chiave API. Controllala in Impostazioni → Riconoscimento IA o incollane una nuova da Google AI Studio.';
+
+  @override
+  String get geminiErrorNoAccess =>
+      'Questa chiave API non è autorizzata a usare Gemini. Forse l\'API Generative Language non è attiva nel suo progetto Google Cloud, oppure la chiave è limitata.';
+
+  @override
+  String get geminiErrorModelUnavailable =>
+      'La tua chiave non raggiunge questo modello IA. Scegli l\'altro modello in Impostazioni → Riconoscimento IA.';
+
+  @override
+  String get geminiErrorQuota =>
+      'La tua quota Gemini è esaurita per ora. Riprova più tardi o controlla il tuo utilizzo in Google AI Studio.';
+
+  @override
+  String get geminiErrorBusy =>
+      'Gemini è occupato in questo momento — aggiungi il pasto manualmente o riprova tra poco.';
+
+  @override
+  String get geminiErrorNetwork =>
+      'Nessuna connessione a Google. Controlla la connessione Internet e riprova.';
+
+  @override
+  String get geminiErrorNotFood => 'Gemini non ha riconosciuto alcun alimento.';
+
+  @override
+  String get geminiErrorUnknown =>
+      'Gemini ha restituito una risposta inattesa. Aggiungi il pasto manualmente.';
+
+  @override
+  String get actionContinueManually => 'Continua manualmente';
 
   @override
   String get captureDescribe => 'Descrivi un pasto';

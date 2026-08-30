@@ -8,8 +8,10 @@ import 'package:fuchsbau/fuchsbau.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/gemini_error.dart';
 import '../../core/support_email.dart';
 import '../../data/backup.dart';
+import '../../data/ml/gemini_service.dart';
 import '../../domain/enums.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/meal_type_i18n.dart';
@@ -736,6 +738,11 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
   // Must stay in sync with the DropdownMenuItem values below.
   static const _models = ['gemini-2.5-flash', 'gemini-3.5-flash'];
   String _model = 'gemini-2.5-flash';
+  // Result of the last "Test key" tap: _tested gates the result line, and a
+  // null _testFailure on a tested key means it worked.
+  bool _testing = false;
+  bool _tested = false;
+  GeminiFailure? _testFailure;
 
   @override
   void initState() {
@@ -757,6 +764,24 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
       if (mounted && v != null && _models.contains(v)) {
         setState(() => _model = v);
       }
+    });
+  }
+
+  /// Check the key against Google right here, so a rejected key is named at
+  /// the field instead of surfacing mid-meal as a vague failure — the support
+  /// case that prompted this (FEEDBACK.md, 2026-08-27).
+  Future<void> _testKey() async {
+    final key = _ctrl.text.trim();
+    if (key.isEmpty) return;
+    setState(() => _testing = true);
+    final failure = await ref
+        .read(geminiServiceProvider)
+        .testKey(key, model: _model);
+    if (!mounted) return;
+    setState(() {
+      _testing = false;
+      _tested = true;
+      _testFailure = failure;
     });
   }
 
@@ -804,35 +829,87 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               ),
             ),
             onChanged: (v) {
-              setState(() {}); // toggle visibility follows the key field
+              // setState: the visibility toggle, the Test button's enabled
+              // state and the model picker all follow the key field. A changed
+              // key also invalidates the last test result.
+              setState(() {
+                _tested = false;
+                _testFailure = null;
+              });
               ref.read(geminiKeyStoreProvider).write(v);
             },
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
-                try {
-                  final ok = await launchUrl(
-                    Uri.parse('https://aistudio.google.com/apikey'),
-                    mode: LaunchMode.externalApplication,
-                  );
-                  if (!ok) {
+          // Wrap, not Row: at large text scales the two actions need to stack
+          // rather than overflow.
+          Wrap(
+            children: [
+              TextButton.icon(
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  try {
+                    final ok = await launchUrl(
+                      Uri.parse('https://aistudio.google.com/apikey'),
+                      mode: LaunchMode.externalApplication,
+                    );
+                    if (!ok) {
+                      messenger.showAutoSnackBar(
+                        SnackBar(content: Text(l10n.couldNotOpenLink)),
+                      );
+                    }
+                  } catch (_) {
                     messenger.showAutoSnackBar(
                       SnackBar(content: Text(l10n.couldNotOpenLink)),
                     );
                   }
-                } catch (_) {
-                  messenger.showAutoSnackBar(
-                    SnackBar(content: Text(l10n.couldNotOpenLink)),
-                  );
-                }
-              },
-              icon: const Icon(Symbols.open_in_new_rounded, size: 16),
-              label: Text(l10n.aiKeyGet),
-            ),
+                },
+                icon: const Icon(Symbols.open_in_new_rounded, size: 16),
+                label: Text(l10n.aiKeyGet),
+              ),
+              TextButton.icon(
+                onPressed: (_ctrl.text.trim().isEmpty || _testing)
+                    ? null
+                    : _testKey,
+                icon: _testing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Symbols.troubleshoot_rounded, size: 16),
+                label: Text(_testing ? l10n.aiKeyTesting : l10n.aiKeyTest),
+              ),
+            ],
           ),
+          if (_tested && !_testing)
+            Padding(
+              padding: const EdgeInsets.only(left: 12, bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    _testFailure == null
+                        ? Symbols.check_circle_rounded
+                        : Symbols.error_rounded,
+                    size: 16,
+                    // Amber, never red: the fuchsbau palette reserves red for
+                    // destruction. The colour rides on the icon so the message
+                    // itself keeps full AA contrast as body text.
+                    color: _testFailure == null
+                        ? theme.colorScheme.tertiary
+                        : FuchsbauStatusColors.of(context).amber,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _testFailure == null
+                          ? l10n.aiKeyTestOk
+                          : geminiFailureMessage(l10n, _testFailure!),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           // Model choice only matters once a key exists.
           if (_loaded && _ctrl.text.trim().isNotEmpty) ...[
             const SizedBox(height: 4),
@@ -856,7 +933,12 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               ],
               onChanged: (v) {
                 if (v == null) return;
-                setState(() => _model = v);
+                // The stale result described the previous model.
+                setState(() {
+                  _model = v;
+                  _tested = false;
+                  _testFailure = null;
+                });
                 ref.read(dbProvider).setSetting(geminiModelSetting, v);
               },
             ),

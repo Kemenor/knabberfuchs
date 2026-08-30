@@ -256,6 +256,63 @@ tracks tester-driven changes specifically.
   meal type), then the emptied source group is deleted. Tests in
   `test/diary_mutations_test.dart`.
 
+## Feedback (2026-08-27)
+
+- ✅ **AI failures now name their cause** — DONE 2026-08-27. A tester (Leonardo,
+  German, closed testing) pasted a Gemini key, got "Gemini nicht erreichbar" on
+  every AI action, and separately saw a **404** in Google AI Studio. The app was
+  not at fault for the 404 — both model ids we ship (`gemini-2.5-flash`,
+  `gemini-3.5-flash`) are current and free-tier-listed — but the app **could not
+  tell him that**: `GeminiService` turned every non-200 into `continue` → `null`,
+  and both capture flows rendered the single string `geminiFailed`
+  ("couldn't reach Gemini"). A key/project problem was therefore reported as a
+  network problem, which is why it became a support mail instead of a two-tap fix.
+  - **Cause is now carried out of the service.** `GeminiFailure` (invalidKey ·
+    noAccess · modelUnavailable · quota · busy · network · notFood · unknown) +
+    `classifyGeminiError` + a `GeminiOutcome<T>` return
+    (`data/ml/gemini_service.dart`). Google reports a bad key as **400
+    `API_KEY_INVALID`**, not 401, so the body is classified, not just the status.
+  - **Fail fast on a rejected key:** invalidKey/noAccess short-circuit the model
+    chain — the fallback would be rejected identically and only re-uploads the
+    photo. 404 still falls through to `gemini-2.5-flash`, which is the point of
+    the chain. When the two models fail differently, the **most actionable**
+    cause is reported (`_failureRank`).
+  - **`is_food: false` is no longer an error.** A photo of a cat said "couldn't
+    reach Gemini"; it now says Gemini recognised no food (`geminiSaidNotFood`).
+  - **Settings → "Test key"** (`ui/settings/settings_screen.dart`,
+    `GeminiService.testKey`) checks the key against the selected model on the
+    spot and names the problem at the field. This is the fix that should stop
+    this class of mail.
+  - Messages come from one place (`core/gemini_error.dart`), mirrored into
+    en/de/fr/it.
+
+- ✅ **Error toast was drawn under the sheet that opened next** — DONE
+  2026-08-27. Reported alongside the above: "when we get an error the toast is
+  under the modal that pops up after". `recognize_food_flow.dart` showed the
+  snackbar and then immediately opened the Quick add **bottom sheet**, which is a
+  route over the Scaffold — both live at the bottom, so the message was never
+  read. `describe_meal_flow.dart` had the same shape, plus two snackbars queued
+  back-to-back when the local matcher also came up empty.
+  - Fixable causes are promoted to a **dialog before** the sheet (with a route
+    into Settings); transient ones stay a snackbar shown **after** the sheet
+    closes / after the review screen is pushed. Describe-meal now shows exactly
+    one message. DESIGN_SYSTEM §10 pins both rules.
+
+- ✅ **Two stale strings corrected** — DONE 2026-08-27. `aiModelNote` promised a
+  fallback "then on-device" in all four locales; the on-device classifier was
+  removed 2026-07-03. And `aiKeyDesc` warned that Google may use free-tier data
+  to improve its models — but Google's API terms say that for the **EEA,
+  Switzerland and the UK** the paid-service data terms apply to free use too,
+  i.e. the opposite, for most of our users. Both rewritten in en/de/fr/it.
+
+- 📝 **EEA/CH/UK "Paid Services" clause — needs a decision.** The same terms say:
+  *"You may use only Paid Services when making API Clients available to users in
+  the European Economic Area, Switzerland, or the United Kingdom."* Knabberfuchs
+  ships an API Client to exactly those users, even though each user brings their
+  own key. Worth reading properly before the next release — it is a compliance
+  question, not a bug, and it is not addressed by anything above.
+  <https://ai.google.dev/gemini-api/terms>
+
 ## Feedback (2026-07-03)
 
 - ✅ **Text-only AI guess (no photo)** — BUILT 2026-07-04

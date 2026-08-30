@@ -756,13 +756,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get aiKeyDesc =>
-      'Ajoutez une clé API Google Gemini pour débloquer les estimations IA à partir d\'une photo ou d\'une description tapée. Photos et descriptions sont alors envoyées à Google. L\'offre gratuite de Gemini suffit pour un usage personnel ; si vous avez activé la facturation sur votre compte Google, une utilisation intensive peut entraîner des frais. Dans l\'offre gratuite, Google peut utiliser vos données pour améliorer ses modèles.';
+      'Ajoutez une clé API Google Gemini pour débloquer les estimations IA à partir d\'une photo ou d\'une description tapée. Photos et descriptions sont alors envoyées à Google. L\'offre gratuite de Gemini suffit pour un usage personnel ; si vous avez activé la facturation sur votre compte Google, une utilisation intensive peut entraîner des frais. Dans l\'offre gratuite, Google peut utiliser vos données pour améliorer ses modèles — sauf dans l\'EEE, en Suisse et au Royaume-Uni, où les conditions de données des services payants s\'appliquent aussi à l\'usage gratuit.';
 
   @override
   String get aiKeyLabel => 'Clé API Gemini';
 
   @override
   String get aiKeyGet => 'Obtenir une clé API';
+
+  @override
+  String get aiKeyTest => 'Tester la clé';
+
+  @override
+  String get aiKeyTesting => 'Vérification…';
+
+  @override
+  String get aiKeyTestOk => 'La clé fonctionne.';
 
   @override
   String get aiModelLabel => 'Modèle IA';
@@ -776,7 +785,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get aiModelNote =>
-      'Si votre modèle est occupé, bascule vers 2.5 Flash, puis sur l\'appareil.';
+      'Si votre choix est indisponible ou occupé, 2.5 Flash est essayé ensuite.';
 
   @override
   String get recognizeByGemini => 'Estimé par Gemini';
@@ -842,8 +851,41 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get geminiFailed =>
-      'Gemini injoignable — ajoutez le repas manuellement.';
+  String get geminiProblemTitle => 'Estimation IA impossible';
+
+  @override
+  String get geminiErrorInvalidKey =>
+      'Google refuse cette clé API. Vérifiez-la dans Réglages → Reconnaissance par IA, ou collez-en une nouvelle depuis Google AI Studio.';
+
+  @override
+  String get geminiErrorNoAccess =>
+      'Cette clé API n\'est pas autorisée à utiliser Gemini. L\'API Generative Language n\'est peut-être pas activée sur son projet Google Cloud, ou la clé est restreinte.';
+
+  @override
+  String get geminiErrorModelUnavailable =>
+      'Votre clé n\'atteint pas ce modèle d\'IA. Choisissez l\'autre modèle dans Réglages → Reconnaissance par IA.';
+
+  @override
+  String get geminiErrorQuota =>
+      'Votre quota Gemini est épuisé pour l\'instant. Réessayez plus tard ou vérifiez votre utilisation dans Google AI Studio.';
+
+  @override
+  String get geminiErrorBusy =>
+      'Gemini est surchargé pour le moment — ajoutez le repas manuellement ou réessayez dans un instant.';
+
+  @override
+  String get geminiErrorNetwork =>
+      'Pas de connexion à Google. Vérifiez votre connexion Internet et réessayez.';
+
+  @override
+  String get geminiErrorNotFood => 'Gemini n\'a reconnu aucun aliment ici.';
+
+  @override
+  String get geminiErrorUnknown =>
+      'Gemini a renvoyé une réponse inattendue. Ajoutez le repas manuellement.';
+
+  @override
+  String get actionContinueManually => 'Continuer manuellement';
 
   @override
   String get captureDescribe => 'Décrire un repas';

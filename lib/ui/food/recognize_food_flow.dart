@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../core/gemini_error.dart';
 import '../../core/snackbar.dart';
 import '../../data/ml/gemini_service.dart';
 import '../../domain/enums.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import 'gemini_loading_dialog.dart';
+import 'gemini_problem_dialog.dart';
 import 'image_source_sheet.dart';
 import 'quick_add_sheet.dart';
 
@@ -105,9 +107,11 @@ Future<bool> startRecognizeFoodFlow(
       ),
     ),
   );
-  GeminiFoodResult? r;
+  var outcome = const GeminiOutcome<GeminiFoodResult>.failed(
+    GeminiFailure.unknown,
+  );
   try {
-    r = await ref
+    outcome = await ref
         .read(geminiServiceProvider)
         .recognizeFood(
           bytes,
@@ -120,12 +124,20 @@ Future<bool> startRecognizeFoodFlow(
   if (cancelled) return false;
   if (context.mounted) navigator.pop();
   if (!context.mounted) return false;
-  if (r == null) {
-    // No on-device fallback anymore — land in a blank Quick add so the
-    // photo effort still ends in a manual entry.
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.geminiFailed)));
+  final r = outcome.value;
+
+  // A failure the user can fix gets a dialog *before* the sheet: a snackbar
+  // here would be drawn underneath the Quick add sheet that opens next
+  // (FEEDBACK.md, 2026-08-27). Leaving for Settings abandons the flow.
+  if (r == null && outcome.isActionable) {
+    final left = await showGeminiProblemDialog(context, ref, outcome.failure!);
+    if (left || !context.mounted) return false;
   }
-  return await showQuickAddSheet(
+
+  // No on-device fallback anymore — land in a blank Quick add so the photo
+  // effort still ends in a manual entry.
+  final logged =
+      await showQuickAddSheet(
         context,
         ref,
         day: day,
@@ -143,6 +155,15 @@ Future<bool> startRecognizeFoodFlow(
         photoBytes: bytes,
       ) ==
       true;
+
+  // Transient causes ("Gemini is busy", "you're offline") stay a snackbar, but
+  // only once the sheet is out of the way and it can actually be read.
+  if (r == null && !outcome.isActionable) {
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(geminiFailureMessage(l10n, outcome.failure!))),
+    );
+  }
+  return logged;
 }
 
 /// Optional pre-send hint sheet (Gemini path): shows the chosen photo + a free-
