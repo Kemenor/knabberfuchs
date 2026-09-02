@@ -129,6 +129,26 @@ final geminiKeyStoreProvider = Provider<GeminiKeyStore>(
 /// gemini-2.5-flash on a 503/timeout). Null = use the reliable default.
 const geminiModelSetting = 'geminiModel';
 
+/// Version of the AI disclosure the user accepted, and when.
+///
+/// The key field and the link to Google AI Studio stay hidden until this
+/// matches [geminiConsentVersion]: a Gemini key is a *developer* credential on
+/// the user's own Google account, and the app shouldn't push anyone toward one
+/// before they've read what it means (2026-08-30). **Bump the version when the
+/// disclosure changes materially** — storing the accepted version means an old
+/// acceptance re-asks instead of silently standing in for text nobody saw.
+const geminiConsentVersion = 1;
+const geminiConsentSetting = 'geminiConsentVersion';
+const geminiConsentAtSetting = 'geminiConsentAt';
+
+/// Whether the current AI disclosure has been accepted.
+final geminiConsentProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting(geminiConsentSetting)
+      .map((v) => (int.tryParse(v ?? '') ?? 0) >= geminiConsentVersion),
+);
+
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final s = GeminiService();
   ref.onDispose(s.dispose);

@@ -362,6 +362,14 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   (busy, offline) stay a snackbar. The caller must abandon its flow when the
   dialog reports that the user left for Settings, rather than opening a sheet
   on top of the Settings tab.
+- **Consent gates: a checkbox, never a timer.** Where a setting hands the user's
+  data to a third party, the disclosure is a sheet of short bullets plus a
+  checkbox that enables the confirm button — see `ui/settings/ai_consent_sheet.dart`.
+  A countdown before Accept is an *artificial gate* (ETHOS) and collides with
+  WCAG 2.2.1; it also buys the look of informed consent, not the substance.
+  Store the **accepted version** of the text plus a timestamp, not a boolean, so
+  a material rewrite re-asks. Any such consent must be withdrawable, and
+  withdrawing it deletes whatever credential it unlocked.
 - **One cause, one sentence, one source.** Every surface that reports a Gemini
   failure — both capture flows and the Settings key test — renders it through
   `geminiFailureMessage` (`core/gemini_error.dart`), so a given cause always

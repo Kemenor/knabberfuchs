@@ -179,6 +179,50 @@ switch, units).
 | Health sync | **Health Connect, write-only, opt-in** (energy + macros + micros). Fast-follow after core logging |
 | Backup | **ZIP** = SQLite snapshot (lossless) + JSON export (portable) + CSV of entries; manifest carries schema version |
 
+## AI estimates — consent gate & terms position (decided 2026-08-30)
+
+Google's Gemini API Additional Terms (eff. 2026-03-23) say two things that bear
+on a bring-your-own-key consumer app:
+
+- *"Use of Google AI Studio and Gemini API is for developers building with
+  Google AI models for professional or business purposes, **not for consumer
+  use**."*
+- *"You may use only Paid Services when making API Clients available to users in
+  the European Economic Area, Switzerland, or the United Kingdom."*
+
+**Read (not legal advice).** Each user obtains their own key and accepts those
+terms themselves, so their usage is theirs. Our thread of exposure is the
+"making API Clients available" sentence. There are no damages — we pay Google
+nothing and they lose nothing — so the realistic remedy is key revocation, not
+litigation. **GDPR is not the issue**: the app is local-first with no server, we
+are not a controller for a photo the user sends to Google with their own key,
+and a person tracking their own meals sits inside the household exemption
+(Art. 2(2)(c)). Our duty there is transparency, which the gate below serves.
+
+**Decision:** keep the feature; **stop soliciting**. The app no longer hands out
+a link to Google AI Studio to anyone who hasn't first read what a Gemini key is:
+
+- `geminiConsentProvider` gates the key field and the AI Studio link on an
+  accepted disclosure version (`providers.dart`). The disclosure lives in
+  `ui/settings/ai_consent_sheet.dart`.
+- The accepted **version** is stored, not a boolean, plus a UTC timestamp —
+  bump `geminiConsentVersion` when the text changes materially and everyone
+  is asked again rather than being covered by a tap on text they never saw.
+- Consent is withdrawable: "Turn off AI estimates" clears the acceptance *and*
+  deletes the stored key.
+- The capture-flow copy no longer pitches "a free API key"; it says the feature
+  is optional, off, and configurable in Settings.
+
+**Explicitly rejected:** a timed "wait 5 seconds before you may accept" gate.
+It is an artificial gate (ETHOS: no dark patterns), it collides with WCAG 2.2.1,
+and a forced delay buys the appearance of informed consent rather than the
+substance. The checkbox is a real affirmative act and costs a fast reader
+nothing.
+
+**Accepted risk:** the consumer-use clause is not resolved by any of the above
+and cannot be, short of dropping the feature. Position if Google ever makes
+contact: revisit then.
+
 ## Architecture
 
 - **Offline-first.** Everything reads/writes the local SQLite DB. Network is only for

@@ -17,6 +17,7 @@ import '../../domain/meal_times.dart';
 import '../../domain/meal_type_i18n.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import 'ai_consent_sheet.dart';
 import 'debug_section.dart';
 import 'offline_regions_screen.dart';
 import 'targets_screen.dart';
@@ -148,7 +149,7 @@ class SettingsScreen extends ConsumerWidget {
                 key: _aiSectionKey,
                 child: FuchsbauSectionHeader(l10n.settingsAi),
               ),
-              const FuchsbauSettingsCard(children: [_AiKeyTile()]),
+              const FuchsbauSettingsCard(children: [_AiSection()]),
               FuchsbauSectionHeader(l10n.settingsHealthConnect(_healthStore())),
               FuchsbauSettingsCard(
                 children: [
@@ -722,6 +723,53 @@ class _ThemePicker extends ConsumerWidget {
   }
 }
 
+/// The AI section, gated on the disclosure. Until it's accepted the app shows
+/// only what the feature *is* — no key field, and no link to Google AI Studio.
+/// See [showAiConsentSheet] for why.
+class _AiSection extends ConsumerWidget {
+  const _AiSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final consented = ref.watch(geminiConsentProvider).asData?.value ?? false;
+    return consented ? const _AiKeyTile() : const _AiConsentGate();
+  }
+}
+
+/// Pre-consent state: what the feature does, and one way in.
+class _AiConsentGate extends ConsumerWidget {
+  const _AiConsentGate();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.aiGateSummary,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.tonalIcon(
+              onPressed: () => showAiConsentSheet(context, ref),
+              icon: const Icon(Symbols.auto_awesome_rounded),
+              label: Text(l10n.aiGateAction),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Optional Google Gemini key (the user's own free-tier key) — unlocks the AI
 /// meal estimates (photo scan and text description). Keyless stays fully
 /// usable: search, barcode, OCR and the describe-meal catalog matcher.
@@ -952,9 +1000,52 @@ class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
               ),
             ),
           ],
+          const Divider(height: 24),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: _turnOff,
+              icon: const Icon(Symbols.block_rounded, size: 16),
+              label: Text(l10n.aiTurnOff),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  /// Withdraw consent: forget both the acceptance and the key, so the section
+  /// returns to its pre-consent state and nothing is left behind on the
+  /// device. Consent you can't take back isn't consent — and it destroys a
+  /// stored credential, so it confirms first.
+  Future<void> _turnOff() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.aiTurnOffTitle),
+        content: Text(l10n.aiTurnOffConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.aiTurnOff),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    await ref.read(geminiKeyStoreProvider).write(null);
+    final db = ref.read(dbProvider);
+    await db.setSetting(geminiConsentSetting, null);
+    await db.setSetting(geminiConsentAtSetting, null);
+    // The consent provider rebuilds _AiSection back to the gate, disposing
+    // this tile — so the messenger had to be captured above.
+    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.aiTurnedOff)));
   }
 }
 

@@ -714,14 +714,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get recognizeGeminiNudge =>
-      'Suggerimento: aggiungi una chiave Gemini gratuita nelle Impostazioni per sbloccare le stime IA da foto e descrizioni.';
+      'Le stime IA per foto e descrizioni sono facoltative e disattivate. Puoi configurarle nelle Impostazioni.';
 
   @override
   String get recognizeKeyMissingTitle => 'Attiva la scansione IA';
 
   @override
   String get recognizeKeyMissingBody =>
-      'La scansione di un pasto con l\'IA usa Google Gemini e richiede una chiave API gratuita. Aggiungila nelle Impostazioni, sezione “Riconoscimento IA”, per attivare la funzione.';
+      'Le stime IA dei pasti sono facoltative e al momento disattivate. Configurale in Impostazioni → Riconoscimento IA: usano Google Gemini con una chiave del tuo account Google.';
 
   @override
   String get actionGoToSettings => 'Vai alle Impostazioni';
@@ -785,6 +785,56 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get aiModelNote =>
       'Se il modello scelto non è disponibile o è occupato, viene provato 2.5 Flash.';
+
+  @override
+  String get aiGateSummary =>
+      'Facoltativo: stima un pasto da una foto o da una descrizione scritta con Google Gemini. Disattivato di default – funziona con una chiave API Gemini del tuo account Google, non del nostro.';
+
+  @override
+  String get aiGateAction => 'Configura le stime IA';
+
+  @override
+  String get aiConsentTitle => 'Prima di attivare';
+
+  @override
+  String get aiConsentPhoto =>
+      'La foto del pasto, o la descrizione che scrivi, viene inviata a Google. Nulla viene inviato finché non aggiungi una chiave.';
+
+  @override
+  String get aiConsentOwnKey =>
+      'Funziona con una chiave API Google Gemini che crei sul tuo account Google. È una chiave da sviluppatore: Google offre l\'API per sviluppare, non come servizio per consumatori.';
+
+  @override
+  String get aiConsentDataUse =>
+      'Nel piano gratuito Google può usare ciò che invii per migliorare i propri modelli. Nel SEE, in Svizzera e nel Regno Unito valgono invece le condizioni sui dati dei servizi a pagamento, e non lo fa.';
+
+  @override
+  String get aiConsentBilling =>
+      'Per l\'uso personale il piano gratuito basta. Se hai attivato la fatturazione sul tuo account Google, un uso intenso può comportare costi.';
+
+  @override
+  String get aiConsentLocal =>
+      'Nient\'altro cambia: diario, foto e obiettivi restano su questo telefono.';
+
+  @override
+  String get aiConsentCheck =>
+      'Capisco che le foto dei miei pasti vengono inviate a Google.';
+
+  @override
+  String get aiConsentAccept => 'Attiva le stime IA';
+
+  @override
+  String get aiTurnOff => 'Disattiva le stime IA';
+
+  @override
+  String get aiTurnOffTitle => 'Disattivare le stime IA?';
+
+  @override
+  String get aiTurnOffConfirm =>
+      'Questo elimina la chiave API da questo telefono e nasconde di nuovo le impostazioni IA. I pasti registrati non cambiano.';
+
+  @override
+  String get aiTurnedOff => 'Stime IA disattivate, chiave API eliminata.';
 
   @override
   String get recognizeByGemini => 'Stimato da Gemini';

@@ -305,7 +305,13 @@ tracks tester-driven changes specifically.
   Switzerland and the UK** the paid-service data terms apply to free use too,
   i.e. the opposite, for most of our users. Both rewritten in en/de/fr/it.
 
-- 📝 **EEA/CH/UK "Paid Services" clause — needs a decision.** The same terms say:
+- ✅ **EEA/CH/UK "Paid Services" clause — decided 2026-08-30.** Read in full and
+  resolved: keep the feature, stop soliciting. The key field and the AI Studio
+  link now sit behind an explicit disclosure the user has to accept, consent is
+  versioned and withdrawable, and the capture copy no longer pitches "a free API
+  key". GDPR turned out not to be the exposure at all. Full reasoning and the
+  accepted residual risk: **PLAN.md → "AI estimates — consent gate & terms
+  position"**. Original note: the terms say:
   *"You may use only Paid Services when making API Clients available to users in
   the European Economic Area, Switzerland, or the United Kingdom."* Knabberfuchs
   ships an API Client to exactly those users, even though each user brings their

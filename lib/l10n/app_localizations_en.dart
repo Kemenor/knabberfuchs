@@ -712,14 +712,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recognizeGeminiNudge =>
-      'Tip: add a free Gemini key in Settings to unlock AI estimates for photos and descriptions.';
+      'AI estimates for photos and descriptions are optional and off. You can set them up in Settings.';
 
   @override
   String get recognizeKeyMissingTitle => 'Activate AI scanning';
 
   @override
   String get recognizeKeyMissingBody =>
-      'Scanning a meal with AI uses Google Gemini and needs a free API key. Add one in Settings under “AI recognition” to activate it.';
+      'AI meal estimates are optional and currently off. Set them up in Settings under “AI recognition” — they use Google Gemini with a key from your own Google account.';
 
   @override
   String get actionGoToSettings => 'Go to Settings';
@@ -782,6 +782,56 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiModelNote =>
       'If your choice is unavailable or busy, 2.5 Flash is tried next.';
+
+  @override
+  String get aiGateSummary =>
+      'Optional: estimate a meal from a photo or a typed description with Google Gemini. Off by default — it runs on a Gemini API key from your own Google account, not ours.';
+
+  @override
+  String get aiGateAction => 'Set up AI estimates';
+
+  @override
+  String get aiConsentTitle => 'Before you turn this on';
+
+  @override
+  String get aiConsentPhoto =>
+      'Your meal photo, or the description you type, is sent to Google. Nothing is sent until you add a key.';
+
+  @override
+  String get aiConsentOwnKey =>
+      'It runs on a Google Gemini API key you create on your own Google account. That\'s a developer key — Google offers the API for building with, not as a consumer service.';
+
+  @override
+  String get aiConsentDataUse =>
+      'On Google\'s free tier they may use what you send to improve their models. In the EEA, Switzerland and the UK their paid-service data terms apply instead, and they don\'t.';
+
+  @override
+  String get aiConsentBilling =>
+      'The free tier covers personal use. If you\'ve enabled billing on your Google account, heavy use can cost money.';
+
+  @override
+  String get aiConsentLocal =>
+      'Nothing else changes: your diary, photos and targets stay on this phone.';
+
+  @override
+  String get aiConsentCheck =>
+      'I understand my meal photos are sent to Google.';
+
+  @override
+  String get aiConsentAccept => 'Enable AI estimates';
+
+  @override
+  String get aiTurnOff => 'Turn off AI estimates';
+
+  @override
+  String get aiTurnOffTitle => 'Turn off AI estimates?';
+
+  @override
+  String get aiTurnOffConfirm =>
+      'This deletes your API key from this phone and hides the AI settings again. Your logged meals are untouched.';
+
+  @override
+  String get aiTurnedOff => 'AI estimates turned off, API key deleted.';
 
   @override
   String get recognizeByGemini => 'Estimated by Gemini';

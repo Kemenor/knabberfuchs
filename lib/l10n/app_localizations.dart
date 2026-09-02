@@ -1299,7 +1299,7 @@ abstract class AppLocalizations {
   /// Hint suggesting a Gemini API key to unlock the AI estimate features
   ///
   /// In en, this message translates to:
-  /// **'Tip: add a free Gemini key in Settings to unlock AI estimates for photos and descriptions.'**
+  /// **'AI estimates for photos and descriptions are optional and off. You can set them up in Settings.'**
   String get recognizeGeminiNudge;
 
   /// Title of the dialog shown when the AI meal scan is tapped without a Gemini API key
@@ -1311,7 +1311,7 @@ abstract class AppLocalizations {
   /// Body of the missing-key dialog; explains how to unlock the AI scan feature
   ///
   /// In en, this message translates to:
-  /// **'Scanning a meal with AI uses Google Gemini and needs a free API key. Add one in Settings under “AI recognition” to activate it.'**
+  /// **'AI meal estimates are optional and currently off. Set them up in Settings under “AI recognition” — they use Google Gemini with a key from your own Google account.'**
   String get recognizeKeyMissingBody;
 
   /// Dialog action that jumps to the Settings tab
@@ -1427,6 +1427,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'If your choice is unavailable or busy, 2.5 Flash is tried next.'**
   String get aiModelNote;
+
+  /// Pre-consent explainer in the AI settings section: what the feature is, before any key field is shown
+  ///
+  /// In en, this message translates to:
+  /// **'Optional: estimate a meal from a photo or a typed description with Google Gemini. Off by default — it runs on a Gemini API key from your own Google account, not ours.'**
+  String get aiGateSummary;
+
+  /// Button that opens the AI disclosure sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Set up AI estimates'**
+  String get aiGateAction;
+
+  /// Title of the one-time AI disclosure sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Before you turn this on'**
+  String get aiConsentTitle;
+
+  /// Disclosure bullet: what leaves the device
+  ///
+  /// In en, this message translates to:
+  /// **'Your meal photo, or the description you type, is sent to Google. Nothing is sent until you add a key.'**
+  String get aiConsentPhoto;
+
+  /// Disclosure bullet: the key is a developer credential on the user’s own Google account
+  ///
+  /// In en, this message translates to:
+  /// **'It runs on a Google Gemini API key you create on your own Google account. That\'s a developer key — Google offers the API for building with, not as a consumer service.'**
+  String get aiConsentOwnKey;
+
+  /// Disclosure bullet: free-tier model training, and the EEA/CH/UK exception
+  ///
+  /// In en, this message translates to:
+  /// **'On Google\'s free tier they may use what you send to improve their models. In the EEA, Switzerland and the UK their paid-service data terms apply instead, and they don\'t.'**
+  String get aiConsentDataUse;
+
+  /// Disclosure bullet: cost risk if billing is enabled
+  ///
+  /// In en, this message translates to:
+  /// **'The free tier covers personal use. If you\'ve enabled billing on your Google account, heavy use can cost money.'**
+  String get aiConsentBilling;
+
+  /// Disclosure bullet: nothing else leaves the phone
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing else changes: your diary, photos and targets stay on this phone.'**
+  String get aiConsentLocal;
+
+  /// Checkbox the user must tick before the accept button enables
+  ///
+  /// In en, this message translates to:
+  /// **'I understand my meal photos are sent to Google.'**
+  String get aiConsentCheck;
+
+  /// Accept action on the AI disclosure sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Enable AI estimates'**
+  String get aiConsentAccept;
+
+  /// Action that withdraws AI consent and deletes the stored key
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off AI estimates'**
+  String get aiTurnOff;
+
+  /// Title of the confirm dialog for turning AI estimates off
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off AI estimates?'**
+  String get aiTurnOffTitle;
+
+  /// Body of the confirm dialog: the key is deleted, logged meals are untouched
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes your API key from this phone and hides the AI settings again. Your logged meals are untouched.'**
+  String get aiTurnOffConfirm;
+
+  /// Snackbar confirming AI estimates were turned off and the key deleted
+  ///
+  /// In en, this message translates to:
+  /// **'AI estimates turned off, API key deleted.'**
+  String get aiTurnedOff;
 
   /// Attribution badge on results estimated by Gemini
   ///

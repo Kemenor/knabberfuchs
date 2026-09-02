@@ -6,7 +6,7 @@ WAS DU TUN KANNST
 • Barcodes scannen – sofort Nährwerte aus Open Food Facts. Nicht in der Datenbank? Füge das Produkt selbst hinzu, indem du das Etikett scannst – beim nächsten Mal ist es gespeichert.
 • Schnell suchen, offline – Open Food Facts plus die kuratierte Schweizer Nährwertdatenbank, dazu deine eigenen Lebensmittel.
 • Schnell erfassen – Zahl schon bekannt? „Lasagne · 816 kcal" mit wenigen Tippern eintragen.
-• Mahlzeit fotografieren – die KI-Erkennung schätzt Gericht und Portion. Standardmäßig läuft sie auf dem Gerät (kein Konto, keine Cloud). Optional fügst du deinen eigenen Google-Gemini-Schlüssel hinzu, für genauere Ergebnisse mit vollständigen Makros.
+• Mahlzeit fotografieren – eine optionale KI-Schätzung von Gericht, Portion und Makros. Standardmäßig aus und nicht eingebaut: Sie läuft über einen Google-Gemini-API-Schlüssel, den du selbst mitbringst, und dein Foto wird erst gesendet, wenn du einen hinterlegt hast.
 • Mahlzeit aus einem Foto – fotografiere eine gedruckte Zutatenliste; die Texterkennung auf dem Gerät macht daraus eine Mahlzeit.
 • Rezepte – ein Rezept einmal anlegen und dann eine Portion an einem beliebigen Tag eintragen; es wird in seine echten Zutaten aufgeschlüsselt. Per QR-Code oder Bild teilen, per QR oder Text importieren.
 • Tag für Tag – Mahlzeiten werden beim Hinzufügen automatisch gruppiert, mit laufender Summe und Makros.
@@ -19,8 +19,8 @@ MEHRSPRACHIG
 Verfügbar in Englisch, Deutsch, Französisch und Italienisch.
 
 PRIVATSPHÄRE VON GRUND AUF
-Keine Konten, keine Analyse, keine Werbung, keine Tracker. Wir betreiben keinen Server und sehen deine Daten nie. Das Einzige, was dein Handy je verlässt, ist ein optionales Gemini-Foto deiner Mahlzeit – und nur, wenn du deinen eigenen Schlüssel einrichtest. Alles andere bleibt auf dem Gerät.
+Keine Konten, keine Analyse, keine Werbung, keine Tracker. Wir betreiben keinen Server und sehen deine Daten nie. Barcode-Scans und Online-Suchen werden bei Open Food Facts nachgeschlagen; die optionale KI-Schätzung sendet dieses eine Mahlzeitenfoto an Google – und nur, wenn du deinen eigenen Schlüssel hinterlegt hast. Alles andere bleibt auf deinem Handy.
 
-Lebensmitteldaten: Open Food Facts (ODbL) und die Schweizer Nährwertdatenbank (BLV). Die Mahlzeitenerkennung auf dem Gerät nutzt das Google-AIY-Lebensmittelmodell, lokal eingebettet und ausgeführt.
+Lebensmitteldaten: Open Food Facts (ODbL) und die Schweizer Nährwertdatenbank (BLV).
 
 Hergestellt in der Schweiz. 🦊

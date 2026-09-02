@@ -6,7 +6,7 @@ CE QUE VOUS POUVEZ FAIRE
 • Scanner des codes-barres – valeurs nutritionnelles instantanées depuis Open Food Facts. Absent de la base ? Ajoutez-le vous-même en scannant l'étiquette ; il sera enregistré pour la prochaine fois.
 • Rechercher vite, hors ligne – Open Food Facts plus la Base suisse de composition des aliments, avec vos propres aliments.
 • Ajout rapide – vous connaissez déjà le chiffre ? Notez « Lasagnes · 816 kcal » en quelques touches.
-• Photographier un repas – la reconnaissance par IA estime le plat et la portion. Par défaut, elle fonctionne sur l'appareil (pas de compte, pas de cloud). En option, ajoutez votre propre clé Google Gemini pour des résultats plus précis avec les macros complètes.
+• Photographier un repas – une estimation IA facultative du plat, de la portion et des macros. Désactivée par défaut et non intégrée : elle fonctionne avec une clé API Google Gemini que vous fournissez vous-même, et votre photo n'est envoyée qu'une fois cette clé ajoutée.
 • Un repas à partir d'une photo – photographiez une liste d'ingrédients imprimée ; la reconnaissance de texte sur l'appareil la transforme en repas.
 • Recettes – créez une recette une fois, puis enregistrez une portion n'importe quel jour ; elle est décomposée en ses véritables ingrédients. Partagez par QR code ou image, importez par QR ou texte.
 • Jour après jour – les repas se regroupent automatiquement, avec total et macros en direct.
@@ -19,8 +19,8 @@ MULTILINGUE
 Disponible en anglais, allemand, français et italien.
 
 CONFIDENTIALITÉ DÈS LA CONCEPTION
-Aucun compte, aucune analyse, aucune publicité, aucun traceur. Nous n'avons pas de serveur et ne voyons jamais vos données. La seule chose qui quitte votre téléphone est une photo de repas Gemini facultative – et uniquement si vous configurez votre propre clé. Tout le reste reste sur l'appareil.
+Aucun compte, aucune analyse, aucune publicité, aucun traceur. Nous n'avons pas de serveur et ne voyons jamais vos données. Les codes-barres et les recherches en ligne sont interrogés chez Open Food Facts ; l'estimation IA facultative envoie cette photo de repas à Google, et uniquement si vous avez ajouté votre propre clé. Tout le reste reste sur votre téléphone.
 
-Données alimentaires : Open Food Facts (ODbL) et la Base suisse de composition des aliments (OSAV). La reconnaissance de repas sur l'appareil utilise le modèle alimentaire Google AIY, intégré et exécuté localement.
+Données alimentaires : Open Food Facts (ODbL) et la Base suisse de composition des aliments (OSAV).
 
 Conçu en Suisse. 🦊

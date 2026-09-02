@@ -6,7 +6,7 @@ WHAT YOU CAN DO
 • Scan barcodes — instant nutrition from Open Food Facts. Not in the database? Add it yourself by scanning the label, and it's saved for next time.
 • Search fast, offline — Open Food Facts plus the curated Swiss Food Composition Database, with your own custom foods alongside.
 • Quick add — already know the number? Log "Lasagna · 816 kcal" in a couple of taps.
-• Snap a meal — AI meal recognition estimates the dish and portion. It runs on-device by default (no account, no cloud). Optionally add your own Google Gemini key for sharper results with full macros.
+• Snap a meal — an optional AI estimate of the dish, portion and macros. Off by default, and it isn't built in: it runs on a Google Gemini API key you provide yourself, and your photo is only ever sent once you've added one.
 • Meal from a photo — photograph a printed ingredient list and on-device text recognition turns it into a meal to log.
 • Recipes — build a recipe once, then log a portion to any day; it's broken back into its real ingredients. Share by QR code or image, import by QR or text.
 • Day by day — meals group automatically as you add them, with a running total and macros.
@@ -19,8 +19,8 @@ MULTILINGUAL
 Available in English, German, French and Italian.
 
 PRIVACY BY DESIGN
-There are no accounts, no analytics, no ads, and no trackers. We don't run a server and we never see your data. The only thing that ever leaves your phone is an optional Gemini meal photo — and only if you set up your own key. Everything else is on-device.
+There are no accounts, no analytics, no ads, and no trackers. We don't run a server and we never see your data. Barcode scans and online searches are looked up at Open Food Facts; the optional AI estimate sends that one meal photo to Google, and only if you've added your own key. Everything else stays on your phone.
 
-Food data: Open Food Facts (ODbL) and the Swiss Food Composition Database (FSVO). On-device meal recognition uses the Google AIY food model, bundled and run locally.
+Food data: Open Food Facts (ODbL) and the Swiss Food Composition Database (FSVO).
 
 Made in Switzerland. 🦊

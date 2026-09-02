@@ -715,14 +715,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get recognizeGeminiNudge =>
-      'Astuce : ajoutez une clé Gemini gratuite dans les Réglages pour débloquer les estimations IA à partir de photos et de descriptions.';
+      'Les estimations IA pour les photos et les descriptions sont facultatives et désactivées. Vous pouvez les configurer dans les réglages.';
 
   @override
   String get recognizeKeyMissingTitle => 'Activer le scan par IA';
 
   @override
   String get recognizeKeyMissingBody =>
-      'Scanner un repas avec l\'IA utilise Google Gemini et nécessite une clé API gratuite. Ajoutez-la dans les Réglages, section « Reconnaissance par IA », pour activer la fonction.';
+      'Les estimations IA sont facultatives et actuellement désactivées. Configurez-les dans Réglages → Reconnaissance par IA : elles utilisent Google Gemini avec une clé de votre propre compte Google.';
 
   @override
   String get actionGoToSettings => 'Ouvrir les réglages';
@@ -786,6 +786,56 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get aiModelNote =>
       'Si votre choix est indisponible ou occupé, 2.5 Flash est essayé ensuite.';
+
+  @override
+  String get aiGateSummary =>
+      'Facultatif : estimer un repas à partir d\'une photo ou d\'une description écrite avec Google Gemini. Désactivé par défaut – cela fonctionne avec une clé API Gemini de votre propre compte Google, pas du nôtre.';
+
+  @override
+  String get aiGateAction => 'Configurer les estimations IA';
+
+  @override
+  String get aiConsentTitle => 'Avant d\'activer';
+
+  @override
+  String get aiConsentPhoto =>
+      'Votre photo de repas, ou la description que vous tapez, est envoyée à Google. Rien n\'est envoyé tant que vous n\'avez pas ajouté de clé.';
+
+  @override
+  String get aiConsentOwnKey =>
+      'Cela fonctionne avec une clé API Google Gemini que vous créez sur votre propre compte Google. C\'est une clé de développeur : Google propose l\'API pour développer, pas comme service grand public.';
+
+  @override
+  String get aiConsentDataUse =>
+      'Dans l\'offre gratuite, Google peut utiliser ce que vous envoyez pour améliorer ses modèles. Dans l\'EEE, en Suisse et au Royaume-Uni, ce sont ses conditions de données des services payants qui s\'appliquent, et il ne le fait pas.';
+
+  @override
+  String get aiConsentBilling =>
+      'L\'offre gratuite suffit pour un usage personnel. Si vous avez activé la facturation sur votre compte Google, une utilisation intensive peut entraîner des frais.';
+
+  @override
+  String get aiConsentLocal =>
+      'Rien d\'autre ne change : votre journal, vos photos et vos objectifs restent sur ce téléphone.';
+
+  @override
+  String get aiConsentCheck =>
+      'Je comprends que mes photos de repas sont envoyées à Google.';
+
+  @override
+  String get aiConsentAccept => 'Activer les estimations IA';
+
+  @override
+  String get aiTurnOff => 'Désactiver les estimations IA';
+
+  @override
+  String get aiTurnOffTitle => 'Désactiver les estimations IA ?';
+
+  @override
+  String get aiTurnOffConfirm =>
+      'Cela supprime votre clé API de ce téléphone et masque à nouveau les réglages IA. Vos repas enregistrés ne changent pas.';
+
+  @override
+  String get aiTurnedOff => 'Estimations IA désactivées, clé API supprimée.';
 
   @override
   String get recognizeByGemini => 'Estimé par Gemini';

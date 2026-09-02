@@ -714,14 +714,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get recognizeGeminiNudge =>
-      'Tipp: Hinterlege in den Einstellungen einen kostenlosen Gemini-Schlüssel für KI-Schätzungen aus Fotos und Beschreibungen.';
+      'KI-Schätzungen für Fotos und Beschreibungen sind optional und ausgeschaltet. Du kannst sie in den Einstellungen einrichten.';
 
   @override
   String get recognizeKeyMissingTitle => 'KI-Scan aktivieren';
 
   @override
   String get recognizeKeyMissingBody =>
-      'Das Scannen einer Mahlzeit mit KI nutzt Google Gemini und braucht einen kostenlosen API-Schlüssel. Hinterlege ihn in den Einstellungen unter „KI-Erkennung“, um die Funktion zu aktivieren.';
+      'KI-Schätzungen für Mahlzeiten sind optional und derzeit aus. Richte sie in den Einstellungen unter „KI-Erkennung“ ein – sie nutzen Google Gemini mit einem Schlüssel aus deinem eigenen Google-Konto.';
 
   @override
   String get actionGoToSettings => 'Zu den Einstellungen';
@@ -784,6 +784,57 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get aiModelNote =>
       'Ist dein Modell nicht verfügbar oder ausgelastet, wird 2.5 Flash versucht.';
+
+  @override
+  String get aiGateSummary =>
+      'Optional: Mahlzeiten aus einem Foto oder einer getippten Beschreibung mit Google Gemini schätzen. Standardmäßig aus – läuft über einen Gemini-API-Schlüssel aus deinem eigenen Google-Konto, nicht über unseren.';
+
+  @override
+  String get aiGateAction => 'KI-Schätzungen einrichten';
+
+  @override
+  String get aiConsentTitle => 'Bevor du das einschaltest';
+
+  @override
+  String get aiConsentPhoto =>
+      'Dein Mahlzeitenfoto bzw. die getippte Beschreibung wird an Google gesendet. Vor dem Hinterlegen eines Schlüssels wird nichts gesendet.';
+
+  @override
+  String get aiConsentOwnKey =>
+      'Es läuft über einen Google-Gemini-API-Schlüssel, den du in deinem eigenen Google-Konto anlegst. Das ist ein Entwicklerschlüssel – Google bietet die API zum Entwickeln an, nicht als Verbraucherdienst.';
+
+  @override
+  String get aiConsentDataUse =>
+      'Im kostenlosen Tarif kann Google das Gesendete zur Verbesserung seiner Modelle nutzen. Im EWR, in der Schweiz und im Vereinigten Königreich gelten stattdessen Googles Datenbedingungen für kostenpflichtige Dienste – dort tut es das nicht.';
+
+  @override
+  String get aiConsentBilling =>
+      'Für den privaten Gebrauch reicht der kostenlose Tarif. Wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen.';
+
+  @override
+  String get aiConsentLocal =>
+      'Sonst ändert sich nichts: Tagebuch, Fotos und Ziele bleiben auf diesem Handy.';
+
+  @override
+  String get aiConsentCheck =>
+      'Mir ist klar, dass meine Mahlzeitenfotos an Google gesendet werden.';
+
+  @override
+  String get aiConsentAccept => 'KI-Schätzungen aktivieren';
+
+  @override
+  String get aiTurnOff => 'KI-Schätzungen ausschalten';
+
+  @override
+  String get aiTurnOffTitle => 'KI-Schätzungen ausschalten?';
+
+  @override
+  String get aiTurnOffConfirm =>
+      'Damit wird dein API-Schlüssel von diesem Handy gelöscht und die KI-Einstellungen werden wieder ausgeblendet. Deine erfassten Mahlzeiten bleiben unverändert.';
+
+  @override
+  String get aiTurnedOff =>
+      'KI-Schätzungen ausgeschaltet, API-Schlüssel gelöscht.';
 
   @override
   String get recognizeByGemini => 'Von Gemini geschätzt';
