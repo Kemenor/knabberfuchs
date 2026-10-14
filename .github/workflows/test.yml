@@ -8,7 +8,7 @@ name: Test · analyze + flutter test
 # green and this job is the source of truth.
 #
 # IMPORTANT: the Flutter version must match the engine the committed goldens
-# were generated with (the dev distrobox — currently 3.44.4). It is
+# were generated with (the dev distrobox — currently 3.47.7). It is
 # single-sourced in .fvmrc, which all four workflows read via
 # flutter-version-file. When you bump Flutter, regenerate the goldens on Linux
 # (`flutter test --update-goldens test/golden`) in the same version and bump
