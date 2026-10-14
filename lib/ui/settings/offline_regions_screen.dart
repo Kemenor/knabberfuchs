@@ -274,7 +274,10 @@ class _RegionTile extends StatelessWidget {
           if (updatable)
             TextButton(onPressed: onDownload, child: Text(l10n.regionUpdate))
           else
-            Icon(Symbols.check_circle_rounded, color: theme.colorScheme.primary),
+            Icon(
+              Symbols.check_circle_rounded,
+              color: theme.colorScheme.primary,
+            ),
           IconButton(
             tooltip: l10n.regionTooltipRemove,
             icon: const Icon(Symbols.delete_rounded),

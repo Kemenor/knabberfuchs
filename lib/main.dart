@@ -17,7 +17,10 @@ Future<void> main() async {
     final container = ProviderContainer();
     await maybeSeedDevData(container.read(dbProvider));
     runApp(
-      UncontrolledProviderScope(container: container, child: const CalorieApp()),
+      UncontrolledProviderScope(
+        container: container,
+        child: const CalorieApp(),
+      ),
     );
     return;
   }

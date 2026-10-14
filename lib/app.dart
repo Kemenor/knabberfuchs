@@ -38,8 +38,7 @@ class _CalorieAppState extends ConsumerState<CalorieApp> {
     // Keep the number formatters in sync as the locale changes — done via
     // listen (a side effect) rather than inline so build() stays pure.
     ref.listen(localeProvider, (_, next) => _syncNumberLocale(next));
-    final font =
-        ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
+    final font = ref.watch(fontProvider).asData?.value ?? FuchsbauFont.figtree;
     final themeMode =
         ref.watch(themeModeProvider).asData?.value ?? ThemeMode.system;
     return MaterialApp(

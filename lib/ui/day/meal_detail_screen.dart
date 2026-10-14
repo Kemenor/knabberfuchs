@@ -147,9 +147,9 @@ class _PhotoBanner extends StatelessWidget {
       button: true,
       image: true,
       child: GestureDetector(
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => _PhotoViewerScreen(file: f)),
-        ),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => _PhotoViewerScreen(file: f))),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Image.file(

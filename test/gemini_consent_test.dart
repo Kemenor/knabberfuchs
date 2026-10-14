@@ -31,7 +31,9 @@ void main() {
       if (container.read(geminiConsentProvider).asData?.value == want) return;
       await Future<void>.delayed(const Duration(milliseconds: 5));
     }
-    fail('expected consent=$want, got ${container.read(geminiConsentProvider)}');
+    fail(
+      'expected consent=$want, got ${container.read(geminiConsentProvider)}',
+    );
   }
 
   test('no acceptance stored → gated', () => expectConsent(false));

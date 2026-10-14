@@ -115,12 +115,8 @@ class TargetsScreen extends ConsumerWidget {
                         ? '${l10n.metricCalories} (${l10n.unitKcal})'
                         : '${metricLabel(l10n, m)} (g)',
                     keyPrefix: m.name,
-                    defaultMin: m == TargetMetric.kcal
-                        ? defaultMin
-                        : md(m).min,
-                    defaultMax: m == TargetMetric.kcal
-                        ? defaultMax
-                        : md(m).max,
+                    defaultMin: m == TargetMetric.kcal ? defaultMin : md(m).min,
+                    defaultMax: m == TargetMetric.kcal ? defaultMax : md(m).max,
                     weekdayMin: (wd) => targetRowBounds(rowFor(wd), m).$1,
                     weekdayMax: (wd) => targetRowBounds(rowFor(wd), m).$2,
                     onDefaultMin: (v) => db.setSetting(
@@ -208,9 +204,7 @@ class _MetricTargets extends StatelessWidget {
               _TargetRow(
                 metric: title,
                 // Localized weekday name (Mon=0…Sun=6); 2024-01-01 was a Monday.
-                label: DateFormat.EEEE(
-                  lang,
-                ).format(DateTime(2024, 1, 1 + wd)),
+                label: DateFormat.EEEE(lang).format(DateTime(2024, 1, 1 + wd)),
                 keyPrefix: '$keyPrefix-wd$wd',
                 initialMin: weekdayMin(wd),
                 initialMax: weekdayMax(wd),
@@ -327,7 +321,10 @@ class _TargetFieldState extends State<_TargetField> {
         textAlign: TextAlign.end,
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(isDense: true, hintText: widget.hint ?? '—'),
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: widget.hint ?? '—',
+        ),
         onChanged: (v) {
           final parsed = v.trim().isEmpty ? null : double.tryParse(v.trim());
           widget.onChanged(parsed);

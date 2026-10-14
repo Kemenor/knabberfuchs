@@ -36,7 +36,10 @@ extension AutoDismissSnackBar on ScaffoldMessengerState {
     );
     final controller = showSnackBar(accessible);
     final atActive = WidgetsBinding
-        .instance.platformDispatcher.accessibilityFeatures.accessibleNavigation;
+        .instance
+        .platformDispatcher
+        .accessibilityFeatures
+        .accessibleNavigation;
     if (atActive) return; // leave it open for screen-reader users
     var closed = false;
     controller.closed.then((_) => closed = true);

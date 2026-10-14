@@ -430,7 +430,11 @@ class _OffContributeCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Symbols.open_in_new_rounded, size: 16, color: scheme.primary),
+                        Icon(
+                          Symbols.open_in_new_rounded,
+                          size: 16,
+                          color: scheme.primary,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           l10n.offContributeAction,

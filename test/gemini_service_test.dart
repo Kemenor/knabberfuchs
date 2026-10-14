@@ -336,26 +336,33 @@ void main() {
         GeminiFailure.notFood,
         GeminiFailure.unknown,
       ]) {
-        expect(GeminiOutcome<int>.failed(f).isActionable, isFalse, reason: '$f');
+        expect(
+          GeminiOutcome<int>.failed(f).isActionable,
+          isFalse,
+          reason: '$f',
+        );
       }
     });
 
-    test('a rejected key short-circuits — the photo is not re-uploaded', () async {
-      var calls = 0;
-      final svc = GeminiService(
-        client: MockClient((req) async {
-          calls++;
-          return http.Response('{"error":{"reason":"API_KEY_INVALID"}}', 400);
-        }),
-      );
-      final r = await svc.recognizeFood(
-        Uint8List.fromList([1, 2, 3]),
-        'bad-key',
-        preferredModel: 'gemini-3.5-flash',
-      );
-      expect(r.failure, GeminiFailure.invalidKey);
-      expect(calls, 1, reason: 'the fallback model would be rejected too');
-    });
+    test(
+      'a rejected key short-circuits — the photo is not re-uploaded',
+      () async {
+        var calls = 0;
+        final svc = GeminiService(
+          client: MockClient((req) async {
+            calls++;
+            return http.Response('{"error":{"reason":"API_KEY_INVALID"}}', 400);
+          }),
+        );
+        final r = await svc.recognizeFood(
+          Uint8List.fromList([1, 2, 3]),
+          'bad-key',
+          preferredModel: 'gemini-3.5-flash',
+        );
+        expect(r.failure, GeminiFailure.invalidKey);
+        expect(calls, 1, reason: 'the fallback model would be rejected too');
+      },
+    );
 
     test('a 403 short-circuits the same way', () async {
       var calls = 0;
@@ -365,8 +372,11 @@ void main() {
           return http.Response('forbidden', 403);
         }),
       );
-      final r = await svc.estimateMealFromText('toast', 'k',
-          preferredModel: 'gemini-3.5-flash');
+      final r = await svc.estimateMealFromText(
+        'toast',
+        'k',
+        preferredModel: 'gemini-3.5-flash',
+      );
       expect(r.failure, GeminiFailure.noAccess);
       expect(calls, 1);
     });
@@ -379,8 +389,11 @@ void main() {
           return http.Response('no such model', 404);
         }),
       );
-      final r = await svc.estimateMealFromText('toast', 'k',
-          preferredModel: 'gemini-3.5-flash');
+      final r = await svc.estimateMealFromText(
+        'toast',
+        'k',
+        preferredModel: 'gemini-3.5-flash',
+      );
       expect(requested, hasLength(2));
       expect(r.failure, GeminiFailure.modelUnavailable);
     });
@@ -393,8 +406,11 @@ void main() {
               : http.Response('overloaded', 503);
         }),
       );
-      final r = await svc.estimateMealFromText('toast', 'k',
-          preferredModel: 'gemini-3.5-flash');
+      final r = await svc.estimateMealFromText(
+        'toast',
+        'k',
+        preferredModel: 'gemini-3.5-flash',
+      );
       expect(r.failure, GeminiFailure.quota);
     });
 

@@ -224,9 +224,8 @@ class _FoodSearchListState extends ConsumerState<FoodSearchList> {
                     child: FilterChip(
                       label: Text(label),
                       selected: _sourceFilter == source,
-                      onSelected: (sel) => setState(
-                        () => _sourceFilter = sel ? source : null,
-                      ),
+                      onSelected: (sel) =>
+                          setState(() => _sourceFilter = sel ? source : null),
                     ),
                   ),
               ],

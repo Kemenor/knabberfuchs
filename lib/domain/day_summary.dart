@@ -215,7 +215,12 @@ List<DayTrend> buildMetricDayTrends(
   while (!d.isAfter(last)) {
     final value = valueByDay[DayKey.of(d)] ?? 0;
     // DateTime.weekday is Mon=1…Sun=7; resolveMetricTarget wants Mon=0…Sun=6.
-    final target = resolveMetricTarget(targets, metric, defaults, d.weekday - 1);
+    final target = resolveMetricTarget(
+      targets,
+      metric,
+      defaults,
+      d.weekday - 1,
+    );
     out.add(
       DayTrend(
         date: d,

@@ -137,7 +137,10 @@ void main() {
 
   group('targetBarFraction', () {
     test('floor (min only) fills toward the min', () {
-      expect(targetBarFraction(80, const CalorieTarget(120, null)), closeTo(2 / 3, 1e-9));
+      expect(
+        targetBarFraction(80, const CalorieTarget(120, null)),
+        closeTo(2 / 3, 1e-9),
+      );
     });
     test('over the floor clamps to full', () {
       expect(targetBarFraction(150, const CalorieTarget(120, null)), 1.0);
@@ -216,10 +219,7 @@ void main() {
       const eaten = 2000.0;
       const static_ = CalorieTarget(1600, 1900);
       expect(statusFor(eaten, static_), TargetStatus.over);
-      expect(
-        statusFor(eaten, shiftTarget(static_, 320)),
-        TargetStatus.inRange,
-      );
+      expect(statusFor(eaten, shiftTarget(static_, 320)), TargetStatus.inRange);
     });
 
     test('an unmoved min would lie on training days — the shift fixes it', () {
@@ -228,10 +228,7 @@ void main() {
       const eaten = 1700.0;
       const static_ = CalorieTarget(1600, null);
       expect(statusFor(eaten, static_), TargetStatus.inRange);
-      expect(
-        statusFor(eaten, shiftTarget(static_, 500)),
-        TargetStatus.under,
-      );
+      expect(statusFor(eaten, shiftTarget(static_, 500)), TargetStatus.under);
     });
   });
 }

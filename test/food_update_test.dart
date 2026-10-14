@@ -49,44 +49,50 @@ void main() {
       expect(updated.source, FoodSource.custom);
     });
 
-    test('changing the barcode updates this row, no duplicate appears', () async {
-      final food = await repo.createFood(name: 'Birchermüesli', kcal100: 150);
+    test(
+      'changing the barcode updates this row, no duplicate appears',
+      () async {
+        final food = await repo.createFood(name: 'Birchermüesli', kcal100: 150);
 
-      final updated = await repo.updateFood(
-        food.id,
-        barcode: '7610000000001',
-        name: 'Birchermüesli',
-        kcal100: 150,
-      );
+        final updated = await repo.updateFood(
+          food.id,
+          barcode: '7610000000001',
+          name: 'Birchermüesli',
+          kcal100: 150,
+        );
 
-      expect(updated.id, food.id);
-      expect(updated.barcode, '7610000000001');
-      // A re-scan of the new barcode finds the edited food.
-      final hit = await db.foodByExternal(FoodSource.custom, '7610000000001');
-      expect(hit?.id, food.id);
-    });
+        expect(updated.id, food.id);
+        expect(updated.barcode, '7610000000001');
+        // A re-scan of the new barcode finds the edited food.
+        final hit = await db.foodByExternal(FoodSource.custom, '7610000000001');
+        expect(hit?.id, food.id);
+      },
+    );
 
-    test('deleteFood unlinks logged entries but keeps their snapshots', () async {
-      final food = await repo.createFood(name: 'Zopf', kcal100: 320);
-      await db.addEntry(
-        EntriesCompanion.insert(
-          day: '2026-07-01',
-          mealType: MealType.breakfast,
-          grams: 80,
-          foodId: Value(food.id),
-          sName: food.name,
-          sKcal100: food.kcal100,
-        ),
-      );
+    test(
+      'deleteFood unlinks logged entries but keeps their snapshots',
+      () async {
+        final food = await repo.createFood(name: 'Zopf', kcal100: 320);
+        await db.addEntry(
+          EntriesCompanion.insert(
+            day: '2026-07-01',
+            mealType: MealType.breakfast,
+            grams: 80,
+            foodId: Value(food.id),
+            sName: food.name,
+            sKcal100: food.kcal100,
+          ),
+        );
 
-      await repo.deleteFood(food.id);
+        await repo.deleteFood(food.id);
 
-      expect(await db.foodById(food.id), isNull);
-      final entry = (await db.allEntries()).single;
-      expect(entry.foodId, isNull); // FK set-null, not cascade
-      expect(entry.sName, 'Zopf');
-      expect(entry.sKcal100, 320);
-    });
+        expect(await db.foodById(food.id), isNull);
+        final entry = (await db.allEntries()).single;
+        expect(entry.foodId, isNull); // FK set-null, not cascade
+        expect(entry.sName, 'Zopf');
+        expect(entry.sKcal100, 320);
+      },
+    );
 
     test('diary snapshots are untouched by a later edit', () async {
       final food = await repo.createFood(name: 'Quark', kcal100: 68);

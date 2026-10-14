@@ -99,10 +99,19 @@ void main() {
   });
 
   test('statusFor boundary: equal to a bound is in range', () {
-    expect(statusFor(2000, const CalorieTarget(1800, 2000)), TargetStatus.inRange);
-    expect(statusFor(1800, const CalorieTarget(1800, 2000)), TargetStatus.inRange);
+    expect(
+      statusFor(2000, const CalorieTarget(1800, 2000)),
+      TargetStatus.inRange,
+    );
+    expect(
+      statusFor(1800, const CalorieTarget(1800, 2000)),
+      TargetStatus.inRange,
+    );
     expect(statusFor(2001, const CalorieTarget(1800, 2000)), TargetStatus.over);
-    expect(statusFor(1799, const CalorieTarget(1800, 2000)), TargetStatus.under);
+    expect(
+      statusFor(1799, const CalorieTarget(1800, 2000)),
+      TargetStatus.under,
+    );
     expect(statusFor(2000, const CalorieTarget(null, null)), TargetStatus.none);
   });
 

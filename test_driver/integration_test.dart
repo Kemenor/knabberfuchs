@@ -6,11 +6,12 @@ import 'package:integration_test/integration_test_driver_extended.dart';
 /// captures via `binding.takeScreenshot(name)` to `./screenshots/NAME.png`.
 Future<void> main() async {
   await integrationDriver(
-    onScreenshot: (String name, List<int> bytes, [Map<String, Object?>? args]) async {
-      final file = File('screenshots/$name.png');
-      await file.create(recursive: true);
-      await file.writeAsBytes(bytes);
-      return true;
-    },
+    onScreenshot:
+        (String name, List<int> bytes, [Map<String, Object?>? args]) async {
+          final file = File('screenshots/$name.png');
+          await file.create(recursive: true);
+          await file.writeAsBytes(bytes);
+          return true;
+        },
   );
 }

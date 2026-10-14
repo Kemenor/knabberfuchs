@@ -22,7 +22,8 @@ class OffApi {
       'code,product_name,product_name_en,brands,nutriments,serving_quantity,serving_size,lang';
   // OFF asks every app to identify itself.
   static const _headers = {
-    'User-Agent': 'Knabberfuchs/1.1 (Android; contact developer@knabberfuchs.ch)',
+    'User-Agent':
+        'Knabberfuchs/1.1 (Android; contact developer@knabberfuchs.ch)',
   };
 
   OffApi({

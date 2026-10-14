@@ -116,9 +116,7 @@ void main() {
   test('install verifies, writes a versioned file, and opens it', () async {
     final pack = gzPack(barcode: '7610001', name: 'Rivella');
     final r = region(size: pack.gz.length, sha: pack.sha);
-    final service = buildService({
-      'https://example/main/${r.file}': pack.gz,
-    });
+    final service = buildService({'https://example/main/${r.file}': pack.gz});
 
     final progress = <double>[];
     await service.install(manifest(r), r, onProgress: progress.add);
@@ -135,9 +133,7 @@ void main() {
   test('install rejects a bad checksum and commits nothing', () async {
     final pack = gzPack(barcode: '7610001', name: 'Rivella');
     final r = region(size: pack.gz.length, sha: 'deadbeef');
-    final service = buildService({
-      'https://example/main/${r.file}': pack.gz,
-    });
+    final service = buildService({'https://example/main/${r.file}': pack.gz});
 
     await expectLater(
       service.install(manifest(r), r),
@@ -170,9 +166,7 @@ void main() {
   test('remove deletes the file, the record, and the open handle', () async {
     final pack = gzPack(barcode: '7610001', name: 'Rivella');
     final r = region(size: pack.gz.length, sha: pack.sha);
-    final service = buildService({
-      'https://example/main/${r.file}': pack.gz,
-    });
+    final service = buildService({'https://example/main/${r.file}': pack.gz});
     await service.install(manifest(r), r);
 
     await service.remove('ch');
@@ -185,9 +179,7 @@ void main() {
   test('a cancelled install aborts before committing anything', () async {
     final pack = gzPack(barcode: '7610001', name: 'Rivella');
     final r = region(size: pack.gz.length, sha: pack.sha);
-    final service = buildService({
-      'https://example/main/${r.file}': pack.gz,
-    });
+    final service = buildService({'https://example/main/${r.file}': pack.gz});
 
     final token = CancellationToken()..cancel();
     await expectLater(

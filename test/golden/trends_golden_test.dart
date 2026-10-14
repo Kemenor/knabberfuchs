@@ -23,9 +23,9 @@ Future<void> _loadRoboto() async {
   final loader = FontLoader('Roboto');
   for (final name in ['Roboto-Regular', 'Roboto-Medium', 'Roboto-Bold']) {
     loader.addFont(
-      File('test/golden/fonts/$name.ttf').readAsBytes().then(
-        (b) => ByteData.view(Uint8List.fromList(b).buffer),
-      ),
+      File(
+        'test/golden/fonts/$name.ttf',
+      ).readAsBytes().then((b) => ByteData.view(Uint8List.fromList(b).buffer)),
     );
   }
   await loader.load();
@@ -194,7 +194,9 @@ void main() {
     );
   });
 
-  testWidgets('trends — long custom range aggregates to weekly', (tester) async {
+  testWidgets('trends — long custom range aggregates to weekly', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1080, 1700);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
@@ -231,12 +233,7 @@ void main() {
     await tester.pumpWidget(
       app(
         trends,
-        TrendWindow(
-          TrendMode.custom,
-          0,
-          trends.first.date,
-          trends.last.date,
-        ),
+        TrendWindow(TrendMode.custom, 0, trends.first.date, trends.last.date),
       ),
     );
     await tester.pumpAndSettle();

@@ -32,7 +32,12 @@ void main() {
   );
 
   Future<void> pumpDetail(WidgetTester tester, List<Entry> entries) async {
-    final group = EntryGroup(id: 1, day: day, name: 'Lunch', createdAt: createdAt);
+    final group = EntryGroup(
+      id: 1,
+      day: day,
+      name: 'Lunch',
+      createdAt: createdAt,
+    );
     final dir = Directory.systemTemp.createTempSync('meal_detail_photo');
     addTearDown(() => dir.deleteSync(recursive: true));
     await tester.pumpWidget(
@@ -41,7 +46,10 @@ void main() {
           dayGroupsStreamProvider.overrideWith((ref) => Stream.value([group])),
           daySummaryProvider.overrideWith(
             (ref) => Stream.value(
-              DaySummary(day: day, entries: [for (final e in entries) EntryView(e)]),
+              DaySummary(
+                day: day,
+                entries: [for (final e in entries) EntryView(e)],
+              ),
             ),
           ),
           trackedNutrientsProvider.overrideWith(

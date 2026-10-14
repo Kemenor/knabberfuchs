@@ -43,28 +43,31 @@ MockClient _productClient(Map<String, dynamic> body, {int status = 200}) =>
 
 void main() {
   group('productByBarcode', () {
-    test('maps a full product, incl. string numerics and sodium g->mg', () async {
-      final api = _api(_productClient({'status': 1, 'product': _product()}));
-      final r = await api.productByBarcode('7610200025678');
-      expect(r, isNotNull);
-      final f = r!.food;
-      expect(f.name.value, 'Rösti'); // product_name wins over the en fallback
-      expect(f.barcode.value, '7610200025678');
-      expect(f.externalId.value, '7610200025678');
-      expect(f.brand.value, 'Migros');
-      expect(f.locale.value, 'de');
-      expect(f.servingLabel.value, '250 g (1/2 Packung)');
-      expect(f.kcal100.value, 112); // parsed from the string numeric
-      expect(f.protein100.value, 2.5);
-      expect(f.carb100.value, 15.0); // parsed from the string numeric
-      expect(f.fat100.value, 4.6);
-      expect(f.fiber100.value, 1.8);
-      expect(f.sugar100.value, 0.6);
-      expect(f.satFat100.value, 0.5);
-      expect(f.sodiumMg100.value, closeTo(240, 0.001)); // sodium_100g * 1000
-      expect(f.saltG100.value, 0.6);
-      expect(r.countryTag, 'en:switzerland'); // first of countries_tags
-    });
+    test(
+      'maps a full product, incl. string numerics and sodium g->mg',
+      () async {
+        final api = _api(_productClient({'status': 1, 'product': _product()}));
+        final r = await api.productByBarcode('7610200025678');
+        expect(r, isNotNull);
+        final f = r!.food;
+        expect(f.name.value, 'Rösti'); // product_name wins over the en fallback
+        expect(f.barcode.value, '7610200025678');
+        expect(f.externalId.value, '7610200025678');
+        expect(f.brand.value, 'Migros');
+        expect(f.locale.value, 'de');
+        expect(f.servingLabel.value, '250 g (1/2 Packung)');
+        expect(f.kcal100.value, 112); // parsed from the string numeric
+        expect(f.protein100.value, 2.5);
+        expect(f.carb100.value, 15.0); // parsed from the string numeric
+        expect(f.fat100.value, 4.6);
+        expect(f.fiber100.value, 1.8);
+        expect(f.sugar100.value, 0.6);
+        expect(f.satFat100.value, 0.5);
+        expect(f.sodiumMg100.value, closeTo(240, 0.001)); // sodium_100g * 1000
+        expect(f.saltG100.value, 0.6);
+        expect(r.countryTag, 'en:switzerland'); // first of countries_tags
+      },
+    );
 
     test('kJ-only products are rejected (no energy-kcal -> null)', () async {
       final p = _product();
@@ -111,7 +114,9 @@ void main() {
         isNull,
       );
       final htmlApi = _api(
-        MockClient((_) async => http.Response('<html>rate limited</html>', 200)),
+        MockClient(
+          (_) async => http.Response('<html>rate limited</html>', 200),
+        ),
       );
       expect(await htmlApi.productByBarcode('7610200025678'), isNull);
     });

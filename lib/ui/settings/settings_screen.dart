@@ -404,9 +404,7 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
   // No mime filter — restore validates, and filters hid files on some
   // pickers.
   final path = await FlutterFileDialog.pickFile(
-    params: const OpenFileDialogParams(
-      dialogType: OpenFileDialogType.document,
-    ),
+    params: const OpenFileDialogParams(dialogType: OpenFileDialogType.document),
   );
   if (path == null || !context.mounted) return;
 

@@ -36,9 +36,7 @@ void main() {
     expect(entries.any((e) => e.sMicrosJson == null), isTrue);
 
     // Recipe items carry full snapshots (they feed the meal detail page).
-    final items = await db.itemsForRecipe(
-      (await db.allRecipes()).single.id,
-    );
+    final items = await db.itemsForRecipe((await db.allRecipes()).single.id);
     expect(items.every((i) => decodeMicros(i.sMicrosJson).isNotEmpty), isTrue);
 
     // Re-seeding is additive but must not throw (deterministic data).
@@ -68,33 +66,35 @@ void main() {
     expect(groupDays, {after.first.day});
   });
 
-  test('wipeAllData resets to first-run: empty tables, 7 blank targets',
-      () async {
-    await seedTestData(db);
-    await db.setSetting('healthSync', 'true');
-    await wipeAllData(db);
+  test(
+    'wipeAllData resets to first-run: empty tables, 7 blank targets',
+    () async {
+      await seedTestData(db);
+      await db.setSetting('healthSync', 'true');
+      await wipeAllData(db);
 
-    for (final table in [
-      'entries',
-      'entry_groups',
-      'recipes',
-      'recipe_items',
-      'foods',
-      'settings',
-      'ocr_mappings',
-      'installed_packs',
-    ]) {
-      expect(await count(table), 0, reason: table);
-    }
-    final targets = await db.allTargets();
-    expect(targets.length, 7);
-    expect(
-      targets.every((t) => t.kcalMin == null && t.kcalMax == null),
-      isTrue,
-    );
-    // Settings gone ⇒ the Swiss seeder re-imports on next launch.
-    expect(await db.getSetting('healthSync'), isNull);
-  });
+      for (final table in [
+        'entries',
+        'entry_groups',
+        'recipes',
+        'recipe_items',
+        'foods',
+        'settings',
+        'ocr_mappings',
+        'installed_packs',
+      ]) {
+        expect(await count(table), 0, reason: table);
+      }
+      final targets = await db.allTargets();
+      expect(targets.length, 7);
+      expect(
+        targets.every((t) => t.kcalMin == null && t.kcalMax == null),
+        isTrue,
+      );
+      // Settings gone ⇒ the Swiss seeder re-imports on next launch.
+      expect(await db.getSetting('healthSync'), isNull);
+    },
+  );
 
   test('dbStats reports schema version and row counts', () async {
     await seedTestData(db, days: 2);

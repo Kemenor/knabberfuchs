@@ -48,14 +48,17 @@ void main() {
       expect(gramsStr(12.34), '12.3');
     });
 
-    test('never groups (pre-fills inputs whose parsers keep no separators)', () {
-      setNumberLocale('de');
-      expect(gramsStr(1234.5), '1234,5');
-      setNumberLocale('fr');
-      expect(gramsStr(1234.5), '1234,5');
-      setNumberLocale('en');
-      expect(gramsStr(1234.5), '1234.5');
-    });
+    test(
+      'never groups (pre-fills inputs whose parsers keep no separators)',
+      () {
+        setNumberLocale('de');
+        expect(gramsStr(1234.5), '1234,5');
+        setNumberLocale('fr');
+        expect(gramsStr(1234.5), '1234,5');
+        setNumberLocale('en');
+        expect(gramsStr(1234.5), '1234.5');
+      },
+    );
   });
 
   group('macroStr', () {
@@ -76,13 +79,16 @@ void main() {
   });
 
   group('CSV serialization', () {
-    test('period decimal and no grouping even under a comma display locale', () {
-      setNumberLocale('de');
-      expect(kcalCsv(1999.6), '2000');
-      expect(gramsCsv(100), '100');
-      expect(gramsCsv(12.34), '12.34');
-      expect(macroCsv(1.26), '1.3');
-      expect(macroCsv(10), '10.0');
-    });
+    test(
+      'period decimal and no grouping even under a comma display locale',
+      () {
+        setNumberLocale('de');
+        expect(kcalCsv(1999.6), '2000');
+        expect(gramsCsv(100), '100');
+        expect(gramsCsv(12.34), '12.34');
+        expect(macroCsv(1.26), '1.3');
+        expect(macroCsv(10), '10.0');
+      },
+    );
   });
 }
