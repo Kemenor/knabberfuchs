@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -131,6 +132,9 @@ class OfflinePackService {
         version: region.version,
         products: region.products,
         sizeBytes: raw.length,
+        // Explicit, so an update (an upsert of an existing row) moves it too —
+        // the regions screen shows it as "updated <date>".
+        installedAt: Value(DateTime.now()),
       ),
     );
     await syncStore();

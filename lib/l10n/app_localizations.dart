@@ -858,6 +858,36 @@ abstract class AppLocalizations {
   /// **'Download country product databases for offline search'**
   String get settingsOfflineRegionsSub;
 
+  /// Settings picker title: when installed offline region packs update themselves
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-update offline regions'**
+  String get settingsPackAutoUpdate;
+
+  /// Auto-update option: only on Wi-Fi (default)
+  ///
+  /// In en, this message translates to:
+  /// **'On Wi-Fi only'**
+  String get packAutoUpdateWifi;
+
+  /// Auto-update option: on Wi-Fi and mobile data
+  ///
+  /// In en, this message translates to:
+  /// **'On Wi-Fi and mobile data'**
+  String get packAutoUpdateAny;
+
+  /// Auto-update option: never
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get packAutoUpdateOff;
+
+  /// Footnote under the auto-update picker
+  ///
+  /// In en, this message translates to:
+  /// **'Checks for newer product data at most once a day, when you open the app.'**
+  String get packAutoUpdateFootnote;
+
   /// Settings section header: just the platform health store's name (e.g. Health Connect)
   ///
   /// In en, this message translates to:
@@ -2478,17 +2508,29 @@ abstract class AppLocalizations {
   /// **'Update'**
   String get regionUpdate;
 
+  /// Snackbar after region packs were updated; regions is a comma-separated list of region names
+  ///
+  /// In en, this message translates to:
+  /// **'Offline data updated: {regions}'**
+  String regionsAutoUpdated(String regions);
+
+  /// Button on the Offline regions screen that updates every outdated region
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Update 1 region} other{Update {count} regions}}'**
+  String regionUpdateAll(int count);
+
   /// Region row subtitle: product count in thousands and download size
   ///
   /// In en, this message translates to:
   /// **'{products}k products · {size} download'**
   String regionSubtitle(String products, String size);
 
-  /// Region row subtitle suffix when the pack is installed
+  /// Region row subtitle suffix when the pack is installed and current; date is when it was last downloaded, e.g. 12 Oct
   ///
   /// In en, this message translates to:
-  /// **'{base} · installed'**
-  String regionSubtitleInstalled(String base);
+  /// **'{base} · updated {date}'**
+  String regionSubtitleInstalled(String base, String date);
 
   /// Region row subtitle suffix when an update is available
   ///

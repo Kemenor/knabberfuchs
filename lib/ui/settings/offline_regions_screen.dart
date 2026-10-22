@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../data/db/database.dart';
@@ -24,8 +25,6 @@ class OfflineRegionsScreen extends ConsumerStatefulWidget {
 }
 
 class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
-  final Map<String, double> _progress = {};
-  final Map<String, CancellationToken> _cancels = {};
   final _searchCtrl = TextEditingController();
   String _query = '';
 
@@ -42,22 +41,10 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
   Future<void> _download(OfflineManifest m, RegionInfo r) async {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
-    final cancelToken = CancellationToken();
-    setState(() {
-      _progress[r.code] = 0;
-      _cancels[r.code] = cancelToken;
-    });
     try {
-      await ref
-          .read(offlinePackServiceProvider)
-          .install(
-            m,
-            r,
-            onProgress: (p) {
-              if (mounted) setState(() => _progress[r.code] = p);
-            },
-            cancelToken: cancelToken,
-          );
+      // Through the shared queue, so a region the auto-updater is already
+      // fetching isn't downloaded twice, and its ring shows here too.
+      await ref.read(packInstallQueueProvider.notifier).install(m, r);
       messenger.showAutoSnackBar(
         SnackBar(content: Text(l10n.regionDownloaded(r.name))),
       );
@@ -67,13 +54,37 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
       messenger.showAutoSnackBar(
         SnackBar(content: Text(l10n.regionDownloadFailed('$e'))),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _progress.remove(r.code);
-          _cancels.remove(r.code);
-        });
-      }
+    }
+  }
+
+  /// Queue every outdated region at once (the queue runs them one by one)
+  /// and report once at the end rather than a snackbar per region.
+  Future<void> _updateAll(OfflineManifest m, List<RegionInfo> outdated) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
+    final queue = ref.read(packInstallQueueProvider.notifier);
+    final updated = <String>[];
+    Object? error;
+    await Future.wait([
+      for (final r in outdated)
+        queue
+            .install(m, r)
+            .then(
+              (_) => updated.add(r.name),
+              onError: (Object e) {
+                if (e is! InstallCancelledException) error ??= e;
+              },
+            ),
+    ]);
+    if (updated.isNotEmpty) {
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.regionsAutoUpdated(updated.join(', ')))),
+      );
+    }
+    if (error != null) {
+      messenger.showAutoSnackBar(
+        SnackBar(content: Text(l10n.regionDownloadFailed('$error'))),
+      );
     }
   }
 
@@ -94,6 +105,7 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final manifestAsync = ref.watch(offlineManifestProvider);
+    final progress = ref.watch(packInstallQueueProvider);
     final installed = {
       for (final p
           in ref.watch(installedPacksProvider).asData?.value ?? const [])
@@ -145,6 +157,14 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
                   if (ai != bi) return ai ? -1 : 1;
                   return a.name.compareTo(b.name);
                 });
+          // From the whole manifest, not the filtered list: the search box
+          // shouldn't hide that updates are waiting.
+          final outdated = [
+            for (final r in manifest.regions)
+              if (installed[r.code] case final p?
+                  when p.version != r.version && !progress.containsKey(r.code))
+                r,
+          ];
 
           return Column(
             children: [
@@ -152,6 +172,18 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 child: Text(l10n.regionIntro),
               ),
+              if (outdated.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonalIcon(
+                      onPressed: () => _updateAll(manifest, outdated),
+                      icon: const Icon(Symbols.update_rounded),
+                      label: Text(l10n.regionUpdateAll(outdated.length)),
+                    ),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                 child: TextField(
@@ -189,9 +221,11 @@ class _OfflineRegionsScreenState extends ConsumerState<OfflineRegionsScreen> {
                             _RegionTile(
                               region: r,
                               installed: installed[r.code],
-                              progress: _progress[r.code],
+                              progress: progress[r.code],
                               onDownload: () => _download(manifest, r),
-                              onCancel: () => _cancels[r.code]?.cancel(),
+                              onCancel: () => ref
+                                  .read(packInstallQueueProvider.notifier)
+                                  .cancel(r.code),
                               onRemove: () => _remove(r.code, r.name),
                             ),
                           const Divider(),
@@ -291,7 +325,13 @@ class _RegionTile extends StatelessWidget {
       title: Text(region.name),
       subtitle: Text(
         isInstalled && !updatable
-            ? l10n.regionSubtitleInstalled(subtitle)
+            ? l10n.regionSubtitleInstalled(
+                subtitle,
+                DateFormat(
+                  'd MMM',
+                  Localizations.localeOf(context).languageCode,
+                ).format(installed!.installedAt.toLocal()),
+              )
             : updatable
             ? l10n.regionSubtitleUpdatable(subtitle)
             : subtitle,

@@ -712,6 +712,21 @@ France (60 MB) and US (59 MB) are large, and only re-syncs of *those* would bene
 re-download already works at these sizes. Instead, fix update-detection to be content-based
 (see below) so unchanged packs don't show "update available".
 
+**5c (automatic pack updates): built 2026-10-23** (branch `feat/auto-update-packs`). Installed
+packs used to update only by tapping *Update* per region. Decisions (Thomas, 2026-10-14):
+- **Trigger: foreground only** — on app open and resume, at most once per 24 h (the packs
+  rebuild weekly). No `workmanager` background job: a diary app is opened daily anyway, iOS
+  background runs are unreliable, and it would mean opening drift from a background isolate.
+- **Network: Wi-Fi only by default** — setting *Auto-update offline regions* (Settings → Food
+  data): Wi-Fi only / Wi-Fi and mobile data / Off. Adds `connectivity_plus`; "Wi-Fi" = wifi or
+  ethernet and no mobile transport.
+- Only installed packs whose content-hash version differs are re-downloaded; a region gone from
+  the manifest keeps its installed copy. A failed attempt retries after 1 h; a user cancel
+  waits for the next daily check. One snackbar names the updated regions.
+- All installs (manual, *Update all*, automatic) go through one serial `PackInstallQueue`, so a
+  region is never fetched twice at once and the screen shows auto-update progress. Installed
+  rows now say when their data was downloaded ("updated 12 Oct").
+
 ## Near-term enhancements (from on-device testing, 2026-06-17)
 
 - ✅ **Search quality** — synonyms (bell pepper→peppers sweet, rocket→arugula…),

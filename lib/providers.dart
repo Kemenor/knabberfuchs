@@ -3,6 +3,7 @@ import 'dart:convert' show jsonDecode, jsonEncode;
 
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter/material.dart' show ThemeMode;
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuchsbau/fuchsbau.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +22,8 @@ import 'data/health/health_service.dart';
 import 'data/ml/gemini_service.dart';
 import 'data/ocr/ocr_service.dart';
 import 'data/offline/offline_pack_service.dart';
+import 'data/offline/pack_auto_updater.dart';
+import 'data/offline/pack_install_queue.dart';
 import 'data/offline/region_pack_store.dart';
 import 'data/sources/off_api.dart';
 import 'data/sources/swiss_seed.dart';
@@ -65,6 +68,37 @@ final installedPacksProvider = StreamProvider<List<InstalledPack>>(
 final offlineManifestProvider = FutureProvider.autoDispose<OfflineManifest>(
   (ref) => ref.watch(offlinePackServiceProvider).fetchManifest(),
 );
+
+/// Every pack install, manual or automatic; state = progress per region code.
+final packInstallQueueProvider =
+    NotifierProvider<PackInstallQueue, Map<String, double>>(
+      () => PackInstallQueue((ref) => ref.read(offlinePackServiceProvider)),
+    );
+
+/// The `offlinePackAutoUpdate` setting (Settings → Food data).
+final packAutoUpdateProvider = StreamProvider<PackAutoUpdate>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting(PackAutoUpdate.settingKey)
+      .map(PackAutoUpdate.parse),
+);
+
+final packAutoUpdaterProvider = Provider<PackAutoUpdater>((ref) {
+  final db = ref.watch(dbProvider);
+  return PackAutoUpdater(
+    readSetting: db.getSetting,
+    writeSetting: db.setSetting,
+    installedPacks: db.installedPacksList,
+    fetchManifest: ref.read(offlinePackServiceProvider).fetchManifest,
+    install: ref.read(packInstallQueueProvider.notifier).install,
+    isUnmetered: () async {
+      final net = await Connectivity().checkConnectivity();
+      return !net.contains(ConnectivityResult.mobile) &&
+          (net.contains(ConnectivityResult.wifi) ||
+              net.contains(ConnectivityResult.ethernet));
+    },
+  );
+});
 
 final foodRepositoryProvider = Provider<FoodRepository>(
   (ref) => FoodRepository(
