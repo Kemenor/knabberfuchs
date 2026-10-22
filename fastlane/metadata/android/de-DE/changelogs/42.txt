@@ -1,0 +1,3 @@
+• Offline-Regionen bleiben jetzt von selbst aktuell: Beim Öffnen der App werden neuere Produktdaten für deine heruntergeladenen Länder automatisch geholt, höchstens einmal am Tag
+• Standardmäßig nur über WLAN – änderbar unter Einstellungen → Lebensmitteldaten → „Offline-Regionen automatisch aktualisieren“ (WLAN und mobile Daten oder aus)
+• Offline-Regionen: Ein Knopf aktualisiert alle veralteten Länder, und jedes Land zeigt, wann seine Daten zuletzt aktualisiert wurden

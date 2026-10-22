@@ -1,3 +1,3 @@
-• Le stime IA ora iniziano con una spiegazione chiara e una tantum di ciò che viene inviato a Google — il campo della chiave e il link per ottenerla appaiono solo dopo averla letta e accettata
-• Nuovo nelle impostazioni: "Disattiva le stime IA" ritira il consenso ed elimina la chiave salvata dal telefono, quando vuoi
-• Descrizione corretta: il riconoscimento dei pasti non funziona più sul dispositivo da luglio
+• Le regioni offline ora si aggiornano da sole: all'apertura dell'app i dati prodotto più recenti dei paesi scaricati vengono recuperati automaticamente, al massimo una volta al giorno
+• Solo con Wi-Fi per impostazione predefinita — modificabile in Impostazioni → Dati alimentari → "Aggiornamento automatico regioni offline" (Wi-Fi e dati mobili, oppure disattivato)
+• Regioni offline: un pulsante aggiorna tutti i paesi non aggiornati, e ogni paese mostra quando i suoi dati sono stati aggiornati

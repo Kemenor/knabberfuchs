@@ -1,3 +1,3 @@
-• Les estimations IA commencent désormais par une explication claire et unique de ce qui est envoyé à Google — le champ de la clé et le lien pour en obtenir une n'apparaissent qu'après lecture et acceptation
-• Nouveau dans les réglages : « Désactiver les estimations IA » retire ce consentement et supprime votre clé du téléphone, à tout moment
-• Description corrigée : la reconnaissance des repas ne fonctionne plus sur l'appareil depuis juillet
+• Les régions hors ligne se mettent désormais à jour toutes seules : à l'ouverture de l'app, les données produits plus récentes de vos pays téléchargés sont récupérées automatiquement, au plus une fois par jour
+• En Wi-Fi uniquement par défaut — modifiable dans Réglages → Données alimentaires → « Mise à jour auto des régions hors ligne » (Wi-Fi et données mobiles, ou désactivée)
+• Régions hors ligne : un bouton met à jour tous les pays obsolètes, et chaque pays indique la date de ses données

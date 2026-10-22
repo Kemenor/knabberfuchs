@@ -1,0 +1,3 @@
+• Offline regions now keep themselves up to date: when you open the app, newer product data for the countries you downloaded is fetched automatically, at most once a day
+• Wi-Fi only by default — change it in Settings → Food data → "Auto-update offline regions" (Wi-Fi and mobile data, or off)
+• Offline regions: one button updates every outdated country, and each country shows when its data was last updated

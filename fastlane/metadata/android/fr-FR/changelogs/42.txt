@@ -1,0 +1,3 @@
+• Les régions hors ligne se mettent désormais à jour toutes seules : à l'ouverture de l'app, les données produits plus récentes de vos pays téléchargés sont récupérées automatiquement, au plus une fois par jour
+• En Wi-Fi uniquement par défaut — modifiable dans Réglages → Données alimentaires → « Mise à jour auto des régions hors ligne » (Wi-Fi et données mobiles, ou désactivée)
+• Régions hors ligne : un bouton met à jour tous les pays obsolètes, et chaque pays indique la date de ses données
