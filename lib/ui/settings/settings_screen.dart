@@ -12,6 +12,7 @@ import '../../core/gemini_error.dart';
 import '../../core/support_email.dart';
 import '../../data/backup.dart';
 import '../../data/ml/gemini_service.dart';
+import '../../data/offline/pack_auto_updater.dart';
 import '../../domain/enums.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/meal_type_i18n.dart';
@@ -143,6 +144,7 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  const _PackAutoUpdatePicker(),
                 ],
               ),
               KeyedSubtree(
@@ -690,6 +692,33 @@ class _TypefacePicker extends ConsumerWidget {
         FuchsbauFont.openDyslexic: l10n.typefaceDyslexia,
       },
       onChanged: (f) => db.setSetting('appFont', f.name),
+    );
+  }
+}
+
+/// When installed offline region packs update themselves (the
+/// 'offlinePackAutoUpdate' setting, see [PackAutoUpdater]). Wi-Fi only by
+/// default — the largest packs are tens of MB.
+class _PackAutoUpdatePicker extends ConsumerWidget {
+  const _PackAutoUpdatePicker();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final db = ref.read(dbProvider);
+    final current =
+        ref.watch(packAutoUpdateProvider).asData?.value ?? PackAutoUpdate.wifi;
+    return FuchsbauChoicePicker<PackAutoUpdate>(
+      icon: Symbols.update_rounded,
+      title: l10n.settingsPackAutoUpdate,
+      value: current,
+      options: {
+        PackAutoUpdate.wifi: l10n.packAutoUpdateWifi,
+        PackAutoUpdate.any: l10n.packAutoUpdateAny,
+        PackAutoUpdate.off: l10n.packAutoUpdateOff,
+      },
+      footnote: l10n.packAutoUpdateFootnote,
+      onChanged: (v) => db.setSetting(PackAutoUpdate.settingKey, v.stored),
     );
   }
 }

@@ -439,6 +439,23 @@ class AppLocalizationsFr extends AppLocalizations {
       'Téléchargez les bases de données de produits par pays pour la recherche hors ligne';
 
   @override
+  String get settingsPackAutoUpdate =>
+      'Mise à jour auto des régions hors ligne';
+
+  @override
+  String get packAutoUpdateWifi => 'En Wi-Fi uniquement';
+
+  @override
+  String get packAutoUpdateAny => 'En Wi-Fi et données mobiles';
+
+  @override
+  String get packAutoUpdateOff => 'Désactivée';
+
+  @override
+  String get packAutoUpdateFootnote =>
+      'Recherche des données produits plus récentes au plus une fois par jour, à l\'ouverture de l\'app.';
+
+  @override
   String settingsHealthConnect(String store) {
     return '$store';
   }
@@ -1416,13 +1433,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get regionUpdate => 'Mettre à jour';
 
   @override
+  String regionsAutoUpdated(String regions) {
+    return 'Données hors ligne mises à jour : $regions';
+  }
+
+  @override
+  String regionUpdateAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mettre à jour $count régions',
+      one: 'Mettre à jour 1 région',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String regionSubtitle(String products, String size) {
     return '${products}k produits · $size à télécharger';
   }
 
   @override
-  String regionSubtitleInstalled(String base) {
-    return '$base · installé';
+  String regionSubtitleInstalled(String base, String date) {
+    return '$base · à jour du $date';
   }
 
   @override

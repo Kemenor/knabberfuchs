@@ -1,6 +1,7 @@
 import 'package:calorie_tracker/app.dart';
 import 'package:calorie_tracker/core/date_x.dart';
 import 'package:calorie_tracker/data/db/database.dart';
+import 'package:calorie_tracker/data/offline/pack_auto_updater.dart';
 import 'package:calorie_tracker/domain/day_summary.dart';
 import 'package:calorie_tracker/domain/enums.dart';
 import 'package:calorie_tracker/providers.dart';
@@ -19,6 +20,18 @@ void main() {
         ProviderScope(
           overrides: [
             appStartupProvider.overrideWith((ref) async {}),
+            // Auto-update "off": the shell's update check must not reach the
+            // real DB, the network or the connectivity plugin.
+            packAutoUpdaterProvider.overrideWithValue(
+              PackAutoUpdater(
+                readSetting: (_) async => PackAutoUpdate.off.stored,
+                writeSetting: (_, _) async {},
+                installedPacks: () async => const [],
+                fetchManifest: () => throw StateError('no network in tests'),
+                install: (_, _) async {},
+                isUnmetered: () async => false,
+              ),
+            ),
             daySummaryProvider.overrideWith(
               (ref) => Stream.value(
                 DaySummary(day: DayKey.today(), entries: const []),

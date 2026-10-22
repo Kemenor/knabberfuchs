@@ -9,6 +9,7 @@ import 'core/theme.dart';
 import 'l10n/app_localizations.dart';
 import 'providers.dart';
 import 'ui/home_shell.dart';
+import 'ui/pack_auto_update_host.dart';
 
 class CalorieApp extends ConsumerStatefulWidget {
   const CalorieApp({super.key});
@@ -55,7 +56,8 @@ class _CalorieAppState extends ConsumerState<CalorieApp> {
   }
 }
 
-/// Runs one-time startup work (USDA seeding) behind a splash, then shows the app.
+/// Runs one-time startup work (USDA seeding) behind a splash, then shows the app
+/// (with offline packs auto-updating behind it).
 class _Startup extends ConsumerWidget {
   const _Startup();
 
@@ -63,10 +65,10 @@ class _Startup extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final startup = ref.watch(appStartupProvider);
     return startup.when(
-      data: (_) => const HomeShell(),
+      data: (_) => const PackAutoUpdateHost(child: HomeShell()),
       loading: () => const _Splash(),
       // Seeding failures are non-fatal — fall through to the app.
-      error: (_, _) => const HomeShell(),
+      error: (_, _) => const PackAutoUpdateHost(child: HomeShell()),
     );
   }
 }

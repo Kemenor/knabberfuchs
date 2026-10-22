@@ -76,6 +76,7 @@ dependencies:
   image: ^4.9.1
   fl_chart: ^1.2.0
   flutter_file_dialog: ^3.3.1
+  connectivity_plus: ^7.3.2
 
 dev_dependencies:
   flutter_test:

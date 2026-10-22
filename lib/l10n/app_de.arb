@@ -143,6 +143,11 @@
   "settingsFoodData": "Lebensmitteldaten",
   "settingsOfflineRegions": "Offline-Regionen",
   "settingsOfflineRegionsSub": "Länder-Produktdatenbanken für die Offline-Suche herunterladen",
+  "settingsPackAutoUpdate": "Offline-Regionen automatisch aktualisieren",
+  "packAutoUpdateWifi": "Nur über WLAN",
+  "packAutoUpdateAny": "Über WLAN und mobile Daten",
+  "packAutoUpdateOff": "Aus",
+  "packAutoUpdateFootnote": "Sucht höchstens einmal täglich beim Öffnen der App nach neueren Produktdaten.",
 
   "settingsHealthConnect": "{store}",
   "settingsHealthSync": "Mit {store} synchronisieren",
@@ -439,7 +444,9 @@
   "regionTooltipDownload": "Herunterladen",
   "regionTooltipRemove": "Entfernen",
   "regionUpdate": "Aktualisieren",
+  "regionsAutoUpdated": "Offline-Daten aktualisiert: {regions}",
+  "regionUpdateAll": "{count, plural, =1{1 Region aktualisieren} other{{count} Regionen aktualisieren}}",
   "regionSubtitle": "{products}k Produkte · {size} Download",
-  "regionSubtitleInstalled": "{base} · installiert",
+  "regionSubtitleInstalled": "{base} · Stand {date}",
   "regionSubtitleUpdatable": "{base} · Update verfügbar"
 }
