@@ -1096,16 +1096,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get shareAsImage => 'Condividi immagine';
 
   @override
-  String get createFromText => 'Importa da testo';
+  String get createFromText => 'Incolla una ricetta o una lista';
 
   @override
-  String get createFromTextSub => 'Incolla una ricetta ricevuta';
+  String get createFromTextSub =>
+      'Dalla tua app di IA, da un sito o un codice ricetta';
 
   @override
-  String get importTextTitle => 'Incolla ricetta';
+  String get importTextTitle => 'Incolla una ricetta o una lista';
 
   @override
-  String get importTextHint => 'Codice ricetta…';
+  String get importTextHint => 'Una lista di ingredienti o un codice ricetta';
 
   @override
   String get shareAsText => 'Condividi come testo';
@@ -1187,6 +1188,27 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get ocrSetGrams => 'imposta g';
+
+  @override
+  String get capturePaste => 'Incolla dalla tua app di IA';
+
+  @override
+  String get capturePasteSub =>
+      'Una lista di ingredienti o un pasto — abbinati ai tuoi alimenti';
+
+  @override
+  String get pasteNothingFound => 'Nessun ingrediente trovato in questo testo.';
+
+  @override
+  String get importedMealName => 'Pasto importato';
+
+  @override
+  String ocrSuggestedFor(String amount, String name) {
+    return '$amount · suggerito per «$name»';
+  }
+
+  @override
+  String get ocrUseSuggestion => 'Usa';
 
   @override
   String kcalDotGrams(String kcal, String grams) {

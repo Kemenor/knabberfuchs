@@ -1965,25 +1965,25 @@ abstract class AppLocalizations {
   /// New-recipe sheet option: paste a recipe code received as text
   ///
   /// In en, this message translates to:
-  /// **'Import from text'**
+  /// **'Paste a recipe or list'**
   String get createFromText;
 
   /// Subtitle under the import-from-text option
   ///
   /// In en, this message translates to:
-  /// **'Paste a recipe you received'**
+  /// **'From your AI app, a website, or a recipe code'**
   String get createFromTextSub;
 
   /// Title of the paste-recipe dialog
   ///
   /// In en, this message translates to:
-  /// **'Paste recipe'**
+  /// **'Paste a recipe or list'**
   String get importTextTitle;
 
   /// Placeholder in the paste-recipe text field
   ///
   /// In en, this message translates to:
-  /// **'Recipe code…'**
+  /// **'An ingredient list, or a recipe code'**
   String get importTextHint;
 
   /// Button to share the recipe as encoded text
@@ -2087,6 +2087,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'set g'**
   String get ocrSetGrams;
+
+  /// Day capture menu: paste text from an AI app (ingredient list or meal)
+  ///
+  /// In en, this message translates to:
+  /// **'Paste from your AI app'**
+  String get capturePaste;
+
+  /// Subtitle of the paste-from-AI option in the capture menu
+  ///
+  /// In en, this message translates to:
+  /// **'An ingredient list or a meal — matched to your foods'**
+  String get capturePasteSub;
+
+  /// Snackbar when pasted/shared text contains no ingredient lines
+  ///
+  /// In en, this message translates to:
+  /// **'No ingredients found in that text.'**
+  String get pasteNothingFound;
+
+  /// Default name of a meal imported from pasted/shared text without a heading
+  ///
+  /// In en, this message translates to:
+  /// **'Imported meal'**
+  String get importedMealName;
+
+  /// Subtitle of a review row showing a best-guess food not yet confirmed: parsed amount and the original name
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} · suggested for \"{name}\"'**
+  String ocrSuggestedFor(String amount, String name);
+
+  /// Button on a review row to accept the suggested food (keep very short)
+  ///
+  /// In en, this message translates to:
+  /// **'Use'**
+  String get ocrUseSuggestion;
 
   /// One-line calories-and-grams summary
   ///

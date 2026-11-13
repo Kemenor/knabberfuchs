@@ -46,6 +46,14 @@
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
             </intent-filter>
+            <!-- Share target: text from another app (an AI app's ingredient
+                 list or meal, a website, a recipe code) — Share → Knabberfuchs
+                 opens the import review. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
         </activity>
 
         <!-- Health Connect permission rationale (Android 14+). -->

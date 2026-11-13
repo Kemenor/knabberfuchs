@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../core/share_intake.dart';
 import '../l10n/app_localizations.dart';
 import '../providers.dart';
 import 'day/day_screen.dart';
+import 'import/text_import.dart';
 import 'recipes/recipes_screen.dart';
 import 'settings/settings_screen.dart';
 import 'trends/trends_screen.dart';
@@ -14,11 +16,39 @@ import 'trends/trends_screen.dart';
 /// (toggled in Settings via [showTrendsProvider]). Day is always index 0 (the
 /// only programmatic jump target). Tabs keep their state (IndexedStack) so
 /// switching never resets scroll position or an in-progress search.
-class HomeShell extends ConsumerWidget {
+///
+/// It is also where text shared in from another app lands (Android share
+/// sheet → [ShareIntake]): on start and on every new share, the text goes to
+/// the Day tab's import review for the day on screen.
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeShell> createState() => _HomeShellState();
+}
+
+class _HomeShellState extends ConsumerState<HomeShell> {
+  @override
+  void initState() {
+    super.initState();
+    ShareIntake.listen(_takeShare);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _takeShare());
+  }
+
+  Future<void> _takeShare() async {
+    final text = await ShareIntake.take();
+    if (text == null || !mounted) return;
+    ref.read(homeTabProvider.notifier).set(HomeTab.day);
+    await handleImportedText(
+      context,
+      ref,
+      text,
+      day: ref.read(selectedDayProvider),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final showTrends = ref.watch(showTrendsProvider).asData?.value ?? true;
 

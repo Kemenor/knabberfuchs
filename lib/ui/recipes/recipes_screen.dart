@@ -4,10 +4,10 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../core/snackbar.dart';
-import '../../core/text_prompt_dialog.dart';
 import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import '../import/text_import.dart';
 import '../scan/scan_screen.dart';
 import 'ocr_meal_screen.dart';
 import 'recipe_detail_screen.dart';
@@ -50,22 +50,6 @@ class RecipesScreen extends ConsumerWidget {
         ),
       );
       if (text == null) return;
-      await applyImport(messenger, text);
-    }
-
-    Future<void> importFromText() async {
-      final messenger = ScaffoldMessenger.of(context);
-      final text = await showTextPromptDialog(
-        context,
-        title: l10n.importTextTitle,
-        confirmLabel: l10n.actionImport,
-        cancelLabel: l10n.actionCancel,
-        hintText: l10n.importTextHint,
-        minLines: 2,
-        maxLines: 5,
-        outlined: true,
-      );
-      if (text == null || text.trim().isEmpty) return;
       await applyImport(messenger, text);
     }
 
@@ -114,7 +98,9 @@ class RecipesScreen extends ConsumerWidget {
                 subtitle: Text(l10n.createFromTextSub),
                 onTap: () {
                   Navigator.pop(sheetCtx);
-                  importFromText();
+                  // A recipe code or an ingredient list (from an AI app, a
+                  // website) — the paste flow tells them apart.
+                  startPasteFlow(context, ref);
                 },
               ),
             ],

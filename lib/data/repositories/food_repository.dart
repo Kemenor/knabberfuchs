@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/enums.dart';
+import '../../domain/text_fold.dart';
 import '../db/database.dart';
 import '../offline/region_pack_store.dart';
 import '../sources/off_api.dart';
@@ -54,6 +55,51 @@ class FoodRepository {
     });
     return merged.take(50).toList();
   }
+
+  /// A best guess for an ingredient name nobody has matched yet ("kidney
+  /// beans, drained", "lean beef mince") — the review screen offers it, it is
+  /// never applied silently. Local search needs every word to match, so long
+  /// recipe names often find nothing as a whole; then the most specific words
+  /// are tried alone, longest first, skipping preparation words.
+  Future<Food?> suggestFor(String name) async {
+    final whole = await searchLocal(name);
+    if (whole.isNotEmpty) return whole.first;
+    final words =
+        name
+            .toLowerCase()
+            .split(RegExp(r"[^\p{L}\p{N}]+", unicode: true))
+            .where(
+              (w) => w.length >= 3 && !_prepWords.contains(foldDiacritics(w)),
+            )
+            .toSet()
+            .toList()
+          ..sort((a, b) => b.length.compareTo(a.length));
+    for (final w in words.take(3)) {
+      final hits = await searchLocal(w);
+      if (hits.isNotEmpty) return hits.first;
+    }
+    return null;
+  }
+
+  /// Words that describe preparation, not the food — useless on their own.
+  static const _prepWords = {
+    // en
+    'cooked', 'raw', 'fresh', 'chopped', 'diced', 'sliced', 'drained',
+    'grated', 'minced', 'lean', 'large', 'small', 'medium', 'boiled',
+    'fried', 'roasted', 'frozen', 'canned', 'dried', 'peeled', 'whole',
+    'and', 'with', 'the',
+    // de
+    'gekocht', 'gekochte', 'gekochter', 'roh', 'rohe', 'frisch', 'frische',
+    'gehackt', 'gehackte', 'gerieben', 'abgetropft', 'gross', 'grosse',
+    'klein', 'kleine', 'mager', 'magere', 'und', 'mit',
+    // fr
+    'cuit', 'cuite', 'cuits', 'cru', 'crue', 'frais', 'fraiche', 'hache',
+    'hachee', 'egoutte', 'rape', 'grand', 'petit', 'avec',
+    // it
+    'cotto', 'cotta', 'cotti', 'crudo', 'cruda', 'fresco', 'fresca',
+    'tritato', 'tritata', 'grattugiato', 'scolato', 'grande', 'piccolo',
+    'con',
+  };
 
   static int _sourceRank(FoodSource source) => switch (source) {
     FoodSource.custom => 0,

@@ -115,7 +115,9 @@ Future<bool> startDescribeMealFlow(
     return false;
   }
   navigator.push(
-    MaterialPageRoute(builder: (_) => OcrMealScreen(ingredients: items)),
+    MaterialPageRoute(
+      builder: (_) => OcrMealScreen(ingredients: items, day: day),
+    ),
   );
   // After the push, so it lands on the review screen the user is now looking
   // at rather than under the sheet they just left.

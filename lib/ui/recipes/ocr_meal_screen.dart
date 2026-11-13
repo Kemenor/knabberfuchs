@@ -22,8 +22,13 @@ import '../food/food_picker_screen.dart';
 import '../food/image_source_sheet.dart';
 
 /// Photograph or pick image(s) of an ingredient list, OCR them, and open the
-/// review screen. Shared by the day-screen capture menu and the recipes screen.
-Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
+/// review screen. Shared by the day-screen capture menu (which passes its
+/// [day], so "Log to day" logs there) and the recipes screen.
+Future<void> startOcrMealFlow(
+  BuildContext context,
+  WidgetRef ref, {
+  String? day,
+}) async {
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
   final l10n = AppLocalizations.of(context);
@@ -64,7 +69,9 @@ Future<void> startOcrMealFlow(BuildContext context, WidgetRef ref) async {
     return;
   }
   navigator.push(
-    MaterialPageRoute(builder: (_) => OcrMealScreen(ingredients: all)),
+    MaterialPageRoute(
+      builder: (_) => OcrMealScreen(ingredients: all, day: day),
+    ),
   );
 }
 
@@ -75,16 +82,37 @@ class _Item {
   final int id = _nextId++;
   final OcrIngredient parsed;
   Food? matched;
+
+  /// Best guess for a name never matched before — shown, never used until
+  /// the user confirms it (a wrong silent match would log wrong numbers).
+  Food? suggested;
   double? gramsOverride;
   _Item(this.parsed);
 }
 
-/// Review screen for a meal parsed from recipe screenshots. Each ingredient is
-/// a placeholder: swipe → to pick its food (keeping the parsed amount/unit),
-/// ← to remove. Then save as a recipe or log it to a day.
+/// Review screen for a meal parsed from recipe screenshots or pasted / shared
+/// text. Each ingredient is a placeholder: swipe → to pick its food (keeping
+/// the parsed amount/unit), ← to remove. Then save as a recipe or log it.
 class OcrMealScreen extends ConsumerStatefulWidget {
   final List<OcrIngredient> ingredients;
-  const OcrMealScreen({super.key, required this.ingredients});
+
+  /// The name the text gave itself (a heading), else the default meal name.
+  final String? initialName;
+
+  /// "Serves 4" from the text, else 1.
+  final double? initialServings;
+
+  /// Where "Log to day" logs — the Day screen's day on screen. Null (opened
+  /// from Recipes) asks for a day, starting at the day selected in Day.
+  final String? day;
+
+  const OcrMealScreen({
+    super.key,
+    required this.ingredients,
+    this.initialName,
+    this.initialServings,
+    this.day,
+  });
 
   @override
   ConsumerState<OcrMealScreen> createState() => _OcrMealScreenState();
@@ -96,7 +124,9 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
   // Servings for "Save as recipe" — askable at creation, not only when
   // re-editing the saved recipe afterwards (feedback 2026-07-06). Defaults to
   // 1: the scanned list is usually "what I ate", unlike the recipe editor's 2.
-  final _servings = TextEditingController(text: '1');
+  late final _servings = TextEditingController(
+    text: gramsStr(widget.initialServings ?? 1),
+  );
   bool _nameInit = false;
 
   @override
@@ -110,7 +140,8 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     super.didChangeDependencies();
     if (!_nameInit) {
       _nameInit = true;
-      _name.text = AppLocalizations.of(context).ocrDefaultMealName;
+      _name.text =
+          widget.initialName ?? AppLocalizations.of(context).ocrDefaultMealName;
     }
   }
 
@@ -121,14 +152,44 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     super.dispose();
   }
 
-  /// Pre-match ingredients whose name was matched to a food before.
+  /// Pre-match ingredients whose name was matched to a food before; for the
+  /// rest, look up a best guess to offer.
   Future<void> _autoMatch() async {
     final db = ref.read(dbProvider);
-    for (var i = 0; i < _items.length; i++) {
-      final food = await db.mappedFoodForOcr(
-        normalizeOcrName(_items[i].parsed.name),
-      );
-      if (food != null && mounted) setState(() => _items[i].matched = food);
+    final foods = ref.read(foodRepositoryProvider);
+    for (final it in List.of(_items)) {
+      final food = await db.mappedFoodForOcr(normalizeOcrName(it.parsed.name));
+      if (!mounted) return;
+      if (food != null) {
+        setState(() => it.matched = food);
+        continue;
+      }
+      final guess = await foods.suggestFor(it.parsed.name);
+      if (guess != null && mounted && it.matched == null) {
+        setState(() => it.suggested = guess);
+      }
+    }
+  }
+
+  /// Accept the suggestion: persisted and remembered like a manual match.
+  Future<void> _confirmSuggestion(_Item it) async {
+    final guess = it.suggested;
+    if (guess == null) return;
+    await _remember(it, guess);
+  }
+
+  Future<void> _remember(_Item it, Food food) async {
+    final persisted = await ref
+        .read(foodRepositoryProvider)
+        .ensurePersisted(food);
+    await ref
+        .read(dbProvider)
+        .setOcrMapping(normalizeOcrName(it.parsed.name), persisted.id);
+    if (mounted) {
+      setState(() {
+        it.matched = persisted;
+        it.suggested = null;
+      });
     }
   }
 
@@ -174,13 +235,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     );
     if (food == null || !mounted) return;
     // Persist + remember the mapping so this name auto-matches next time.
-    final persisted = await ref
-        .read(foodRepositoryProvider)
-        .ensurePersisted(food);
-    await ref
-        .read(dbProvider)
-        .setOcrMapping(normalizeOcrName(_items[i].parsed.name), persisted.id);
-    if (mounted) setState(() => _items[i].matched = persisted);
+    await _remember(_items[i], food);
   }
 
   Future<void> _addIngredient() async {
@@ -275,18 +330,23 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       messenger.showAutoSnackBar(SnackBar(content: Text(l10n.ocrNeedMatch)));
       return;
     }
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked == null || !mounted) return;
-    // Same double-tap guard as _saveRecipe: the sequential logSnapshot awaits
-    // keep the button live long enough to log the whole meal twice.
+    // The Day screen's day on screen; from Recipes, ask — starting at the day
+    // selected in Day, not always today.
+    var day = widget.day;
+    if (day == null) {
+      final picked = await showDatePicker(
+        context: context,
+        initialDate: DayKey.parse(ref.read(selectedDayProvider)),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2100),
+      );
+      if (picked == null || !mounted) return;
+      day = DayKey.of(picked);
+    }
+    // Same double-tap guard as _saveRecipe: the sequential log awaits keep the
+    // button live long enough to log the whole meal twice.
     if (_saving) return;
     setState(() => _saving = true);
-    final day = DayKey.of(picked);
     final dayLbl = dayLabel(context, day);
     final db = ref.read(dbProvider);
     final diary = ref.read(diaryRepositoryProvider);
@@ -294,23 +354,32 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
         (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
             .inferNow();
     try {
-      final gid = await db.createEntryGroup(
-        day,
-        _name.text.trim().isEmpty ? l10n.ocrDefaultMealName : _name.text.trim(),
-      );
+      // Like every other add: into the meal group that's active on that day,
+      // else a new one — named after this meal rather than the clock.
+      final gid = await ref
+          .read(activeGroupProvider.notifier)
+          .ensureGroup(
+            day,
+            name: _name.text.trim().isEmpty
+                ? l10n.ocrDefaultMealName
+                : _name.text.trim(),
+          );
       for (final it in ready) {
-        await diary.logSnapshot(
-          name: it.matched!.name,
-          kcal100: it.matched!.kcal100,
-          protein100: it.matched!.protein100,
-          carb100: it.matched!.carb100,
-          fat100: it.matched!.fat100,
+        // logFood keeps the food link, the tracked micros and the usage
+        // bump — the snapshot-only path dropped all three.
+        await diary.logFood(
+          food: it.matched!,
           grams: _grams(it)!,
           meal: meal,
           day: day,
           groupId: gid,
         );
       }
+      // Health sync is driven by the Day screen for the day it shows; a meal
+      // logged to another day would otherwise wait until that day is viewed.
+      await ref
+          .read(healthServiceProvider)
+          .maybeSyncDay(day, await db.watchDay(day).first);
       if (mounted) Navigator.of(context).pop();
       messenger.showAutoSnackBar(
         SnackBar(content: Text(l10n.loggedTo(dayLbl))),
@@ -464,37 +533,52 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
         return true;
       },
       onDismissed: (_) => setState(() => _items.removeAt(i)),
-      child: ListTile(
-        leading: Icon(
-          it.matched != null
-              ? Symbols.check_circle_rounded
-              : Symbols.help_rounded,
-          color: it.matched != null
-              ? theme.colorScheme.primary
-              : theme.disabledColor,
-        ),
-        title: Text(it.matched?.name ?? it.parsed.name),
-        subtitle: Text(
-          it.matched != null && it.matched!.name != it.parsed.name
-              ? l10n.ocrFromSource(amountLabel, it.parsed.name)
-              : it.matched == null
-              ? l10n.ocrPickHintSub(amountLabel)
-              : amountLabel,
-        ),
-        trailing: it.matched == null
-            ? null
-            : (n != null
-                  ? Text(
-                      l10n.kcalGrams(kcalStr(n.kcal), gramsStr(g!)),
-                      textAlign: TextAlign.right,
-                      style: theme.textTheme.bodySmall,
-                    )
-                  : TextButton(
-                      onPressed: () => _editGrams(i),
-                      child: Text(l10n.ocrSetGrams),
-                    )),
-        onTap: () => it.matched == null ? _match(i) : _editGrams(i),
-      ),
+      child: it.matched == null && it.suggested != null
+          // A best guess: named, offered, never counted until confirmed.
+          ? ListTile(
+              leading: Icon(
+                Symbols.lightbulb_rounded,
+                color: theme.colorScheme.secondary,
+              ),
+              title: Text(it.suggested!.name),
+              subtitle: Text(l10n.ocrSuggestedFor(amountLabel, it.parsed.name)),
+              trailing: TextButton(
+                onPressed: () => _confirmSuggestion(it),
+                child: Text(l10n.ocrUseSuggestion),
+              ),
+              onTap: () => _match(i),
+            )
+          : ListTile(
+              leading: Icon(
+                it.matched != null
+                    ? Symbols.check_circle_rounded
+                    : Symbols.help_rounded,
+                color: it.matched != null
+                    ? theme.colorScheme.primary
+                    : theme.disabledColor,
+              ),
+              title: Text(it.matched?.name ?? it.parsed.name),
+              subtitle: Text(
+                it.matched != null && it.matched!.name != it.parsed.name
+                    ? l10n.ocrFromSource(amountLabel, it.parsed.name)
+                    : it.matched == null
+                    ? l10n.ocrPickHintSub(amountLabel)
+                    : amountLabel,
+              ),
+              trailing: it.matched == null
+                  ? null
+                  : (n != null
+                        ? Text(
+                            l10n.kcalGrams(kcalStr(n.kcal), gramsStr(g!)),
+                            textAlign: TextAlign.right,
+                            style: theme.textTheme.bodySmall,
+                          )
+                        : TextButton(
+                            onPressed: () => _editGrams(i),
+                            child: Text(l10n.ocrSetGrams),
+                          )),
+              onTap: () => it.matched == null ? _match(i) : _editGrams(i),
+            ),
     );
   }
 }

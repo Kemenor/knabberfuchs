@@ -201,6 +201,13 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   (Save-as-recipe / Log-to-day). Use this only when both actions are primary; a
   single primary action stays a FAB (§2).
 
+- **Suggested match (review rows):** a best-guess food for a name never matched
+  before is *offered, never applied*: `Symbols.lightbulb_rounded` in
+  `colorScheme.secondary`, the suggested food as the title, "{amount} · suggested
+  for "{name}"" as the subtitle, and a short `TextButton` ("Use") as the trailing
+  action; tapping the row still opens the picker. Only a confirmed row counts
+  toward saving/logging. Live: `ocr_meal_screen.dart` (`_row`).
+
 ---
 
 ## 6. Forms & inputs
@@ -412,6 +419,8 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   (save / finish meal), `Symbols.bolt_rounded` (quick-add/capture),
   `Symbols.event_available_rounded` (log a portion),
   `Symbols.document_scanner_rounded` (OCR-from-list),
+  `Symbols.content_paste_rounded` (paste a recipe / list from another app),
+  `Symbols.lightbulb_rounded` (a suggested, unconfirmed match),
   `Symbols.more_vert_rounded` (size 20, the only overflow icon).
 - `Symbols.auto_awesome_rounded` (14px, `colorScheme.outline`) marks
   **AI-sourced data** (`quick_add_sheet.dart:222-227`).

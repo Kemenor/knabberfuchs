@@ -274,9 +274,11 @@ class ActiveGroupNotifier extends Notifier<int?> {
     return _now().millisecondsSinceEpoch - at > timeout.inMilliseconds;
   }
 
-  /// Active group for [day], creating a time-named one if none is active (or it
-  /// expired / belongs to another day). Returns the group id to log into.
-  Future<int> ensureGroup(String day) async {
+  /// Active group for [day], creating one if none is active (or it expired /
+  /// belongs to another day) — named [name] when given (an imported meal's
+  /// own name), else after the meal and the clock. Returns the group id to
+  /// log into.
+  Future<int> ensureGroup(String day, {String? name}) async {
     final current = state;
     if (current != null && !(await _expired())) {
       final g = await _db.entryGroupById(current);
@@ -285,6 +287,13 @@ class ActiveGroupNotifier extends Notifier<int?> {
         return current;
       }
     }
+    final id = await _db.createEntryGroup(day, name ?? await _autoName());
+    await _setActive(id);
+    return id;
+  }
+
+  /// "Lunch 12:30" — the meal by the clock, in the active UI language.
+  Future<String> _autoName() async {
     final now = _now();
     final settings = {
       for (final s in await _db.watchAllSettings().first) s.key: s.value,
@@ -295,12 +304,8 @@ class ActiveGroupNotifier extends Notifier<int?> {
     final locale = resolveUiLocale(settings['appLocale']);
     // jm follows the locale's clock ("1:05 PM" en, "13:05" de/fr/it) instead
     // of forcing 24 h on everyone.
-    final name =
-        '${mealTypeTitle(mt.inferAt(now), locale)} '
+    return '${mealTypeTitle(mt.inferAt(now), locale)} '
         '${DateFormat.jm(locale).format(now)}';
-    final id = await _db.createEntryGroup(day, name);
-    await _setActive(id);
-    return id;
   }
 
   Future<void> reopen(int groupId) => _setActive(groupId);

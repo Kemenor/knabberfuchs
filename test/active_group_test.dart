@@ -64,6 +64,16 @@ void main() {
     },
   );
 
+  test('a new group can take a given name (an imported meal)', () async {
+    final n = container.read(activeGroupProvider.notifier);
+    final id = await n.ensureGroup('2026-06-17', name: 'Chili con carne');
+    expect((await db.entryGroupById(id))!.name, 'Chili con carne');
+    // An already-active group on that day is reused as is — the name only
+    // applies to a group created now.
+    expect(await n.ensureGroup('2026-06-17', name: 'Other'), id);
+    expect((await db.entryGroupById(id))!.name, 'Chili con carne');
+  });
+
   test('an expired group is not reused; a fresh one is created', () async {
     final n = container.read(activeGroupProvider.notifier);
     final id = await n.ensureGroup('2026-06-17');

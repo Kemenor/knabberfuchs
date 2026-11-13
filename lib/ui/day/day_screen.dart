@@ -23,6 +23,7 @@ import '../food/describe_meal_flow.dart';
 import '../food/log_food_sheet.dart';
 import '../food/quick_add_sheet.dart';
 import '../food/recognize_food_flow.dart';
+import '../import/text_import.dart';
 import '../recipes/ocr_meal_screen.dart';
 import 'meal_detail_screen.dart';
 import 'merge_meal_sheet.dart';
@@ -177,7 +178,16 @@ class _DayScreenState extends ConsumerState<DayScreen>
               subtitle: Text(l10n.createFromListSub),
               onTap: () {
                 Navigator.pop(sheetCtx);
-                startOcrMealFlow(context, ref);
+                startOcrMealFlow(context, ref, day: day);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Symbols.content_paste_rounded),
+              title: Text(l10n.capturePaste),
+              subtitle: Text(l10n.capturePasteSub),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                startPasteFlow(context, ref, day: day);
               },
             ),
           ],
