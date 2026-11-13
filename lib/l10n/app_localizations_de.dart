@@ -724,34 +724,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get quickAddMacros => 'Makros hinzufügen (optional)';
 
   @override
-  String get recognizeTooltip => 'Per Foto erkennen';
-
-  @override
   String get recognizeTakePhoto => 'Foto aufnehmen';
-
-  @override
-  String get recognizeGeminiNudge =>
-      'KI-Schätzungen für Fotos und Beschreibungen sind optional und ausgeschaltet. Du kannst sie in den Einstellungen einrichten.';
-
-  @override
-  String get recognizeKeyMissingTitle => 'KI-Scan aktivieren';
-
-  @override
-  String get recognizeKeyMissingBody =>
-      'KI-Schätzungen für Mahlzeiten sind optional und derzeit aus. Richte sie in den Einstellungen unter „KI-Erkennung“ ein – sie nutzen Google Gemini mit einem Schlüssel aus deinem eigenen Google-Konto.';
-
-  @override
-  String get actionGoToSettings => 'Zu den Einstellungen';
-
-  @override
-  String get dayCaptureTooltip => 'Per Foto hinzufügen';
-
-  @override
-  String get captureScanAi => 'Mahlzeit mit KI scannen';
-
-  @override
-  String get captureScanAiSub =>
-      'Fotografiere ein Gericht — wir schätzen es und die Kalorien';
 
   @override
   String get foodFormTitle => 'Neues Lebensmittel';
@@ -769,104 +742,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsAi => 'KI-Erkennung';
-
-  @override
-  String get aiKeyDesc =>
-      'Füge einen Google-Gemini-API-Schlüssel hinzu, um KI-Schätzungen aus einem Foto oder einer getippten Beschreibung freizuschalten. Fotos und Beschreibungen werden dann an Google gesendet. Geminis kostenloser Tarif reicht für den privaten Gebrauch; wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen. Im kostenlosen Tarif kann Google deine Daten zur Verbesserung seiner Modelle verwenden – außer im EWR, in der Schweiz und im Vereinigten Königreich, wo auch für die kostenlose Nutzung Googles Datenbedingungen für kostenpflichtige Dienste gelten.';
-
-  @override
-  String get aiKeyLabel => 'Gemini-API-Schlüssel';
-
-  @override
-  String get aiKeyGet => 'API-Schlüssel holen';
-
-  @override
-  String get aiKeyTest => 'Schlüssel testen';
-
-  @override
-  String get aiKeyTesting => 'Wird geprüft …';
-
-  @override
-  String get aiKeyTestOk => 'Der Schlüssel funktioniert.';
-
-  @override
-  String get aiModelLabel => 'KI-Modell';
-
-  @override
-  String get aiModelReliable => 'Gemini 2.5 Flash — zuverlässig';
-
-  @override
-  String get aiModelAccurate => 'Gemini 3.5 Flash — schärfer, oft ausgelastet';
-
-  @override
-  String get aiModelNote =>
-      'Ist dein Modell nicht verfügbar oder ausgelastet, wird 2.5 Flash versucht.';
-
-  @override
-  String get aiGateSummary =>
-      'Optional: Mahlzeiten aus einem Foto oder einer getippten Beschreibung mit Google Gemini schätzen. Standardmäßig aus – läuft über einen Gemini-API-Schlüssel aus deinem eigenen Google-Konto, nicht über unseren.';
-
-  @override
-  String get aiGateAction => 'KI-Schätzungen einrichten';
-
-  @override
-  String get aiConsentTitle => 'Bevor du das einschaltest';
-
-  @override
-  String get aiConsentPhoto =>
-      'Dein Mahlzeitenfoto bzw. die getippte Beschreibung wird an Google gesendet. Vor dem Hinterlegen eines Schlüssels wird nichts gesendet.';
-
-  @override
-  String get aiConsentOwnKey =>
-      'Es läuft über einen Google-Gemini-API-Schlüssel, den du in deinem eigenen Google-Konto anlegst. Das ist ein Entwicklerschlüssel – Google bietet die API zum Entwickeln an, nicht als Verbraucherdienst.';
-
-  @override
-  String get aiConsentDataUse =>
-      'Im kostenlosen Tarif kann Google das Gesendete zur Verbesserung seiner Modelle nutzen. Im EWR, in der Schweiz und im Vereinigten Königreich gelten stattdessen Googles Datenbedingungen für kostenpflichtige Dienste – dort tut es das nicht.';
-
-  @override
-  String get aiConsentBilling =>
-      'Für den privaten Gebrauch reicht der kostenlose Tarif. Wenn du in deinem Google-Konto die Abrechnung aktiviert hast, kann intensive Nutzung Kosten verursachen.';
-
-  @override
-  String get aiConsentLocal =>
-      'Sonst ändert sich nichts: Tagebuch, Fotos und Ziele bleiben auf diesem Handy.';
-
-  @override
-  String get aiConsentCheck =>
-      'Mir ist klar, dass meine Mahlzeitenfotos an Google gesendet werden.';
-
-  @override
-  String get aiConsentAccept => 'KI-Schätzungen aktivieren';
-
-  @override
-  String get aiTurnOff => 'KI-Schätzungen ausschalten';
-
-  @override
-  String get aiTurnOffTitle => 'KI-Schätzungen ausschalten?';
-
-  @override
-  String get aiTurnOffConfirm =>
-      'Damit wird dein API-Schlüssel von diesem Handy gelöscht und die KI-Einstellungen werden wieder ausgeblendet. Deine erfassten Mahlzeiten bleiben unverändert.';
-
-  @override
-  String get aiTurnedOff =>
-      'KI-Schätzungen ausgeschaltet, API-Schlüssel gelöscht.';
-
-  @override
-  String get recognizeByGemini => 'Von Gemini geschätzt';
-
-  @override
-  String get geminiHintTitle => 'Mahlzeit beschreiben (optional)';
-
-  @override
-  String get geminiHintLabel => 'Hinweis hinzufügen';
-
-  @override
-  String get geminiHintExample => 'z. B. hausgemachte Lasagne, große Portion';
-
-  @override
-  String get geminiHintEstimate => 'Schätzen';
 
   @override
   String get a11yPreviousPeriod => 'Vorheriger Zeitraum';
@@ -916,88 +791,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get geminiProblemTitle => 'KI-Schätzung nicht möglich';
-
-  @override
-  String get geminiErrorInvalidKey =>
-      'Google lehnt diesen API-Schlüssel ab. Prüfe ihn unter Einstellungen → KI-Erkennung oder füge einen neuen aus Google AI Studio ein.';
-
-  @override
-  String get geminiErrorNoAccess =>
-      'Dieser API-Schlüssel darf Gemini nicht nutzen. Womöglich ist im zugehörigen Google-Cloud-Projekt die Generative Language API nicht aktiviert, oder der Schlüssel ist eingeschränkt.';
-
-  @override
-  String get geminiErrorModelUnavailable =>
-      'Dein Schlüssel erreicht dieses KI-Modell nicht. Wähle unter Einstellungen → KI-Erkennung das andere Modell.';
-
-  @override
-  String get geminiErrorQuota =>
-      'Dein Gemini-Kontingent ist vorerst aufgebraucht. Versuche es später noch einmal oder prüfe deine Nutzung in Google AI Studio.';
-
-  @override
-  String get geminiErrorBusy =>
-      'Gemini ist gerade ausgelastet – füge die Mahlzeit manuell hinzu oder versuche es gleich noch einmal.';
-
-  @override
-  String get geminiErrorNetwork =>
-      'Keine Verbindung zu Google. Prüfe deine Internetverbindung und versuche es erneut.';
-
-  @override
-  String get geminiErrorNotFood => 'Gemini hat hier kein Essen erkannt.';
-
-  @override
-  String get geminiErrorUnknown =>
-      'Gemini hat etwas Unerwartetes zurückgegeben. Füge die Mahlzeit stattdessen manuell hinzu.';
-
-  @override
   String get actionContinueManually => 'Manuell weiter';
-
-  @override
-  String get captureDescribe => 'Mahlzeit beschreiben';
-
-  @override
-  String get captureDescribeSub =>
-      'Tippe, was du gegessen hast – wir schätzen es';
-
-  @override
-  String get describeMealTitle => 'Mahlzeit beschreiben';
-
-  @override
-  String get describeMealLabel => 'Was hast du gegessen?';
-
-  @override
-  String get describeMealExample =>
-      'z. B. 2 Scheiben Roggenbrot, Butter 10 g, 1 Apfel';
-
-  @override
-  String get describeMealNoLines =>
-      'Keine Zutaten erkannt – schreibe ein Lebensmittel pro Zeile, am besten mit Menge (z. B. \"Reis 150 g\").';
-
-  @override
-  String get geminiThinking1 => 'Gemini wird nach Kalorien gefragt…';
-
-  @override
-  String get geminiThinking2 => 'Kalorien werden aus deinem Foto geschätzt…';
-
-  @override
-  String get geminiThinking3 => 'Gericht wird erkannt…';
-
-  @override
-  String get geminiThinking4 => 'Portionsgröße wird ermittelt…';
-
-  @override
-  String get geminiThinking5 => 'Teller wird gelesen…';
-
-  @override
-  String get geminiThinking6 => 'Zahlen werden berechnet…';
-
-  @override
-  String get geminiSlow => 'Gemini ist etwas ausgelastet – einen Moment…';
-
-  @override
-  String geminiRetrying(int n) {
-    return 'Server ausgelastet – neuer Versuch (Versuch $n)…';
-  }
 
   @override
   String get scanBarcode => 'Barcode scannen';
@@ -1209,6 +1003,62 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ocrUseSuggestion => 'Nehmen';
+
+  @override
+  String get aiHelperTitle => 'KI-Helfer';
+
+  @override
+  String get aiHelperSettingsSub =>
+      'Nutze deine eigene KI-App – ganz ohne Schlüssel';
+
+  @override
+  String get aiHelperIntro =>
+      'Knabberfuchs spricht mit keiner KI. Das übernimmt deine eigene KI-App – Claude, ChatGPT, Gemini …: Gib ihr einmal diese Anleitung, dann holst du ihre Antworten mit Teilen → Knabberfuchs oder «Aus deiner KI-App einfügen» zurück.';
+
+  @override
+  String get aiInstructionsSection => 'Anleitung für deine KI-App';
+
+  @override
+  String get aiTaskLogTitle => 'Festhalten, was ich gegessen habe';
+
+  @override
+  String get aiTaskLogSub =>
+      'Beschreibe eine Mahlzeit oder schick ein Foto – zurück kommt ein Block zum Erfassen';
+
+  @override
+  String get aiTaskRecipeTitle => 'Ein Rezept anpassen';
+
+  @override
+  String get aiTaskRecipeSub =>
+      'Ein Rezept auf deine Ziele zuschneiden – zurück kommt die Zutatenliste';
+
+  @override
+  String get aiCopy => 'Kopieren';
+
+  @override
+  String get aiCopied => 'Anleitung kopiert – füge sie in deine KI-App ein.';
+
+  @override
+  String get aiHowTo =>
+      'Füge sie einmal in ein Claude-Projekt, die benutzerdefinierten Anweisungen von ChatGPT oder ein Gem ein – sie enthalten deine aktuellen Ziele. Kopiere sie neu, wenn du deine Ziele änderst.';
+
+  @override
+  String get aiSummarySection => 'Zusammenfassung teilen';
+
+  @override
+  String get aiSummarySub =>
+      'Deine letzten Tage als Text – damit deine KI-App nach Mustern suchen kann.';
+
+  @override
+  String get aiSummary7 => 'Letzte 7 Tage';
+
+  @override
+  String get aiSummary30 => 'Letzte 30 Tage';
+
+  @override
+  String ocrEstimated(String amount) {
+    return '$amount · geschätzt von deiner KI';
+  }
 
   @override
   String kcalDotGrams(String kcal, String grams) {

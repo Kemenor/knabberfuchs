@@ -46,7 +46,7 @@
 <header>
   <img class="logo" src="favicon.png" alt="Knabberfuchs" />
   <h1>Datenschutzerklärung</h1>
-  <p class="meta">Knabberfuchs 🦊 &middot; zuletzt aktualisiert am 6. Juli 2026</p>
+  <p class="meta">Knabberfuchs 🦊 &middot; zuletzt aktualisiert am 13. November 2026</p>
   <p class="langs"><a href="privacy.html">EN</a> &middot; <strong>DE</strong> &middot; <a href="privacy-fr.html">FR</a> &middot; <a href="privacy-it.html">IT</a></p>
 </header>
 
@@ -91,11 +91,6 @@
       <td>Open Food Facts (<span class="muted">world.openfoodfacts.org</span>)</td>
     </tr>
     <tr>
-      <td>KI-Mahlzeitenschätzung <strong>(optional)</strong></td>
-      <td>Das aufgenommene Foto der Mahlzeit und/oder die von dir eingetippte Beschreibung der Mahlzeit — <em>nur</em> wenn du deinen eigenen Google-Gemini-API-Schlüssel hinzugefügt hast</td>
-      <td>Google (<span class="muted">generativelanguage.googleapis.com</span>)</td>
-    </tr>
-    <tr>
       <td>Download der Offline-Datenbank</td>
       <td>Eine normale Datei-Download-Anfrage für die von dir gewählte Länderdatenbank</td>
       <td>Hugging Face (<span class="muted">huggingface.co</span>)</td>
@@ -107,21 +102,15 @@
     </tr>
   </table>
 
-  <h3>KI-Schätzungen sind standardmäßig aus</h3>
-  <p>Die Funktionen „Mahlzeit mit KI scannen“ und „Mahlzeit beschreiben“ funktionieren erst, nachdem
-    du in den Einstellungen persönlich einen Google-Gemini-API-Schlüssel eingegeben hast. Ohne
-    Schlüssel wird nie etwas an Google gesendet — die App erklärt dir lediglich, wie du die Funktion
-    aktivierst.</p>
-
-  <h3>Wenn du deinen eigenen Gemini-Schlüssel verwendest</h3>
-  <p>Wenn aktiviert, wird das Mahlzeitenfoto (zusammen mit dem optionalen kurzen Hinweistext, den du
-    zur Beschreibung der Mahlzeit eingeben kannst, z.&nbsp;B. „selbstgemachte Calzone“) oder die von
-    dir eingetippte Beschreibung der Mahlzeit an Googles Gemini-API gesendet, um das Gericht und seine
-    Kalorien zu schätzen. Diese Anfrage unterliegt
-    <a href="https://policies.google.com/privacy">Googles Datenschutzerklärung</a> und den Bedingungen
-    von Google AI Studio / der Gemini-API. Je nach deinem Google-Konto und -Tarif kann Google an die
-    kostenlose Stufe gesendete Daten zur Verbesserung seiner Dienste verwenden. Dies ist deine
-    Entscheidung; die App funktioniert auch vollständig ohne sie.</p>
+  <h3>Kein KI-Dienst — nur deine eigene KI-App, wenn du willst</h3>
+  <p>Die App sendet keine Daten an einen KI-Dienst und speichert keinen API-Schlüssel (ein von einer
+    früheren Version gespeicherter Gemini-Schlüssel wird beim Update von deinem Gerät gelöscht). Der
+    optionale KI-Helfer gibt dir lediglich eine Anleitung zum Kopieren in deine eigene KI-App (zum
+    Beispiel Claude, ChatGPT oder die Gemini-App) und kann eine Textzusammenfassung deiner letzten
+    Tage erstellen, die du teilen kannst. Wenn du Text mit deiner eigenen KI-App teilst oder ihre
+    Antwort in Knabberfuchs einfügst bzw. dorthin teilst, geschieht das über deine eigenen Apps und
+    unterliegt deren Bedingungen und Datenschutzerklärungen. Knabberfuchs erhält nur, was du selbst
+    einfügst oder teilst, und verarbeitet es auf deinem Gerät.</p>
 
   <h2>4. Apple Health &amp; Health Connect (optional)</h2>
   <p>Wenn du es aktivierst, kann die App deine erfassten Kalorien und Makronährstoffe in den

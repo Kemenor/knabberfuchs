@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/snackbar.dart';
 import '../../core/text_prompt_dialog.dart';
+import '../../domain/ai_block.dart';
 import '../../domain/ocr_ingredient.dart';
 import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
@@ -38,6 +39,24 @@ Future<void> handleImportedText(
     await ref.read(recipeRepositoryProvider).importShare(recipe);
     messenger.showAutoSnackBar(
       SnackBar(content: Text(l10n.recipeImported(recipe.name))),
+    );
+    return;
+  }
+
+  // The structured answer an AI app gives when it follows the copied
+  // instructions — items may carry their own estimates.
+  final block = findAiBlock(trimmed);
+  if (block != null && block.items.isNotEmpty) {
+    navigator.push(
+      MaterialPageRoute(
+        builder: (_) => OcrMealScreen(
+          ingredients: block.items,
+          initialName: block.name ?? l10n.importedMealName,
+          initialServings: block.servings,
+          day: block.day ?? day,
+          meal: block.meal,
+        ),
+      ),
     );
     return;
   }

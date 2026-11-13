@@ -5,6 +5,7 @@ import '../domain/enums.dart';
 import '../domain/meal_type_i18n.dart';
 import '../domain/nutrition.dart';
 import 'db/database.dart';
+import 'legacy_gemini_cleanup.dart';
 
 /// Backup schema version, carried in the manifest so future versions can
 /// migrate an older export on import. v2 adds entryGroups + entry.groupId and
@@ -31,13 +32,13 @@ class BackupVersionException extends FormatException {
       );
 }
 
-/// Settings keys that ever held credentials. The Gemini API key now lives in
-/// the platform keystore (see `GeminiKeyStore`), so current exports never see
-/// it — but pre-migration devices and old backup files still can. The backup
-/// ZIP is unencrypted and goes through the share sheet, so these are stripped
-/// from the export, never imported, and left untouched on-device by a
-/// restore.
-const _credentialSettingKeys = {'geminiApiKey'};
+/// Settings keys never carried by a backup: the retired Gemini integration's
+/// (its API key — a credential that old devices and old backup files may
+/// still hold — the model choice and the consent record). The backup ZIP is
+/// unencrypted and goes through the share sheet, so these are stripped from
+/// the export, never imported, and left untouched on-device by a restore
+/// (startup deletes them, see `removeLegacyGeminiData`).
+const _credentialSettingKeys = legacyGeminiSettingKeys;
 
 int _ms(DateTime d) => d.millisecondsSinceEpoch;
 DateTime _dt(Object? v) =>

@@ -6,7 +6,7 @@ COSA PUOI FARE
 • Scansiona i codici a barre – valori nutrizionali immediati da Open Food Facts. Non è nel database? Aggiungilo tu stesso scansionando l'etichetta: sarà salvato per la prossima volta.
 • Cerca veloce, offline – Open Food Facts più la curata Banca dati svizzera dei valori nutritivi, insieme ai tuoi alimenti personali.
 • Aggiunta rapida – conosci già il numero? Registra «Lasagne · 816 kcal» con pochi tocchi.
-• Fotografa un pasto – una stima IA facoltativa di piatto, porzione e macro. Disattivata di default e non integrata: funziona con una chiave API Google Gemini che fornisci tu, e la foto viene inviata solo dopo che ne hai aggiunta una.
+• Con la tua app di IA – nessuna chiave, nessuna IA integrata. Copia le istruzioni in Claude, ChatGPT, Gemini o simili, poi condividi la sua risposta con Knabberfuchs o incollala (funzionano anche gli elenchi di ingredienti dai siti web). Gli ingredienti vengono abbinati ai tuoi alimenti e tu controlli prima di salvare. L'app in sé non invia nulla a un'IA.
 • Un pasto da una foto – fotografa un elenco di ingredienti stampato; il riconoscimento del testo sul dispositivo lo trasforma in un pasto.
 • Ricette – crea una ricetta una volta, poi registra una porzione in qualsiasi giorno; viene scomposta nei suoi veri ingredienti. Condividi con QR code o immagine, importa con QR o testo.
 • Giorno per giorno – i pasti si raggruppano automaticamente, con totale e macro in tempo reale.
@@ -19,7 +19,7 @@ MULTILINGUA
 Disponibile in inglese, tedesco, francese e italiano.
 
 PRIVACY FIN DALLA PROGETTAZIONE
-Nessun account, nessuna analisi, nessuna pubblicità, nessun tracker. Non gestiamo alcun server e non vediamo mai i tuoi dati. I codici a barre e le ricerche online vengono consultati su Open Food Facts; la stima IA facoltativa invia quella foto del pasto a Google, e solo se hai aggiunto la tua chiave. Tutto il resto rimane sul telefono.
+Nessun account, nessuna analisi, nessuna pubblicità, nessun tracker. Non gestiamo alcun server e non vediamo mai i tuoi dati. I codici a barre e le ricerche online vengono consultati su Open Food Facts; l'app non contatta alcun servizio di IA e non memorizza alcuna chiave API. Tutto il resto rimane sul telefono.
 
 Dati alimentari: Open Food Facts (ODbL) e la Banca dati svizzera dei valori nutritivi (USAV).
 

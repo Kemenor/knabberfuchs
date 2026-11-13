@@ -19,10 +19,8 @@ import '../../domain/recipe_share.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../add/add_food_screen.dart';
-import '../food/describe_meal_flow.dart';
 import '../food/log_food_sheet.dart';
 import '../food/quick_add_sheet.dart';
-import '../food/recognize_food_flow.dart';
 import '../import/text_import.dart';
 import '../recipes/ocr_meal_screen.dart';
 import 'meal_detail_screen.dart';
@@ -134,8 +132,8 @@ class _DayScreenState extends ConsumerState<DayScreen>
     );
   }
 
-  /// Capture menu: quick add, AI photo scan, typed meal description, or an
-  /// ingredient-list OCR.
+  /// Capture menu: quick add, paste from your AI app (a meal it estimated or
+  /// an ingredient list — PLAN "AI bridge"), or an ingredient-list OCR.
   void _showCaptureMenu(BuildContext context, WidgetRef ref, String day) {
     final l10n = AppLocalizations.of(context);
     showModalBottomSheet<void>(
@@ -155,21 +153,12 @@ class _DayScreenState extends ConsumerState<DayScreen>
               },
             ),
             ListTile(
-              leading: const Icon(Symbols.center_focus_weak_rounded),
-              title: Text(l10n.captureScanAi),
-              subtitle: Text(l10n.captureScanAiSub),
+              leading: const Icon(Symbols.content_paste_rounded),
+              title: Text(l10n.capturePaste),
+              subtitle: Text(l10n.capturePasteSub),
               onTap: () {
                 Navigator.pop(sheetCtx);
-                recognizeFoodByDay(context, ref, day);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Symbols.edit_note_rounded),
-              title: Text(l10n.captureDescribe),
-              subtitle: Text(l10n.captureDescribeSub),
-              onTap: () {
-                Navigator.pop(sheetCtx);
-                startDescribeMealFlow(context, ref, day: day);
+                startPasteFlow(context, ref, day: day);
               },
             ),
             ListTile(
@@ -179,15 +168,6 @@ class _DayScreenState extends ConsumerState<DayScreen>
               onTap: () {
                 Navigator.pop(sheetCtx);
                 startOcrMealFlow(context, ref, day: day);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Symbols.content_paste_rounded),
-              title: Text(l10n.capturePaste),
-              subtitle: Text(l10n.capturePasteSub),
-              onTap: () {
-                Navigator.pop(sheetCtx);
-                startPasteFlow(context, ref, day: day);
               },
             ),
           ],
@@ -224,23 +204,6 @@ void addFoodByDay(BuildContext context, WidgetRef ref, String day) {
             ref.read(activeGroupProvider.notifier).ensureGroup(day),
       ),
     ),
-  );
-}
-
-/// AI photo recognition that logs into [day]'s active (or new) meal group.
-Future<void> recognizeFoodByDay(
-  BuildContext context,
-  WidgetRef ref,
-  String day,
-) async {
-  final meal = (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
-      .inferNow();
-  await startRecognizeFoodFlow(
-    context,
-    ref,
-    day: day,
-    meal: meal,
-    resolveGroup: () => ref.read(activeGroupProvider.notifier).ensureGroup(day),
   );
 }
 

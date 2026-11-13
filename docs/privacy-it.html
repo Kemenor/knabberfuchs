@@ -46,7 +46,7 @@
 <header>
   <img class="logo" src="favicon.png" alt="Knabberfuchs" />
   <h1>Informativa sulla privacy</h1>
-  <p class="meta">Knabberfuchs 🦊 &middot; ultimo aggiornamento 6 luglio 2026</p>
+  <p class="meta">Knabberfuchs 🦊 &middot; ultimo aggiornamento 13 novembre 2026</p>
   <p class="langs"><a href="privacy.html">EN</a> &middot; <a href="privacy-de.html">DE</a> &middot; <a href="privacy-fr.html">FR</a> &middot; <strong>IT</strong></p>
 </header>
 
@@ -90,11 +90,6 @@
       <td>Open Food Facts (<span class="muted">world.openfoodfacts.org</span>)</td>
     </tr>
     <tr>
-      <td>Stima del pasto con IA <strong>(facoltativo)</strong></td>
-      <td>La foto del pasto che hai scattato e/o la descrizione del pasto che hai digitato — <em>solo</em> se hai aggiunto la tua chiave API di Google&nbsp;Gemini</td>
-      <td>Google (<span class="muted">generativelanguage.googleapis.com</span>)</td>
-    </tr>
-    <tr>
       <td>Download del database offline</td>
       <td>Una normale richiesta di download del file per il database nazionale che hai scelto</td>
       <td>Hugging Face (<span class="muted">huggingface.co</span>)</td>
@@ -106,18 +101,15 @@
     </tr>
   </table>
 
-  <h3>Le stime con IA sono disattivate per impostazione predefinita</h3>
-  <p>Le funzioni «scansiona un pasto con l'IA» e «descrivi un pasto» funzionano solo dopo che hai
-    inserito personalmente una chiave API di Google Gemini nelle Impostazioni. Senza chiave non viene
-    mai inviato nulla a Google — l'app si limita a spiegarti come attivare la funzione.</p>
-
-  <h3>Se usi la tua chiave Gemini</h3>
-  <p>Quando è attiva, la foto del pasto (insieme al breve suggerimento facoltativo che puoi digitare,
-    ad es. «calzone fatto in casa») o la descrizione del pasto che hai digitato viene inviata all'API
-    Gemini di Google per stimare il piatto e le sue calorie. Quella richiesta è regolata dall'<a href="https://policies.google.com/privacy">informativa
-    sulla privacy di Google</a> e dai termini di Google AI Studio / dell'API Gemini. A seconda del tuo
-    account e piano Google, Google potrebbe usare i dati inviati al livello gratuito per migliorare i
-    propri servizi. È una tua scelta; l'app funziona pienamente senza.</p>
+  <h3>Nessun servizio di IA — solo la tua app di IA, se lo desideri</h3>
+  <p>L'app non invia alcun dato a un servizio di IA e non memorizza alcuna chiave API (una chiave
+    Gemini salvata da una versione precedente viene eliminata dal tuo dispositivo con l'aggiornamento).
+    L'assistente IA facoltativo ti fornisce solo istruzioni da copiare nella tua app di IA (ad esempio
+    Claude, ChatGPT o l'app Gemini) e può creare un riepilogo testuale dei tuoi ultimi giorni da
+    condividere. Se condividi del testo con la tua app di IA, oppure incolli o condividi la sua
+    risposta in Knabberfuchs, ciò avviene tramite le tue app ed è regolato dai loro termini e dalle
+    loro informative sulla privacy. Knabberfuchs riceve solo ciò che incolli o condividi al suo
+    interno, e lo elabora sul tuo dispositivo.</p>
 
   <h2>4. Apple Salute e Health Connect (facoltativo)</h2>
   <p>Se la attivi, l'app può scrivere le calorie e i macronutrienti registrati nell'archivio salute del

@@ -1,3 +1,4 @@
+import 'nutrition.dart';
 import 'text_fold.dart';
 import 'units.dart';
 
@@ -12,11 +13,17 @@ class OcrIngredient {
   final AmountUnit? unit;
   final String rawUnit;
 
+  /// An AI app's nutrition estimate for this amount (totals, not per 100 g) —
+  /// usable without matching a food, marked as estimated. Null for lines that
+  /// must be matched (OCR, plain lists).
+  final Nutrition? estimate;
+
   const OcrIngredient({
     required this.name,
     required this.amount,
     required this.unit,
     required this.rawUnit,
+    this.estimate,
   });
 
   bool get isCount => unit == null;

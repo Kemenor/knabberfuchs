@@ -10,6 +10,7 @@ import '../../core/format.dart';
 import '../../core/snackbar.dart';
 import '../../core/text_prompt_dialog.dart';
 import '../../data/db/database.dart';
+import '../../domain/enums.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/day_summary.dart' show snapshotMicros100;
 import '../../domain/nutrition.dart';
@@ -106,12 +107,17 @@ class OcrMealScreen extends ConsumerStatefulWidget {
   /// from Recipes) asks for a day, starting at the day selected in Day.
   final String? day;
 
+  /// The meal an AI answer named ("meal": "lunch"); else inferred from the
+  /// clock at log time.
+  final MealType? meal;
+
   const OcrMealScreen({
     super.key,
     required this.ingredients,
     this.initialName,
     this.initialServings,
     this.day,
+    this.meal,
   });
 
   @override
@@ -161,9 +167,12 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
       final food = await db.mappedFoodForOcr(normalizeOcrName(it.parsed.name));
       if (!mounted) return;
       if (food != null) {
+        // A name the user matched before beats an AI estimate.
         setState(() => it.matched = food);
         continue;
       }
+      // An estimate is usable as is — no guess to offer on top of it.
+      if (it.parsed.estimate != null) continue;
       final guess = await foods.suggestFor(it.parsed.name);
       if (guess != null && mounted && it.matched == null) {
         setState(() => it.suggested = guess);
@@ -199,23 +208,61 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     if (known != null) return known;
     final serving = it.matched?.servingG;
     if (serving != null) return serving * it.parsed.amount;
+    // An estimate without a weight ("1 apple"): the totals stand for a
+    // nominal 100 g, so they log verbatim and still scale if edited.
+    if (it.matched == null && it.parsed.estimate != null) return 100;
     return null;
+  }
+
+  /// An AI estimate as per-100 g values, from the totals for the parsed
+  /// amount — so editing the grams scales it like any food.
+  Nutrition? _estimate100(_Item it) {
+    final e = it.parsed.estimate;
+    if (it.matched != null || e == null) return null;
+    final f = 100 / (it.parsed.gramsIfKnown ?? 100);
+    return Nutrition(
+      kcal: e.kcal * f,
+      protein: e.protein * f,
+      carb: e.carb * f,
+      fat: e.fat * f,
+      micros: e.micros.map((k, v) => MapEntry(k, v * f)),
+    );
   }
 
   Nutrition? _nutrition(_Item it) {
     final g = _grams(it);
-    if (it.matched == null || g == null) return null;
-    return Nutrition.fromPer100g(
-      kcal100: it.matched!.kcal100,
-      protein100: it.matched!.protein100,
-      carb100: it.matched!.carb100,
-      fat100: it.matched!.fat100,
-      grams: g,
+    if (g == null) return null;
+    final m = it.matched;
+    if (m != null) {
+      return Nutrition.fromPer100g(
+        kcal100: m.kcal100,
+        protein100: m.protein100,
+        carb100: m.carb100,
+        fat100: m.fat100,
+        grams: g,
+      );
+    }
+    final e = _estimate100(it);
+    if (e == null) return null;
+    final f = g / 100;
+    return Nutrition(
+      kcal: e.kcal * f,
+      protein: e.protein * f,
+      carb: e.carb * f,
+      fat: e.fat * f,
+      micros: e.micros.map((k, v) => MapEntry(k, v * f)),
     );
   }
 
-  List<_Item> get _ready =>
-      _items.where((it) => it.matched != null && _grams(it) != null).toList();
+  /// Rows that can be saved or logged: matched to a food, or carrying an AI
+  /// estimate — with a weight either way.
+  List<_Item> get _ready => _items
+      .where(
+        (it) =>
+            (it.matched != null || it.parsed.estimate != null) &&
+            _grams(it) != null,
+      )
+      .toList();
 
   /// Servings for the saved recipe; blank/invalid/zero falls back to 1
   /// (matching the pre-field behavior).
@@ -302,15 +349,26 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
             servings: _servingsValue,
             items: [
               for (final it in ready)
-                RecipeShareItem(
-                  name: it.matched!.name,
-                  grams: _grams(it)!,
-                  kcal100: it.matched!.kcal100,
-                  protein100: it.matched!.protein100,
-                  carb100: it.matched!.carb100,
-                  fat100: it.matched!.fat100,
-                  micros100: snapshotMicros100(it.matched!),
-                ),
+                if (it.matched case final m?)
+                  RecipeShareItem(
+                    name: m.name,
+                    grams: _grams(it)!,
+                    kcal100: m.kcal100,
+                    protein100: m.protein100,
+                    carb100: m.carb100,
+                    fat100: m.fat100,
+                    micros100: snapshotMicros100(m),
+                  )
+                else if (_estimate100(it) case final e?)
+                  RecipeShareItem(
+                    name: it.parsed.name,
+                    grams: _grams(it)!,
+                    kcal100: e.kcal,
+                    protein100: e.protein,
+                    carb100: e.carb,
+                    fat100: e.fat,
+                    micros100: e.micros,
+                  ),
             ],
           );
       if (mounted) Navigator.of(context).pop();
@@ -351,6 +409,7 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
     final db = ref.read(dbProvider);
     final diary = ref.read(diaryRepositoryProvider);
     final meal =
+        widget.meal ??
         (ref.read(mealTimesProvider).asData?.value ?? MealTimes.defaults)
             .inferNow();
     try {
@@ -365,15 +424,31 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
                 : _name.text.trim(),
           );
       for (final it in ready) {
-        // logFood keeps the food link, the tracked micros and the usage
-        // bump — the snapshot-only path dropped all three.
-        await diary.logFood(
-          food: it.matched!,
-          grams: _grams(it)!,
-          meal: meal,
-          day: day,
-          groupId: gid,
-        );
+        if (it.matched case final m?) {
+          // logFood keeps the food link, the tracked micros and the usage
+          // bump — the snapshot-only path dropped all three.
+          await diary.logFood(
+            food: m,
+            grams: _grams(it)!,
+            meal: meal,
+            day: day,
+            groupId: gid,
+          );
+        } else if (_estimate100(it) case final e?) {
+          // An AI estimate has no food behind it: logged as a snapshot.
+          await diary.logSnapshot(
+            name: it.parsed.name,
+            kcal100: e.kcal,
+            protein100: e.protein,
+            carb100: e.carb,
+            fat100: e.fat,
+            microsJson: encodeMicros(e.micros),
+            grams: _grams(it)!,
+            meal: meal,
+            day: day,
+            groupId: gid,
+          );
+        }
       }
       // Health sync is driven by the Day screen for the day it shows; a meal
       // logged to another day would otherwise wait until that day is viewed.
@@ -533,7 +608,26 @@ class _OcrMealScreenState extends ConsumerState<OcrMealScreen> {
         return true;
       },
       onDismissed: (_) => setState(() => _items.removeAt(i)),
-      child: it.matched == null && it.suggested != null
+      child: it.matched == null && it.parsed.estimate != null
+          // An AI estimate: usable as is, marked as AI-sourced (§12); swipe →
+          // swaps in a real food, tap edits the weight.
+          ? ListTile(
+              leading: Icon(
+                Symbols.auto_awesome_rounded,
+                color: theme.colorScheme.outline,
+              ),
+              title: Text(it.parsed.name),
+              subtitle: Text(l10n.ocrEstimated(amountLabel)),
+              trailing: n == null
+                  ? null
+                  : Text(
+                      l10n.kcalGrams(kcalStr(n.kcal), gramsStr(g!)),
+                      textAlign: TextAlign.right,
+                      style: theme.textTheme.bodySmall,
+                    ),
+              onTap: () => _editGrams(i),
+            )
+          : it.matched == null && it.suggested != null
           // A best guess: named, offered, never counted until confirmed.
           ? ListTile(
               leading: Icon(

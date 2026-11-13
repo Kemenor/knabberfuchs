@@ -8,17 +8,15 @@ import 'package:fuchsbau/fuchsbau.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../core/gemini_error.dart';
 import '../../core/support_email.dart';
 import '../../data/backup.dart';
-import '../../data/ml/gemini_service.dart';
 import '../../data/offline/pack_auto_updater.dart';
 import '../../domain/enums.dart';
 import '../../domain/meal_times.dart';
 import '../../domain/meal_type_i18n.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
-import 'ai_consent_sheet.dart';
+import '../ai/ai_helper_screen.dart';
 import 'debug_section.dart';
 import 'offline_regions_screen.dart';
 import 'targets_screen.dart';
@@ -26,31 +24,11 @@ import 'targets_screen.dart';
 /// HealthKit on iOS, Health Connect on Android — for user-facing labels.
 String _healthStore() => Platform.isIOS ? 'Apple Health' : 'Health Connect';
 
-/// Anchor for [settingsScrollProvider] requests targeting the AI section.
-/// File-level: the screen is a singleton inside HomeShell's IndexedStack.
-final _aiSectionKey = GlobalKey();
-
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<String?>(settingsScrollProvider, (_, target) {
-      if (target == null) return;
-      // Post-frame so a simultaneous tab switch has laid the list out.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final anchor = _aiSectionKey.currentContext;
-        if (target == settingsSectionAi && anchor != null) {
-          Scrollable.ensureVisible(
-            anchor,
-            alignment: 0,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-          );
-        }
-        ref.read(settingsScrollProvider.notifier).clear();
-      });
-    });
     final db = ref.watch(dbProvider);
     final targetsAsync = ref.watch(targetsProvider);
     final healthSync =
@@ -147,11 +125,21 @@ class SettingsScreen extends ConsumerWidget {
                   const _PackAutoUpdatePicker(),
                 ],
               ),
-              KeyedSubtree(
-                key: _aiSectionKey,
-                child: FuchsbauSectionHeader(l10n.settingsAi),
+              FuchsbauSectionHeader(l10n.settingsAi),
+              FuchsbauSettingsCard(
+                children: [
+                  ListTile(
+                    contentPadding: fuchsbauCardRowPadding,
+                    leading: const Icon(Symbols.auto_awesome_rounded),
+                    title: Text(l10n.aiHelperTitle),
+                    subtitle: Text(l10n.aiHelperSettingsSub),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const AiHelperScreen()),
+                    ),
+                  ),
+                ],
               ),
-              const FuchsbauSettingsCard(children: [_AiSection()]),
               FuchsbauSectionHeader(l10n.settingsHealthConnect(_healthStore())),
               FuchsbauSettingsCard(
                 children: [
@@ -747,332 +735,6 @@ class _ThemePicker extends ConsumerWidget {
       onChanged: (v) =>
           db.setSetting('appThemeMode', v == ThemeMode.system ? null : v.name),
     );
-  }
-}
-
-/// The AI section, gated on the disclosure. Until it's accepted the app shows
-/// only what the feature *is* — no key field, and no link to Google AI Studio.
-/// See [showAiConsentSheet] for why.
-class _AiSection extends ConsumerWidget {
-  const _AiSection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final consented = ref.watch(geminiConsentProvider).asData?.value ?? false;
-    return consented ? const _AiKeyTile() : const _AiConsentGate();
-  }
-}
-
-/// Pre-consent state: what the feature does, and one way in.
-class _AiConsentGate extends ConsumerWidget {
-  const _AiConsentGate();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.aiGateSummary,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.outline,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.tonalIcon(
-              onPressed: () => showAiConsentSheet(context, ref),
-              icon: const Icon(Symbols.auto_awesome_rounded),
-              label: Text(l10n.aiGateAction),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Optional Google Gemini key (the user's own free-tier key) — unlocks the AI
-/// meal estimates (photo scan and text description). Keyless stays fully
-/// usable: search, barcode, OCR and the describe-meal catalog matcher.
-class _AiKeyTile extends ConsumerStatefulWidget {
-  const _AiKeyTile();
-  @override
-  ConsumerState<_AiKeyTile> createState() => _AiKeyTileState();
-}
-
-class _AiKeyTileState extends ConsumerState<_AiKeyTile> {
-  final _ctrl = TextEditingController();
-  bool _obscure = true;
-  bool _loaded = false;
-  // Must stay in sync with the DropdownMenuItem values below.
-  static const _models = ['gemini-2.5-flash', 'gemini-3.5-flash'];
-  String _model = 'gemini-2.5-flash';
-  // Result of the last "Test key" tap: _tested gates the result line, and a
-  // null _testFailure on a tested key means it worked.
-  bool _testing = false;
-  bool _tested = false;
-  GeminiFailure? _testFailure;
-
-  @override
-  void initState() {
-    super.initState();
-    final db = ref.read(dbProvider);
-    // Keystore-backed (and migrates a pre-2026-07 key out of the DB).
-    ref.read(geminiKeyStoreProvider).read().then((v) {
-      if (mounted) {
-        setState(() {
-          _ctrl.text = v ?? '';
-          _loaded = true;
-        });
-      }
-    });
-    db.getSetting(geminiModelSetting).then((v) {
-      // Coerce unknown stored values (e.g. after a model rename) to the
-      // default: DropdownButtonFormField asserts when initialValue matches
-      // no item, which would crash the whole Settings screen.
-      if (mounted && v != null && _models.contains(v)) {
-        setState(() => _model = v);
-      }
-    });
-  }
-
-  /// Check the key against Google right here, so a rejected key is named at
-  /// the field instead of surfacing mid-meal as a vague failure — the support
-  /// case that prompted this (FEEDBACK.md, 2026-08-27).
-  Future<void> _testKey() async {
-    final key = _ctrl.text.trim();
-    if (key.isEmpty) return;
-    setState(() => _testing = true);
-    final failure = await ref
-        .read(geminiServiceProvider)
-        .testKey(key, model: _model);
-    if (!mounted) return;
-    setState(() {
-      _testing = false;
-      _tested = true;
-      _testFailure = failure;
-    });
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.aiKeyDesc,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.outline,
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _ctrl,
-            obscureText: _obscure,
-            enabled: _loaded,
-            autocorrect: false,
-            enableSuggestions: false,
-            decoration: InputDecoration(
-              labelText: l10n.aiKeyLabel,
-              border: const OutlineInputBorder(),
-              isDense: true,
-              suffixIcon: IconButton(
-                tooltip: _obscure ? l10n.a11yShowApiKey : l10n.a11yHideApiKey,
-                icon: Icon(
-                  _obscure
-                      ? Symbols.visibility_rounded
-                      : Symbols.visibility_off_rounded,
-                  size: 20,
-                ),
-                onPressed: () => setState(() => _obscure = !_obscure),
-              ),
-            ),
-            onChanged: (v) {
-              // setState: the visibility toggle, the Test button's enabled
-              // state and the model picker all follow the key field. A changed
-              // key also invalidates the last test result.
-              setState(() {
-                _tested = false;
-                _testFailure = null;
-              });
-              ref.read(geminiKeyStoreProvider).write(v);
-            },
-          ),
-          // Wrap, not Row: at large text scales the two actions need to stack
-          // rather than overflow.
-          Wrap(
-            children: [
-              TextButton.icon(
-                onPressed: () async {
-                  final messenger = ScaffoldMessenger.of(context);
-                  try {
-                    final ok = await launchUrl(
-                      Uri.parse('https://aistudio.google.com/apikey'),
-                      mode: LaunchMode.externalApplication,
-                    );
-                    if (!ok) {
-                      messenger.showAutoSnackBar(
-                        SnackBar(content: Text(l10n.couldNotOpenLink)),
-                      );
-                    }
-                  } catch (_) {
-                    messenger.showAutoSnackBar(
-                      SnackBar(content: Text(l10n.couldNotOpenLink)),
-                    );
-                  }
-                },
-                icon: const Icon(Symbols.open_in_new_rounded, size: 16),
-                label: Text(l10n.aiKeyGet),
-              ),
-              TextButton.icon(
-                onPressed: (_ctrl.text.trim().isEmpty || _testing)
-                    ? null
-                    : _testKey,
-                icon: _testing
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Symbols.troubleshoot_rounded, size: 16),
-                label: Text(_testing ? l10n.aiKeyTesting : l10n.aiKeyTest),
-              ),
-            ],
-          ),
-          if (_tested && !_testing)
-            Padding(
-              padding: const EdgeInsets.only(left: 12, bottom: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    _testFailure == null
-                        ? Symbols.check_circle_rounded
-                        : Symbols.error_rounded,
-                    size: 16,
-                    // Amber, never red: the fuchsbau palette reserves red for
-                    // destruction. The colour rides on the icon so the message
-                    // itself keeps full AA contrast as body text.
-                    color: _testFailure == null
-                        ? theme.colorScheme.tertiary
-                        : FuchsbauStatusColors.of(context).amber,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _testFailure == null
-                          ? l10n.aiKeyTestOk
-                          : geminiFailureMessage(l10n, _testFailure!),
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          // Model choice only matters once a key exists.
-          if (_loaded && _ctrl.text.trim().isNotEmpty) ...[
-            const SizedBox(height: 4),
-            DropdownButtonFormField<String>(
-              initialValue: _model,
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: l10n.aiModelLabel,
-                border: const OutlineInputBorder(),
-                isDense: true,
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: 'gemini-2.5-flash',
-                  child: Text(l10n.aiModelReliable),
-                ),
-                DropdownMenuItem(
-                  value: 'gemini-3.5-flash',
-                  child: Text(l10n.aiModelAccurate),
-                ),
-              ],
-              onChanged: (v) {
-                if (v == null) return;
-                // The stale result described the previous model.
-                setState(() {
-                  _model = v;
-                  _tested = false;
-                  _testFailure = null;
-                });
-                ref.read(dbProvider).setSetting(geminiModelSetting, v);
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text(
-                l10n.aiModelNote,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.outline,
-                ),
-              ),
-            ),
-          ],
-          const Divider(height: 24),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: _turnOff,
-              icon: const Icon(Symbols.block_rounded, size: 16),
-              label: Text(l10n.aiTurnOff),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Withdraw consent: forget both the acceptance and the key, so the section
-  /// returns to its pre-consent state and nothing is left behind on the
-  /// device. Consent you can't take back isn't consent — and it destroys a
-  /// stored credential, so it confirms first.
-  Future<void> _turnOff() async {
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.aiTurnOffTitle),
-        content: Text(l10n.aiTurnOffConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.actionCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.aiTurnOff),
-          ),
-        ],
-      ),
-    );
-    if (ok != true || !mounted) return;
-    await ref.read(geminiKeyStoreProvider).write(null);
-    final db = ref.read(dbProvider);
-    await db.setSetting(geminiConsentSetting, null);
-    await db.setSetting(geminiConsentAtSetting, null);
-    // The consent provider rebuilds _AiSection back to the gate, disposing
-    // this tile — so the messenger had to be captured above.
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.aiTurnedOff)));
   }
 }
 

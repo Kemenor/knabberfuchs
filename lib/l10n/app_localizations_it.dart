@@ -724,34 +724,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quickAddMacros => 'Aggiungi macro (facoltativo)';
 
   @override
-  String get recognizeTooltip => 'Riconosci da foto';
-
-  @override
   String get recognizeTakePhoto => 'Scatta una foto';
-
-  @override
-  String get recognizeGeminiNudge =>
-      'Le stime IA per foto e descrizioni sono facoltative e disattivate. Puoi configurarle nelle Impostazioni.';
-
-  @override
-  String get recognizeKeyMissingTitle => 'Attiva la scansione IA';
-
-  @override
-  String get recognizeKeyMissingBody =>
-      'Le stime IA dei pasti sono facoltative e al momento disattivate. Configurale in Impostazioni → Riconoscimento IA: usano Google Gemini con una chiave del tuo account Google.';
-
-  @override
-  String get actionGoToSettings => 'Vai alle Impostazioni';
-
-  @override
-  String get dayCaptureTooltip => 'Aggiungi da una foto';
-
-  @override
-  String get captureScanAi => 'Scansiona un pasto con l\'IA';
-
-  @override
-  String get captureScanAiSub =>
-      'Fotografa un piatto — indoviniamo piatto e calorie';
 
   @override
   String get foodFormTitle => 'Nuovo alimento';
@@ -769,104 +742,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsAi => 'Riconoscimento IA';
-
-  @override
-  String get aiKeyDesc =>
-      'Aggiungi una chiave API Google Gemini per sbloccare le stime IA dei pasti da una foto o da una descrizione scritta. Foto e descrizioni vengono quindi inviate a Google. Il piano gratuito di Gemini è sufficiente per l\'uso personale; se hai attivato la fatturazione sul tuo account Google, un uso intenso può comportare costi. Nel piano gratuito Google può usare i tuoi dati per migliorare i propri modelli — tranne nel SEE, in Svizzera e nel Regno Unito, dove le condizioni sui dati dei servizi a pagamento valgono anche per l\'uso gratuito.';
-
-  @override
-  String get aiKeyLabel => 'Chiave API Gemini';
-
-  @override
-  String get aiKeyGet => 'Ottieni una chiave API';
-
-  @override
-  String get aiKeyTest => 'Prova la chiave';
-
-  @override
-  String get aiKeyTesting => 'Verifica in corso…';
-
-  @override
-  String get aiKeyTestOk => 'La chiave funziona.';
-
-  @override
-  String get aiModelLabel => 'Modello IA';
-
-  @override
-  String get aiModelReliable => 'Gemini 2.5 Flash — affidabile';
-
-  @override
-  String get aiModelAccurate =>
-      'Gemini 3.5 Flash — più preciso, spesso occupato';
-
-  @override
-  String get aiModelNote =>
-      'Se il modello scelto non è disponibile o è occupato, viene provato 2.5 Flash.';
-
-  @override
-  String get aiGateSummary =>
-      'Facoltativo: stima un pasto da una foto o da una descrizione scritta con Google Gemini. Disattivato di default – funziona con una chiave API Gemini del tuo account Google, non del nostro.';
-
-  @override
-  String get aiGateAction => 'Configura le stime IA';
-
-  @override
-  String get aiConsentTitle => 'Prima di attivare';
-
-  @override
-  String get aiConsentPhoto =>
-      'La foto del pasto, o la descrizione che scrivi, viene inviata a Google. Nulla viene inviato finché non aggiungi una chiave.';
-
-  @override
-  String get aiConsentOwnKey =>
-      'Funziona con una chiave API Google Gemini che crei sul tuo account Google. È una chiave da sviluppatore: Google offre l\'API per sviluppare, non come servizio per consumatori.';
-
-  @override
-  String get aiConsentDataUse =>
-      'Nel piano gratuito Google può usare ciò che invii per migliorare i propri modelli. Nel SEE, in Svizzera e nel Regno Unito valgono invece le condizioni sui dati dei servizi a pagamento, e non lo fa.';
-
-  @override
-  String get aiConsentBilling =>
-      'Per l\'uso personale il piano gratuito basta. Se hai attivato la fatturazione sul tuo account Google, un uso intenso può comportare costi.';
-
-  @override
-  String get aiConsentLocal =>
-      'Nient\'altro cambia: diario, foto e obiettivi restano su questo telefono.';
-
-  @override
-  String get aiConsentCheck =>
-      'Capisco che le foto dei miei pasti vengono inviate a Google.';
-
-  @override
-  String get aiConsentAccept => 'Attiva le stime IA';
-
-  @override
-  String get aiTurnOff => 'Disattiva le stime IA';
-
-  @override
-  String get aiTurnOffTitle => 'Disattivare le stime IA?';
-
-  @override
-  String get aiTurnOffConfirm =>
-      'Questo elimina la chiave API da questo telefono e nasconde di nuovo le impostazioni IA. I pasti registrati non cambiano.';
-
-  @override
-  String get aiTurnedOff => 'Stime IA disattivate, chiave API eliminata.';
-
-  @override
-  String get recognizeByGemini => 'Stimato da Gemini';
-
-  @override
-  String get geminiHintTitle => 'Descrivi il pasto (facoltativo)';
-
-  @override
-  String get geminiHintLabel => 'Aggiungi un suggerimento';
-
-  @override
-  String get geminiHintExample => 'es. lasagne fatte in casa, porzione grande';
-
-  @override
-  String get geminiHintEstimate => 'Stima';
 
   @override
   String get a11yPreviousPeriod => 'Periodo precedente';
@@ -917,88 +792,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get geminiProblemTitle => 'Stima IA non riuscita';
-
-  @override
-  String get geminiErrorInvalidKey =>
-      'Google rifiuta questa chiave API. Controllala in Impostazioni → Riconoscimento IA o incollane una nuova da Google AI Studio.';
-
-  @override
-  String get geminiErrorNoAccess =>
-      'Questa chiave API non è autorizzata a usare Gemini. Forse l\'API Generative Language non è attiva nel suo progetto Google Cloud, oppure la chiave è limitata.';
-
-  @override
-  String get geminiErrorModelUnavailable =>
-      'La tua chiave non raggiunge questo modello IA. Scegli l\'altro modello in Impostazioni → Riconoscimento IA.';
-
-  @override
-  String get geminiErrorQuota =>
-      'La tua quota Gemini è esaurita per ora. Riprova più tardi o controlla il tuo utilizzo in Google AI Studio.';
-
-  @override
-  String get geminiErrorBusy =>
-      'Gemini è occupato in questo momento — aggiungi il pasto manualmente o riprova tra poco.';
-
-  @override
-  String get geminiErrorNetwork =>
-      'Nessuna connessione a Google. Controlla la connessione Internet e riprova.';
-
-  @override
-  String get geminiErrorNotFood => 'Gemini non ha riconosciuto alcun alimento.';
-
-  @override
-  String get geminiErrorUnknown =>
-      'Gemini ha restituito una risposta inattesa. Aggiungi il pasto manualmente.';
-
-  @override
   String get actionContinueManually => 'Continua manualmente';
-
-  @override
-  String get captureDescribe => 'Descrivi un pasto';
-
-  @override
-  String get captureDescribeSub =>
-      'Scrivi cosa hai mangiato — lo stimeremo noi';
-
-  @override
-  String get describeMealTitle => 'Descrivi il pasto';
-
-  @override
-  String get describeMealLabel => 'Cosa hai mangiato?';
-
-  @override
-  String get describeMealExample =>
-      'es. 2 fette di pane di segale, burro 10 g, 1 mela';
-
-  @override
-  String get describeMealNoLines =>
-      'Nessun alimento riconosciuto — scrivi un alimento per riga, meglio con la quantità (es. \"Riso 150 g\").';
-
-  @override
-  String get geminiThinking1 => 'Richiesta delle calorie a Gemini…';
-
-  @override
-  String get geminiThinking2 => 'Stima delle calorie dalla tua foto…';
-
-  @override
-  String get geminiThinking3 => 'Identificazione del piatto…';
-
-  @override
-  String get geminiThinking4 => 'Calcolo della porzione…';
-
-  @override
-  String get geminiThinking5 => 'Lettura del piatto…';
-
-  @override
-  String get geminiThinking6 => 'Calcolo dei numeri…';
-
-  @override
-  String get geminiSlow => 'Gemini è un po\' occupato — un attimo…';
-
-  @override
-  String geminiRetrying(int n) {
-    return 'Server occupato — nuovo tentativo ($n)…';
-  }
 
   @override
   String get scanBarcode => 'Scansiona codice a barre';
@@ -1209,6 +1003,61 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get ocrUseSuggestion => 'Usa';
+
+  @override
+  String get aiHelperTitle => 'Assistente IA';
+
+  @override
+  String get aiHelperSettingsSub => 'Usa la tua app di IA — nessuna chiave';
+
+  @override
+  String get aiHelperIntro =>
+      'Knabberfuchs non parla con nessuna IA. Ci pensa la tua app di IA — Claude, ChatGPT, Gemini… —: dalle queste istruzioni una volta, poi riporta le sue risposte con Condividi → Knabberfuchs o «Incolla dalla tua app di IA».';
+
+  @override
+  String get aiInstructionsSection => 'Istruzioni per la tua app di IA';
+
+  @override
+  String get aiTaskLogTitle => 'Registrare cosa ho mangiato';
+
+  @override
+  String get aiTaskLogSub =>
+      'Descrivi un pasto o invia una foto — ricevi un blocco da registrare';
+
+  @override
+  String get aiTaskRecipeTitle => 'Adattare una ricetta';
+
+  @override
+  String get aiTaskRecipeSub =>
+      'Adatta una ricetta ai tuoi obiettivi — ricevi la lista degli ingredienti';
+
+  @override
+  String get aiCopy => 'Copia';
+
+  @override
+  String get aiCopied => 'Istruzioni copiate — incollale nella tua app di IA.';
+
+  @override
+  String get aiHowTo =>
+      'Incollale una volta in un progetto Claude, nelle istruzioni personalizzate di ChatGPT o in un Gem — contengono i tuoi obiettivi attuali. Ricopiale se cambi i tuoi obiettivi.';
+
+  @override
+  String get aiSummarySection => 'Condividi un riepilogo';
+
+  @override
+  String get aiSummarySub =>
+      'I tuoi ultimi giorni come testo — perché la tua app di IA cerchi degli schemi.';
+
+  @override
+  String get aiSummary7 => 'Ultimi 7 giorni';
+
+  @override
+  String get aiSummary30 => 'Ultimi 30 giorni';
+
+  @override
+  String ocrEstimated(String amount) {
+    return '$amount · stimato dalla tua IA';
+  }
 
   @override
   String kcalDotGrams(String kcal, String grams) {

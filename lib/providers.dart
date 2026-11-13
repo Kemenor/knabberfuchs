@@ -12,14 +12,13 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'core/date_x.dart';
 import 'core/locale.dart';
 import 'data/db/database.dart';
-import 'data/gemini_key_store.dart';
+import 'data/legacy_gemini_cleanup.dart';
 import 'data/meal_photo_store.dart';
 import 'data/repositories/diary_repository.dart';
 import 'data/repositories/food_repository.dart';
 import 'data/repositories/recipe_repository.dart';
 import 'data/backup_service.dart';
 import 'data/health/health_service.dart';
-import 'data/ml/gemini_service.dart';
 import 'data/ocr/ocr_service.dart';
 import 'data/offline/offline_pack_service.dart';
 import 'data/offline/pack_auto_updater.dart';
@@ -151,44 +150,6 @@ final appVersionProvider = FutureProvider<String>((ref) async {
   return '${info.version} (${info.buildNumber})';
 });
 
-/// The user's Gemini API key lives in the platform keystore, NOT the settings
-/// table (the diary DB is included in OS device backups). All reads/writes go
-/// through this store; it migrates pre-2026-07 keys out of the DB on first
-/// read.
-final geminiKeyStoreProvider = Provider<GeminiKeyStore>(
-  (ref) => GeminiKeyStore(ref.watch(dbProvider)),
-);
-
-/// Preferred Gemini model to try first (the service always falls back to
-/// gemini-2.5-flash on a 503/timeout). Null = use the reliable default.
-const geminiModelSetting = 'geminiModel';
-
-/// Version of the AI disclosure the user accepted, and when.
-///
-/// The key field and the link to Google AI Studio stay hidden until this
-/// matches [geminiConsentVersion]: a Gemini key is a *developer* credential on
-/// the user's own Google account, and the app shouldn't push anyone toward one
-/// before they've read what it means (2026-08-30). **Bump the version when the
-/// disclosure changes materially** — storing the accepted version means an old
-/// acceptance re-asks instead of silently standing in for text nobody saw.
-const geminiConsentVersion = 1;
-const geminiConsentSetting = 'geminiConsentVersion';
-const geminiConsentAtSetting = 'geminiConsentAt';
-
-/// Whether the current AI disclosure has been accepted.
-final geminiConsentProvider = StreamProvider<bool>(
-  (ref) => ref
-      .watch(dbProvider)
-      .watchSetting(geminiConsentSetting)
-      .map((v) => (int.tryParse(v ?? '') ?? 0) >= geminiConsentVersion),
-);
-
-final geminiServiceProvider = Provider<GeminiService>((ref) {
-  final s = GeminiService();
-  ref.onDispose(s.dispose);
-  return s;
-});
-
 final healthSyncEnabledProvider = StreamProvider<bool>(
   (ref) =>
       ref.watch(dbProvider).watchSetting('healthSync').map((v) => v == 'true'),
@@ -204,6 +165,8 @@ final selectedDayEntriesProvider = StreamProvider<List<Entry>>((ref) {
 /// and open any installed offline region packs.
 final appStartupProvider = FutureProvider<void>((ref) async {
   await seedSwissIfNeeded(ref.watch(dbProvider));
+  // The Gemini key is gone; delete what a past key left on the device.
+  await removeLegacyGeminiData(ref.read(dbProvider));
   await ref.read(offlinePackServiceProvider).syncStore();
   await ref.read(healthServiceProvider).refreshEnabled(ref.read(dbProvider));
   // Fire-and-forget: photo GC must never delay or fail first paint.
@@ -524,23 +487,6 @@ class HomeTabNotifier extends Notifier<HomeTab> {
 final homeTabProvider = NotifierProvider<HomeTabNotifier, HomeTab>(
   HomeTabNotifier.new,
 );
-
-/// One-shot scroll request for the Settings tab: flows that jump there (e.g.
-/// the missing-key dialog's "Go to Settings") name the section to reveal;
-/// SettingsScreen scrolls to it and clears the request.
-const settingsSectionAi = 'ai';
-
-class SettingsScrollNotifier extends Notifier<String?> {
-  @override
-  String? build() => null;
-  void request(String section) => state = section;
-  void clear() => state = null;
-}
-
-final settingsScrollProvider =
-    NotifierProvider<SettingsScrollNotifier, String?>(
-      SettingsScrollNotifier.new,
-    );
 
 /// Whether the activity budget adjustment is on ('healthEnergyRead' setting).
 final healthEnergyReadProvider = StreamProvider<bool>(

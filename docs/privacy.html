@@ -46,7 +46,7 @@
 <header>
   <img class="logo" src="favicon.png" alt="Knabberfuchs" />
   <h1>Privacy Policy</h1>
-  <p class="meta">Knabberfuchs 🦊 &middot; last updated 6 July 2026</p>
+  <p class="meta">Knabberfuchs 🦊 &middot; last updated 13 November 2026</p>
   <p class="langs"><strong>EN</strong> &middot; <a href="privacy-de.html">DE</a> &middot; <a href="privacy-fr.html">FR</a> &middot; <a href="privacy-it.html">IT</a></p>
 </header>
 
@@ -89,11 +89,6 @@
       <td>Open Food Facts (<span class="muted">world.openfoodfacts.org</span>)</td>
     </tr>
     <tr>
-      <td>AI meal estimate <strong>(optional)</strong></td>
-      <td>The meal photo you took and/or the meal description you typed — <em>only</em> if you have added your own Google&nbsp;Gemini API key</td>
-      <td>Google (<span class="muted">generativelanguage.googleapis.com</span>)</td>
-    </tr>
-    <tr>
       <td>Offline database download</td>
       <td>A standard file-download request for the country database you chose</td>
       <td>Hugging Face (<span class="muted">huggingface.co</span>)</td>
@@ -105,18 +100,14 @@
     </tr>
   </table>
 
-  <h3>AI meal estimates are off by default</h3>
-  <p>The “scan a meal with AI” and “describe a meal” features only work after you have personally
-    entered a Google Gemini API key in Settings. Without a key, nothing is ever sent to Google —
-    the app simply explains how to activate the feature.</p>
-
-  <h3>If you use your own Gemini key</h3>
-  <p>When enabled, the meal photo (together with the optional short text hint you can type to
-    describe it, e.g. “homemade calzone”) or the meal description you typed is sent to Google's
-    Gemini API to estimate the dish and its calories. That request is governed by
-    <a href="https://policies.google.com/privacy">Google's Privacy Policy</a> and the terms of Google
-    AI Studio / the Gemini API. Depending on your Google account and plan, Google may use data sent to
-    the free tier to improve their services. This is your choice; the app works fully without it.</p>
+  <h3>No AI service — only your own AI app, if you choose</h3>
+  <p>The app does not send any data to an AI service and does not store an API key (a Gemini key
+    saved by an earlier version is deleted from your device when you update). The optional AI helper
+    only gives you instructions to copy into your own AI app (for example Claude, ChatGPT or the
+    Gemini app) and can create a text summary of your recent days for you to share. If you share text
+    with your own AI app, or paste or share its answer back into Knabberfuchs, that happens through
+    your own apps and is governed by those apps' terms and privacy policies. Knabberfuchs receives
+    only what you paste or share into it, and processes it on your device.</p>
 
   <h2>4. Apple Health &amp; Health Connect (optional)</h2>
   <p>If you turn it on, the app can write your logged calories and macronutrients to your device's

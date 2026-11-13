@@ -331,7 +331,7 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   ```dart
   final messenger = ScaffoldMessenger.of(context); // capture BEFORE await
   // …await…
-  messenger.showAutoSnackBar(SnackBar(content: Text(l10n.geminiErrorBusy)));
+  messenger.showAutoSnackBar(SnackBar(content: Text(l10n.pasteNothingFound)));
   ```
 
   > **Don't** call `messenger.showSnackBar(...)` directly — there are zero such
@@ -341,13 +341,14 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
 - **Loading:** inline `Center(child: CircularProgressIndicator())` for
   `AsyncValue.loading`; a full `showDialog(barrierDismissible: false)` overlay,
   wrapped in `PopScope(canPop: false)` so hardware back can't pop the route
-  beneath, for blocking async (AI calls) (`recognize_food_flow.dart:130`
-  on-device, `:72` Gemini).
+  beneath, for blocking async work (the ingredient-list OCR,
+  `startOcrMealFlow` in `ocr_meal_screen.dart`).
 - **Cancellable blocking modal** (long network-bound calls): the blocking dialog
   carries a `TextButton` labelled `l10n.actionCancel` that pops via *its own*
   dialog context and raises a `cancelled` flag; the awaiting flow then discards
-  the late result and must not touch the navigator again
-  (`recognize_food_flow.dart:71-99`).
+  the late result and must not touch the navigator again. (No live use since
+  the Gemini flows were removed, 2026-11 — the rule stands for the next long
+  call.)
 - **In-progress download with cancel:** the row's trailing `IconButton`
   (`tooltip: l10n.actionCancel`) stacks a 32×32 `CircularProgressIndicator`
   (determinate; indeterminate while progress is 0) over a small
@@ -362,24 +363,23 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   closes, or, when the message is the reason the sheet looks empty, promote it
   to a dialog *before* the sheet.
 - **Failure that the user can fix → dialog, not snackbar.** A cause the user can
-  act on (a rejected API key, a model their key can't reach, a spent quota)
-  gets an `AlertDialog` whose confirm action routes to the relevant Settings
-  section — `showGeminiProblemDialog` (`ui/food/gemini_problem_dialog.dart`),
-  which mirrors the missing-key dialog. Causes the user can only wait out
-  (busy, offline) stay a snackbar. The caller must abandon its flow when the
-  dialog reports that the user left for Settings, rather than opening a sheet
-  on top of the Settings tab.
+  act on (a rejected credential, a missing permission, a spent quota) gets an
+  `AlertDialog` whose confirm action routes to the relevant Settings section.
+  Causes the user can only wait out (busy, offline) stay a snackbar. The caller
+  must abandon its flow when the dialog reports that the user left for
+  Settings, rather than opening a sheet on top of the Settings tab. (The Gemini
+  problem dialog was the live example until the key was removed, 2026-11.)
 - **Consent gates: a checkbox, never a timer.** Where a setting hands the user's
   data to a third party, the disclosure is a sheet of short bullets plus a
-  checkbox that enables the confirm button — see `ui/settings/ai_consent_sheet.dart`.
-  A countdown before Accept is an *artificial gate* (ETHOS) and collides with
-  WCAG 2.2.1; it also buys the look of informed consent, not the substance.
-  Store the **accepted version** of the text plus a timestamp, not a boolean, so
-  a material rewrite re-asks. Any such consent must be withdrawable, and
-  withdrawing it deletes whatever credential it unlocked.
-- **One cause, one sentence, one source.** Every surface that reports a Gemini
-  failure — both capture flows and the Settings key test — renders it through
-  `geminiFailureMessage` (`core/gemini_error.dart`), so a given cause always
+  checkbox that enables the confirm button. A countdown before Accept is an
+  *artificial gate* (ETHOS) and collides with WCAG 2.2.1; it also buys the look
+  of informed consent, not the substance. Store the **accepted version** of the
+  text plus a timestamp, not a boolean, so a material rewrite re-asks. Any such
+  consent must be withdrawable, and withdrawing it deletes whatever credential
+  it unlocked. (No third-party hand-off is left in the app since the AI helper
+  replaced the Gemini key — the user's own AI app is theirs to consent to.)
+- **One cause, one sentence, one source.** Every surface that reports the same
+  failure renders it through one message function, so a given cause always
   reads the same. Collapsing distinct causes into one string is what sent a
   tester with a rejected key hunting for a network outage.
 
@@ -422,8 +422,9 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   `Symbols.content_paste_rounded` (paste a recipe / list from another app),
   `Symbols.lightbulb_rounded` (a suggested, unconfirmed match),
   `Symbols.more_vert_rounded` (size 20, the only overflow icon).
-- `Symbols.auto_awesome_rounded` (14px, `colorScheme.outline`) marks
-  **AI-sourced data** (`quick_add_sheet.dart:222-227`).
+- `Symbols.auto_awesome_rounded` (`colorScheme.outline`) marks **AI-sourced
+  data** — an AI app's estimate on a review row ("{amount} · estimated by your
+  AI", `ocr_meal_screen.dart` `_row`) — and the Settings → AI helper entry.
   `Symbols.restaurant_menu_rounded` is the splash/brand glyph (`app.dart:85`).
 
 ---
@@ -480,14 +481,14 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   `primary` + label/value rows per enabled metric) above an uppercase
   `labelSmall` section header and a `Card` of `ListTile` ingredient rows —
   the same layout grammar as `recipe_detail_screen.dart`.
-- **Meal photos** (2026-07-06, tester feedback): the AI-recognition photo is
+- **Meal photos** (2026-07-06, tester feedback): the AI-recognition photo was
   kept with the logged entry (`entries.photoPath`, file in the documents
-  `meal_photos/` dir; orphaned files swept at startup). It previews as a
-  rounded (`12`) 96-high thumbnail in the Quick add sheet and as a rounded
-  (`16`) 180-high `BoxFit.cover` banner atop the meal detail page (multiple
-  photos → horizontal strip), tap → full-screen black `InteractiveViewer`.
-  A missing file (backup restored elsewhere) renders nothing — no broken-image
-  placeholder.
+  `meal_photos/` dir; orphaned files swept at startup). Since the Gemini photo
+  scan was removed (2026-11) no new photos are taken, but existing ones still
+  show as a rounded (`16`) 180-high `BoxFit.cover` banner atop the meal detail
+  page (multiple photos → horizontal strip), tap → full-screen black
+  `InteractiveViewer`. A missing file (backup restored elsewhere) renders
+  nothing — no broken-image placeholder.
 - **Debug-only surfaces are the one sanctioned l10n exception**: the hidden
   Settings Debug section (About-dialog long-press easter egg) is
   English-only, DEBUG-labelled with an `error`-colored header, and never

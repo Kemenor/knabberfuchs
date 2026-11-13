@@ -1,8 +1,8 @@
 # Knabberfuchs 🦊
 
 An ad-free, no-subscription, no-popup calorie tracker for Android and iOS. Scan a barcode, search,
-snap a photo of your meal, describe it in words, or just type a name and the calories. Your data
-stays on your phone.
+paste an ingredient list from your own AI app or a website, or just type a name and the calories.
+Your data stays on your phone.
 
 > Built because every popular tracker nags with paywalls. This one doesn't.
 
@@ -15,9 +15,14 @@ stays on your phone.
 - 🔎 **Fast local search** — Open Food Facts + the curated **Swiss Food Composition Database**,
   plus your own custom foods.
 - ⚡ **Quick add** — already know the number? Log “Lasagna · 816 kcal” in a couple of taps.
-- 📸 **AI meal estimate** — snap a photo *or just describe the meal in words* and get the dish,
-  portion and macros. **Optional and off by default**: bring your own free **Google Gemini** key
-  (the app stays keyless and account-free without it).
+- 🤖 **AI helper** — the app never talks to an AI itself. It gives you instructions to copy into
+  *your own* AI app (Claude, ChatGPT, Gemini …); share its answer back (Android: Share →
+  Knabberfuchs) or **paste it from your AI app**, and the ingredients are matched to your food
+  database (or kept as marked estimates) for you to review before logging. It can also export a
+  text summary of your recent days for your AI app to analyse. **No API key, nothing sent by the
+  app.**
+- 📋 **Paste an ingredient list** — from a website or an AI chat; it lands in the review screen,
+  matched to your foods.
 - 🖼️ **Meal from a photo** — photograph a printed ingredient list; on-device OCR turns it into a
   meal to log.
 - 📅 **Day by day** — meals group automatically as you add; running total and macros, with a
@@ -39,15 +44,15 @@ stays on your phone.
 
 - Food data: **Open Food Facts** (ODbL) + the **Swiss Food Composition Database** (FSVO).
 - The app talks to the internet only for: **Open Food Facts** lookups (barcode / search terms),
-  downloading **offline country packs** from Hugging Face when you request one, and — **optional**,
-  only if *you* configure a key — sending a meal photo and/or your typed meal description to
-  Gemini. Everything else is on-device. No accounts, no analytics, no server. Details:
+  and downloading **offline country packs** from Hugging Face when you request one. It contacts no
+  AI service and stores no API key — anything you exchange with your own AI app goes through your
+  own apps. Everything else is on-device. No accounts, no analytics, no server. Details:
   [privacy policy](https://knabberfuchs.ch/privacy.html).
 
 ## Stack
 
 Flutter · drift (SQLite) · Riverpod · fuchsbau (shared design system) · mobile_scanner ·
-`http` (hand-rolled Open Food Facts client + Gemini REST) · health (Apple Health / Health
+`http` (hand-rolled Open Food Facts client) · health (Apple Health / Health
 Connect) · ML Kit (OCR) · `image_picker`
 
 ## Build & run

@@ -10,8 +10,8 @@ import '../../providers.dart';
 
 /// Free add: log a one-off item by name + calories (optionally macros) without
 /// searching the catalog or creating a persistent food. The entered kcal/macros
-/// are the totals for the portion. If a weight (g) is given (e.g. Gemini's
-/// portion estimate via [initialWeight]), the entry stores that real weight with
+/// are the totals for the portion. If a weight (g) is given (typed, or passed
+/// as [initialWeight]), the entry stores that real weight with
 /// a correct per-100 g snapshot, so it scales when edited; otherwise it falls
 /// back to grams=100 (the typed totals shown verbatim). Returns true if logged.
 Future<bool?> showQuickAddSheet(
@@ -26,8 +26,6 @@ Future<bool?> showQuickAddSheet(
   double? initialCarb,
   double? initialFat,
   double? initialWeight,
-  String? sourceLabel,
-  Uint8List? photoBytes,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -43,8 +41,6 @@ Future<bool?> showQuickAddSheet(
       initialCarb: initialCarb,
       initialFat: initialFat,
       initialWeight: initialWeight,
-      sourceLabel: sourceLabel,
-      photoBytes: photoBytes,
     ),
   );
 }
@@ -59,10 +55,6 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
   final double? initialCarb;
   final double? initialFat;
   final double? initialWeight;
-  final String? sourceLabel;
-
-  /// The recognized meal photo — kept with the entry and shown in Meal detail.
-  final Uint8List? photoBytes;
   const _QuickAddSheet({
     required this.day,
     required this.meal,
@@ -73,8 +65,6 @@ class _QuickAddSheet extends ConsumerStatefulWidget {
     required this.initialCarb,
     required this.initialFat,
     required this.initialWeight,
-    required this.sourceLabel,
-    required this.photoBytes,
   });
 
   @override
@@ -175,16 +165,6 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
       final groupId = widget.resolveGroup == null
           ? null
           : await widget.resolveGroup!();
-      // Persist the photo only now, at log time — a dismissed sheet leaves no
-      // file behind. If the write fails the entry still logs, just photo-less.
-      String? photoPath;
-      if (widget.photoBytes != null) {
-        try {
-          photoPath = await ref
-              .read(mealPhotoStoreProvider)
-              .save(widget.photoBytes!);
-        } catch (_) {}
-      }
       // The fields hold portion totals. With a weight, store the real grams and
       // a correct per-100 g snapshot (total / grams * 100) so the entry scales
       // when edited; without one, fall back to grams=100 (totals verbatim).
@@ -208,7 +188,6 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
             meal: widget.meal,
             day: widget.day,
             groupId: groupId,
-            photoPath: photoPath,
           );
       if (mounted) Navigator.of(context).pop(true);
     } catch (_) {
@@ -233,38 +212,6 @@ class _QuickAddSheetState extends ConsumerState<_QuickAddSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.quickAdd, style: Theme.of(context).textTheme.titleLarge),
-            if (widget.sourceLabel != null) ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(
-                    Symbols.auto_awesome_rounded,
-                    size: 14,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    widget.sourceLabel!,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (widget.photoBytes != null) ...[
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.memory(
-                  widget.photoBytes!,
-                  height: 96,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  semanticLabel: l10n.a11yMealPhoto,
-                ),
-              ),
-            ],
             const SizedBox(height: 12),
             TextField(
               controller: _name,

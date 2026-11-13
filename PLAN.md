@@ -181,6 +181,10 @@ switch, units).
 
 ## AI estimates — consent gate & terms position (decided 2026-08-30)
 
+> **Superseded 2026-11-13 by Phase 17 (AI bridge):** the Gemini key, consent
+> sheet and photo/describe flows are removed; the user's own AI app answers with
+> a JSON block or ingredient list that is pasted or shared in. Kept for history.
+
 Google's Gemini API Additional Terms (eff. 2026-03-23) say two things that bear
 on a bring-your-own-key consumer app:
 
@@ -503,6 +507,8 @@ Strategy:
     **live path verified end-to-end** with a real key (pizza → "Pizza Margherita", 850 kcal,
     P32/C105/F28). The on-device path stays the keyless default.
   - **Caveat:** calorie-from-photo is inherently rough → always framed as an *estimate to confirm*.
+  - **Superseded 2026-11-13 by Phase 17:** Gemini path removed; photos go to the user's own AI
+    app, whose answer comes back via paste/share.
 
 - **Phase 14 — Design-system migration (fuchsbau):** ✅ DONE (shipped 2026-06-28 as
   1.1.0+32, "fuchsbau redesign + AI text hint"; polish through 1.1.2+34). As shipped, the
@@ -667,7 +673,9 @@ Strategy:
   - **Follow-ups (explicitly out of v1):** adjusted target band in **Trends**
     (per-day range aggregate + caching); eat-back **percentage** setting; **TDEE
     mode** replacing the static target.
-- **Phase 17 — AI bridge (replaces the Gemini key):** 📋 PLANNED 2026-11-13. Keyless:
+- **Phase 17 — AI bridge (replaces the Gemini key):** ✅ BUILT 2026-11-13 (unreleased;
+  next release: drop `flutter_secure_storage` once the legacy-key cleanup has run,
+  write changelogs; iOS share extension later). Keyless:
   the user's own AI app (Claude, ChatGPT, …) gets copyable instructions and answers
   with a `{"knabberfuchs": 1, …}` JSON block (or a plain ingredient list) that comes
   back via the Android share sheet or paste into the generalized ingredient-list review

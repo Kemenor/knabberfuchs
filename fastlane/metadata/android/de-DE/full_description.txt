@@ -6,7 +6,7 @@ WAS DU TUN KANNST
 • Barcodes scannen – sofort Nährwerte aus Open Food Facts. Nicht in der Datenbank? Füge das Produkt selbst hinzu, indem du das Etikett scannst – beim nächsten Mal ist es gespeichert.
 • Schnell suchen, offline – Open Food Facts plus die kuratierte Schweizer Nährwertdatenbank, dazu deine eigenen Lebensmittel.
 • Schnell erfassen – Zahl schon bekannt? „Lasagne · 816 kcal" mit wenigen Tippern eintragen.
-• Mahlzeit fotografieren – eine optionale KI-Schätzung von Gericht, Portion und Makros. Standardmäßig aus und nicht eingebaut: Sie läuft über einen Google-Gemini-API-Schlüssel, den du selbst mitbringst, und dein Foto wird erst gesendet, wenn du einen hinterlegt hast.
+• Mit deiner eigenen KI-App – ohne Schlüssel, ohne eingebaute KI. Kopiere eine Anleitung in Claude, ChatGPT, Gemini oder Ähnliches, dann teilst du die Antwort an Knabberfuchs oder fügst sie ein (Zutatenlisten von Websites klappen auch). Die Zutaten werden deinen Lebensmitteln zugeordnet, du prüfst vor dem Speichern. Die App selbst schickt nichts an eine KI.
 • Mahlzeit aus einem Foto – fotografiere eine gedruckte Zutatenliste; die Texterkennung auf dem Gerät macht daraus eine Mahlzeit.
 • Rezepte – ein Rezept einmal anlegen und dann eine Portion an einem beliebigen Tag eintragen; es wird in seine echten Zutaten aufgeschlüsselt. Per QR-Code oder Bild teilen, per QR oder Text importieren.
 • Tag für Tag – Mahlzeiten werden beim Hinzufügen automatisch gruppiert, mit laufender Summe und Makros.
@@ -19,7 +19,7 @@ MEHRSPRACHIG
 Verfügbar in Englisch, Deutsch, Französisch und Italienisch.
 
 PRIVATSPHÄRE VON GRUND AUF
-Keine Konten, keine Analyse, keine Werbung, keine Tracker. Wir betreiben keinen Server und sehen deine Daten nie. Barcode-Scans und Online-Suchen werden bei Open Food Facts nachgeschlagen; die optionale KI-Schätzung sendet dieses eine Mahlzeitenfoto an Google – und nur, wenn du deinen eigenen Schlüssel hinterlegt hast. Alles andere bleibt auf deinem Handy.
+Keine Konten, keine Analyse, keine Werbung, keine Tracker. Wir betreiben keinen Server und sehen deine Daten nie. Barcode-Scans und Online-Suchen werden bei Open Food Facts nachgeschlagen; die App kontaktiert keinen KI-Dienst und speichert keinen API-Schlüssel. Alles andere bleibt auf deinem Handy.
 
 Lebensmitteldaten: Open Food Facts (ODbL) und die Schweizer Nährwertdatenbank (BLV).
 

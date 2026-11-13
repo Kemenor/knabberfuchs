@@ -721,34 +721,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickAddMacros => 'Add macros (optional)';
 
   @override
-  String get recognizeTooltip => 'Recognize from photo';
-
-  @override
   String get recognizeTakePhoto => 'Take a photo';
-
-  @override
-  String get recognizeGeminiNudge =>
-      'AI estimates for photos and descriptions are optional and off. You can set them up in Settings.';
-
-  @override
-  String get recognizeKeyMissingTitle => 'Activate AI scanning';
-
-  @override
-  String get recognizeKeyMissingBody =>
-      'AI meal estimates are optional and currently off. Set them up in Settings under “AI recognition” — they use Google Gemini with a key from your own Google account.';
-
-  @override
-  String get actionGoToSettings => 'Go to Settings';
-
-  @override
-  String get dayCaptureTooltip => 'Add from a photo';
-
-  @override
-  String get captureScanAi => 'Scan a meal with AI';
-
-  @override
-  String get captureScanAiSub =>
-      'Photograph a dish — we\'ll guess it and the calories';
 
   @override
   String get foodFormTitle => 'New food';
@@ -766,103 +739,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAi => 'AI recognition';
-
-  @override
-  String get aiKeyDesc =>
-      'Add a Google Gemini API key to unlock AI meal estimates from a photo or a typed description. Photos and descriptions are then sent to Google. Gemini\'s free tier is plenty for personal use; if you\'ve enabled billing on your Google account, heavy use may incur charges. On the free tier Google may use your data to improve their models — except in the EEA, Switzerland and the UK, where Google\'s paid-service data terms apply to free use too.';
-
-  @override
-  String get aiKeyLabel => 'Gemini API key';
-
-  @override
-  String get aiKeyGet => 'Get an API key';
-
-  @override
-  String get aiKeyTest => 'Test key';
-
-  @override
-  String get aiKeyTesting => 'Testing…';
-
-  @override
-  String get aiKeyTestOk => 'The key works.';
-
-  @override
-  String get aiModelLabel => 'AI model';
-
-  @override
-  String get aiModelReliable => 'Gemini 2.5 Flash — reliable';
-
-  @override
-  String get aiModelAccurate => 'Gemini 3.5 Flash — sharper, often busy';
-
-  @override
-  String get aiModelNote =>
-      'If your choice is unavailable or busy, 2.5 Flash is tried next.';
-
-  @override
-  String get aiGateSummary =>
-      'Optional: estimate a meal from a photo or a typed description with Google Gemini. Off by default — it runs on a Gemini API key from your own Google account, not ours.';
-
-  @override
-  String get aiGateAction => 'Set up AI estimates';
-
-  @override
-  String get aiConsentTitle => 'Before you turn this on';
-
-  @override
-  String get aiConsentPhoto =>
-      'Your meal photo, or the description you type, is sent to Google. Nothing is sent until you add a key.';
-
-  @override
-  String get aiConsentOwnKey =>
-      'It runs on a Google Gemini API key you create on your own Google account. That\'s a developer key — Google offers the API for building with, not as a consumer service.';
-
-  @override
-  String get aiConsentDataUse =>
-      'On Google\'s free tier they may use what you send to improve their models. In the EEA, Switzerland and the UK their paid-service data terms apply instead, and they don\'t.';
-
-  @override
-  String get aiConsentBilling =>
-      'The free tier covers personal use. If you\'ve enabled billing on your Google account, heavy use can cost money.';
-
-  @override
-  String get aiConsentLocal =>
-      'Nothing else changes: your diary, photos and targets stay on this phone.';
-
-  @override
-  String get aiConsentCheck =>
-      'I understand my meal photos are sent to Google.';
-
-  @override
-  String get aiConsentAccept => 'Enable AI estimates';
-
-  @override
-  String get aiTurnOff => 'Turn off AI estimates';
-
-  @override
-  String get aiTurnOffTitle => 'Turn off AI estimates?';
-
-  @override
-  String get aiTurnOffConfirm =>
-      'This deletes your API key from this phone and hides the AI settings again. Your logged meals are untouched.';
-
-  @override
-  String get aiTurnedOff => 'AI estimates turned off, API key deleted.';
-
-  @override
-  String get recognizeByGemini => 'Estimated by Gemini';
-
-  @override
-  String get geminiHintTitle => 'Describe the meal (optional)';
-
-  @override
-  String get geminiHintLabel => 'Add a hint';
-
-  @override
-  String get geminiHintExample => 'e.g. homemade lasagne, large portion';
-
-  @override
-  String get geminiHintEstimate => 'Estimate';
 
   @override
   String get a11yPreviousPeriod => 'Previous period';
@@ -912,87 +788,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get geminiProblemTitle => 'AI estimate didn\'t work';
-
-  @override
-  String get geminiErrorInvalidKey =>
-      'Google rejected this API key. Check it under Settings → AI recognition, or paste a fresh one from Google AI Studio.';
-
-  @override
-  String get geminiErrorNoAccess =>
-      'This API key isn\'t allowed to use Gemini. Its Google Cloud project may not have the Generative Language API enabled, or the key is restricted.';
-
-  @override
-  String get geminiErrorModelUnavailable =>
-      'Your key can\'t reach this AI model. Pick the other model under Settings → AI recognition.';
-
-  @override
-  String get geminiErrorQuota =>
-      'Your Gemini quota is used up for now. Try again later, or check your usage in Google AI Studio.';
-
-  @override
-  String get geminiErrorBusy =>
-      'Gemini is busy right now — add the meal manually, or try again in a moment.';
-
-  @override
-  String get geminiErrorNetwork =>
-      'No connection to Google. Check your internet connection and try again.';
-
-  @override
-  String get geminiErrorNotFood => 'Gemini didn\'t recognise any food here.';
-
-  @override
-  String get geminiErrorUnknown =>
-      'Gemini sent back something unexpected. Add the meal manually instead.';
-
-  @override
   String get actionContinueManually => 'Continue manually';
-
-  @override
-  String get captureDescribe => 'Describe a meal';
-
-  @override
-  String get captureDescribeSub => 'Type what you ate — we\'ll estimate it';
-
-  @override
-  String get describeMealTitle => 'Describe the meal';
-
-  @override
-  String get describeMealLabel => 'What did you eat?';
-
-  @override
-  String get describeMealExample =>
-      'e.g. 2 slices rye bread, butter 10 g, 1 apple';
-
-  @override
-  String get describeMealNoLines =>
-      'Couldn\'t read any items — write one food per line, ideally with an amount (e.g. \"Rice 150 g\").';
-
-  @override
-  String get geminiThinking1 => 'Asking Gemini for calories…';
-
-  @override
-  String get geminiThinking2 => 'Estimating calories from your photo…';
-
-  @override
-  String get geminiThinking3 => 'Identifying the dish…';
-
-  @override
-  String get geminiThinking4 => 'Working out the portion size…';
-
-  @override
-  String get geminiThinking5 => 'Reading the plate…';
-
-  @override
-  String get geminiThinking6 => 'Crunching the numbers…';
-
-  @override
-  String get geminiSlow => 'Gemini\'s a bit busy — hang on…';
-
-  @override
-  String geminiRetrying(int n) {
-    return 'Server busy — retrying (attempt $n)…';
-  }
 
   @override
   String get scanBarcode => 'Scan barcode';
@@ -1201,6 +997,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ocrUseSuggestion => 'Use';
+
+  @override
+  String get aiHelperTitle => 'AI helper';
+
+  @override
+  String get aiHelperSettingsSub => 'Use your own AI app — no key needed';
+
+  @override
+  String get aiHelperIntro =>
+      'Knabberfuchs doesn\'t talk to any AI. Your own AI app — Claude, ChatGPT, Gemini … — does the thinking: give it these instructions once, then bring its answers back with Share → Knabberfuchs or \"Paste from your AI app\".';
+
+  @override
+  String get aiInstructionsSection => 'Instructions for your AI app';
+
+  @override
+  String get aiTaskLogTitle => 'Log what I ate';
+
+  @override
+  String get aiTaskLogSub =>
+      'Describe a meal or send a photo — get back a block to log';
+
+  @override
+  String get aiTaskRecipeTitle => 'Adapt a recipe';
+
+  @override
+  String get aiTaskRecipeSub =>
+      'Fit a recipe to your targets — get back its ingredient list';
+
+  @override
+  String get aiCopy => 'Copy';
+
+  @override
+  String get aiCopied => 'Instructions copied — paste them into your AI app.';
+
+  @override
+  String get aiHowTo =>
+      'Paste them once into a Claude Project, ChatGPT\'s custom instructions or a Gem — they include your current targets. Copy them again after changing your targets.';
+
+  @override
+  String get aiSummarySection => 'Share a summary';
+
+  @override
+  String get aiSummarySub =>
+      'Your last days as text — for your AI app to look for patterns.';
+
+  @override
+  String get aiSummary7 => 'Last 7 days';
+
+  @override
+  String get aiSummary30 => 'Last 30 days';
+
+  @override
+  String ocrEstimated(String amount) {
+    return '$amount · estimated by your AI';
+  }
 
   @override
   String kcalDotGrams(String kcal, String grams) {

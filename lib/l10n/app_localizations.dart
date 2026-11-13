@@ -1314,59 +1314,11 @@ abstract class AppLocalizations {
   /// **'Add macros (optional)'**
   String get quickAddMacros;
 
-  /// Tooltip of the photo-recognition action
-  ///
-  /// In en, this message translates to:
-  /// **'Recognize from photo'**
-  String get recognizeTooltip;
-
   /// Image source option: take a photo with the camera
   ///
   /// In en, this message translates to:
   /// **'Take a photo'**
   String get recognizeTakePhoto;
-
-  /// Hint suggesting a Gemini API key to unlock the AI estimate features
-  ///
-  /// In en, this message translates to:
-  /// **'AI estimates for photos and descriptions are optional and off. You can set them up in Settings.'**
-  String get recognizeGeminiNudge;
-
-  /// Title of the dialog shown when the AI meal scan is tapped without a Gemini API key
-  ///
-  /// In en, this message translates to:
-  /// **'Activate AI scanning'**
-  String get recognizeKeyMissingTitle;
-
-  /// Body of the missing-key dialog; explains how to unlock the AI scan feature
-  ///
-  /// In en, this message translates to:
-  /// **'AI meal estimates are optional and currently off. Set them up in Settings under “AI recognition” — they use Google Gemini with a key from your own Google account.'**
-  String get recognizeKeyMissingBody;
-
-  /// Dialog action that jumps to the Settings tab
-  ///
-  /// In en, this message translates to:
-  /// **'Go to Settings'**
-  String get actionGoToSettings;
-
-  /// Tooltip of the camera action on the Day screen
-  ///
-  /// In en, this message translates to:
-  /// **'Add from a photo'**
-  String get dayCaptureTooltip;
-
-  /// Capture menu entry: recognize a meal photo with AI
-  ///
-  /// In en, this message translates to:
-  /// **'Scan a meal with AI'**
-  String get captureScanAi;
-
-  /// Subtitle under the scan-a-meal-with-AI entry
-  ///
-  /// In en, this message translates to:
-  /// **'Photograph a dish — we\'ll guess it and the calories'**
-  String get captureScanAiSub;
 
   /// Title of the new-food form
   ///
@@ -1397,180 +1349,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI recognition'**
   String get settingsAi;
-
-  /// Explainer for the Gemini API key setting, including the privacy implications
-  ///
-  /// In en, this message translates to:
-  /// **'Add a Google Gemini API key to unlock AI meal estimates from a photo or a typed description. Photos and descriptions are then sent to Google. Gemini\'s free tier is plenty for personal use; if you\'ve enabled billing on your Google account, heavy use may incur charges. On the free tier Google may use your data to improve their models — except in the EEA, Switzerland and the UK, where Google\'s paid-service data terms apply to free use too.'**
-  String get aiKeyDesc;
-
-  /// Label of the Gemini API key field
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini API key'**
-  String get aiKeyLabel;
-
-  /// Link that opens the page for obtaining a Gemini API key
-  ///
-  /// In en, this message translates to:
-  /// **'Get an API key'**
-  String get aiKeyGet;
-
-  /// Button that checks the entered Gemini API key against Google
-  ///
-  /// In en, this message translates to:
-  /// **'Test key'**
-  String get aiKeyTest;
-
-  /// Label of the key-test button while the check is running
-  ///
-  /// In en, this message translates to:
-  /// **'Testing…'**
-  String get aiKeyTesting;
-
-  /// Result line after a successful key test
-  ///
-  /// In en, this message translates to:
-  /// **'The key works.'**
-  String get aiKeyTestOk;
-
-  /// Label of the AI model picker
-  ///
-  /// In en, this message translates to:
-  /// **'AI model'**
-  String get aiModelLabel;
-
-  /// AI model option: Gemini 2.5 Flash (model name stays as is)
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini 2.5 Flash — reliable'**
-  String get aiModelReliable;
-
-  /// AI model option: Gemini 3.5 Flash (model name stays as is)
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini 3.5 Flash — sharper, often busy'**
-  String get aiModelAccurate;
-
-  /// Note under the model picker explaining the fallback chain
-  ///
-  /// In en, this message translates to:
-  /// **'If your choice is unavailable or busy, 2.5 Flash is tried next.'**
-  String get aiModelNote;
-
-  /// Pre-consent explainer in the AI settings section: what the feature is, before any key field is shown
-  ///
-  /// In en, this message translates to:
-  /// **'Optional: estimate a meal from a photo or a typed description with Google Gemini. Off by default — it runs on a Gemini API key from your own Google account, not ours.'**
-  String get aiGateSummary;
-
-  /// Button that opens the AI disclosure sheet
-  ///
-  /// In en, this message translates to:
-  /// **'Set up AI estimates'**
-  String get aiGateAction;
-
-  /// Title of the one-time AI disclosure sheet
-  ///
-  /// In en, this message translates to:
-  /// **'Before you turn this on'**
-  String get aiConsentTitle;
-
-  /// Disclosure bullet: what leaves the device
-  ///
-  /// In en, this message translates to:
-  /// **'Your meal photo, or the description you type, is sent to Google. Nothing is sent until you add a key.'**
-  String get aiConsentPhoto;
-
-  /// Disclosure bullet: the key is a developer credential on the user’s own Google account
-  ///
-  /// In en, this message translates to:
-  /// **'It runs on a Google Gemini API key you create on your own Google account. That\'s a developer key — Google offers the API for building with, not as a consumer service.'**
-  String get aiConsentOwnKey;
-
-  /// Disclosure bullet: free-tier model training, and the EEA/CH/UK exception
-  ///
-  /// In en, this message translates to:
-  /// **'On Google\'s free tier they may use what you send to improve their models. In the EEA, Switzerland and the UK their paid-service data terms apply instead, and they don\'t.'**
-  String get aiConsentDataUse;
-
-  /// Disclosure bullet: cost risk if billing is enabled
-  ///
-  /// In en, this message translates to:
-  /// **'The free tier covers personal use. If you\'ve enabled billing on your Google account, heavy use can cost money.'**
-  String get aiConsentBilling;
-
-  /// Disclosure bullet: nothing else leaves the phone
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing else changes: your diary, photos and targets stay on this phone.'**
-  String get aiConsentLocal;
-
-  /// Checkbox the user must tick before the accept button enables
-  ///
-  /// In en, this message translates to:
-  /// **'I understand my meal photos are sent to Google.'**
-  String get aiConsentCheck;
-
-  /// Accept action on the AI disclosure sheet
-  ///
-  /// In en, this message translates to:
-  /// **'Enable AI estimates'**
-  String get aiConsentAccept;
-
-  /// Action that withdraws AI consent and deletes the stored key
-  ///
-  /// In en, this message translates to:
-  /// **'Turn off AI estimates'**
-  String get aiTurnOff;
-
-  /// Title of the confirm dialog for turning AI estimates off
-  ///
-  /// In en, this message translates to:
-  /// **'Turn off AI estimates?'**
-  String get aiTurnOffTitle;
-
-  /// Body of the confirm dialog: the key is deleted, logged meals are untouched
-  ///
-  /// In en, this message translates to:
-  /// **'This deletes your API key from this phone and hides the AI settings again. Your logged meals are untouched.'**
-  String get aiTurnOffConfirm;
-
-  /// Snackbar confirming AI estimates were turned off and the key deleted
-  ///
-  /// In en, this message translates to:
-  /// **'AI estimates turned off, API key deleted.'**
-  String get aiTurnedOff;
-
-  /// Attribution badge on results estimated by Gemini
-  ///
-  /// In en, this message translates to:
-  /// **'Estimated by Gemini'**
-  String get recognizeByGemini;
-
-  /// Title of the optional meal-description step before a Gemini scan
-  ///
-  /// In en, this message translates to:
-  /// **'Describe the meal (optional)'**
-  String get geminiHintTitle;
-
-  /// Label of the optional hint text field for a Gemini scan
-  ///
-  /// In en, this message translates to:
-  /// **'Add a hint'**
-  String get geminiHintLabel;
-
-  /// Example placeholder in the Gemini hint field
-  ///
-  /// In en, this message translates to:
-  /// **'e.g. homemade lasagne, large portion'**
-  String get geminiHintExample;
-
-  /// Button that starts the Gemini estimate
-  ///
-  /// In en, this message translates to:
-  /// **'Estimate'**
-  String get geminiHintEstimate;
 
   /// Accessibility label of the previous-period arrow on the Trends screen
   ///
@@ -1662,149 +1440,11 @@ abstract class AppLocalizations {
   /// **'QR code for recipe {name}'**
   String a11yQrCode(String name);
 
-  /// Title of the dialog shown when an AI estimate failed for a reason the user can fix
-  ///
-  /// In en, this message translates to:
-  /// **'AI estimate didn\'t work'**
-  String get geminiProblemTitle;
-
-  /// Gemini failure: Google rejected the API key (HTTP 400 API_KEY_INVALID / 401)
-  ///
-  /// In en, this message translates to:
-  /// **'Google rejected this API key. Check it under Settings → AI recognition, or paste a fresh one from Google AI Studio.'**
-  String get geminiErrorInvalidKey;
-
-  /// Gemini failure: the key is not permitted (HTTP 403) — API not enabled or key restricted
-  ///
-  /// In en, this message translates to:
-  /// **'This API key isn\'t allowed to use Gemini. Its Google Cloud project may not have the Generative Language API enabled, or the key is restricted.'**
-  String get geminiErrorNoAccess;
-
-  /// Gemini failure: the chosen model is not reachable with this key (HTTP 404)
-  ///
-  /// In en, this message translates to:
-  /// **'Your key can\'t reach this AI model. Pick the other model under Settings → AI recognition.'**
-  String get geminiErrorModelUnavailable;
-
-  /// Gemini failure: rate limit or daily free-tier quota exhausted (HTTP 429)
-  ///
-  /// In en, this message translates to:
-  /// **'Your Gemini quota is used up for now. Try again later, or check your usage in Google AI Studio.'**
-  String get geminiErrorQuota;
-
-  /// Gemini failure: Google overloaded or slow (HTTP 5xx / timeout)
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini is busy right now — add the meal manually, or try again in a moment.'**
-  String get geminiErrorBusy;
-
-  /// Gemini failure: the request never reached Google (no connectivity)
-  ///
-  /// In en, this message translates to:
-  /// **'No connection to Google. Check your internet connection and try again.'**
-  String get geminiErrorNetwork;
-
-  /// Gemini answered, but the photo/text is not food
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini didn\'t recognise any food here.'**
-  String get geminiErrorNotFood;
-
-  /// Gemini failure: unclassified status or an unusable payload
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini sent back something unexpected. Add the meal manually instead.'**
-  String get geminiErrorUnknown;
-
   /// Dismiss action on the AI-problem dialog: skip the AI and enter the meal by hand
   ///
   /// In en, this message translates to:
   /// **'Continue manually'**
   String get actionContinueManually;
-
-  /// Capture menu entry: type what you ate instead of photographing it
-  ///
-  /// In en, this message translates to:
-  /// **'Describe a meal'**
-  String get captureDescribe;
-
-  /// Subtitle under the describe-a-meal entry
-  ///
-  /// In en, this message translates to:
-  /// **'Type what you ate — we\'ll estimate it'**
-  String get captureDescribeSub;
-
-  /// Title of the describe-meal input sheet
-  ///
-  /// In en, this message translates to:
-  /// **'Describe the meal'**
-  String get describeMealTitle;
-
-  /// Label of the describe-meal text field
-  ///
-  /// In en, this message translates to:
-  /// **'What did you eat?'**
-  String get describeMealLabel;
-
-  /// Example placeholder in the describe-meal field; hints that amounts help
-  ///
-  /// In en, this message translates to:
-  /// **'e.g. 2 slices rye bread, butter 10 g, 1 apple'**
-  String get describeMealExample;
-
-  /// Shown when the keyless describe-meal parser found no usable ingredient lines
-  ///
-  /// In en, this message translates to:
-  /// **'Couldn\'t read any items — write one food per line, ideally with an amount (e.g. \"Rice 150 g\").'**
-  String get describeMealNoLines;
-
-  /// Rotating status line while waiting for Gemini (1/6)
-  ///
-  /// In en, this message translates to:
-  /// **'Asking Gemini for calories…'**
-  String get geminiThinking1;
-
-  /// Rotating status line while waiting for Gemini (2/6)
-  ///
-  /// In en, this message translates to:
-  /// **'Estimating calories from your photo…'**
-  String get geminiThinking2;
-
-  /// Rotating status line while waiting for Gemini (3/6)
-  ///
-  /// In en, this message translates to:
-  /// **'Identifying the dish…'**
-  String get geminiThinking3;
-
-  /// Rotating status line while waiting for Gemini (4/6)
-  ///
-  /// In en, this message translates to:
-  /// **'Working out the portion size…'**
-  String get geminiThinking4;
-
-  /// Rotating status line while waiting for Gemini (5/6)
-  ///
-  /// In en, this message translates to:
-  /// **'Reading the plate…'**
-  String get geminiThinking5;
-
-  /// Rotating status line while waiting for Gemini (6/6)
-  ///
-  /// In en, this message translates to:
-  /// **'Crunching the numbers…'**
-  String get geminiThinking6;
-
-  /// Status line when a Gemini request takes unusually long
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini\'s a bit busy — hang on…'**
-  String get geminiSlow;
-
-  /// Status line while retrying a busy Gemini server
-  ///
-  /// In en, this message translates to:
-  /// **'Server busy — retrying (attempt {n})…'**
-  String geminiRetrying(int n);
 
   /// FAB label that opens the barcode scanner
   ///
@@ -2123,6 +1763,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use'**
   String get ocrUseSuggestion;
+
+  /// Settings row and screen title: the keyless bridge to the user's own AI app
+  ///
+  /// In en, this message translates to:
+  /// **'AI helper'**
+  String get aiHelperTitle;
+
+  /// Subtitle of the AI helper row in Settings
+  ///
+  /// In en, this message translates to:
+  /// **'Use your own AI app — no key needed'**
+  String get aiHelperSettingsSub;
+
+  /// Intro paragraph of the AI helper screen
+  ///
+  /// In en, this message translates to:
+  /// **'Knabberfuchs doesn\'t talk to any AI. Your own AI app — Claude, ChatGPT, Gemini … — does the thinking: give it these instructions once, then bring its answers back with Share → Knabberfuchs or \"Paste from your AI app\".'**
+  String get aiHelperIntro;
+
+  /// Section header on the AI helper screen
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions for your AI app'**
+  String get aiInstructionsSection;
+
+  /// AI helper: instruction preset for estimating and logging meals
+  ///
+  /// In en, this message translates to:
+  /// **'Log what I ate'**
+  String get aiTaskLogTitle;
+
+  /// Subtitle of the log-a-meal preset
+  ///
+  /// In en, this message translates to:
+  /// **'Describe a meal or send a photo — get back a block to log'**
+  String get aiTaskLogSub;
+
+  /// AI helper: instruction preset for adapting recipes to targets
+  ///
+  /// In en, this message translates to:
+  /// **'Adapt a recipe'**
+  String get aiTaskRecipeTitle;
+
+  /// Subtitle of the adapt-a-recipe preset
+  ///
+  /// In en, this message translates to:
+  /// **'Fit a recipe to your targets — get back its ingredient list'**
+  String get aiTaskRecipeSub;
+
+  /// Button copying an instruction preset (keep short)
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get aiCopy;
+
+  /// Snackbar after copying instructions
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions copied — paste them into your AI app.'**
+  String get aiCopied;
+
+  /// How-to note under the instruction presets
+  ///
+  /// In en, this message translates to:
+  /// **'Paste them once into a Claude Project, ChatGPT\'s custom instructions or a Gem — they include your current targets. Copy them again after changing your targets.'**
+  String get aiHowTo;
+
+  /// Section header: share recent days as text for analysis
+  ///
+  /// In en, this message translates to:
+  /// **'Share a summary'**
+  String get aiSummarySection;
+
+  /// Explanation under the share-summary header
+  ///
+  /// In en, this message translates to:
+  /// **'Your last days as text — for your AI app to look for patterns.'**
+  String get aiSummarySub;
+
+  /// Button: share the last 7 days
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get aiSummary7;
+
+  /// Button: share the last 30 days
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get aiSummary30;
+
+  /// Subtitle of a review row carrying an AI estimate
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} · estimated by your AI'**
+  String ocrEstimated(String amount);
 
   /// One-line calories-and-grams summary
   ///
