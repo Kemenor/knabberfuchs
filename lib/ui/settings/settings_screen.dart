@@ -17,6 +17,7 @@ import '../../domain/meal_type_i18n.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../ai/ai_helper_screen.dart';
+import '../weight/weight_settings_screen.dart';
 import 'debug_section.dart';
 import 'offline_regions_screen.dart';
 import 'targets_screen.dart';
@@ -46,6 +47,8 @@ class SettingsScreen extends ConsumerWidget {
           final l10n = AppLocalizations.of(context);
           final showTrends =
               ref.watch(showTrendsProvider).asData?.value ?? true;
+          final trackWeight =
+              ref.watch(trackWeightProvider).asData?.value ?? false;
           return ListView(
             children: [
               FuchsbauSectionHeader(l10n.settingsAppearance),
@@ -94,6 +97,28 @@ class SettingsScreen extends ConsumerWidget {
                     onChanged: (v) =>
                         db.setSetting('showTrends', v ? 'true' : 'false'),
                   ),
+                  SwitchListTile(
+                    contentPadding: fuchsbauCardRowPadding,
+                    secondary: const Icon(Symbols.monitor_weight_rounded),
+                    title: Text(l10n.settingsTrackWeight),
+                    subtitle: Text(l10n.settingsTrackWeightSub),
+                    value: trackWeight,
+                    onChanged: (v) =>
+                        db.setSetting('trackWeight', v ? 'true' : null),
+                  ),
+                  if (trackWeight)
+                    ListTile(
+                      contentPadding: fuchsbauCardRowPadding,
+                      leading: const Icon(Symbols.flag_rounded),
+                      title: Text(l10n.settingsWeight),
+                      subtitle: Text(l10n.settingsWeightSub),
+                      trailing: const Icon(Symbols.chevron_right_rounded),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const WeightSettingsScreen(),
+                        ),
+                      ),
+                    ),
                   SwitchListTile(
                     contentPadding: fuchsbauCardRowPadding,
                     secondary: const Icon(Symbols.nutrition_rounded),

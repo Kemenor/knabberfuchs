@@ -1333,4 +1333,243 @@ class AppLocalizationsIt extends AppLocalizations {
   String regionSubtitleUpdatable(String base) {
     return '$base · aggiornamento disponibile';
   }
+
+  @override
+  String get actionUndo => 'Annulla';
+
+  @override
+  String get settingsTrackWeight => 'Monitora il peso';
+
+  @override
+  String get settingsTrackWeightSub =>
+      'Pesate, il tuo andamento a 7 giorni e i pesi obiettivo';
+
+  @override
+  String get settingsWeight => 'Pesi obiettivo e unità';
+
+  @override
+  String get settingsWeightSub => 'Traguardi, kg o lb, altezza per il BMI';
+
+  @override
+  String get trendsNutrition => 'Nutrizione';
+
+  @override
+  String get unitKg => 'kg';
+
+  @override
+  String get unitLb => 'lb';
+
+  @override
+  String get unitCm => 'cm';
+
+  @override
+  String get unitIn => 'in';
+
+  @override
+  String get weightTitle => 'Peso';
+
+  @override
+  String weightValue(String value, String unit) {
+    return '$value $unit';
+  }
+
+  @override
+  String get weightSevenDay => '7 giorni';
+
+  @override
+  String weightThisWeek(String change) {
+    return '$change questa settimana';
+  }
+
+  @override
+  String weightDayValue(String day, String value) {
+    return '$day $value';
+  }
+
+  @override
+  String get weightAddToday => 'Aggiungi il peso di oggi';
+
+  @override
+  String get weightAddForDay => 'Aggiungi un peso';
+
+  @override
+  String get weightNoAverageYet =>
+      'La media a 7 giorni parte da 3 pesate in una settimana';
+
+  @override
+  String weightSheetDate(String day, String date) {
+    return '$day, $date';
+  }
+
+  @override
+  String weightEditing(String time) {
+    return 'Modifica la pesata delle $time';
+  }
+
+  @override
+  String weightTime(String time) {
+    return 'Ora $time';
+  }
+
+  @override
+  String get weightChangeTime => 'Cambia';
+
+  @override
+  String get weightWeighIns => 'Pesate';
+
+  @override
+  String get weightCountsFirst => 'conta · la prima';
+
+  @override
+  String get weightCountsChosen => 'conta · scelta';
+
+  @override
+  String weightSourceHealth(String store) {
+    return 'da $store';
+  }
+
+  @override
+  String get weightSourceHere => 'aggiunta qui';
+
+  @override
+  String get weightCountThis => 'Conta questa';
+
+  @override
+  String get weightRemove => 'Rimuovi';
+
+  @override
+  String get weightRemoved => 'Pesata rimossa';
+
+  @override
+  String weightSheetAverage(String value) {
+    return 'Media a 7 giorni $value';
+  }
+
+  @override
+  String get weightSeeTrend => 'Vedi andamento';
+
+  @override
+  String get weightAdd => 'Aggiungi peso';
+
+  @override
+  String get weightEmpty =>
+      'Ancora nessuna pesata. Aggiungine una con il pulsante qui sotto o dalla schermata del giorno.';
+
+  @override
+  String get weightEmptyRange => 'Nessuna pesata in questo periodo';
+
+  @override
+  String get weightRange1M => '1 M';
+
+  @override
+  String get weightRange3M => '3 M';
+
+  @override
+  String get weightRange1Y => '1 A';
+
+  @override
+  String get weightRangeAll => 'Tutto';
+
+  @override
+  String get weightCardAverage => 'Media a 7 giorni';
+
+  @override
+  String weightVsLastWeek(String change) {
+    return '$change rispetto alla settimana scorsa';
+  }
+
+  @override
+  String get weightCardLatest => 'Ultima';
+
+  @override
+  String get weightCardSinceStart => 'Dall\'inizio';
+
+  @override
+  String weightSinceFrom(String value, String date) {
+    return 'da $value · $date';
+  }
+
+  @override
+  String get weightCardNext => 'Prossimo traguardo';
+
+  @override
+  String get weightCardGoal => 'Obiettivo';
+
+  @override
+  String weightToGo(String distance) {
+    return 'ancora $distance';
+  }
+
+  @override
+  String weightEta(int weeks) {
+    String _temp0 = intl.Intl.pluralLogic(
+      weeks,
+      locale: localeName,
+      other: '~$weeks settimane a questo ritmo',
+      one: '~1 settimana a questo ritmo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get weightNoGoal => 'Nessun obiettivo';
+
+  @override
+  String get weightSetGoal => 'Imposta un peso obiettivo →';
+
+  @override
+  String get weightGoalReached => 'Obiettivo raggiunto';
+
+  @override
+  String get weightGoalLabel => 'Obiettivo';
+
+  @override
+  String weightBmiUnder(String bmi) {
+    return 'BMI < $bmi';
+  }
+
+  @override
+  String weightBmiAtLeast(String bmi) {
+    return 'BMI ≥ $bmi';
+  }
+
+  @override
+  String get weightWeeks => 'Settimane';
+
+  @override
+  String weightSoFar(String range) {
+    return '$range · finora';
+  }
+
+  @override
+  String get weightLegendWeighIn => 'Pesata';
+
+  @override
+  String get weightLegendMilestones => 'Traguardi';
+
+  @override
+  String get a11yWeightChart =>
+      'Grafico del peso: pesate giornaliere, media a 7 giorni e i tuoi traguardi';
+
+  @override
+  String get weightUnit => 'Unità';
+
+  @override
+  String get weightHeight => 'Altezza';
+
+  @override
+  String get weightHeightSub => 'Facoltativa — aggiunge traguardi BMI';
+
+  @override
+  String get weightGoalsSection => 'Pesi obiettivo';
+
+  @override
+  String get weightGoalsHelp =>
+      'Il tuo obiettivo e i traguardi lungo la strada. Quello più lontano dal tuo andamento è l\'obiettivo — se è sotto, perdere conta come progresso; se è sopra, aumentare. Senza obiettivo i numeri restano neutri.';
+
+  @override
+  String get weightGoalAdd => 'Aggiungi un peso obiettivo';
+
+  @override
+  String get weightGoalsEmpty => 'Nessun obiettivo — i numeri restano neutri';
 }

@@ -2309,6 +2309,402 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{base} · update available'**
   String regionSubtitleUpdatable(String base);
+
+  /// Snackbar action undoing a removal
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get actionUndo;
+
+  /// Settings switch: shows or hides all weight tracking
+  ///
+  /// In en, this message translates to:
+  /// **'Track weight'**
+  String get settingsTrackWeight;
+
+  /// Subtitle of the Track weight switch
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-ins, your 7-day trend and goal weights'**
+  String get settingsTrackWeightSub;
+
+  /// Settings row opening the weight settings
+  ///
+  /// In en, this message translates to:
+  /// **'Goal weights & unit'**
+  String get settingsWeight;
+
+  /// Subtitle of the weight settings row
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones, kg or lb, height for BMI'**
+  String get settingsWeightSub;
+
+  /// Trends view switch: the nutrition charts
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition'**
+  String get trendsNutrition;
+
+  /// Unit: kilograms
+  ///
+  /// In en, this message translates to:
+  /// **'kg'**
+  String get unitKg;
+
+  /// Unit: pounds
+  ///
+  /// In en, this message translates to:
+  /// **'lb'**
+  String get unitLb;
+
+  /// Unit: centimetres
+  ///
+  /// In en, this message translates to:
+  /// **'cm'**
+  String get unitCm;
+
+  /// Unit: inches
+  ///
+  /// In en, this message translates to:
+  /// **'in'**
+  String get unitIn;
+
+  /// Weight sheet / view / settings title; also the input label
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weightTitle;
+
+  /// A weight with its unit, e.g. 87.4 kg
+  ///
+  /// In en, this message translates to:
+  /// **'{value} {unit}'**
+  String weightValue(String value, String unit);
+
+  /// After the big 7-day average on the Day row: 87.0 kg 7-day
+  ///
+  /// In en, this message translates to:
+  /// **'7-day'**
+  String get weightSevenDay;
+
+  /// Day row: change of the 7-day average vs the week before
+  ///
+  /// In en, this message translates to:
+  /// **'{change} this week'**
+  String weightThisWeek(String change);
+
+  /// Day row: the day's own weigh-in under the trend, e.g. Today 86.9 kg
+  ///
+  /// In en, this message translates to:
+  /// **'{day} {value}'**
+  String weightDayValue(String day, String value);
+
+  /// Day row before today's weigh-in
+  ///
+  /// In en, this message translates to:
+  /// **'Add today\'s weight'**
+  String get weightAddToday;
+
+  /// Day row on another day without a weigh-in
+  ///
+  /// In en, this message translates to:
+  /// **'Add a weight'**
+  String get weightAddForDay;
+
+  /// Shown while there are too few weigh-ins for an average
+  ///
+  /// In en, this message translates to:
+  /// **'The 7-day average starts at 3 weigh-ins in a week'**
+  String get weightNoAverageYet;
+
+  /// Weight sheet date line, e.g. Today, 13 Nov
+  ///
+  /// In en, this message translates to:
+  /// **'{day}, {date}'**
+  String weightSheetDate(String day, String date);
+
+  /// Weight sheet input label while editing a weigh-in
+  ///
+  /// In en, this message translates to:
+  /// **'Editing the {time} weigh-in'**
+  String weightEditing(String time);
+
+  /// Weight sheet: the weigh-in's time
+  ///
+  /// In en, this message translates to:
+  /// **'Time {time}'**
+  String weightTime(String time);
+
+  /// Button changing the weigh-in time
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get weightChangeTime;
+
+  /// Weight sheet: header of the day's weigh-ins
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-ins'**
+  String get weightWeighIns;
+
+  /// Badge: this weigh-in is the day's value because it was the first
+  ///
+  /// In en, this message translates to:
+  /// **'counts · first'**
+  String get weightCountsFirst;
+
+  /// Badge: the user chose this weigh-in as the day's value
+  ///
+  /// In en, this message translates to:
+  /// **'counts · chosen'**
+  String get weightCountsChosen;
+
+  /// Weigh-in source: imported from Health Connect / Apple Health
+  ///
+  /// In en, this message translates to:
+  /// **'from {store}'**
+  String weightSourceHealth(String store);
+
+  /// Weigh-in source: typed into the app
+  ///
+  /// In en, this message translates to:
+  /// **'added here'**
+  String get weightSourceHere;
+
+  /// Menu: make this weigh-in the day's value
+  ///
+  /// In en, this message translates to:
+  /// **'Count this one'**
+  String get weightCountThis;
+
+  /// Menu: remove a weigh-in / goal
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get weightRemove;
+
+  /// Snackbar after removing a weigh-in
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-in removed'**
+  String get weightRemoved;
+
+  /// Weight sheet footer
+  ///
+  /// In en, this message translates to:
+  /// **'7-day average {value}'**
+  String weightSheetAverage(String value);
+
+  /// Weight sheet link to Trends · Weight
+  ///
+  /// In en, this message translates to:
+  /// **'See trend'**
+  String get weightSeeTrend;
+
+  /// FAB on the weight view
+  ///
+  /// In en, this message translates to:
+  /// **'Add weight'**
+  String get weightAdd;
+
+  /// Weight view empty state
+  ///
+  /// In en, this message translates to:
+  /// **'No weigh-ins yet. Add one with the button below or from the Day screen.'**
+  String get weightEmpty;
+
+  /// Weight chart with no data in the chosen range
+  ///
+  /// In en, this message translates to:
+  /// **'No weigh-ins in this range'**
+  String get weightEmptyRange;
+
+  /// Range: one month (keep short)
+  ///
+  /// In en, this message translates to:
+  /// **'1 M'**
+  String get weightRange1M;
+
+  /// Range: three months (keep short)
+  ///
+  /// In en, this message translates to:
+  /// **'3 M'**
+  String get weightRange3M;
+
+  /// Range: one year (keep short)
+  ///
+  /// In en, this message translates to:
+  /// **'1 Y'**
+  String get weightRange1Y;
+
+  /// Range: everything (keep short)
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get weightRangeAll;
+
+  /// Weight card / chart legend: the rolling 7-day average
+  ///
+  /// In en, this message translates to:
+  /// **'7-day average'**
+  String get weightCardAverage;
+
+  /// Weight card: change of the average vs the week before
+  ///
+  /// In en, this message translates to:
+  /// **'{change} vs. last week'**
+  String weightVsLastWeek(String change);
+
+  /// Weight card: the latest daily value
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get weightCardLatest;
+
+  /// Weight card: change of the trend since the first average
+  ///
+  /// In en, this message translates to:
+  /// **'Since start'**
+  String get weightCardSinceStart;
+
+  /// Weight card: where the trend started
+  ///
+  /// In en, this message translates to:
+  /// **'from {value} · {date}'**
+  String weightSinceFrom(String value, String date);
+
+  /// Weight card: the next goal weight or BMI boundary
+  ///
+  /// In en, this message translates to:
+  /// **'Next milestone'**
+  String get weightCardNext;
+
+  /// Weight card label when no goal is set
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get weightCardGoal;
+
+  /// Weight card: distance to the next milestone
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} to go'**
+  String weightToGo(String distance);
+
+  /// Weight card: estimate, only on a steady trend
+  ///
+  /// In en, this message translates to:
+  /// **'{weeks, plural, =1{~1 week at this pace} other{~{weeks} weeks at this pace}}'**
+  String weightEta(int weeks);
+
+  /// Weight card without a goal
+  ///
+  /// In en, this message translates to:
+  /// **'No goal set'**
+  String get weightNoGoal;
+
+  /// Weight card link to the goal settings
+  ///
+  /// In en, this message translates to:
+  /// **'Set a goal weight →'**
+  String get weightSetGoal;
+
+  /// Weight card once past the final goal
+  ///
+  /// In en, this message translates to:
+  /// **'Goal reached'**
+  String get weightGoalReached;
+
+  /// Tag of the final goal weight on the chart / card
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get weightGoalLabel;
+
+  /// Milestone tag when losing: the weight where BMI drops under this value
+  ///
+  /// In en, this message translates to:
+  /// **'BMI < {bmi}'**
+  String weightBmiUnder(String bmi);
+
+  /// Milestone tag when gaining: the weight where BMI reaches this value
+  ///
+  /// In en, this message translates to:
+  /// **'BMI ≥ {bmi}'**
+  String weightBmiAtLeast(String bmi);
+
+  /// Header of the calendar-week list
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks'**
+  String get weightWeeks;
+
+  /// The current calendar week in the list
+  ///
+  /// In en, this message translates to:
+  /// **'{range} · so far'**
+  String weightSoFar(String range);
+
+  /// Chart legend: a daily weigh-in dot
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-in'**
+  String get weightLegendWeighIn;
+
+  /// Chart legend: dashed goal lines
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get weightLegendMilestones;
+
+  /// Screen-reader label of the weight chart
+  ///
+  /// In en, this message translates to:
+  /// **'Weight chart: daily weigh-ins, the 7-day average and your milestones'**
+  String get a11yWeightChart;
+
+  /// Weight settings: kg / lb
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get weightUnit;
+
+  /// Weight settings: body height
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get weightHeight;
+
+  /// Weight settings: what the height is for
+  ///
+  /// In en, this message translates to:
+  /// **'Optional — adds BMI milestones'**
+  String get weightHeightSub;
+
+  /// Weight settings section header
+  ///
+  /// In en, this message translates to:
+  /// **'Goal weights'**
+  String get weightGoalsSection;
+
+  /// Weight settings: how goals and direction work
+  ///
+  /// In en, this message translates to:
+  /// **'Your goal and the milestones on the way. The one farthest from your trend is the goal — below it means losing counts as progress, above it gaining. Without a goal, the numbers stay neutral.'**
+  String get weightGoalsHelp;
+
+  /// Weight settings: add a goal / milestone
+  ///
+  /// In en, this message translates to:
+  /// **'Add a goal weight'**
+  String get weightGoalAdd;
+
+  /// Weight settings: empty goal list
+  ///
+  /// In en, this message translates to:
+  /// **'No goal set — the numbers stay neutral'**
+  String get weightGoalsEmpty;
 }
 
 class _AppLocalizationsDelegate

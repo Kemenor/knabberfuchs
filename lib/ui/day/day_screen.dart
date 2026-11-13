@@ -23,6 +23,7 @@ import '../food/log_food_sheet.dart';
 import '../food/quick_add_sheet.dart';
 import '../import/text_import.dart';
 import '../recipes/ocr_meal_screen.dart';
+import '../weight/weight_day_row.dart';
 import 'meal_detail_screen.dart';
 import 'merge_meal_sheet.dart';
 import 'scale_meal_sheet.dart';
@@ -390,6 +391,7 @@ class _SummaryCard extends StatelessWidget {
             ],
             const SizedBox(height: 12),
             _MacroRow(summary: summary),
+            WeightDayRow(day: summary.day),
           ],
         ),
       ),

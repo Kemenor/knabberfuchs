@@ -10,13 +10,66 @@ import '../../core/status_color.dart';
 import '../../domain/day_summary.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import '../weight/weight_trend_view.dart';
 
 /// Intake history for the chosen metric (calories or a macro) against the
 /// user's target: a line of daily values over a shaded target band, each day's
 /// dot colored by its status (under / in-range / over). A metric toggle picks
 /// kcal/P/C/F; Week / Month / a custom range steps through periods.
+///
+/// With "Track weight" on, a Nutrition | Weight switch sits on top and the
+/// Weight view brings its own "Add weight" FAB (PLAN B.6).
 class TrendsScreen extends ConsumerWidget {
   const TrendsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final trackWeight = ref.watch(trackWeightProvider).asData?.value ?? false;
+    final view = trackWeight
+        ? ref.watch(trendsViewProvider)
+        : TrendsView.nutrition;
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.navTrends)),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (trackWeight)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SegmentedButton<TrendsView>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(
+                    value: TrendsView.nutrition,
+                    label: Text(l10n.trendsNutrition),
+                  ),
+                  ButtonSegment(
+                    value: TrendsView.weight,
+                    label: Text(l10n.weightTitle),
+                  ),
+                ],
+                selected: {view},
+                onSelectionChanged: (s) =>
+                    ref.read(trendsViewProvider.notifier).set(s.first),
+              ),
+            ),
+          Expanded(
+            child: view == TrendsView.weight
+                ? const WeightTrendView()
+                : const _NutritionTrends(),
+          ),
+        ],
+      ),
+      floatingActionButton: view == TrendsView.weight
+          ? const AddWeightFab(heroTag: 'trendsAddWeight')
+          : null,
+    );
+  }
+}
+
+class _NutritionTrends extends ConsumerWidget {
+  const _NutritionTrends();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,96 +85,93 @@ class TrendsScreen extends ConsumerWidget {
         ? selected
         : TargetMetric.kcal;
     final trendsAsync = ref.watch(trendsProvider);
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.navTrends)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Scrollable single-select chips: kcal + the enabled nutrients.
-            // (Replaced the 4-slot SegmentedButton when the metric list became
-            // user-configurable — Phase 15.)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  for (final m in TargetMetric.values)
-                    if (m == TargetMetric.kcal || tracked.contains(m))
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(
-                            m == TargetMetric.kcal
-                                ? l10n.unitKcal
-                                : metricLabel(l10n, m),
-                          ),
-                          selected: metric == m,
-                          onSelected: (_) => ref
-                              .read(selectedTrendMetricProvider.notifier)
-                              .set(m),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Scrollable single-select chips: kcal + the enabled nutrients.
+          // (Replaced the 4-slot SegmentedButton when the metric list became
+          // user-configurable — Phase 15.)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final m in TargetMetric.values)
+                  if (m == TargetMetric.kcal || tracked.contains(m))
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(
+                          m == TargetMetric.kcal
+                              ? l10n.unitKcal
+                              : metricLabel(l10n, m),
                         ),
+                        selected: metric == m,
+                        onSelected: (_) => ref
+                            .read(selectedTrendMetricProvider.notifier)
+                            .set(m),
                       ),
-                ],
-              ),
-            ),
-            // With the activity budget adjustment on, the Day screen's target
-            // moves per day — this band doesn't (v1 limitation, see PLAN
-            // Phase 16 follow-ups). Say so instead of quietly disagreeing.
-            if (ref.watch(healthEnergyReadProvider).asData?.value ?? false) ...[
-              const SizedBox(height: 4),
-              Text(
-                l10n.trendsActivityNote,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-            ],
-            const SizedBox(height: 8),
-            SegmentedButton<TrendMode>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(
-                  value: TrendMode.week,
-                  label: Text(l10n.trendsWeek),
-                ),
-                ButtonSegment(
-                  value: TrendMode.month,
-                  label: Text(l10n.trendsMonth),
-                ),
-                ButtonSegment(
-                  value: TrendMode.custom,
-                  label: Text(l10n.trendsCustom),
-                ),
+                    ),
               ],
-              selected: {window.mode},
-              onSelectionChanged: (s) {
-                final notifier = ref.read(trendRangeProvider.notifier);
-                if (s.first != TrendMode.custom) {
-                  notifier.setMode(s.first);
-                  return;
-                }
-                // Reuse the last custom range if there is one; otherwise pick.
-                final saved = notifier.savedCustom;
-                if (saved != null) {
-                  notifier.setCustom(saved.start, saved.end);
-                } else {
-                  pickCustomRange(context, ref, window);
-                }
-              },
             ),
-            const SizedBox(height: 8),
-            _RangeHeader(window: window),
-            const SizedBox(height: 8),
-            Expanded(
-              child: trendsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text(l10n.genericError('$e'))),
-                data: (trends) => _TrendsBody(trends: trends, metric: metric),
+          ),
+          // With the activity budget adjustment on, the Day screen's target
+          // moves per day — this band doesn't (v1 limitation, see PLAN
+          // Phase 16 follow-ups). Say so instead of quietly disagreeing.
+          if (ref.watch(healthEnergyReadProvider).asData?.value ?? false) ...[
+            const SizedBox(height: 4),
+            Text(
+              l10n.trendsActivityNote,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
               ),
             ),
           ],
-        ),
+          const SizedBox(height: 8),
+          SegmentedButton<TrendMode>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(
+                value: TrendMode.week,
+                label: Text(l10n.trendsWeek),
+              ),
+              ButtonSegment(
+                value: TrendMode.month,
+                label: Text(l10n.trendsMonth),
+              ),
+              ButtonSegment(
+                value: TrendMode.custom,
+                label: Text(l10n.trendsCustom),
+              ),
+            ],
+            selected: {window.mode},
+            onSelectionChanged: (s) {
+              final notifier = ref.read(trendRangeProvider.notifier);
+              if (s.first != TrendMode.custom) {
+                notifier.setMode(s.first);
+                return;
+              }
+              // Reuse the last custom range if there is one; otherwise pick.
+              final saved = notifier.savedCustom;
+              if (saved != null) {
+                notifier.setCustom(saved.start, saved.end);
+              } else {
+                pickCustomRange(context, ref, window);
+              }
+            },
+          ),
+          const SizedBox(height: 8),
+          _RangeHeader(window: window),
+          const SizedBox(height: 8),
+          Expanded(
+            child: trendsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text(l10n.genericError('$e'))),
+              data: (trends) => _TrendsBody(trends: trends, metric: metric),
+            ),
+          ),
+        ],
       ),
     );
   }

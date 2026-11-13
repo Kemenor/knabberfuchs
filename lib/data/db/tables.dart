@@ -198,6 +198,44 @@ class OcrMappings extends Table {
   Set<Column> get primaryKey => {normalizedName};
 }
 
+/// A body measurement — for now only weigh-ins (`kind` keeps the door open
+/// for waist etc.). Values are stored in metric (kg); the display unit is a
+/// setting. Several per day are kept; the day's value for charts is the one
+/// flagged [countsForDay], else the day's first (see `domain/weight.dart`).
+///
+/// Indexed by (kind, day): the Day row and the Weight sheet read one day,
+/// the Weight view reads them all in day order (v16).
+@TableIndex(name: 'idx_body_measurements_day', columns: {#kind, #day})
+class BodyMeasurements extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get kind => intEnum<MeasurementKind>()();
+
+  /// Local calendar day of [measuredAt] as 'YYYY-MM-DD' (the diary key).
+  TextColumn get day => text().withLength(min: 10, max: 10)();
+  DateTimeColumn get measuredAt => dateTime()();
+
+  /// kg for weight.
+  RealColumn get value => real()();
+  IntColumn get source => intEnum<MeasurementSource>()();
+
+  /// The health store's record id for [MeasurementSource.health] rows, so a
+  /// re-import never duplicates them. Null for entries made in the app.
+  TextColumn get externalId => text().nullable()();
+
+  /// The user picked this weigh-in as the day's value ("Count this one").
+  /// At most one per day and kind; local only — never written to Health.
+  BoolColumn get countsForDay => boolean().withDefault(const Constant(false))();
+
+  /// Removed in the app but owned by the health store: kept (hidden) so the
+  /// next import doesn't bring it back.
+  BoolColumn get hidden => boolean().withDefault(const Constant(false))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {source, externalId},
+  ];
+}
+
 /// Simple key/value store for app preferences.
 class Settings extends Table {
   TextColumn get key => text()();

@@ -5498,6 +5498,594 @@ class OcrMappingsCompanion extends UpdateCompanion<OcrMapping> {
   }
 }
 
+class $BodyMeasurementsTable extends BodyMeasurements
+    with TableInfo<$BodyMeasurementsTable, BodyMeasurement> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BodyMeasurementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<MeasurementKind, int> kind =
+      GeneratedColumn<int>(
+        'kind',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<MeasurementKind>($BodyMeasurementsTable.$converterkind);
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 10,
+      maxTextLength: 10,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _measuredAtMeta = const VerificationMeta(
+    'measuredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> measuredAt = GeneratedColumn<DateTime>(
+    'measured_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<double> value = GeneratedColumn<double>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<MeasurementSource, int> source =
+      GeneratedColumn<int>(
+        'source',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<MeasurementSource>(
+        $BodyMeasurementsTable.$convertersource,
+      );
+  static const VerificationMeta _externalIdMeta = const VerificationMeta(
+    'externalId',
+  );
+  @override
+  late final GeneratedColumn<String> externalId = GeneratedColumn<String>(
+    'external_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _countsForDayMeta = const VerificationMeta(
+    'countsForDay',
+  );
+  @override
+  late final GeneratedColumn<bool> countsForDay = GeneratedColumn<bool>(
+    'counts_for_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("counts_for_day" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _hiddenMeta = const VerificationMeta('hidden');
+  @override
+  late final GeneratedColumn<bool> hidden = GeneratedColumn<bool>(
+    'hidden',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("hidden" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    kind,
+    day,
+    measuredAt,
+    value,
+    source,
+    externalId,
+    countsForDay,
+    hidden,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'body_measurements';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BodyMeasurement> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('measured_at')) {
+      context.handle(
+        _measuredAtMeta,
+        measuredAt.isAcceptableOrUnknown(data['measured_at']!, _measuredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_measuredAtMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('external_id')) {
+      context.handle(
+        _externalIdMeta,
+        externalId.isAcceptableOrUnknown(data['external_id']!, _externalIdMeta),
+      );
+    }
+    if (data.containsKey('counts_for_day')) {
+      context.handle(
+        _countsForDayMeta,
+        countsForDay.isAcceptableOrUnknown(
+          data['counts_for_day']!,
+          _countsForDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hidden')) {
+      context.handle(
+        _hiddenMeta,
+        hidden.isAcceptableOrUnknown(data['hidden']!, _hiddenMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {source, externalId},
+  ];
+  @override
+  BodyMeasurement map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BodyMeasurement(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      kind: $BodyMeasurementsTable.$converterkind.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}kind'],
+        )!,
+      ),
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      measuredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}measured_at'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}value'],
+      )!,
+      source: $BodyMeasurementsTable.$convertersource.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}source'],
+        )!,
+      ),
+      externalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}external_id'],
+      ),
+      countsForDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}counts_for_day'],
+      )!,
+      hidden: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}hidden'],
+      )!,
+    );
+  }
+
+  @override
+  $BodyMeasurementsTable createAlias(String alias) {
+    return $BodyMeasurementsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<MeasurementKind, int, int> $converterkind =
+      const EnumIndexConverter<MeasurementKind>(MeasurementKind.values);
+  static JsonTypeConverter2<MeasurementSource, int, int> $convertersource =
+      const EnumIndexConverter<MeasurementSource>(MeasurementSource.values);
+}
+
+class BodyMeasurement extends DataClass implements Insertable<BodyMeasurement> {
+  final int id;
+  final MeasurementKind kind;
+
+  /// Local calendar day of [measuredAt] as 'YYYY-MM-DD' (the diary key).
+  final String day;
+  final DateTime measuredAt;
+
+  /// kg for weight.
+  final double value;
+  final MeasurementSource source;
+
+  /// The health store's record id for [MeasurementSource.health] rows, so a
+  /// re-import never duplicates them. Null for entries made in the app.
+  final String? externalId;
+
+  /// The user picked this weigh-in as the day's value ("Count this one").
+  /// At most one per day and kind; local only — never written to Health.
+  final bool countsForDay;
+
+  /// Removed in the app but owned by the health store: kept (hidden) so the
+  /// next import doesn't bring it back.
+  final bool hidden;
+  const BodyMeasurement({
+    required this.id,
+    required this.kind,
+    required this.day,
+    required this.measuredAt,
+    required this.value,
+    required this.source,
+    this.externalId,
+    required this.countsForDay,
+    required this.hidden,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['kind'] = Variable<int>(
+        $BodyMeasurementsTable.$converterkind.toSql(kind),
+      );
+    }
+    map['day'] = Variable<String>(day);
+    map['measured_at'] = Variable<DateTime>(measuredAt);
+    map['value'] = Variable<double>(value);
+    {
+      map['source'] = Variable<int>(
+        $BodyMeasurementsTable.$convertersource.toSql(source),
+      );
+    }
+    if (!nullToAbsent || externalId != null) {
+      map['external_id'] = Variable<String>(externalId);
+    }
+    map['counts_for_day'] = Variable<bool>(countsForDay);
+    map['hidden'] = Variable<bool>(hidden);
+    return map;
+  }
+
+  BodyMeasurementsCompanion toCompanion(bool nullToAbsent) {
+    return BodyMeasurementsCompanion(
+      id: Value(id),
+      kind: Value(kind),
+      day: Value(day),
+      measuredAt: Value(measuredAt),
+      value: Value(value),
+      source: Value(source),
+      externalId: externalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(externalId),
+      countsForDay: Value(countsForDay),
+      hidden: Value(hidden),
+    );
+  }
+
+  factory BodyMeasurement.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BodyMeasurement(
+      id: serializer.fromJson<int>(json['id']),
+      kind: $BodyMeasurementsTable.$converterkind.fromJson(
+        serializer.fromJson<int>(json['kind']),
+      ),
+      day: serializer.fromJson<String>(json['day']),
+      measuredAt: serializer.fromJson<DateTime>(json['measuredAt']),
+      value: serializer.fromJson<double>(json['value']),
+      source: $BodyMeasurementsTable.$convertersource.fromJson(
+        serializer.fromJson<int>(json['source']),
+      ),
+      externalId: serializer.fromJson<String?>(json['externalId']),
+      countsForDay: serializer.fromJson<bool>(json['countsForDay']),
+      hidden: serializer.fromJson<bool>(json['hidden']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'kind': serializer.toJson<int>(
+        $BodyMeasurementsTable.$converterkind.toJson(kind),
+      ),
+      'day': serializer.toJson<String>(day),
+      'measuredAt': serializer.toJson<DateTime>(measuredAt),
+      'value': serializer.toJson<double>(value),
+      'source': serializer.toJson<int>(
+        $BodyMeasurementsTable.$convertersource.toJson(source),
+      ),
+      'externalId': serializer.toJson<String?>(externalId),
+      'countsForDay': serializer.toJson<bool>(countsForDay),
+      'hidden': serializer.toJson<bool>(hidden),
+    };
+  }
+
+  BodyMeasurement copyWith({
+    int? id,
+    MeasurementKind? kind,
+    String? day,
+    DateTime? measuredAt,
+    double? value,
+    MeasurementSource? source,
+    Value<String?> externalId = const Value.absent(),
+    bool? countsForDay,
+    bool? hidden,
+  }) => BodyMeasurement(
+    id: id ?? this.id,
+    kind: kind ?? this.kind,
+    day: day ?? this.day,
+    measuredAt: measuredAt ?? this.measuredAt,
+    value: value ?? this.value,
+    source: source ?? this.source,
+    externalId: externalId.present ? externalId.value : this.externalId,
+    countsForDay: countsForDay ?? this.countsForDay,
+    hidden: hidden ?? this.hidden,
+  );
+  BodyMeasurement copyWithCompanion(BodyMeasurementsCompanion data) {
+    return BodyMeasurement(
+      id: data.id.present ? data.id.value : this.id,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      day: data.day.present ? data.day.value : this.day,
+      measuredAt: data.measuredAt.present
+          ? data.measuredAt.value
+          : this.measuredAt,
+      value: data.value.present ? data.value.value : this.value,
+      source: data.source.present ? data.source.value : this.source,
+      externalId: data.externalId.present
+          ? data.externalId.value
+          : this.externalId,
+      countsForDay: data.countsForDay.present
+          ? data.countsForDay.value
+          : this.countsForDay,
+      hidden: data.hidden.present ? data.hidden.value : this.hidden,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BodyMeasurement(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('day: $day, ')
+          ..write('measuredAt: $measuredAt, ')
+          ..write('value: $value, ')
+          ..write('source: $source, ')
+          ..write('externalId: $externalId, ')
+          ..write('countsForDay: $countsForDay, ')
+          ..write('hidden: $hidden')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    kind,
+    day,
+    measuredAt,
+    value,
+    source,
+    externalId,
+    countsForDay,
+    hidden,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BodyMeasurement &&
+          other.id == this.id &&
+          other.kind == this.kind &&
+          other.day == this.day &&
+          other.measuredAt == this.measuredAt &&
+          other.value == this.value &&
+          other.source == this.source &&
+          other.externalId == this.externalId &&
+          other.countsForDay == this.countsForDay &&
+          other.hidden == this.hidden);
+}
+
+class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurement> {
+  final Value<int> id;
+  final Value<MeasurementKind> kind;
+  final Value<String> day;
+  final Value<DateTime> measuredAt;
+  final Value<double> value;
+  final Value<MeasurementSource> source;
+  final Value<String?> externalId;
+  final Value<bool> countsForDay;
+  final Value<bool> hidden;
+  const BodyMeasurementsCompanion({
+    this.id = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.day = const Value.absent(),
+    this.measuredAt = const Value.absent(),
+    this.value = const Value.absent(),
+    this.source = const Value.absent(),
+    this.externalId = const Value.absent(),
+    this.countsForDay = const Value.absent(),
+    this.hidden = const Value.absent(),
+  });
+  BodyMeasurementsCompanion.insert({
+    this.id = const Value.absent(),
+    required MeasurementKind kind,
+    required String day,
+    required DateTime measuredAt,
+    required double value,
+    required MeasurementSource source,
+    this.externalId = const Value.absent(),
+    this.countsForDay = const Value.absent(),
+    this.hidden = const Value.absent(),
+  }) : kind = Value(kind),
+       day = Value(day),
+       measuredAt = Value(measuredAt),
+       value = Value(value),
+       source = Value(source);
+  static Insertable<BodyMeasurement> custom({
+    Expression<int>? id,
+    Expression<int>? kind,
+    Expression<String>? day,
+    Expression<DateTime>? measuredAt,
+    Expression<double>? value,
+    Expression<int>? source,
+    Expression<String>? externalId,
+    Expression<bool>? countsForDay,
+    Expression<bool>? hidden,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (kind != null) 'kind': kind,
+      if (day != null) 'day': day,
+      if (measuredAt != null) 'measured_at': measuredAt,
+      if (value != null) 'value': value,
+      if (source != null) 'source': source,
+      if (externalId != null) 'external_id': externalId,
+      if (countsForDay != null) 'counts_for_day': countsForDay,
+      if (hidden != null) 'hidden': hidden,
+    });
+  }
+
+  BodyMeasurementsCompanion copyWith({
+    Value<int>? id,
+    Value<MeasurementKind>? kind,
+    Value<String>? day,
+    Value<DateTime>? measuredAt,
+    Value<double>? value,
+    Value<MeasurementSource>? source,
+    Value<String?>? externalId,
+    Value<bool>? countsForDay,
+    Value<bool>? hidden,
+  }) {
+    return BodyMeasurementsCompanion(
+      id: id ?? this.id,
+      kind: kind ?? this.kind,
+      day: day ?? this.day,
+      measuredAt: measuredAt ?? this.measuredAt,
+      value: value ?? this.value,
+      source: source ?? this.source,
+      externalId: externalId ?? this.externalId,
+      countsForDay: countsForDay ?? this.countsForDay,
+      hidden: hidden ?? this.hidden,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<int>(
+        $BodyMeasurementsTable.$converterkind.toSql(kind.value),
+      );
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (measuredAt.present) {
+      map['measured_at'] = Variable<DateTime>(measuredAt.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<double>(value.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<int>(
+        $BodyMeasurementsTable.$convertersource.toSql(source.value),
+      );
+    }
+    if (externalId.present) {
+      map['external_id'] = Variable<String>(externalId.value);
+    }
+    if (countsForDay.present) {
+      map['counts_for_day'] = Variable<bool>(countsForDay.value);
+    }
+    if (hidden.present) {
+      map['hidden'] = Variable<bool>(hidden.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BodyMeasurementsCompanion(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('day: $day, ')
+          ..write('measuredAt: $measuredAt, ')
+          ..write('value: $value, ')
+          ..write('source: $source, ')
+          ..write('externalId: $externalId, ')
+          ..write('countsForDay: $countsForDay, ')
+          ..write('hidden: $hidden')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5510,9 +6098,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SettingsTable settings = $SettingsTable(this);
   late final $InstalledPacksTable installedPacks = $InstalledPacksTable(this);
   late final $OcrMappingsTable ocrMappings = $OcrMappingsTable(this);
+  late final $BodyMeasurementsTable bodyMeasurements = $BodyMeasurementsTable(
+    this,
+  );
   late final Index idxEntriesDay = Index(
     'idx_entries_day',
     'CREATE INDEX idx_entries_day ON entries (day)',
+  );
+  late final Index idxBodyMeasurementsDay = Index(
+    'idx_body_measurements_day',
+    'CREATE INDEX idx_body_measurements_day ON body_measurements (kind, day)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -5528,7 +6123,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settings,
     installedPacks,
     ocrMappings,
+    bodyMeasurements,
     idxEntriesDay,
+    idxBodyMeasurementsDay,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -9031,6 +9628,290 @@ typedef $$OcrMappingsTableProcessedTableManager =
       OcrMapping,
       PrefetchHooks Function({bool foodId})
     >;
+typedef $$BodyMeasurementsTableCreateCompanionBuilder =
+    BodyMeasurementsCompanion Function({
+      Value<int> id,
+      required MeasurementKind kind,
+      required String day,
+      required DateTime measuredAt,
+      required double value,
+      required MeasurementSource source,
+      Value<String?> externalId,
+      Value<bool> countsForDay,
+      Value<bool> hidden,
+    });
+typedef $$BodyMeasurementsTableUpdateCompanionBuilder =
+    BodyMeasurementsCompanion Function({
+      Value<int> id,
+      Value<MeasurementKind> kind,
+      Value<String> day,
+      Value<DateTime> measuredAt,
+      Value<double> value,
+      Value<MeasurementSource> source,
+      Value<String?> externalId,
+      Value<bool> countsForDay,
+      Value<bool> hidden,
+    });
+
+class $$BodyMeasurementsTableFilterComposer
+    extends Composer<_$AppDatabase, $BodyMeasurementsTable> {
+  $$BodyMeasurementsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<MeasurementKind, MeasurementKind, int>
+  get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get measuredAt => $composableBuilder(
+    column: $table.measuredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<MeasurementSource, MeasurementSource, int>
+  get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get countsForDay => $composableBuilder(
+    column: $table.countsForDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hidden => $composableBuilder(
+    column: $table.hidden,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BodyMeasurementsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BodyMeasurementsTable> {
+  $$BodyMeasurementsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get measuredAt => $composableBuilder(
+    column: $table.measuredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get countsForDay => $composableBuilder(
+    column: $table.countsForDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hidden => $composableBuilder(
+    column: $table.hidden,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BodyMeasurementsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BodyMeasurementsTable> {
+  $$BodyMeasurementsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<MeasurementKind, int> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get measuredAt => $composableBuilder(
+    column: $table.measuredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<MeasurementSource, int> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get countsForDay => $composableBuilder(
+    column: $table.countsForDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get hidden =>
+      $composableBuilder(column: $table.hidden, builder: (column) => column);
+}
+
+class $$BodyMeasurementsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BodyMeasurementsTable,
+          BodyMeasurement,
+          $$BodyMeasurementsTableFilterComposer,
+          $$BodyMeasurementsTableOrderingComposer,
+          $$BodyMeasurementsTableAnnotationComposer,
+          $$BodyMeasurementsTableCreateCompanionBuilder,
+          $$BodyMeasurementsTableUpdateCompanionBuilder,
+          (
+            BodyMeasurement,
+            BaseReferences<
+              _$AppDatabase,
+              $BodyMeasurementsTable,
+              BodyMeasurement
+            >,
+          ),
+          BodyMeasurement,
+          PrefetchHooks Function()
+        > {
+  $$BodyMeasurementsTableTableManager(
+    _$AppDatabase db,
+    $BodyMeasurementsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BodyMeasurementsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BodyMeasurementsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BodyMeasurementsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<MeasurementKind> kind = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<DateTime> measuredAt = const Value.absent(),
+                Value<double> value = const Value.absent(),
+                Value<MeasurementSource> source = const Value.absent(),
+                Value<String?> externalId = const Value.absent(),
+                Value<bool> countsForDay = const Value.absent(),
+                Value<bool> hidden = const Value.absent(),
+              }) => BodyMeasurementsCompanion(
+                id: id,
+                kind: kind,
+                day: day,
+                measuredAt: measuredAt,
+                value: value,
+                source: source,
+                externalId: externalId,
+                countsForDay: countsForDay,
+                hidden: hidden,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required MeasurementKind kind,
+                required String day,
+                required DateTime measuredAt,
+                required double value,
+                required MeasurementSource source,
+                Value<String?> externalId = const Value.absent(),
+                Value<bool> countsForDay = const Value.absent(),
+                Value<bool> hidden = const Value.absent(),
+              }) => BodyMeasurementsCompanion.insert(
+                id: id,
+                kind: kind,
+                day: day,
+                measuredAt: measuredAt,
+                value: value,
+                source: source,
+                externalId: externalId,
+                countsForDay: countsForDay,
+                hidden: hidden,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BodyMeasurementsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BodyMeasurementsTable,
+      BodyMeasurement,
+      $$BodyMeasurementsTableFilterComposer,
+      $$BodyMeasurementsTableOrderingComposer,
+      $$BodyMeasurementsTableAnnotationComposer,
+      $$BodyMeasurementsTableCreateCompanionBuilder,
+      $$BodyMeasurementsTableUpdateCompanionBuilder,
+      (
+        BodyMeasurement,
+        BaseReferences<_$AppDatabase, $BodyMeasurementsTable, BodyMeasurement>,
+      ),
+      BodyMeasurement,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9053,4 +9934,6 @@ class $AppDatabaseManager {
       $$InstalledPacksTableTableManager(_db, _db.installedPacks);
   $$OcrMappingsTableTableManager get ocrMappings =>
       $$OcrMappingsTableTableManager(_db, _db.ocrMappings);
+  $$BodyMeasurementsTableTableManager get bodyMeasurements =>
+      $$BodyMeasurementsTableTableManager(_db, _db.bodyMeasurements);
 }

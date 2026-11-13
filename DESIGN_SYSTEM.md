@@ -489,6 +489,36 @@ Live: `quick_add_sheet.dart:188-294`, `log_food_sheet.dart:205-340`,
   page (multiple photos → horizontal strip), tap → full-screen black
   `InteractiveViewer`. A missing file (backup restored elsewhere) renders
   nothing — no broken-image placeholder.
+- **Weight** (Phase 18, 2026-11; mockup `examples/ui/08-weight.html`), all
+  behind Settings → "Track weight" (off by default; off = none of it shows):
+  - **The trend leads, the day whispers.** Wherever weight appears, the big
+    number is the trailing **7-day average** (from 3 values); the day's own
+    weigh-in is small and muted. Day card: a `Divider` then a tappable row at
+    the card's foot (`weight/weight_day_row.dart`) — `monitor_weight` icon,
+    "87.0 kg 7-day · −0.5 kg this week", "Today 86.9 kg" under it, or an
+    indigo `w700` "Add today's weight" before the weigh-in (trailing `add`
+    instead of `chevron_right`). Tap → the Weight sheet for the day on screen.
+  - **Colour only with a goal**: `towardColor` (`weight/weight_format.dart`) —
+    toward the goal = in-range emerald text, away = amber, no goal or a
+    change under 50 g = default text. The goal's direction (lose / gain) comes
+    from the goal farthest from the trend. Never red.
+  - **Weight sheet** (`weight/weight_sheet.dart`): input-sheet shape with an
+    outlined value field (`monitor_weight` prefix, unit suffix), a muted
+    "Time 7:10 · Change" line, a `Card` of the day's weigh-ins and a full-width
+    Save. The counting weigh-in has an emerald `check_circle` and a small
+    `secondaryContainer` badge ("counts · first" / "counts · chosen"); the
+    others a muted `schedule`. ⋮ = Count this one (not on the counting one) ·
+    Edit (entries made in the app only — Health owns its numbers) · Remove
+    (undo snackbar). Footer: "7-day average … · See trend →".
+  - **Trends · Weight** (`weight/weight_trend_view.dart`): a Nutrition | Weight
+    `SegmentedButton` atop Trends, then a 1 M / 3 M / 1 Y / All one; a 2×2 of
+    stat `Card`s (label `bodySmall` muted, value bold, sub line), the chart —
+    faded `outline` dots per day, a 3 px `primary` average line, the latest
+    dot ringed in `primary`, dashed indigo milestone lines labelled at the
+    right edge — and a calendar-week list (`ExpansionTile`s, the locale's
+    first weekday, current week "· so far") whose day rows open the sheet.
+    The Weight view brings its own "Add weight" extended FAB; Nutrition stays
+    FAB-less.
 - **Debug-only surfaces are the one sanctioned l10n exception**: the hidden
   Settings Debug section (About-dialog long-press easter egg) is
   English-only, DEBUG-labelled with an `error`-colored header, and never

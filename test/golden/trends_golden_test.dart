@@ -81,6 +81,7 @@ void main() {
           (ref) => Stream.value(defaultTrackedNutrients),
         ),
         healthEnergyReadProvider.overrideWith((ref) => Stream.value(false)),
+        trackWeightProvider.overrideWith((ref) => Stream.value(false)),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

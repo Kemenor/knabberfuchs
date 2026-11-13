@@ -16,6 +16,18 @@ enum FoodSource {
   swissFcdb,
 }
 
+/// What a body measurement measures. Stored as the enum index — append only.
+enum MeasurementKind { weight }
+
+/// Where a body measurement came from. Stored as the enum index — append only.
+enum MeasurementSource {
+  /// Typed into knabberfuchs.
+  manual,
+
+  /// Imported from Health Connect / Apple Health (a scale, another app).
+  health,
+}
+
 /// Meal a diary entry belongs to. Order matters: it's the display order.
 enum MealType {
   breakfast,

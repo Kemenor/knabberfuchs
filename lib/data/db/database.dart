@@ -18,6 +18,7 @@ part 'database.g.dart';
     Settings,
     InstalledPacks,
     OcrMappings,
+    BodyMeasurements,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -25,7 +26,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'calorie_tracker'));
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -230,6 +231,11 @@ class AppDatabase extends _$AppDatabase {
         if (from < 15) {
           // Meal photo kept from AI recognition (tester feedback 2026-07-06).
           await m.addColumn(entries, entries.photoPath);
+        }
+        if (from < 16) {
+          // Weight tracking (Phase 18).
+          await m.createTable(bodyMeasurements);
+          await m.createIndex(idxBodyMeasurementsDay);
         }
       });
     },
@@ -649,6 +655,121 @@ class AppDatabase extends _$AppDatabase {
           foodId: foodId,
         ),
       );
+
+  // ---------------- Body measurements (weight) ----------------
+
+  SimpleSelectStatement<$BodyMeasurementsTable, BodyMeasurement> _weights() =>
+      select(bodyMeasurements)..where(
+        (b) =>
+            b.kind.equalsValue(MeasurementKind.weight) & b.hidden.equals(false),
+      );
+
+  /// Every visible weigh-in, oldest first — the Weight view and the Day row
+  /// derive their numbers from this (a few thousand rows at most).
+  Stream<List<BodyMeasurement>> watchWeights() =>
+      (_weights()..orderBy([
+            (b) => OrderingTerm.asc(b.measuredAt),
+            (b) => OrderingTerm.asc(b.id),
+          ]))
+          .watch();
+
+  /// One day's visible weigh-ins, earliest first.
+  Stream<List<BodyMeasurement>> watchWeighInsForDay(String day) =>
+      (_weights()
+            ..where((b) => b.day.equals(day))
+            ..orderBy([
+              (b) => OrderingTerm.asc(b.measuredAt),
+              (b) => OrderingTerm.asc(b.id),
+            ]))
+          .watch();
+
+  /// Every weigh-in incl. hidden ones, for the backup.
+  Future<List<BodyMeasurement>> allBodyMeasurements() =>
+      (select(bodyMeasurements)..orderBy([
+            (b) => OrderingTerm.asc(b.measuredAt),
+            (b) => OrderingTerm.asc(b.id),
+          ]))
+          .get();
+
+  Future<BodyMeasurement?> bodyMeasurementById(int id) => (select(
+    bodyMeasurements,
+  )..where((b) => b.id.equals(id))).getSingleOrNull();
+
+  Future<int> addWeight({
+    required String day,
+    required DateTime at,
+    required double kg,
+    MeasurementSource source = MeasurementSource.manual,
+    String? externalId,
+  }) => into(bodyMeasurements).insert(
+    BodyMeasurementsCompanion.insert(
+      kind: MeasurementKind.weight,
+      day: day,
+      measuredAt: at,
+      value: kg,
+      source: source,
+      externalId: Value(externalId),
+    ),
+  );
+
+  /// Edit a weigh-in made in the app (value and time; the day follows the
+  /// time). A "counts" flag stays only if it still sits on the same day.
+  Future<void> updateWeight(
+    int id, {
+    required String day,
+    required DateTime at,
+    required double kg,
+  }) => transaction(() async {
+    final old = await bodyMeasurementById(id);
+    if (old == null) return;
+    await (update(bodyMeasurements)..where((b) => b.id.equals(id))).write(
+      BodyMeasurementsCompanion(
+        day: Value(day),
+        measuredAt: Value(at),
+        value: Value(kg),
+        countsForDay: Value(old.countsForDay && old.day == day),
+      ),
+    );
+  });
+
+  /// "Count this one": [id] becomes its day's value; any other choice on that
+  /// day is cleared.
+  Future<void> setCountsForDay(int id) => transaction(() async {
+    final row = await bodyMeasurementById(id);
+    if (row == null) return;
+    await (update(bodyMeasurements)
+          ..where((b) => b.kind.equalsValue(row.kind) & b.day.equals(row.day)))
+        .write(const BodyMeasurementsCompanion(countsForDay: Value(false)));
+    await (update(bodyMeasurements)..where((b) => b.id.equals(id))).write(
+      const BodyMeasurementsCompanion(countsForDay: Value(true)),
+    );
+  });
+
+  /// Remove a weigh-in: rows made in the app are deleted; rows owned by the
+  /// health store are hidden so the next import doesn't bring them back.
+  Future<void> removeWeight(int id) => transaction(() async {
+    final row = await bodyMeasurementById(id);
+    if (row == null) return;
+    if (row.source == MeasurementSource.manual) {
+      await (delete(bodyMeasurements)..where((b) => b.id.equals(id))).go();
+    } else {
+      await (update(bodyMeasurements)..where((b) => b.id.equals(id))).write(
+        const BodyMeasurementsCompanion(
+          hidden: Value(true),
+          countsForDay: Value(false),
+        ),
+      );
+    }
+  });
+
+  /// Undo [removeWeight]: put [row] back exactly as it was (re-inserting a
+  /// deleted row, or un-hiding a Health one), its "counts" choice included.
+  Future<void> restoreWeight(BodyMeasurement row) => transaction(() async {
+    await into(
+      bodyMeasurements,
+    ).insertOnConflictUpdate(row.copyWith(countsForDay: false));
+    if (row.countsForDay) await setCountsForDay(row.id);
+  });
 
   // ---------------- Settings ----------------
 

@@ -1,5 +1,6 @@
 import 'dart:async' show unawaited;
 import 'dart:convert' show jsonDecode, jsonEncode;
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter/material.dart' show ThemeMode;
@@ -30,6 +31,7 @@ import 'domain/day_summary.dart';
 import 'domain/meal_times.dart';
 import 'domain/meal_type_i18n.dart';
 import 'domain/offline_manifest.dart';
+import 'domain/weight.dart';
 
 // ---------------- Infrastructure ----------------
 
@@ -744,4 +746,102 @@ final trendsProvider = StreamProvider<List<DayTrend>>((ref) {
 final showTrendsProvider = StreamProvider<bool>(
   (ref) =>
       ref.watch(dbProvider).watchSetting('showTrends').map((v) => v != 'false'),
+);
+
+// ---------------- Weight ----------------
+
+/// Settings → "Track weight" (off by default): off hides the Day row, the
+/// Trends weight view and the Health weight switches.
+final trackWeightProvider = StreamProvider<bool>(
+  (ref) =>
+      ref.watch(dbProvider).watchSetting('trackWeight').map((v) => v == 'true'),
+);
+
+/// kg / lb; unset follows the phone's region (US, Liberia, Myanmar → lb).
+final weightUnitProvider = StreamProvider<WeightUnit>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('weightUnit')
+      .map(
+        (v) =>
+            parseWeightUnit(v, PlatformDispatcher.instance.locale.countryCode),
+      ),
+);
+
+/// The user's goal weights / milestones in kg (a JSON list in 'weightGoals').
+final weightGoalsProvider = StreamProvider<List<double>>(
+  (ref) => ref.watch(dbProvider).watchSetting('weightGoals').map((v) {
+    if (v == null) return const <double>[];
+    try {
+      return [for (final g in jsonDecode(v) as List) (g as num).toDouble()]
+        ..sort();
+    } catch (_) {
+      return const <double>[];
+    }
+  }),
+);
+
+Future<void> setWeightGoals(AppDatabase db, List<double> kg) => db.setSetting(
+  'weightGoals',
+  kg.isEmpty ? null : jsonEncode([...kg]..sort()),
+);
+
+/// Height in cm for the BMI milestones; null when not set.
+final heightCmProvider = StreamProvider<double?>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('heightCm')
+      .map((v) => v == null ? null : double.tryParse(v)),
+);
+
+/// Every visible weigh-in, oldest first.
+final weightsProvider = StreamProvider<List<BodyMeasurement>>(
+  (ref) => ref.watch(dbProvider).watchWeights(),
+);
+
+/// Daily values + trend maths over [weightsProvider].
+final weightSeriesProvider = Provider<WeightSeries>(
+  (ref) =>
+      WeightSeries.from(ref.watch(weightsProvider).asData?.value ?? const []),
+);
+
+/// One day's visible weigh-ins, earliest first.
+final dayWeighInsProvider =
+    StreamProvider.family<List<BodyMeasurement>, String>(
+      (ref, day) => ref.watch(dbProvider).watchWeighInsForDay(day),
+    );
+
+/// The Trends tab's view (Nutrition | Weight). In memory; "See trend" from
+/// the Weight sheet switches it.
+enum TrendsView { nutrition, weight }
+
+class TrendsViewNotifier extends Notifier<TrendsView> {
+  @override
+  TrendsView build() => TrendsView.nutrition;
+  void set(TrendsView v) => state = v;
+}
+
+final trendsViewProvider = NotifierProvider<TrendsViewNotifier, TrendsView>(
+  TrendsViewNotifier.new,
+);
+
+/// The Weight view's range: 1 M / 3 M / 1 Y / all.
+enum WeightRange {
+  month(30),
+  quarter(91),
+  year(365),
+  all(null);
+
+  const WeightRange(this.days);
+  final int? days;
+}
+
+class WeightRangeNotifier extends Notifier<WeightRange> {
+  @override
+  WeightRange build() => WeightRange.quarter;
+  void set(WeightRange r) => state = r;
+}
+
+final weightRangeProvider = NotifierProvider<WeightRangeNotifier, WeightRange>(
+  WeightRangeNotifier.new,
 );

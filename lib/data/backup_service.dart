@@ -11,7 +11,8 @@ import 'db/database.dart';
 
 /// Builds/shares backup ZIPs and restores from them. The ZIP contains
 /// backup.json (the lossless logical restore source), entries.csv (portable /
-/// spreadsheet-friendly), and manifest.json (schema version + timestamp).
+/// spreadsheet-friendly), weights.csv (when there are weigh-ins), and
+/// manifest.json (schema version + timestamp).
 class BackupService {
   final AppDatabase db;
   BackupService(this.db);
@@ -23,6 +24,10 @@ class BackupService {
       const JsonEncoder.withIndent('  ').convert(map),
     );
     final csvBytes = utf8.encode(buildEntriesCsv(await db.allEntries()));
+    final weights = await db.allBodyMeasurements();
+    final weightsCsv = weights.isEmpty
+        ? null
+        : utf8.encode(buildWeightsCsv(weights));
     final manifestBytes = utf8.encode(
       jsonEncode({
         'app': 'calorie_tracker',
@@ -37,6 +42,11 @@ class BackupService {
       ..addFile(
         ArchiveFile('manifest.json', manifestBytes.length, manifestBytes),
       );
+    if (weightsCsv != null) {
+      archive.addFile(
+        ArchiveFile('weights.csv', weightsCsv.length, weightsCsv),
+      );
+    }
 
     final zipBytes = ZipEncoder().encode(archive);
     final dir = await getTemporaryDirectory();

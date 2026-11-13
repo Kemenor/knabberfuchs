@@ -240,7 +240,7 @@ void main() {
 
   Future<void> expectSchemaVersionLatest(AppDatabase d) async {
     final row = await d.customSelect('PRAGMA user_version').getSingle();
-    expect(row.read<int>('user_version'), 15);
+    expect(row.read<int>('user_version'), 16);
     // v14: the entries.day index exists on migrated DBs, same as on fresh ones.
     final idx = await d
         .customSelect(
@@ -251,6 +251,17 @@ void main() {
     expect(idx, hasLength(1));
     // v15: the meal-photo column exists (and old rows read null).
     expect(await columnsOf(d, 'entries'), contains('photo_path'));
+    // v16: weigh-ins table + its day index, usable straight away.
+    expect(await columnsOf(d, 'body_measurements'), contains('counts_for_day'));
+    final wIdx = await d
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type = 'index' "
+          "AND name = 'idx_body_measurements_day'",
+        )
+        .get();
+    expect(wIdx, hasLength(1));
+    await d.addWeight(day: '2026-11-13', at: DateTime(2026, 11, 13), kg: 80);
+    expect(await d.watchWeights().first, hasLength(1));
   }
 
   test('v1 -> latest: kcal target carries into kcal_max, usda layer purged', () async {

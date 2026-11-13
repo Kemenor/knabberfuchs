@@ -17,7 +17,7 @@ import 'legacy_gemini_cleanup.dart';
 /// `barcode`/`externalId`/`densityGPerMl`/`usageCount`/`lastUsedAt` columns,
 /// and the `catalogFoodState` + `ocrMappings` sections (favorites/usage on
 /// catalog foods and remembered OCR matches, keyed by food identity rather
-/// than row id).
+/// than row id), and `bodyMeasurements` (weigh-ins; absent → none).
 const backupSchemaVersion = 2;
 
 /// Thrown when a backup was written by a newer app version than this build
@@ -78,6 +78,7 @@ Future<Map<String, dynamic>> buildBackupMap(
   final recipes = await db.allRecipes();
   final targets = await db.allTargets();
   final settings = await db.allSettings();
+  final measurements = await db.allBodyMeasurements();
 
   // Favorites/usage on non-custom catalog rows (Swiss seed, OFF cache).
   final catalogState =
@@ -223,6 +224,19 @@ Future<Map<String, dynamic>> buildBackupMap(
         },
     ],
     'ocrMappings': ocrMappings,
+    'bodyMeasurements': [
+      for (final b in measurements)
+        {
+          'kind': b.kind.name,
+          'day': b.day,
+          'measuredAt': _ms(b.measuredAt),
+          'value': b.value,
+          'source': b.source.name,
+          'externalId': b.externalId,
+          'countsForDay': b.countsForDay,
+          'hidden': b.hidden,
+        },
+    ],
     'settings': {
       for (final s in settings)
         if (!_credentialSettingKeys.contains(s.key)) s.key: s.value,
@@ -262,6 +276,27 @@ String buildEntriesCsv(List<Entry> entries) {
     );
   }
   return rows.join('\n');
+}
+
+/// Spreadsheet-friendly CSV of the weigh-ins (kg, local time), hidden ones
+/// left out.
+String buildWeightsCsv(List<BodyMeasurement> rows) {
+  final out = <String>['day,time,weight_kg,source,counts_for_day'];
+  for (final b in rows) {
+    if (b.hidden || b.kind != MeasurementKind.weight) continue;
+    final t = b.measuredAt;
+    String two(int v) => v.toString().padLeft(2, '0');
+    out.add(
+      [
+        b.day,
+        '${two(t.hour)}:${two(t.minute)}',
+        b.value.toStringAsFixed(2),
+        b.source.name,
+        b.countsForDay ? 'yes' : '',
+      ].join(','),
+    );
+  }
+  return out.join('\n');
 }
 
 // ---------------- Import ----------------
@@ -306,6 +341,7 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
       ),
     );
     await db.delete(db.ocrMappings).go();
+    await db.delete(db.bodyMeasurements).go();
     await (db.delete(
       db.settings,
     )..where((s) => s.key.isNotIn(_credentialSettingKeys))).go();
@@ -494,6 +530,28 @@ Future<void> restoreBackupMap(AppDatabase db, Map<String, dynamic> map) async {
         food = await db.foodByExternal(source, m['foodExternalId'] as String);
       }
       if (food != null) await db.setOcrMapping(name, food.id);
+    }
+
+    // Weigh-ins (absent in older exports → none, like every other section).
+    for (final b in (map['bodyMeasurements'] as List? ?? const [])) {
+      final kind = MeasurementKind.values.asNameMap()[b['kind'] as String?];
+      final source = MeasurementSource.values
+          .asNameMap()[b['source'] as String?];
+      if (kind == null || source == null) continue;
+      await db
+          .into(db.bodyMeasurements)
+          .insert(
+            BodyMeasurementsCompanion.insert(
+              kind: kind,
+              day: b['day'] as String,
+              measuredAt: _dt(b['measuredAt']),
+              value: _d(b['value']) ?? 0,
+              source: source,
+              externalId: Value(b['externalId'] as String?),
+              countsForDay: Value((b['countsForDay'] as bool?) ?? false),
+              hidden: Value((b['hidden'] as bool?) ?? false),
+            ),
+          );
     }
 
     final settings = (map['settings'] as Map?) ?? const {};

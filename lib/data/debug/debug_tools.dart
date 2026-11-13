@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../domain/enums.dart';
 import '../../domain/nutrition.dart' show encodeMicros;
 import '../db/database.dart';
+import '../dev_seed.dart' show seedDemoWeights;
 import '../offline/offline_pack_service.dart';
 
 /// Developer/tester tools behind the hidden debug menu (FEEDBACK.md
@@ -37,6 +38,7 @@ Future<void> wipeAllData(AppDatabase db, {OfflinePackService? packs}) async {
       'installed_packs',
       'targets',
       'settings',
+      'body_measurements',
     ]) {
       await db.customStatement('DELETE FROM $table');
     }
@@ -171,6 +173,8 @@ Future<int> seedTestData(AppDatabase db, {int days = 21}) async {
     }
   });
 
+  await seedDemoWeights(db);
+
   // One recipe with micros-complete item snapshots.
   await db.createRecipe(
     RecipesCompanion.insert(name: 'Test Porridge', servings: Value(2)),
@@ -230,6 +234,7 @@ Future<Map<String, String>> dbStats(AppDatabase db) async {
     'settings',
     'installed_packs',
     'ocr_mappings',
+    'body_measurements',
   ]) {
     final row = await db
         .customSelect('SELECT COUNT(*) AS c FROM $table')

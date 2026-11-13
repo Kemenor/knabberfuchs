@@ -13,6 +13,9 @@ import 'db/database.dart';
 Future<void> maybeSeedDevData(AppDatabase db) async {
   if (await db.getSetting('devSeeded') == '1') return;
 
+  // Weigh-ins exist for the weight views; they show only with Track weight.
+  await seedDemoWeights(db);
+
   // Default targets so the status colours + bars have something to read against:
   // a kcal range, a protein floor (min), and carb/fat ceilings (max).
   await db.setSetting('defaultKcalMin', '1800');
@@ -189,4 +192,27 @@ RecipeItemsCompanion _item(
     sCarb100: Value(c),
     sFat100: Value(f),
   );
+}
+
+/// 12 weeks of weigh-ins: ≈ −0.45 kg/week with ±0.7 kg day-to-day noise and
+/// a few skipped days; yesterday has a second, later weigh-in. Today stays
+/// empty so the Day row shows "Add today's weight".
+Future<void> seedDemoWeights(AppDatabase db) async {
+  final today = DateTime.now();
+  await db.transaction(() async {
+    for (var d = 84; d >= 1; d--) {
+      if (d % 6 == 0 || d % 11 == 0) continue;
+      final date = DateTime(today.year, today.month, today.day - d, 7, 10);
+      final noise = ((d * 37) % 15 - 7) / 10; // deterministic −0.7…+0.7
+      final kg = 92 - (84 - d) * 0.45 / 7 + noise;
+      await db.addWeight(day: DayKey.of(date), at: date, kg: kg);
+      if (d == 1) {
+        await db.addWeight(
+          day: DayKey.of(date),
+          at: date.add(const Duration(hours: 12)),
+          kg: kg + 0.8,
+        );
+      }
+    }
+  });
 }
