@@ -667,6 +667,19 @@ Strategy:
   - **Follow-ups (explicitly out of v1):** adjusted target band in **Trends**
     (per-day range aggregate + caching); eat-back **percentage** setting; **TDEE
     mode** replacing the static target.
+- **Phase 17 — AI bridge (replaces the Gemini key):** 📋 PLANNED 2026-11-13. Keyless:
+  the user's own AI app (Claude, ChatGPT, …) gets copyable instructions and answers
+  with a `{"knabberfuchs": 1, …}` JSON block (or a plain ingredient list) that comes
+  back via the Android share sheet or paste into the generalized ingredient-list review
+  screen (matches to your foods, or AI estimates marked as such). Gemini BYOK removed.
+  Also: tolerant ingredient parser, the OCR "Log to day" fixes, Share summary.
+  **Full plan & decisions: `PLAN-ai-bridge-and-weight.md` Part A / C.**
+- **Phase 18 — Weight:** 📋 PLANNED 2026-11-13. Behind a "Track weight" switch (off by
+  default): weigh-ins (first of the day counts, or the one you choose), a Day-screen
+  row + Weight sheet, Trends gets a Nutrition | Weight switch — 7-day average leads,
+  calendar-week list, goal weights / milestones (incl. BMI), colour only with a goal —
+  and Health weight read/write. Mockup `examples/ui/08-weight.html`.
+  **Full plan & decisions: `PLAN-ai-bridge-and-weight.md` Part B.**
 
 ## Phase 5 design — Offline OFF regional packs (planned 2026-06-17)
 

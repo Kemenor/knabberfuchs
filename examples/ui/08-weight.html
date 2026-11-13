@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knabberfuchs — Weight</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="fuchsbau.css">
+<style>
+  .stage3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:14px}
+  @media(max-width:1100px){.stage3{grid-template-columns:1fr 1fr}}
+  @media(max-width:820px){.stage3{grid-template-columns:1fr;max-width:400px;margin-inline:auto}}
+  .wrap{max-width:1240px}
+  .phone{min-height:760px}
+  .body{overflow:auto}
+  .wcards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .wcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+  .wcard.hero{background:var(--card-tint);grid-column:1/-1}
+  .wcard .l{color:var(--muted);font-size:.74rem;font-weight:600}
+  .wcard .v{font-weight:800;font-size:1.3rem;letter-spacing:-.02em;line-height:1.15}
+  .wcard.hero .v{font-size:2rem}
+  .wcard .s{color:var(--muted);font-size:.76rem}
+  .delta{font-weight:800}
+  .delta.toward{color:var(--emerald)} .delta.away{color:var(--amber)} .delta.neutral{color:var(--ink)}
+  .wkd+.wkd{border-top:1px solid var(--line)}
+  .wkd summary{list-style:none;cursor:pointer}
+  .wkd summary::-webkit-details-marker{display:none}
+  .wkd .chev{color:var(--muted);vertical-align:middle;transition:transform .15s}
+  .wkd[open] .chev{transform:rotate(180deg)}
+  .wdays{padding:0 2px 8px 10px}
+  .wday{display:flex;justify-content:space-between;font-size:.82rem;padding:3px 0;color:var(--ink)}
+  .wday span:first-child{color:var(--muted)}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.72rem;color:var(--muted);margin:4px 2px 0}
+  .legend i{display:inline-block;vertical-align:middle;margin-right:5px}
+  .wk{display:flex;justify-content:space-between;align-items:baseline;padding:9px 2px;font-size:.88rem}
+  .wk+.wk{border-top:1px solid var(--line)}
+  .wk .d{color:var(--muted)}
+  .wrow{display:flex;align-items:center;gap:12px;padding:10px 2px 4px;border-top:1px solid var(--line);margin-top:12px}
+  .wrow .ms{color:var(--orange)}
+  .wrow .t{font-weight:700}
+  .wrow .s{color:var(--muted);font-size:.8rem}
+  .wrow .go{margin-left:auto;color:var(--muted)}
+  .note{font-size:.84rem;margin-top:22px;max-width:980px}
+  .note li{margin-bottom:6px}
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px;font-size:.86rem;max-width:980px}
+  .vs div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+  .vs b{display:block;margin-bottom:4px}
+  .vs ul{margin:4px 0 0;padding-left:18px}
+  @media(max-width:820px){.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="wrap">
+  <header class="pg"><h1>🦊 Knabberfuchs — Weight</h1>
+  <button class="toggle" onclick="document.body.classList.toggle('dark')">◐ Light / dark</button></header>
+  <p class="cap" style="margin-top:10px">The trend leads — everywhere, the Day row included: 7-day average + its change vs. the week before · daily weigh-ins as faded dots · goals &amp; milestones dashed · emerald = toward the goal, amber = away, never red.</p>
+
+  <div class="seg" id="dirsw" style="max-width:420px;margin-top:12px">
+    <span data-dir="lose" class="on">Goal: lose</span><span data-dir="gain">Goal: gain</span><span data-dir="none">No goal</span>
+  </div>
+  <div class="stage3">
+
+    <!-- A · INSIDE TRENDS -->
+    <div>
+      <p class="cap">Trends · Weight <small>· Nutrition | Weight switch on top, Add weight FAB</small></p>
+      <div class="phone">
+        <div class="appbar"><b>Trends</b></div>
+        <div class="body">
+          <div class="seg"><span>Nutrition</span><span class="on">Weight</span></div>
+          <div class="seg"><span>1 M</span><span class="on">3 M</span><span>1 Y</span><span>All</span></div>
+          <div class="wcards" data-cards></div>
+          <div class="card" style="padding:10px 8px 8px">
+            <svg data-chart viewBox="0 0 300 190" width="100%" role="img" aria-label="Weight, 7-day average and milestones"></svg>
+            <div class="legend" data-legend></div>
+          </div>
+          <div class="sect">Weeks</div>
+          <div class="card pad0" data-weeks></div>
+          <div style="height:70px"></div>
+        </div>
+        <!-- The FAB only exists on the Weight view; Nutrition keeps Trends FAB-less. -->
+        <div class="fabs">
+          <button class="fab ext"><span class="ms">add</span> Add weight</button>
+        </div>
+        <div class="nav">
+          <div class="dest"><span class="pl"><span class="ms">today</span></span>Day</div>
+          <div class="dest"><span class="pl"><span class="ms">menu_book</span></span>Recipes</div>
+          <div class="dest on"><span class="pl"><span class="ms fill">trending_up</span></span>Trends</div>
+          <div class="dest"><span class="pl"><span class="ms">settings</span></span>Settings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEIGHT SHEET (from the Day row or the Trends FAB) -->
+    <div>
+      <p class="cap">Weight sheet <small>· tap the Day row — log, add another, edit today</small></p>
+      <div class="phone">
+        <div class="appbar"><span class="ms nav-i l">chevron_left</span><b>Today <span class="ms sm">expand_more</span></b><span class="ms nav-i r">chevron_right</span></div>
+        <div class="body">
+          <div class="card hero" style="height:240px"></div>
+          <div class="card" style="height:180px"></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <h3>Weight</h3>
+          <div class="flab">Today, 13 Nov</div>
+          <div class="field focus" style="margin-bottom:6px">
+            <span class="ms">monitor_weight</span>
+            <span class="val num" style="flex:1;font-size:1.25rem">87.4</span>
+            <span class="lab" style="flex:none">kg</span>
+          </div>
+          <div class="s" style="color:var(--muted);font-size:.78rem;margin:0 2px 12px" class="num">Time 19:40 · <span style="color:var(--indigo);font-weight:700">change</span></div>
+          <div class="sect" style="margin-top:4px">Today's weigh-ins</div>
+          <div class="card pad0" style="margin-bottom:12px">
+            <div class="tile">
+              <span class="ms" style="color:var(--emerald)">check_circle</span>
+              <div class="tx"><div class="t num">86.9 kg <span class="pill foc" style="margin-left:6px">counts · first</span></div><div class="s">07:12 · from Health</div></div>
+              <span class="ms" style="color:var(--muted)">more_vert</span>
+            </div>
+            <div class="tile">
+              <span class="ms" style="color:var(--muted)">schedule</span>
+              <div class="tx"><div class="t num">87.6 kg</div><div class="s">12:30 · added here</div></div>
+              <span class="ms" style="color:var(--muted)">more_vert</span>
+            </div>
+          </div>
+          <div class="s num" style="color:var(--muted);font-size:.8rem;margin:0 2px 12px">7-day average <b style="color:var(--ink)" data-sheet-avg></b> · <span style="color:var(--indigo);font-weight:700">See trend →</span></div>
+          <button class="btn emerald"><span class="ms">check</span> Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY ROW (both options) -->
+    <div>
+      <p class="cap">Day screen <small>· the trend big, today's weigh-in small — tap = Weight sheet</small></p>
+      <div class="phone">
+        <div class="appbar"><span class="ms nav-i l">chevron_left</span><b>Today <span class="ms sm">expand_more</span></b><span class="ms nav-i r">chevron_right</span></div>
+        <div class="body">
+          <div class="card hero">
+            <div class="heroTop"><div class="kcal num">512<small>kcal</small></div><div class="togo num">1,288 to go</div></div>
+            <div class="bar"><i style="width:28%"></i></div>
+            <div class="target num">Target 1,800–2,200 kcal</div>
+            <div class="macros">
+              <div class="macro none"><div class="v num">34 g</div><div class="mbar"><i style="width:27%"></i></div><div class="l">Protein</div></div>
+              <div class="macro none"><div class="v num">58 g</div><div class="mbar"><i style="width:30%"></i></div><div class="l">Carbs</div></div>
+              <div class="macro none"><div class="v num">14 g</div><div class="mbar"><i style="width:22%"></i></div><div class="l">Fat</div></div>
+            </div>
+            <div class="wrow">
+              <span class="ms">monitor_weight</span>
+              <div><div class="t num" data-today-row></div><div class="s num" data-today-sub></div></div>
+              <span class="ms go">chevron_right</span>
+            </div>
+          </div>
+          <p class="cap" style="margin:6px 4px 4px">Before today's weigh-in</p>
+          <div class="card" style="padding:4px 14px">
+            <div class="wrow" style="border-top:0;margin-top:0;padding:10px 0">
+              <span class="ms">monitor_weight</span>
+              <div><div class="t num" data-avg-only></div><div class="s" style="color:var(--indigo);font-weight:700">Add today's weight</div></div>
+              <span class="ms go">add</span>
+            </div>
+          </div>
+          <div class="card pad0">
+            <div class="ghead" style="padding-top:10px"><span class="ms">wb_twilight</span>Breakfast<span class="k num">512 kcal</span></div>
+            <div class="tile"><span class="ms">egg_alt</span><div class="tx"><div class="t">Skyr with berries</div></div><div class="tr num">250 g<b>232</b></div></div>
+            <div class="tile"><span class="ms">bakery_dining</span><div class="tx"><div class="t">Rye bread</div></div><div class="tr num">90 g<b>200</b></div></div>
+          </div>
+        </div>
+        <div class="fabs">
+          <button class="fab small"><span class="ms fill">bolt</span></button>
+          <button class="fab ext"><span class="ms">add</span> Add food</button>
+        </div>
+        <div class="nav">
+          <div class="dest on"><span class="pl"><span class="ms fill">today</span></span>Day</div>
+          <div class="dest"><span class="pl"><span class="ms">menu_book</span></span>Recipes</div>
+          <div class="dest"><span class="pl"><span class="ms">trending_up</span></span>Trends</div>
+          <div class="dest"><span class="pl"><span class="ms">settings</span></span>Settings</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="note">
+    <li><b>Placement (decided)</b>: inside Trends — a Nutrition | Weight switch; the Weight view has its own <b>Add weight</b> FAB. The Day row is the everyday way in.</li>
+    <li><b>Logging is one tap</b>: the Day row opens the Weight sheet straight away (no detour through Trends); "See trend →" goes on to Trends · Weight. With Health "Read weight" on, a scale's reading just appears — nothing to type.</li>
+    <li><b>Several weigh-ins a day</b> are kept with their times. By default the <b>first of the day counts</b> ("counts · first"); <b>"Count this one"</b> in another's ⋮ menu overrides it ("counts · chosen") — e.g. the first was after breakfast, or the scale misread. Removing the chosen one falls back to the first. The ⋮ menu: count this one (not on the one that counts) · edit (entries made here) · remove. Entries from Health can't be edited — Health owns that number — but can be removed or simply not counted.</li>
+    <li>The days in an expanded week open that day's Weight sheet, so an old day is fixed from Trends too.</li>
+    <li>The Weight sheet logs for the <b>day on screen</b> (yesterday's forgotten weigh-in: go to yesterday, tap the row).</li>
+    <li><b>Daily value</b> = the day's first weigh-in. <b>7-day average</b> (chart line, headline, Day row) = mean of the weigh-ins in the trailing 7 days, drawn from 3 values on; gaps don't make it jump.</li>
+    <li><b>Weeks</b> are calendar weeks (Mon–Sun, or the locale's first day): the mean of that week's weigh-ins and its change vs. the week before; the current week says "so far". Tap a week to see its days.</li>
+    <li><b>Colour comes from the goal</b> (switch above): losing → down is emerald, gaining → up is emerald, the other way amber. <b>No goal</b> → plain numbers, no milestone lines, and the card offers "Set a goal weight".</li>
+    <li><b>Settings → "Track weight"</b> (off = none of this shows: no Day row, no Nutrition | Weight switch, no Health weight switches).</li>
+    <li><b>Milestones</b> are your own list (e.g. 89 · 85 · 80) plus BMI lines once height is set; the chart shows those within range, the card the next one.</li>
+    <li><b>"~5 weeks"</b> on the next milestone only appears when the last 3 weeks' trend points steadily toward it — otherwise just the distance.</li>
+    <li>Sample data: 12 weeks, ≈ −0.45 kg/week with ±0.7 kg daily noise and a few skipped days.</li>
+  </ul>
+</div>
+
+<script>
+// --- sample data: 84 days, trend from 92.0 down ~0.45 kg/week, noise, gaps ---
+const N = 84, today = new Date(2026, 10, 13);
+let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const days = [];
+for (let i = 0; i < N; i++) {
+  const d = new Date(today); d.setDate(today.getDate() - (N - 1 - i));
+  const trend = 92 - i * (0.45 / 7);
+  const skip = rnd() < 0.18 && i < N - 1;
+  const water = (rnd() - 0.5) * 1.4 + (d.getDay() === 1 ? 0.35 : 0); // Monday after the weekend
+  days.push({ d, w: skip ? null : Math.round((trend + water) * 10) / 10 });
+}
+const avgAt = i => { let s = 0, n = 0; for (let k = Math.max(0, i - 6); k <= i; k++) if (days[k].w != null) { s += days[k].w; n++; } return n >= 3 ? s / n : null; };
+days.forEach((x, i) => x.a = avgAt(i));
+// Milestones per goal direction (none = no goal set: neutral numbers, no lines).
+const milestones = {
+  lose: [{ w: 89, l: 'BMI < 30' }, { w: 85, l: '' }, { w: 80, l: '' }, { w: 75, l: 'Goal' }],
+  gain: [{ w: 90, l: '' }, { w: 92, l: 'Goal' }],
+  none: [],
+};
+let dir = 'lose';
+const fmt = v => v.toFixed(1);
+const sgn = v => (v > 0 ? '+' : v < 0 ? '−' : '±') + Math.abs(v).toFixed(1);
+const fmtD = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const fmtW = d => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+const last = days[N - 1], lastW = [...days].reverse().find(x => x.w != null);
+const first = days.find(x => x.w != null);
+const avgNow = last.a, wk = avgNow - days[N - 8].a;
+const rate = (avgNow - days[N - 22].a) / 3; // kg/week over the last 3 weeks
+
+// Colour only says something when there is a goal: toward = emerald, away = amber.
+const cls = d => dir === 'none' ? 'neutral' : ((dir === 'lose' ? d <= 0 : d >= 0) ? 'toward' : 'away');
+const delta = (d, unit = ' kg') => `<span class="delta ${cls(d)}">${sgn(d)}${unit}</span>`;
+
+function nextMilestone() {
+  if (dir === 'lose') return milestones.lose.find(g => g.w < avgNow);
+  if (dir === 'gain') return milestones.gain.find(g => g.w > avgNow);
+  return null;
+}
+
+function render() {
+  const next = nextMilestone();
+  const toward = next && (dir === 'lose' ? rate < 0 : rate > 0);
+  const eta = toward ? Math.round(Math.abs(avgNow - next.w) / Math.abs(rate)) : null;
+
+  // --- cards ---
+  const milestoneCard = next
+    ? `<div class="l">Next milestone</div>
+       <div class="v num">${next.w} kg <span class="s" style="font-weight:600">${next.l ? '· ' + next.l : ''}</span></div>
+       <div class="s num">${fmt(Math.abs(avgNow - next.w))} kg to go${eta ? ' · ~' + eta + ' weeks at this pace' : ''}</div>`
+    : `<div class="l">Goal</div><div class="v" style="font-size:1rem;color:var(--muted)">No goal set</div>
+       <div class="s" style="color:var(--indigo);font-weight:700">Set a goal weight →</div>`;
+  const cards = `
+    <div class="wcard hero"><div class="l">7-day average</div>
+      <div class="v num">${fmt(avgNow)} kg</div>
+      <div class="s num">${delta(wk)} vs. last week</div></div>
+    <div class="wcard"><div class="l">Latest</div><div class="v num">${fmt(lastW.w)} kg</div><div class="s">Today, ${fmtD(lastW.d)}</div></div>
+    <div class="wcard"><div class="l">Since start</div><div class="v num">${delta(avgNow - first.w)}</div><div class="s num">from ${fmt(first.w)} kg · ${fmtD(first.d)}</div></div>
+    <div class="wcard" style="grid-column:1/-1">${milestoneCard}</div>`;
+  document.querySelectorAll('[data-cards]').forEach(el => el.innerHTML = cards);
+
+  // --- chart ---
+  const W = 300, H = 190, L = 30, R = 8, T = 10, B = 22;
+  const ws = days.filter(x => x.w != null).map(x => x.w);
+  const shown = milestones[dir];
+  let lo = Math.floor(Math.min(...ws, ...(next ? [next.w] : [])) - 0.5);
+  let hi = Math.ceil(Math.max(...ws, ...(next ? [next.w] : [])) + 0.5);
+  const X = i => L + i / (N - 1) * (W - L - R);
+  const Y = w => T + (hi - w) / (hi - lo) * (H - T - B);
+  let s = '';
+  for (let g = lo; g <= hi; g += (hi - lo > 8 ? 2 : 1)) {
+    s += `<line x1="${L}" x2="${W - R}" y1="${Y(g).toFixed(1)}" y2="${Y(g).toFixed(1)}" stroke="var(--line)"/>`;
+    s += `<text x="${L - 5}" y="${(Y(g) + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)" font-family="Figtree">${g}</text>`;
+  }
+  shown.filter(g => g.w >= lo && g.w <= hi).forEach(g => {
+    s += `<line x1="${L}" x2="${W - R}" y1="${Y(g.w).toFixed(1)}" y2="${Y(g.w).toFixed(1)}" stroke="var(--emerald)" stroke-width="1.3" stroke-dasharray="4 3"/>`;
+    // Label sits just above its line, right-aligned inside the plot.
+    s += `<text x="${W - R}" y="${(Y(g.w) - 4).toFixed(1)}" text-anchor="end" font-size="9" font-weight="700" fill="var(--emerald)" font-family="Figtree">${g.w} kg${g.l ? ' · ' + g.l : ''}</text>`;
+  });
+  days.forEach((x, i) => { if (x.w != null && i < N - 1) s += `<circle cx="${X(i).toFixed(1)}" cy="${Y(x.w).toFixed(1)}" r="2" fill="var(--taupe)" opacity=".55"/>`; });
+  const pts = days.map((x, i) => x.a == null ? null : `${X(i).toFixed(1)},${Y(x.a).toFixed(1)}`).filter(Boolean).join(' ');
+  s += `<polyline points="${pts}" fill="none" stroke="var(--indigo)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s += `<circle cx="${X(N - 1).toFixed(1)}" cy="${Y(lastW.w).toFixed(1)}" r="3.6" fill="var(--indigo)"/>`;
+  [0, 42, 83].forEach((i, k) => s += `<text x="${X(i).toFixed(1)}" y="${H - 6}" font-size="9" fill="var(--muted)" font-family="Figtree" text-anchor="${k === 0 ? 'start' : k === 2 ? 'end' : 'middle'}">${fmtD(days[i].d)}</text>`);
+  document.querySelectorAll('[data-chart]').forEach(el => el.innerHTML = s);
+  const legend = `<span><i style="width:7px;height:7px;border-radius:50%;background:var(--taupe);opacity:.55"></i>Weigh-in</span>
+    <span><i style="width:14px;height:3px;border-radius:2px;background:var(--indigo)"></i>7-day average</span>` +
+    (shown.length ? `<span><i style="width:14px;height:0;border-top:2px dashed var(--emerald)"></i>Milestones</span>` : '');
+  document.querySelectorAll('[data-legend]').forEach(el => el.innerHTML = legend);
+
+  // --- weeks: calendar weeks (Mon–Sun), each the mean of its weigh-ins; tap opens the days ---
+  const dayIdx = d => Math.round((d - days[0].d) / 864e5);
+  const monday = new Date(today); monday.setDate(today.getDate() - (today.getDay() + 6) % 7);
+  const weeks = [];
+  for (let k = 0; k < 7; k++) {
+    const start = new Date(monday); start.setDate(monday.getDate() - 7 * k);
+    const ds = [];
+    for (let j = 0; j < 7; j++) {
+      const d = new Date(start); d.setDate(start.getDate() + j);
+      const i = dayIdx(d);
+      if (i > N - 1) break; // the current week ends today
+      ds.push({ d, w: i >= 0 ? days[i].w : null });
+    }
+    const ws7 = ds.filter(x => x.w != null).map(x => x.w);
+    weeks.push({ start, ds, mean: ws7.length ? ws7.reduce((a, b) => a + b) / ws7.length : null, current: k === 0 });
+  }
+  let rows = '';
+  weeks.slice(0, 6).forEach((w, k) => {
+    const prev = weeks[k + 1];
+    const end = new Date(w.start); end.setDate(w.start.getDate() + 6);
+    const ch = w.mean != null && prev && prev.mean != null ? w.mean - prev.mean : null;
+    const dayRows = w.ds.map((x, j) => `<div class="wday"><span>${fmtW(x.d)}</span><span class="num">${x.w != null ? fmt(x.w) + ' kg' : '<span style="color:var(--muted)">—</span>'}</span></div>`).reverse().join('');
+    rows += `<details class="wkd"${k === 1 ? ' open' : ''}><summary class="wk">
+        <span class="d">${fmtD(w.start)} – ${fmtD(end)}${w.current ? ' · so far' : ''}</span>
+        <span class="num"><b>${w.mean != null ? fmt(w.mean) + ' kg' : '—'}</b> ${ch != null ? delta(ch, '') : ''}
+        <span class="ms sm chev">expand_more</span></span></summary>
+        <div class="wdays">${dayRows}</div></details>`;
+  });
+  document.querySelectorAll('[data-weeks]').forEach(el => el.innerHTML = rows);
+
+  // --- day rows: the trend is the big number; today's weigh-in rides underneath ---
+  const big = `${fmt(avgNow)} kg <span style="color:var(--muted);font-weight:600;font-size:.78rem">7-day · ${delta(wk)} this week</span>`;
+  document.querySelector('[data-today-row]').innerHTML = big;
+  document.querySelector('[data-today-sub]').textContent = `Today ${fmt(lastW.w)} kg`;
+  document.querySelector('[data-avg-only]').innerHTML = big;
+  document.querySelector('[data-sheet-avg]').textContent = `${fmt(avgNow)} kg`;
+}
+
+document.querySelectorAll('#dirsw [data-dir]').forEach(b => b.addEventListener('click', () => {
+  dir = b.dataset.dir;
+  document.querySelectorAll('#dirsw [data-dir]').forEach(x => x.classList.toggle('on', x === b));
+  render();
+}));
+render();
+</script>
+</body></html>
