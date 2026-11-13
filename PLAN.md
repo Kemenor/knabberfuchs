@@ -682,8 +682,10 @@ Strategy:
   screen (matches to your foods, or AI estimates marked as such). Gemini BYOK removed.
   Also: tolerant ingredient parser, the OCR "Log to day" fixes, Share summary.
   **Full plan & decisions: `PLAN-ai-bridge-and-weight.md` Part A / C.**
-- **Phase 18 — Weight:** ✅ BUILT 2026-11-13 (unreleased) except Health weight
-  read/write (next). Schema v16 `body_measurements` (+ backup section and
+- **Phase 18 — Weight:** ✅ BUILT 2026-11-13 (unreleased; Health weight
+  read/write built, permission grant not yet tried on a device — the Play
+  health-permission declaration needs READ_WEIGHT / WRITE_WEIGHT added before
+  release). Schema v16 `body_measurements` (+ backup section and
   `weights.csv`), `domain/weight.dart`, `ui/weight/`. Behind a "Track weight" switch (off by
   default): weigh-ins (first of the day counts, or the one you choose), a Day-screen
   row + Weight sheet, Trends gets a Nutrition | Weight switch — 7-day average leads,

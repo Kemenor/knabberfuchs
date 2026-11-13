@@ -105,4 +105,25 @@ void main() {
       expect(await fresh.allBodyMeasurements(), isEmpty);
     },
   );
+
+  test('Health import dedupes by record id, removed ones stay out', () async {
+    final at = DateTime(2026, 11, 13, 6, 30);
+    expect(
+      await db.addHealthWeight(at: at, kg: 87.1, externalId: 'hc-9'),
+      isTrue,
+    );
+    expect(
+      await db.addHealthWeight(at: at, kg: 87.1, externalId: 'hc-9'),
+      isFalse,
+    );
+    final row = (await db.watchWeights().first).single;
+    expect((row.day, row.source), ('2026-11-13', MeasurementSource.health));
+
+    await db.removeWeight(row.id); // hidden, keeps its id
+    expect(
+      await db.addHealthWeight(at: at, kg: 87.1, externalId: 'hc-9'),
+      isFalse,
+    );
+    expect(await db.watchWeights().first, isEmpty);
+  });
 }

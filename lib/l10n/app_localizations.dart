@@ -2705,6 +2705,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No goal set — the numbers stay neutral'**
   String get weightGoalsEmpty;
+
+  /// Health section switch: import weigh-ins from the health store
+  ///
+  /// In en, this message translates to:
+  /// **'Read weight'**
+  String get settingsHealthWeightRead;
+
+  /// Subtitle of Read weight
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-ins from a scale or another app in {store}'**
+  String settingsHealthWeightReadSub(String store);
+
+  /// Health section switch: save weigh-ins typed in the app to the health store
+  ///
+  /// In en, this message translates to:
+  /// **'Write my weights'**
+  String get settingsHealthWeightWrite;
+
+  /// Subtitle of Write my weights
+  ///
+  /// In en, this message translates to:
+  /// **'Saves the weigh-ins you add here to {store}'**
+  String settingsHealthWeightWriteSub(String store);
+
+  /// Snackbar after turning on Read weight
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-ins from {store} now show up here'**
+  String healthWeightReadOn(String store);
+
+  /// Snackbar after turning on Write my weights
+  ///
+  /// In en, this message translates to:
+  /// **'New weigh-ins are saved to {store}'**
+  String healthWeightWriteOn(String store);
 }
 
 class _AppLocalizationsDelegate

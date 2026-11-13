@@ -10,6 +10,10 @@
     <!-- Activity budget adjustment (Phase 16, separate opt-in): read-only
          active energy for the "eat back your exercise" target shift. -->
     <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED"/>
+    <!-- Weight (Phase 18, separate opt-ins): read a scale's weigh-ins, write
+         the ones typed into the app. -->
+    <uses-permission android:name="android.permission.health.READ_WEIGHT"/>
+    <uses-permission android:name="android.permission.health.WRITE_WEIGHT"/>
 
     <application
         android:label="Knabberfuchs"

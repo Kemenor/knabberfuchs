@@ -171,6 +171,10 @@ final appStartupProvider = FutureProvider<void>((ref) async {
   await removeLegacyGeminiData(ref.read(dbProvider));
   await ref.read(offlinePackServiceProvider).syncStore();
   await ref.read(healthServiceProvider).refreshEnabled(ref.read(dbProvider));
+  // A scale's new weigh-ins (no-op unless Health "Read weight" is on).
+  unawaited(
+    importHealthWeights(ref.read(dbProvider), ref.read(healthServiceProvider)),
+  );
   // Fire-and-forget: photo GC must never delay or fail first paint.
   unawaited(ref.read(mealPhotoStoreProvider).sweepOrphans());
 });
@@ -845,3 +849,26 @@ class WeightRangeNotifier extends Notifier<WeightRange> {
 final weightRangeProvider = NotifierProvider<WeightRangeNotifier, WeightRange>(
   WeightRangeNotifier.new,
 );
+
+/// Health → "Read weight" / "Write my weights" (each also needs Track weight).
+final healthWeightReadProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('healthWeightRead')
+      .map((v) => v == 'true'),
+);
+
+final healthWeightWriteProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(dbProvider)
+      .watchSetting('healthWeightWrite')
+      .map((v) => v == 'true'),
+);
+
+/// Pull new weigh-ins from the health store, skipping the ones this app
+/// wrote (matched by its own package / bundle id).
+Future<int> importHealthWeights(AppDatabase db, HealthService health) async {
+  if (!health.weightReadEnabled) return 0;
+  final info = await PackageInfo.fromPlatform();
+  return health.importWeights(db, ownSourceId: info.packageName);
+}

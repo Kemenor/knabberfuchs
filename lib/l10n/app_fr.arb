@@ -473,5 +473,11 @@
   "weightGoalsSection": "Poids cibles",
   "weightGoalsHelp": "Votre objectif et les étapes en chemin. Le plus éloigné de votre tendance est l'objectif — en dessous, perdre compte comme un progrès ; au-dessus, prendre. Sans objectif, les chiffres restent neutres.",
   "weightGoalAdd": "Ajouter un poids cible",
-  "weightGoalsEmpty": "Aucun objectif — les chiffres restent neutres"
+  "weightGoalsEmpty": "Aucun objectif — les chiffres restent neutres",
+  "settingsHealthWeightRead": "Lire le poids",
+  "settingsHealthWeightReadSub": "Pesées d'une balance ou d'une autre app dans {store}",
+  "settingsHealthWeightWrite": "Enregistrer mes pesées",
+  "settingsHealthWeightWriteSub": "Enregistre dans {store} les pesées ajoutées ici",
+  "healthWeightReadOn": "Les pesées de {store} apparaissent maintenant ici",
+  "healthWeightWriteOn": "Les nouvelles pesées sont enregistrées dans {store}"
 }

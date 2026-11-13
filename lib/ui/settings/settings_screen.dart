@@ -103,8 +103,11 @@ class SettingsScreen extends ConsumerWidget {
                     title: Text(l10n.settingsTrackWeight),
                     subtitle: Text(l10n.settingsTrackWeightSub),
                     value: trackWeight,
-                    onChanged: (v) =>
-                        db.setSetting('trackWeight', v ? 'true' : null),
+                    onChanged: (v) async {
+                      await db.setSetting('trackWeight', v ? 'true' : null);
+                      // The Health weight switches follow this one.
+                      await ref.read(healthServiceProvider).refreshEnabled(db);
+                    },
                   ),
                   if (trackWeight)
                     ListTile(
@@ -188,6 +191,42 @@ class SettingsScreen extends ConsumerWidget {
                     value: energyRead,
                     onChanged: (v) => _toggleEnergyRead(context, ref, v),
                   ),
+                  if (trackWeight) ...[
+                    SwitchListTile(
+                      contentPadding: fuchsbauCardRowPadding,
+                      secondary: const Icon(Symbols.monitor_weight_rounded),
+                      title: Text(l10n.settingsHealthWeightRead),
+                      subtitle: Text(
+                        l10n.settingsHealthWeightReadSub(_healthStore()),
+                      ),
+                      value:
+                          ref.watch(healthWeightReadProvider).asData?.value ??
+                          false,
+                      onChanged: (v) => _toggleHealthWeight(
+                        context,
+                        ref,
+                        write: false,
+                        value: v,
+                      ),
+                    ),
+                    SwitchListTile(
+                      contentPadding: fuchsbauCardRowPadding,
+                      secondary: const Icon(Symbols.upload_rounded),
+                      title: Text(l10n.settingsHealthWeightWrite),
+                      subtitle: Text(
+                        l10n.settingsHealthWeightWriteSub(_healthStore()),
+                      ),
+                      value:
+                          ref.watch(healthWeightWriteProvider).asData?.value ??
+                          false,
+                      onChanged: (v) => _toggleHealthWeight(
+                        context,
+                        ref,
+                        write: true,
+                        value: v,
+                      ),
+                    ),
+                  ],
                   if (healthSync) ...[
                     const _HealthResyncTile(),
                     ListTile(
@@ -343,6 +382,51 @@ Future<void> _toggleEnergyRead(
   await db.setSetting('healthEnergyRead', 'true');
   await health.refreshEnabled(db);
   messenger.showAutoSnackBar(SnackBar(content: Text(l10n.healthEnergyReadOn)));
+}
+
+/// "Read weight" / "Write my weights" (Phase 18): separate grants, like the
+/// energy read-back. Turning reading on imports straight away.
+Future<void> _toggleHealthWeight(
+  BuildContext context,
+  WidgetRef ref, {
+  required bool write,
+  required bool value,
+}) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final l10n = AppLocalizations.of(context);
+  final db = ref.read(dbProvider);
+  final health = ref.read(healthServiceProvider);
+  final key = write ? 'healthWeightWrite' : 'healthWeightRead';
+
+  if (!value) {
+    await db.setSetting(key, null);
+    await health.refreshEnabled(db);
+    return;
+  }
+  if (!await health.isAvailable()) {
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.healthUnavailable(_healthStore()))),
+    );
+    return;
+  }
+  if (!await health.requestWeightPermission(write: write)) {
+    messenger.showAutoSnackBar(
+      SnackBar(content: Text(l10n.healthNoPermission(_healthStore()))),
+    );
+    return;
+  }
+  await db.setSetting(key, 'true');
+  await health.refreshEnabled(db);
+  if (!write) await importHealthWeights(db, health);
+  messenger.showAutoSnackBar(
+    SnackBar(
+      content: Text(
+        write
+            ? l10n.healthWeightWriteOn(_healthStore())
+            : l10n.healthWeightReadOn(_healthStore()),
+      ),
+    ),
+  );
 }
 
 Future<void> _toggleHealthSync(

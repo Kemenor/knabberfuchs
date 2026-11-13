@@ -75,19 +75,19 @@ class _WeightSheetState extends ConsumerState<WeightSheet> {
     final v = _parsed;
     if (v == null) return;
     final db = ref.read(dbProvider);
+    final health = ref.read(healthServiceProvider);
     final kg = unit.toKg(v);
+    final at = _at(_time);
     final editing = _editing;
-    if (editing != null) {
-      await db.updateWeight(
-        editing.id,
-        day: widget.day,
-        at: _at(_time),
-        kg: kg,
-      );
-    } else {
-      await db.addWeight(day: widget.day, at: _at(_time), kg: kg);
-    }
     if (mounted) Navigator.pop(context);
+    if (editing != null) {
+      await db.updateWeight(editing.id, day: widget.day, at: at, kg: kg);
+      // Health copy (with "Write my weights" on): replace it.
+      await health.maybeDeleteWeight(editing.measuredAt);
+    } else {
+      await db.addWeight(day: widget.day, at: at, kg: kg);
+    }
+    await health.maybeWriteWeight(at, kg);
   }
 
   void _startEdit(BodyMeasurement row, WeightUnit unit) {
@@ -108,13 +108,22 @@ class _WeightSheetState extends ConsumerState<WeightSheet> {
         _value.clear();
       });
     }
+    final health = ref.read(healthServiceProvider);
+    final manual = row.source == MeasurementSource.manual;
     await db.removeWeight(row.id);
+    // Made here → its Health copy goes too; from Health → only hidden here.
+    if (manual) await health.maybeDeleteWeight(row.measuredAt);
     messenger.showAutoSnackBar(
       SnackBar(
         content: Text(l10n.weightRemoved),
         action: SnackBarAction(
           label: l10n.actionUndo,
-          onPressed: () => db.restoreWeight(row),
+          onPressed: () async {
+            await db.restoreWeight(row);
+            if (manual) {
+              await health.maybeWriteWeight(row.measuredAt, row.value);
+            }
+          },
         ),
       ),
     );

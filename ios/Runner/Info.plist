@@ -76,9 +76,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Knabberfuchs uses the camera to scan product barcodes and nutrition labels so you can log food quickly.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Knabberfuchs reads calories and macros from Apple Health to keep your tracking in sync.</string>
+	<string>Knabberfuchs reads your active energy (to adjust your daily target) and your weigh-ins from Apple Health — only the ones you turn on in Settings.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>Knabberfuchs saves the calories and macros you log to Apple Health.</string>
+	<string>Knabberfuchs saves the calories and nutrients you log — and, if you turn it on, your weigh-ins — to Apple Health.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Knabberfuchs uses photos you choose to recognize meals and read nutrition labels so you can log food quickly.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

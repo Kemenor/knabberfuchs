@@ -1575,4 +1575,30 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get weightGoalsEmpty =>
       'Aucun objectif — les chiffres restent neutres';
+
+  @override
+  String get settingsHealthWeightRead => 'Lire le poids';
+
+  @override
+  String settingsHealthWeightReadSub(String store) {
+    return 'Pesées d\'une balance ou d\'une autre app dans $store';
+  }
+
+  @override
+  String get settingsHealthWeightWrite => 'Enregistrer mes pesées';
+
+  @override
+  String settingsHealthWeightWriteSub(String store) {
+    return 'Enregistre dans $store les pesées ajoutées ici';
+  }
+
+  @override
+  String healthWeightReadOn(String store) {
+    return 'Les pesées de $store apparaissent maintenant ici';
+  }
+
+  @override
+  String healthWeightWriteOn(String store) {
+    return 'Les nouvelles pesées sont enregistrées dans $store';
+  }
 }

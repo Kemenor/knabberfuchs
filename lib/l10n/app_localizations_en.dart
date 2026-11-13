@@ -1565,4 +1565,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weightGoalsEmpty => 'No goal set — the numbers stay neutral';
+
+  @override
+  String get settingsHealthWeightRead => 'Read weight';
+
+  @override
+  String settingsHealthWeightReadSub(String store) {
+    return 'Weigh-ins from a scale or another app in $store';
+  }
+
+  @override
+  String get settingsHealthWeightWrite => 'Write my weights';
+
+  @override
+  String settingsHealthWeightWriteSub(String store) {
+    return 'Saves the weigh-ins you add here to $store';
+  }
+
+  @override
+  String healthWeightReadOn(String store) {
+    return 'Weigh-ins from $store now show up here';
+  }
+
+  @override
+  String healthWeightWriteOn(String store) {
+    return 'New weigh-ins are saved to $store';
+  }
 }

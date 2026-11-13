@@ -473,5 +473,11 @@
   "weightGoalsSection": "Zielgewichte",
   "weightGoalsHelp": "Dein Ziel und die Etappen dorthin. Das am weitesten von deinem Trend entfernte ist das Ziel – liegt es darunter, zählt Abnehmen als Fortschritt, liegt es darüber, Zunehmen. Ohne Ziel bleiben die Zahlen neutral.",
   "weightGoalAdd": "Zielgewicht hinzufügen",
-  "weightGoalsEmpty": "Kein Ziel gesetzt – die Zahlen bleiben neutral"
+  "weightGoalsEmpty": "Kein Ziel gesetzt – die Zahlen bleiben neutral",
+  "settingsHealthWeightRead": "Gewicht lesen",
+  "settingsHealthWeightReadSub": "Wägungen einer Waage oder anderen App aus {store}",
+  "settingsHealthWeightWrite": "Meine Wägungen speichern",
+  "settingsHealthWeightWriteSub": "Speichert die hier eingetragenen Wägungen in {store}",
+  "healthWeightReadOn": "Wägungen aus {store} erscheinen jetzt hier",
+  "healthWeightWriteOn": "Neue Wägungen werden in {store} gespeichert"
 }

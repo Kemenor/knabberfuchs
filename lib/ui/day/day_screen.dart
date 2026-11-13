@@ -54,6 +54,11 @@ class _DayScreenState extends ConsumerState<DayScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ref.read(activeGroupProvider.notifier).refreshTimeout();
+      // A scale may have synced while the app was away.
+      importHealthWeights(
+        ref.read(dbProvider),
+        ref.read(healthServiceProvider),
+      );
     }
   }
 

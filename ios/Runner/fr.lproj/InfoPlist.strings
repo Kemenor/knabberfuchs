@@ -1,3 +1,3 @@
 "NSCameraUsageDescription" = "Knabberfuchs utilise l’appareil photo pour scanner les codes-barres et les étiquettes nutritionnelles des produits afin d’enregistrer rapidement vos aliments.";
-"NSHealthShareUsageDescription" = "Knabberfuchs lit les calories et les macros depuis Apple Santé pour garder votre suivi synchronisé.";
-"NSHealthUpdateUsageDescription" = "Knabberfuchs enregistre dans Apple Santé les calories et les macros que vous saisissez.";
+"NSHealthShareUsageDescription" = "Knabberfuchs lit votre énergie active (pour ajuster votre objectif du jour) et vos pesées depuis Apple Santé — uniquement ce que vous activez dans les réglages.";
+"NSHealthUpdateUsageDescription" = "Knabberfuchs enregistre dans Apple Santé les calories et nutriments saisis — et, si vous l'activez, vos pesées.";

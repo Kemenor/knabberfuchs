@@ -19,6 +19,11 @@ class HealthService {
   /// 'healthEnergyRead' setting) — a separate grant from write-sync.
   bool energyReadEnabled = false;
 
+  /// Weight opt-ins (Phase 18, separate grants): read a scale's weigh-ins
+  /// ('healthWeightRead'), write the ones typed in here ('healthWeightWrite').
+  bool weightReadEnabled = false;
+  bool weightWriteEnabled = false;
+
   /// Last write-sync outcome, for the debug menu's sync-status view only —
   /// sync errors are swallowed by design, so this is the one place they
   /// surface. In-memory, resets on app restart.
@@ -89,7 +94,18 @@ class HealthService {
   Future<void> refreshEnabled(AppDatabase db) async {
     enabled = (await db.getSetting('healthSync')) == 'true';
     energyReadEnabled = (await db.getSetting('healthEnergyRead')) == 'true';
-    if (enabled || energyReadEnabled) await _ensureConfigured();
+    // Weight follows the master "Track weight" switch too.
+    final track = (await db.getSetting('trackWeight')) == 'true';
+    weightReadEnabled =
+        track && (await db.getSetting('healthWeightRead')) == 'true';
+    weightWriteEnabled =
+        track && (await db.getSetting('healthWeightWrite')) == 'true';
+    if (enabled ||
+        energyReadEnabled ||
+        weightReadEnabled ||
+        weightWriteEnabled) {
+      await _ensureConfigured();
+    }
   }
 
   /// Active energy burned on [day] in kcal, via the platform aggregate API —
@@ -208,6 +224,102 @@ class HealthService {
           endTime: DateTime.now().add(const Duration(days: 1)),
         );
       }
+    } catch (_) {}
+  }
+
+  // ---------------- Weight ----------------
+
+  static const _weightTypes = [h.HealthDataType.WEIGHT];
+
+  /// Prompt for weight read or write access. Writing on iOS also needs read
+  /// (the plugin's delete runs a query — same as nutrition above).
+  Future<bool> requestWeightPermission({required bool write}) async {
+    await _ensureConfigured();
+    return _health.requestAuthorization(
+      _weightTypes,
+      permissions: [
+        write
+            ? (Platform.isIOS
+                  ? h.HealthDataAccess.READ_WRITE
+                  : h.HealthDataAccess.WRITE)
+            : h.HealthDataAccess.READ,
+      ],
+    );
+  }
+
+  static const _weightSyncedKey = 'healthWeightSyncedAt';
+
+  /// Import weigh-ins other apps (a scale) wrote since the last import — a
+  /// year back the first time. Deduped by the store's record id; records
+  /// this app wrote itself are skipped (they're already here), and ones
+  /// removed here stay hidden (their row keeps the id). Returns how many
+  /// were new; 0 on any failure.
+  Future<int> importWeights(
+    AppDatabase db, {
+    required String ownSourceId,
+  }) async {
+    if (!weightReadEnabled) return 0;
+    await _ensureConfigured();
+    final now = DateTime.now();
+    final last = int.tryParse(await db.getSetting(_weightSyncedKey) ?? '');
+    // A day of overlap: a scale may sync late; the id dedupes the overlap.
+    final since = last == null
+        ? DateTime(now.year - 1, now.month, now.day)
+        : DateTime.fromMillisecondsSinceEpoch(
+            last,
+          ).subtract(const Duration(days: 1));
+    try {
+      final points = await _health.getHealthDataFromTypes(
+        types: _weightTypes,
+        startTime: since,
+        endTime: now,
+      );
+      var added = 0;
+      for (final p in points) {
+        if (p.sourceId == ownSourceId) continue;
+        final v = p.value;
+        if (v is! h.NumericHealthValue) continue;
+        final kg = v.numericValue.toDouble();
+        if (kg <= 0 || p.uuid.isEmpty) continue;
+        final at = p.dateFrom.toLocal();
+        if (await db.addHealthWeight(at: at, kg: kg, externalId: p.uuid)) {
+          added++;
+        }
+      }
+      await db.setSetting(_weightSyncedKey, '${now.millisecondsSinceEpoch}');
+      return added;
+    } catch (_) {
+      return 0; // revoked / unavailable — try again next time
+    }
+  }
+
+  /// Write a weigh-in typed in here (no-op unless "Write my weights" is on).
+  Future<void> maybeWriteWeight(DateTime at, double kg) async {
+    if (!weightWriteEnabled) return;
+    await _ensureConfigured();
+    try {
+      await _health.writeHealthData(
+        value: kg,
+        type: h.HealthDataType.WEIGHT,
+        unit: h.HealthDataUnit.KILOGRAM,
+        startTime: at,
+        endTime: at,
+      );
+    } catch (_) {}
+  }
+
+  /// Remove the copy of a weigh-in this app wrote (the stores only let an
+  /// app delete its own records, so a scale's reading at the same moment is
+  /// safe).
+  Future<void> maybeDeleteWeight(DateTime at) async {
+    if (!weightWriteEnabled) return;
+    await _ensureConfigured();
+    try {
+      await _health.delete(
+        type: h.HealthDataType.WEIGHT,
+        startTime: at.subtract(const Duration(seconds: 1)),
+        endTime: at.add(const Duration(seconds: 1)),
+      );
     } catch (_) {}
   }
 

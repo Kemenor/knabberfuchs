@@ -907,5 +907,17 @@
   "weightGoalAdd": "Add a goal weight",
   "@weightGoalAdd": { "description": "Weight settings: add a goal / milestone" },
   "weightGoalsEmpty": "No goal set — the numbers stay neutral",
-  "@weightGoalsEmpty": { "description": "Weight settings: empty goal list" }
+  "@weightGoalsEmpty": { "description": "Weight settings: empty goal list" },
+  "settingsHealthWeightRead": "Read weight",
+  "@settingsHealthWeightRead": { "description": "Health section switch: import weigh-ins from the health store" },
+  "settingsHealthWeightReadSub": "Weigh-ins from a scale or another app in {store}",
+  "@settingsHealthWeightReadSub": { "description": "Subtitle of Read weight", "placeholders": { "store": { "type": "String" } } },
+  "settingsHealthWeightWrite": "Write my weights",
+  "@settingsHealthWeightWrite": { "description": "Health section switch: save weigh-ins typed in the app to the health store" },
+  "settingsHealthWeightWriteSub": "Saves the weigh-ins you add here to {store}",
+  "@settingsHealthWeightWriteSub": { "description": "Subtitle of Write my weights", "placeholders": { "store": { "type": "String" } } },
+  "healthWeightReadOn": "Weigh-ins from {store} now show up here",
+  "@healthWeightReadOn": { "description": "Snackbar after turning on Read weight", "placeholders": { "store": { "type": "String" } } },
+  "healthWeightWriteOn": "New weigh-ins are saved to {store}",
+  "@healthWeightWriteOn": { "description": "Snackbar after turning on Write my weights", "placeholders": { "store": { "type": "String" } } }
 }

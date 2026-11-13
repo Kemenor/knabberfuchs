@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+import '../../core/date_x.dart';
 import '../../domain/enums.dart';
 import '../../domain/search_query.dart';
 import 'tables.dart';
@@ -711,6 +712,31 @@ class AppDatabase extends _$AppDatabase {
       externalId: Value(externalId),
     ),
   );
+
+  /// Import one weigh-in from the health store unless its record id is
+  /// already here (visible or hidden). Returns whether it was new.
+  Future<bool> addHealthWeight({
+    required DateTime at,
+    required double kg,
+    required String externalId,
+  }) => transaction(() async {
+    final existing =
+        await (select(bodyMeasurements)..where(
+              (b) =>
+                  b.source.equalsValue(MeasurementSource.health) &
+                  b.externalId.equals(externalId),
+            ))
+            .getSingleOrNull();
+    if (existing != null) return false;
+    await addWeight(
+      day: DayKey.of(at),
+      at: at,
+      kg: kg,
+      source: MeasurementSource.health,
+      externalId: externalId,
+    );
+    return true;
+  });
 
   /// Edit a weigh-in made in the app (value and time; the day follows the
   /// time). A "counts" flag stays only if it still sits on the same day.

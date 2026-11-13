@@ -1573,4 +1573,30 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get weightGoalsEmpty =>
       'Kein Ziel gesetzt – die Zahlen bleiben neutral';
+
+  @override
+  String get settingsHealthWeightRead => 'Gewicht lesen';
+
+  @override
+  String settingsHealthWeightReadSub(String store) {
+    return 'Wägungen einer Waage oder anderen App aus $store';
+  }
+
+  @override
+  String get settingsHealthWeightWrite => 'Meine Wägungen speichern';
+
+  @override
+  String settingsHealthWeightWriteSub(String store) {
+    return 'Speichert die hier eingetragenen Wägungen in $store';
+  }
+
+  @override
+  String healthWeightReadOn(String store) {
+    return 'Wägungen aus $store erscheinen jetzt hier';
+  }
+
+  @override
+  String healthWeightWriteOn(String store) {
+    return 'Neue Wägungen werden in $store gespeichert';
+  }
 }
