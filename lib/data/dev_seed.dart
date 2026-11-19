@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 
 import '../core/date_x.dart';
 import '../domain/enums.dart';
+import '../domain/ocr_ingredient.dart' show normalizeOcrName;
 import 'db/database.dart';
 
 /// Debug-only sample data so the app can be explored / screenshotted with a
@@ -15,6 +16,10 @@ Future<void> maybeSeedDevData(AppDatabase db) async {
 
   // Weigh-ins exist for the weight views; they show only with Track weight.
   await seedDemoWeights(db);
+  await db.setSetting('trackWeight', 'true');
+  await db.setSetting('weightGoals', '[80.0,85.0]');
+  await db.setSetting('heightCm', '180');
+  await _seedAiFoods(db);
 
   // Default targets so the status colours + bars have something to read against:
   // a kcal range, a protein floor (min), and carb/fat ceilings (max).
@@ -125,6 +130,35 @@ Future<void> maybeSeedDevData(AppDatabase db) async {
   );
 
   await db.setSetting('devSeeded', '1');
+}
+
+/// Custom foods for exercising the AI-bridge matcher: the first three are
+/// remembered matches (OCR mapping), the rest are found only by search.
+Future<void> _seedAiFoods(AppDatabase db) async {
+  const foods = [
+    // name, kcal, protein, carbs, fat per 100 g; remembered match?
+    ('Chicken breast', 165.0, 31.0, 0.0, 3.6, true),
+    ('Basmati rice, cooked', 130.0, 2.7, 28.0, 0.3, true),
+    ('Red kidney beans, canned', 100.0, 7.0, 13.0, 0.5, true),
+    ('Beef mince 5%', 137.0, 21.0, 0.0, 5.0, false),
+    ('Chopped tomatoes, canned', 21.0, 1.1, 3.5, 0.2, false),
+    ('Onion', 40.0, 1.1, 9.0, 0.1, false),
+    ('Olive oil', 884.0, 0.0, 0.0, 100.0, false),
+    ('Greek yogurt 2%', 73.0, 10.0, 3.9, 2.0, false),
+  ];
+  for (final (name, kcal, p, c, f, remembered) in foods) {
+    final id = await db.upsertFood(
+      FoodsCompanion.insert(
+        source: FoodSource.custom,
+        name: name,
+        kcal100: kcal,
+        protein100: Value(p),
+        carb100: Value(c),
+        fat100: Value(f),
+      ),
+    );
+    if (remembered) await db.setOcrMapping(normalizeOcrName(name), id);
+  }
 }
 
 /// A history day as a single snapshot entry totalling exactly [kcal]
