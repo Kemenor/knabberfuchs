@@ -9,3 +9,9 @@
 -dontwarn com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 -dontwarn com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions$Builder
 -dontwarn com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
+
+# ML Kit (barcode scanner, text recognition) finds its components by
+# reflection: R8 must keep the registrars' no-arg constructors, or the
+# scanner and OCR fail at runtime with NoSuchMethodException <init>.
+-keep class * implements com.google.firebase.components.ComponentRegistrar { <init>(); }
+-keep class com.google.mlkit.**.*Registrar { <init>(); }

@@ -76,8 +76,15 @@ android {
             // release only). The APK is dominated by bundled ML models, so the
             // code-shrink savings are negligible. Re-enable with full keep rules
             // (mobile_scanner, CameraX, ML Kit, drift, …) if going to the Store.
-            isMinifyEnabled = false
-            isShrinkResources = false
+            // R8: shrink + obfuscate the Java/Kotlin side (Play flags DEX
+            // obfuscation under 25%). Plugins ship their own consumer keep
+            // rules; ours are in proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

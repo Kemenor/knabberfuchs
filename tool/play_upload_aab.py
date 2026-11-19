@@ -32,6 +32,8 @@ from googleapiclient.http import MediaFileUpload
 KEY = 'fastlane/play-store-key.json'
 PKG = 'ch.knabberfuchs.app'
 AAB = 'build/app/outputs/bundle/release/app-release.aab'
+# R8's mapping for the same build — Play needs it to de-obfuscate crash stacks.
+MAPPING = 'build/app/outputs/mapping/release/mapping.txt'
 META = 'fastlane/metadata/android'
 # One or more tracks (the AAB is uploaded once, then assigned to each). Track
 # names with spaces (e.g. a custom closed track "Google Group - Alpha") must be
@@ -97,6 +99,14 @@ def main():
                     print('  %d%%' % int(status.progress() * 100))
             vc = resp['versionCode']
             print('uploaded versionCode %s' % vc)
+            if os.path.isfile(MAPPING):
+                svc.edits().deobfuscationfiles().upload(
+                    packageName=PKG, editId=edit_id, apkVersionCode=vc,
+                    deobfuscationFileType='proguard',
+                    media_body=MediaFileUpload(
+                        MAPPING, mimetype='application/octet-stream')
+                ).execute()
+                print('uploaded R8 mapping for versionCode %s' % vc)
 
         notes = release_notes(vc)
         name = release_name()
