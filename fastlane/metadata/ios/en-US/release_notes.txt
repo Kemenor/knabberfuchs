@@ -1,4 +1,4 @@
-• Use your own AI app — Claude, ChatGPT, Gemini … — no key needed: tap ⚡ → "Paste from your AI app", copy the prompt, describe or snap your meal, then paste back the answer
+• Use your own AI app — Claude, ChatGPT, Gemini … — no key needed: tap the lightning button → "Paste from your AI app", copy the prompt, describe or snap your meal, then paste back the answer
 • The built-in Gemini option and its API key are gone — your AI app does it now
 • Paste any ingredient list to save it as a recipe or log it
 • New: weight tracking (Settings → Track weight) — weigh-ins, 7-day average, trend and goals, synced with Apple Health

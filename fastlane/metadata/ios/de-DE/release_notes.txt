@@ -1,4 +1,4 @@
-• Deine eigene KI-App – Claude, ChatGPT, Gemini … – ohne Schlüssel: ⚡ → „Aus deiner KI-App einfügen“, Prompt kopieren, Mahlzeit beschreiben oder fotografieren, Antwort einfügen
+• Deine eigene KI-App – Claude, ChatGPT, Gemini … – ohne Schlüssel: Blitz-Knopf → „Aus deiner KI-App einfügen“, Prompt kopieren, Mahlzeit beschreiben oder fotografieren, Antwort einfügen
 • Die eingebaute Gemini-Option samt API-Schlüssel entfällt
 • Zutatenlisten einfügen, um sie als Rezept zu speichern oder einzutragen
 • Neu: Gewicht (Einstellungen → Gewicht erfassen) – Wiegungen, 7-Tage-Schnitt, Verlauf und Ziele, abgeglichen mit Apple Health
