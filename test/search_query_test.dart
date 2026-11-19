@@ -55,9 +55,10 @@ void main() {
       ['olive'],
       ['oil'],
     ]);
-    // Synonym-introduced tokens exist only folded.
+    // A one-word alias keeps the typed word as a spelling, so a custom
+    // "Rocket salad" still matches alongside USDA "arugula".
     expect(searchTokenVariants('rocket'), [
-      ['arugula'],
+      ['arugula', 'rocket'],
     ]);
   });
 }

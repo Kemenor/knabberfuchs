@@ -70,9 +70,22 @@ List<List<String>> searchTokenVariants(String raw) {
           .where((t) => t.isNotEmpty)) {
     byFold.putIfAbsent(foldDiacritics(t), () => t);
   }
+  // A one-word alias adds a spelling, it doesn't replace the word: "mince"
+  // must still find a custom "Beef mince", not only USDA "ground" beef.
+  final aliasOf = <String, Set<String>>{};
+  for (final t in byFold.keys) {
+    final alias = kSearchSynonyms[t];
+    if (alias != null && !alias.contains(' ')) {
+      (aliasOf[alias] ??= {}).add(t);
+    }
+  }
   return [
     for (final t in searchTokens(raw))
-      [t, if (byFold[t] != null && byFold[t] != t) byFold[t]!],
+      {
+        t,
+        if (byFold[t] != null && byFold[t] != t) byFold[t]!,
+        ...?aliasOf[t],
+      }.toList(),
   ];
 }
 

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/enums.dart';
+import '../../domain/search_query.dart' show kSearchSynonyms;
 import '../../domain/text_fold.dart';
 import '../db/database.dart';
 import '../offline/region_pack_store.dart';
@@ -60,25 +61,66 @@ class FoodRepository {
   /// beans, drained", "lean beef mince") — the review screen offers it, it is
   /// never applied silently. Local search needs every word to match, so long
   /// recipe names often find nothing as a whole; then the most specific words
-  /// are tried alone, longest first, skipping preparation words.
+  /// are tried alone, skipping preparation words. A hit found that way must
+  /// share more than half of the name's words: "chili powder" is better left
+  /// for the user to pick than guessed as "Chocolate powder".
   Future<Food?> suggestFor(String name) async {
     final whole = await searchLocal(name);
-    if (whole.isNotEmpty) return whole.first;
-    final words =
-        name
-            .toLowerCase()
-            .split(RegExp(r"[^\p{L}\p{N}]+", unicode: true))
-            .where(
-              (w) => w.length >= 3 && !_prepWords.contains(foldDiacritics(w)),
-            )
-            .toSet()
-            .toList()
-          ..sort((a, b) => b.length.compareTo(a.length));
-    for (final w in words.take(3)) {
-      final hits = await searchLocal(w);
-      if (hits.isNotEmpty) return hits.first;
+    if (whole.isNotEmpty) {
+      // A food named exactly like the ingredient beats a shorter or more
+      // used one that merely contains its words.
+      final key = _nameKey(name);
+      return whole.firstWhere(
+        (f) => _nameKey(f.name) == key,
+        orElse: () => whole.first,
+      );
     }
-    return null;
+    final words = _significantWords(name);
+    if (words.isEmpty) return null;
+    final byLength = [...words]..sort((a, b) => b.length.compareTo(a.length));
+    Food? best;
+    var bestShared = 0;
+    for (final w in byLength.take(3)) {
+      for (final f in (await searchLocal(w)).take(10)) {
+        final shared = _sharedWords(words, f);
+        if (shared > bestShared) {
+          best = f;
+          bestShared = shared;
+        }
+      }
+    }
+    return bestShared * 2 > words.length ? best : null;
+  }
+
+  static String _nameKey(String s) => foldDiacritics(
+    s.toLowerCase(),
+  ).replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
+
+  /// The words that say what the food is: 3+ letters, no preparation words.
+  static List<String> _significantWords(String name) =>
+      foldDiacritics(name.toLowerCase())
+          .split(RegExp(r'[^a-z0-9]+'))
+          .where((w) => w.length >= 3 && !_prepWords.contains(w))
+          .toSet()
+          .toList();
+
+  /// How many of [words] the food's name or search text contains — under the
+  /// word itself, its one-word search alias, or its singular.
+  static int _sharedWords(List<String> words, Food f) {
+    final text = foldDiacritics(
+      '${f.name} ${f.searchText ?? ''}'.toLowerCase(),
+    );
+    var n = 0;
+    for (final w in words) {
+      final alias = kSearchSynonyms[w];
+      final singular = w.endsWith('s') ? w.substring(0, w.length - 1) : w;
+      if (text.contains(w) ||
+          text.contains(singular) ||
+          (alias != null && text.contains(alias))) {
+        n++;
+      }
+    }
+    return n;
   }
 
   /// Words that describe preparation, not the food — useless on their own.
@@ -87,6 +129,8 @@ class FoodRepository {
     'cooked', 'raw', 'fresh', 'chopped', 'diced', 'sliced', 'drained',
     'grated', 'minced', 'lean', 'large', 'small', 'medium', 'boiled',
     'fried', 'roasted', 'frozen', 'canned', 'dried', 'peeled', 'whole',
+    'grilled', 'baked', 'steamed', 'tbsp', 'tsp', 'cup', 'cups', 'piece',
+    'pieces',
     'and', 'with', 'the',
     // de
     'gekocht', 'gekochte', 'gekochter', 'roh', 'rohe', 'frisch', 'frische',
