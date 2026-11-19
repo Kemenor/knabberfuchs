@@ -152,21 +152,39 @@ class _TaskTile extends ConsumerWidget {
     );
   }
 
-  Future<void> _copy(BuildContext context, WidgetRef ref) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final l10n = AppLocalizations.of(context);
-    final language = Localizations.localeOf(context).languageCode;
-    final text = buildAiInstructions(
-      task,
-      language: language,
-      kcal: CalorieTarget(
-        await ref.read(defaultMinProvider.future),
-        await ref.read(defaultMaxProvider.future),
-      ),
-      nutrients: await ref.read(macroDefaultsProvider.future),
-      tracked: await ref.read(trackedNutrientsProvider.future),
-    );
-    await Clipboard.setData(ClipboardData(text: text));
-    messenger.showAutoSnackBar(SnackBar(content: Text(l10n.aiCopied)));
-  }
+  Future<void> _copy(BuildContext context, WidgetRef ref) =>
+      copyAiInstructions(context, ref, task);
+}
+
+/// [task]'s instructions for the user's AI app, with their current targets,
+/// in the app's language.
+Future<String> aiInstructionsFor(
+  BuildContext context,
+  WidgetRef ref,
+  AiTask task,
+) async {
+  final language = Localizations.localeOf(context).languageCode;
+  return buildAiInstructions(
+    task,
+    language: language,
+    kcal: CalorieTarget(
+      await ref.read(defaultMinProvider.future),
+      await ref.read(defaultMaxProvider.future),
+    ),
+    nutrients: await ref.read(macroDefaultsProvider.future),
+    tracked: await ref.read(trackedNutrientsProvider.future),
+  );
+}
+
+/// Copies [task]'s instructions and confirms with a snackbar.
+Future<void> copyAiInstructions(
+  BuildContext context,
+  WidgetRef ref,
+  AiTask task,
+) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final l10n = AppLocalizations.of(context);
+  final text = await aiInstructionsFor(context, ref, task);
+  await Clipboard.setData(ClipboardData(text: text));
+  messenger.showAutoSnackBar(SnackBar(content: Text(l10n.aiCopied)));
 }

@@ -1038,6 +1038,23 @@ class AppLocalizationsIt extends AppLocalizations {
   String get aiCopied => 'Istruzioni copiate — incollale nella tua app di IA.';
 
   @override
+  String get aiCopyPrompt => 'Copia il prompt';
+
+  @override
+  String get aiPromptCopied => 'Prompt copiato';
+
+  @override
+  String get aiPasteHint => 'Qui arriva la risposta dell\'IA';
+
+  @override
+  String get aiPasteStepsLog =>
+      '1. Copia il prompt e mandalo alla tua app di IA con il tuo pasto — descrivilo o aggiungi una foto.\n2. Copia la risposta e torna qui — arriva qui sotto. Tocca Importa.';
+
+  @override
+  String get aiPasteStepsRecipe =>
+      '1. Copia il prompt e mandalo alla tua app di IA con la ricetta che vuoi.\n2. Copia la risposta e torna qui — arriva qui sotto. Tocca Importa. Va bene anche una lista di ingredienti o un codice ricetta.';
+
+  @override
   String get aiHowTo =>
       'Incollale una volta in un progetto Claude, nelle istruzioni personalizzate di ChatGPT o in un Gem — contengono i tuoi obiettivi attuali. Ricopiale se cambi i tuoi obiettivi.';
 

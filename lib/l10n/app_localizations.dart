@@ -1824,6 +1824,36 @@ abstract class AppLocalizations {
   /// **'Instructions copied — paste them into your AI app.'**
   String get aiCopied;
 
+  /// Button in the paste dialog copying the AI instructions (keep short)
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the prompt'**
+  String get aiCopyPrompt;
+
+  /// Button label right after the prompt was copied (keep short)
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt copied'**
+  String get aiPromptCopied;
+
+  /// Placeholder of the paste field in the Day paste-from-AI dialog
+  ///
+  /// In en, this message translates to:
+  /// **'The AI\'s answer lands here'**
+  String get aiPasteHint;
+
+  /// Two-step how-to in the Day paste-from-AI dialog
+  ///
+  /// In en, this message translates to:
+  /// **'1. Copy the prompt and send it to your AI app with your meal — describe it or add a photo.\n2. Copy its answer and come back — it lands below. Tap Import.'**
+  String get aiPasteStepsLog;
+
+  /// Two-step how-to in the Recipes paste dialog
+  ///
+  /// In en, this message translates to:
+  /// **'1. Copy the prompt and send it to your AI app with the recipe you want.\n2. Copy its answer and come back — it lands below. Tap Import. An ingredient list or a recipe code works too.'**
+  String get aiPasteStepsRecipe;
+
   /// How-to note under the instruction presets
   ///
   /// In en, this message translates to:

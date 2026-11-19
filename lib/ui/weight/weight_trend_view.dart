@@ -676,6 +676,10 @@ class _WeightChart extends StatelessWidget {
           lineTouchData: LineTouchData(
             touchTooltipData: LineTouchTooltipData(
               getTooltipColor: (_) => scheme.inverseSurface,
+              // Keep it inside the chart: above the box it ran past the card
+              // edge, which drew its border straight through the tooltip.
+              fitInsideHorizontally: true,
+              fitInsideVertically: true,
               getTooltipItems: (touched) => [
                 for (final s in touched)
                   LineTooltipItem(
@@ -719,6 +723,9 @@ class _WeekTile extends StatelessWidget {
         '${fmt.format(DayKey.parse(DayKey.shift(week.start, 6)))}';
     final change = week.change;
     return ExpansionTile(
+      // Remembers it's open when the list rebuilds or scrolls it away — e.g.
+      // the keyboard of the Weight sheet shrinking the page behind it.
+      key: PageStorageKey('weightWeek-${week.start}'),
       dense: true,
       visualDensity: VisualDensity.compact,
       shape: const Border(),

@@ -1039,6 +1039,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aiCopied => 'Anleitung kopiert – füge sie in deine KI-App ein.';
 
   @override
+  String get aiCopyPrompt => 'Prompt kopieren';
+
+  @override
+  String get aiPromptCopied => 'Prompt kopiert';
+
+  @override
+  String get aiPasteHint => 'Hier landet die Antwort der KI';
+
+  @override
+  String get aiPasteStepsLog =>
+      '1. Kopiere den Prompt und schick ihn mit deiner Mahlzeit an deine KI-App – beschreib sie oder häng ein Foto an.\n2. Kopiere die Antwort und komm zurück – sie landet unten. Tippe auf Importieren.';
+
+  @override
+  String get aiPasteStepsRecipe =>
+      '1. Kopiere den Prompt und schick ihn mit dem gewünschten Rezept an deine KI-App.\n2. Kopiere die Antwort und komm zurück – sie landet unten. Tippe auf Importieren. Eine Zutatenliste oder ein Rezept-Code geht auch.';
+
+  @override
   String get aiHowTo =>
       'Füge sie einmal in ein Claude-Projekt, die benutzerdefinierten Anweisungen von ChatGPT oder ein Gem ein – sie enthalten deine aktuellen Ziele. Kopiere sie neu, wenn du deine Ziele änderst.';
 
