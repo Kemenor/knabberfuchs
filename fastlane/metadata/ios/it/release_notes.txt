@@ -1,3 +1,4 @@
-• Le regioni offline ora si aggiornano da sole: all'apertura dell'app i dati prodotto più recenti dei paesi scaricati vengono recuperati automaticamente, al massimo una volta al giorno
-• Solo con Wi-Fi per impostazione predefinita — modificabile in Impostazioni → Dati alimentari → "Aggiornamento automatico regioni offline" (Wi-Fi e dati mobili, oppure disattivato)
-• Regioni offline: un pulsante aggiorna tutti i paesi non aggiornati, e ogni paese mostra quando i suoi dati sono stati aggiornati
+• La tua app di IA — Claude, ChatGPT, Gemini … — senza chiave: ⚡ → «Incolla dalla tua app di IA», copia il prompt, descrivi o fotografa il pasto, poi incolla la risposta
+• L'opzione Gemini integrata e la sua chiave API non ci sono più
+• Incolla una lista di ingredienti per salvarla come ricetta o registrarla
+• Novità: peso (Impostazioni → Monitora il peso) — pesate, media a 7 giorni, andamento e obiettivi, sincronizzati con Salute

@@ -1,3 +1,4 @@
-• Offline regions now keep themselves up to date: when you open the app, newer product data for the countries you downloaded is fetched automatically, at most once a day
-• Wi-Fi only by default — change it in Settings → Food data → "Auto-update offline regions" (Wi-Fi and mobile data, or off)
-• Offline regions: one button updates every outdated country, and each country shows when its data was last updated
+• Use your own AI app — Claude, ChatGPT, Gemini … — no key needed: tap ⚡ → "Paste from your AI app", copy the prompt, describe or snap your meal, then paste back the answer
+• The built-in Gemini option and its API key are gone — your AI app does it now
+• Paste any ingredient list to save it as a recipe or log it
+• New: weight tracking (Settings → Track weight) — weigh-ins, 7-day average, trend and goals, synced with Apple Health

@@ -1,0 +1,4 @@
+• Votre propre app d'IA — Claude, ChatGPT, Gemini … — sans clé : ⚡ → « Coller depuis votre app d'IA », copiez le prompt, décrivez ou photographiez le repas, puis partagez ou collez la réponse
+• L'option Gemini intégrée et sa clé API disparaissent
+• Collez ou partagez une liste d'ingrédients pour en faire une recette ou la noter
+• Nouveau : poids (Réglages → Suivre le poids) — pesées, moyenne sur 7 jours, tendance et objectifs, synchronisés avec Health Connect

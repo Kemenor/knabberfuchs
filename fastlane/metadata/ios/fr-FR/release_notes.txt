@@ -1,3 +1,4 @@
-• Les régions hors ligne se mettent désormais à jour toutes seules : à l'ouverture de l'app, les données produits plus récentes de vos pays téléchargés sont récupérées automatiquement, au plus une fois par jour
-• En Wi-Fi uniquement par défaut — modifiable dans Réglages → Données alimentaires → « Mise à jour auto des régions hors ligne » (Wi-Fi et données mobiles, ou désactivée)
-• Régions hors ligne : un bouton met à jour tous les pays obsolètes, et chaque pays indique la date de ses données
+• Votre propre app d'IA — Claude, ChatGPT, Gemini … — sans clé : ⚡ → « Coller depuis votre app d'IA », copiez le prompt, décrivez ou photographiez le repas, puis collez la réponse
+• L'option Gemini intégrée et sa clé API disparaissent
+• Collez une liste d'ingrédients pour en faire une recette ou la noter
+• Nouveau : poids (Réglages → Suivre le poids) — pesées, moyenne sur 7 jours, tendance et objectifs, synchronisés avec Apple Santé

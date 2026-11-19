@@ -1,0 +1,4 @@
+• La tua app di IA — Claude, ChatGPT, Gemini … — senza chiave: ⚡ → «Incolla dalla tua app di IA», copia il prompt, descrivi o fotografa il pasto, poi condividi o incolla la risposta
+• L'opzione Gemini integrata e la sua chiave API non ci sono più
+• Incolla o condividi una lista di ingredienti per salvarla come ricetta o registrarla
+• Novità: peso (Impostazioni → Monitora il peso) — pesate, media a 7 giorni, andamento e obiettivi, sincronizzati con Health Connect
